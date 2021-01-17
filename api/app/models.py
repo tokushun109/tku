@@ -8,6 +8,9 @@ class Product(models.Model):
     '''
     商品のモデル
     '''
+    class Meta:
+        verbose_name_plural = '商品'
+
     # uuid
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     # 名前
