@@ -12,5 +12,6 @@ django-cors-headers = "*"
 [requires]
 python_version = "3.9"
 
-[script]
+[scripts]
 start = "python manage.py runserver"
+
