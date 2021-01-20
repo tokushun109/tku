@@ -5,10 +5,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue } from 'nuxt-property-decorator'
 
 @Component({
-    components: {},
+    head: {
+        title: 'head title',
+    },
 })
 export default class LayoutDefault extends Vue {}
 </script>
