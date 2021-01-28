@@ -5,7 +5,7 @@ from .models import Product, AccessoryCategory
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ('uuid', 'name', 'description')
+        fields = ('uuid', 'name', 'description', 'accessory_category')
 
 
 class AccessoryCategorySerializer(serializers.ModelSerializer):
