@@ -1,13 +1,29 @@
-from rest_framework import viewsets
-from .serializers import ProductSerializer, AccessoryCategorySerializer
+from rest_framework import generics
+
 from .models import Product, AccessoryCategory
+from .serializers import ProductSerializer, AccessoryCategorySerializer
 
 
-class ProductsViewSet(viewsets.ModelViewSet):
-    serializer_class = ProductSerializer
+class ProductListAPIView(generics.ListAPIView):
+    '''
+    商品モデルの取得(一覧)APIクラス
+    '''
+
     queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+class ProductRetrieveAPIView(generics.RetrieveAPIView):
+    '''
+    商品モデルの取得(詳細)APIクラス
+    '''
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
 
 
-class AccessoryCategoryViewSet(viewsets.ModelViewSet):
-    serializer_class = AccessoryCategorySerializer
+class AccessoryListAPIView(generics.ListAPIView):
+    '''
+    アクセサリーカテゴリーモデルの取得(一覧)APIクラス
+    '''
+
     queryset = AccessoryCategory.objects.all()
+    serializer_class = AccessoryCategorySerializer
