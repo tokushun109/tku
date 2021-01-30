@@ -1,7 +1,7 @@
 from rest_framework import generics
 
-from .models import Product, AccessoryCategory, MaterialCategory
-from .serializers import ProductSerializer, AccessoryCategorySerializer, MaterialCategorySerializer
+from .models import Product, AccessoryCategory, MaterialCategory, SalesSite
+from .serializers import ProductSerializer, AccessoryCategorySerializer, MaterialCategorySerializer, SalesSiteSerializer
 
 
 class ProductListAPIView(generics.ListAPIView):
@@ -31,3 +31,10 @@ class MaterialCategoryListAPIView(generics.ListAPIView):
     '''
     queryset = MaterialCategory.objects.all()
     serializer_class = MaterialCategorySerializer
+
+class SalesSiteListAPIView(generics.ListAPIView):
+    '''
+    アクセサリーカテゴリーモデルの取得(一覧)APIクラス
+    '''
+    queryset = SalesSite.objects.all()
+    serializer_class = SalesSiteSerializer

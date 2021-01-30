@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Product, AccessoryCategory, MaterialCategory
+from .models import Product, AccessoryCategory, MaterialCategory, SalesSite
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -16,4 +16,9 @@ class AccessoryCategorySerializer(serializers.ModelSerializer):
 class MaterialCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = MaterialCategory
+        fields = ('id', 'name')
+
+class SalesSiteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SalesSite
         fields = ('id', 'name')
