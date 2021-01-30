@@ -10,10 +10,7 @@ class AccessoryCategory(models.Model):
     '''
     class Meta:
         verbose_name_plural = 'アクセサリーカテゴリー'
-        ordering = ['created_at']
 
-    # uuid
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     # 名前
     name = models.CharField('アクセサリーカテゴリー名', max_length=120)
     # 作成日
@@ -32,10 +29,7 @@ class MaterialCategory(models.Model):
     '''
     class Meta:
         verbose_name_plural = '材料カテゴリー'
-        ordering = ['created_at']
 
-    # uuid
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     # 名前
     name = models.CharField('材料カテゴリー名', max_length=120)
     # 作成日
