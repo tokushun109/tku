@@ -26,6 +26,28 @@ class AccessoryCategory(models.Model):
     def __str__(self):
         return self.name
 
+class MaterialCategory(models.Model):
+    '''
+    材料カテゴリーモデル
+    '''
+    class Meta:
+        verbose_name_plural = '材料カテゴリー'
+        ordering = ['created_at']
+
+    # uuid
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+    # 名前
+    name = models.CharField('材料カテゴリー名', max_length=120)
+    # 作成日
+    created_at = models.DateTimeField(
+        '作成日', auto_now_add=True)
+    # 更新日
+    updated_at = models.DateTimeField(
+        '更新日', auto_now=True)
+
+    def __str__(self):
+        return self.name
+
 class Product(models.Model):
     '''
     商品のモデル
@@ -43,6 +65,8 @@ class Product(models.Model):
     # アクセサリーカテゴリー
     accessory_category = models.ForeignKey(
         AccessoryCategory, verbose_name='アクセサリーカテゴリー', on_delete=models.SET_NULL, null=True)
+    # 材料カテゴリー
+    material_category = models.ManyToManyField(MaterialCategory, verbose_name='材料カテゴリー', null=True)
     # 作成日
     created_at = models.DateTimeField(
         '作成日', auto_now_add=True)
