@@ -42,6 +42,27 @@ class MaterialCategory(models.Model):
     def __str__(self):
         return self.name
 
+class SalesSite(models.Model):
+    '''
+    販売サイトモデル
+    '''
+    class Meta:
+        verbose_name_plural = '販売サイト'
+
+    # 名前
+    name = models.CharField('材料カテゴリー名', max_length=120)
+    # url
+    url = models.URLField('販売サイトURL', max_length=200, null=False)
+    # 作成日
+    created_at = models.DateTimeField(
+        '作成日', auto_now_add=True)
+    # 更新日
+    updated_at = models.DateTimeField(
+        '更新日', auto_now=True)
+
+    def __str__(self):
+        return self.name
+
 class Product(models.Model):
     '''
     商品のモデル
@@ -61,6 +82,8 @@ class Product(models.Model):
         AccessoryCategory, verbose_name='アクセサリーカテゴリー', on_delete=models.SET_NULL, null=True)
     # 材料カテゴリー
     material_category = models.ManyToManyField(MaterialCategory, verbose_name='材料カテゴリー', null=True)
+    # 販売サイト
+    sales_site = models.ManyToManyField(SalesSite, verbose_name='販売サイト', null=True)
     # 作成日
     created_at = models.DateTimeField(
         '作成日', auto_now_add=True)
