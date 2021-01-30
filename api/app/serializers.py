@@ -21,4 +21,4 @@ class MaterialCategorySerializer(serializers.ModelSerializer):
 class SalesSiteSerializer(serializers.ModelSerializer):
     class Meta:
         model = SalesSite
-        fields = ('id', 'name')
+        fields = ('id', 'name', 'url')
