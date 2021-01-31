@@ -1,11 +1,11 @@
 from rest_framework import serializers
-from .models import Product, AccessoryCategory, MaterialCategory, SalesSite
+from .models import Product, AccessoryCategory, MaterialCategory, SalesSite, ProductImage
 
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ('uuid', 'name', 'description', 'accessory_category')
+        fields = ('uuid', 'name', 'description', 'accessory_category', 'material_category', 'product_image', 'sales_site')
 
 
 class AccessoryCategorySerializer(serializers.ModelSerializer):
@@ -22,3 +22,8 @@ class SalesSiteSerializer(serializers.ModelSerializer):
     class Meta:
         model = SalesSite
         fields = ('id', 'name', 'url')
+
+class ProductImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductImage
+        fields = ('uuid', 'name', 'image')
