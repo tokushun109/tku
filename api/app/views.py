@@ -27,14 +27,14 @@ class AccessoryCategoryListAPIView(generics.ListAPIView):
 
 class MaterialCategoryListAPIView(generics.ListAPIView):
     '''
-    アクセサリーカテゴリーモデルの取得(一覧)APIクラス
+    材料カテゴリーモデルの取得(一覧)APIクラス
     '''
     queryset = MaterialCategory.objects.all()
     serializer_class = MaterialCategorySerializer
 
 class SalesSiteListAPIView(generics.ListAPIView):
     '''
-    アクセサリーカテゴリーモデルの取得(一覧)APIクラス
+    販売サイトモデルの取得(一覧)APIクラス
     '''
     queryset = SalesSite.objects.all()
     serializer_class = SalesSiteSerializer

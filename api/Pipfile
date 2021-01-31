@@ -7,6 +7,7 @@ name = "pypi"
 django-rest-framework = "*"
 django-cors-headers = "*"
 pymysql = "*"
+pillow = "*"
 
 [dev-packages]
 
