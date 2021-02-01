@@ -76,7 +76,7 @@ class ProductImage(models.Model):
     # 商品画像名
     name = models.CharField('商品画像名', max_length=120)
     # 商品画像
-    image = models.ImageField(upload_to='images/')
+    image = models.ImageField(verbose_name='商品画像',upload_to='images/')
     # 作成日
     created_at = models.DateTimeField(
         '作成日', auto_now_add=True)
@@ -111,6 +111,72 @@ class Product(models.Model):
         ProductImage, verbose_name='商品画像', on_delete=models.SET_NULL, null=True)
     # 販売サイト
     sales_site = models.ManyToManyField(SalesSite, verbose_name='販売サイト', null=True)
+    # 作成日
+    created_at = models.DateTimeField(
+        '作成日', auto_now_add=True)
+    # 更新日
+    updated_at = models.DateTimeField(
+        '更新日', auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+class ProducerProfile(models.Model):
+    '''
+    製作者プロフィールのモデル
+    '''
+    class Meta:
+        verbose_name_plural = '製作者'
+        ordering = ['created_at']
+
+    # 製作者名
+    name = models.CharField('製作者名', max_length=120, primary_key=True)
+    # 紹介
+    introduction = models.TextField('製作者の紹介')
+    # 製作者のロゴ
+    logo = models.ImageField(verbose_name='ロゴ', upload_to='images/')
+    # 作成日
+    created_at = models.DateTimeField(
+        '作成日', auto_now_add=True)
+    # 更新日
+    updated_at = models.DateTimeField(
+        '更新日', auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+class SkillMarket(models.Model):
+    '''
+    スキルマーケットモデル
+    '''
+    class Meta:
+        verbose_name_plural = 'スキルマーケット'
+
+    # スキルマーケット名
+    name = models.CharField('スキルマーケット名', max_length=120)
+    # url
+    url = models.URLField('スキルマーケットURL', max_length=200, null=False)
+    # 作成日
+    created_at = models.DateTimeField(
+        '作成日', auto_now_add=True)
+    # 更新日
+    updated_at = models.DateTimeField(
+        '更新日', auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+class Sns(models.Model):
+    '''
+    SNSモデル
+    '''
+    class Meta:
+        verbose_name_plural = 'SNS'
+
+    # SNS名
+    name = models.CharField('SNS名', max_length=120)
+    # url
+    url = models.URLField('SNSのURL', max_length=200, null=False)
     # 作成日
     created_at = models.DateTimeField(
         '作成日', auto_now_add=True)
