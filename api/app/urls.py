@@ -10,4 +10,4 @@ urlpatterns = [
     path('producer_profile/', ProducerProfileListAPIView.as_view()),
     path('skill_market/', SkillMarketListAPIView.as_view()),
     path('sns/', SnsListAPIView.as_view()),
-    ]
+]

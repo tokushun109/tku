@@ -10,7 +10,7 @@ admin_model_list = [
     ProducerProfile,
     SkillMarket,
     Sns,
-    ]
+]
 
 for admin_model in admin_model_list:
     admin.site.register(admin_model)
