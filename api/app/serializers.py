@@ -2,13 +2,6 @@ from rest_framework import serializers
 from .models import Product, AccessoryCategory, MaterialCategory, SalesSite, ProductImage, ProducerProfile, SkillMarket, Sns
 
 
-class ProductSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Product
-        fields = ('uuid', 'name', 'description', 'accessory_category',
-                  'material_category', 'product_image', 'sales_site')
-
-
 class AccessoryCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = AccessoryCategory
@@ -31,6 +24,18 @@ class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImage
         fields = ('uuid', 'name', 'image')
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    accessory_category = AccessoryCategorySerializer()
+    material_category = MaterialCategorySerializer(many=True)
+    product_image = ProductImageSerializer()
+    sales_site = SalesSiteSerializer(many=True)
+
+    class Meta:
+        model = Product
+        fields = ('uuid', 'name', 'description', 'accessory_category',
+                  'material_category', 'product_image', 'sales_site')
 
 
 class ProducerProfileSerializer(serializers.ModelSerializer):
