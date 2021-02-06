@@ -15,10 +15,13 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='AccessoryCategory',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=120, verbose_name='アクセサリーカテゴリー名')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='作成日')),
-                ('updated_at', models.DateTimeField(auto_now=True, verbose_name='更新日')),
+                ('created_at', models.DateTimeField(
+                    auto_now_add=True, verbose_name='作成日')),
+                ('updated_at', models.DateTimeField(
+                    auto_now=True, verbose_name='更新日')),
             ],
             options={
                 'verbose_name_plural': 'アクセサリーカテゴリー',
@@ -27,10 +30,13 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='MaterialCategory',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=120, verbose_name='材料カテゴリー名')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='作成日')),
-                ('updated_at', models.DateTimeField(auto_now=True, verbose_name='更新日')),
+                ('created_at', models.DateTimeField(
+                    auto_now_add=True, verbose_name='作成日')),
+                ('updated_at', models.DateTimeField(
+                    auto_now=True, verbose_name='更新日')),
             ],
             options={
                 'verbose_name_plural': '材料カテゴリー',
@@ -43,7 +49,8 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='product',
             name='created_at',
-            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now, verbose_name='作成日'),
+            field=models.DateTimeField(
+                auto_now_add=True, default=django.utils.timezone.now, verbose_name='作成日'),
             preserve_default=False,
         ),
         migrations.AddField(
@@ -64,11 +71,13 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='product',
             name='accessory_category',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='app.accessorycategory', verbose_name='アクセサリーカテゴリー'),
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL,
+                                    to='app.accessorycategory', verbose_name='アクセサリーカテゴリー'),
         ),
         migrations.AddField(
             model_name='product',
             name='material_category',
-            field=models.ManyToManyField(null=True, to='app.MaterialCategory', verbose_name='材料カテゴリー'),
+            field=models.ManyToManyField(
+                null=True, to='app.MaterialCategory', verbose_name='材料カテゴリー'),
         ),
     ]
