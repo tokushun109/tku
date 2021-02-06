@@ -139,7 +139,7 @@ class ProducerProfile(models.Model):
         ordering = ['created_at']
 
     # 製作者名
-    name = models.CharField('製作者名', max_length=120, primary_key=True)
+    name = models.CharField('製作者名', max_length=120)
     # 紹介
     introduction = models.TextField('製作者の紹介')
     # 製作者のロゴ

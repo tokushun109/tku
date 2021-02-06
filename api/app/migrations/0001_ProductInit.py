@@ -3,6 +3,7 @@
 from django.db import migrations, models
 import uuid
 
+
 class Migration(migrations.Migration):
 
     initial = True
@@ -14,7 +15,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Product',
             fields=[
-                ('uuid', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                ('uuid', models.UUIDField(default=uuid.uuid4,
+                                          editable=False, primary_key=True, serialize=False)),
                 ('name', models.CharField(max_length=120)),
                 ('description', models.TextField(max_length=3000)),
             ],

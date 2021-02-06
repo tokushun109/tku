@@ -12,13 +12,13 @@ import { IProducerProfile } from '~/types'
     },
 })
 export default class PageProducerProfileIndex extends Vue {
-    producerProfile: IProducerProfile = []
+    producerProfile: IProducerProfile | null = null
     async asyncData({ app }: Context) {
         try {
             const producerProfile = await app.$axios.$get(`/producer_profile/`)
             return { producerProfile }
         } catch (e) {
-            return { producerProfile: [] }
+            return { producerProfile: null }
         }
     }
 }

@@ -1,4 +1,6 @@
-from rest_framework import generics
+from django.shortcuts import get_object_or_404
+from rest_framework import generics, status, views
+from rest_framework.response import Response
 
 from .models import Product, AccessoryCategory, MaterialCategory, SalesSite, ProducerProfile, SkillMarket, Sns
 from .serializers import ProductSerializer, AccessoryCategorySerializer, MaterialCategorySerializer, SalesSiteSerializer, ProducerProfileSerializer, SkillMarketSerializer, SnsSerializer
@@ -44,12 +46,16 @@ class SalesSiteListAPIView(generics.ListAPIView):
     serializer_class = SalesSiteSerializer
 
 
-class ProducerProfileListAPIView(generics.ListAPIView):
+class ProducerProfileAPIView(views.APIView):
     '''
-    製作者モデルの取得(一覧)APIクラス
+    製作者モデルの取得APIクラス
     '''
-    queryset = ProducerProfile.objects.all()
-    serializer_class = ProducerProfileSerializer
+
+    def get(self, request, *args, **kwargs):
+        # pk=1の製作者のプロフィールを取得する
+        producer_profile = get_object_or_404(ProducerProfile, pk=1)
+        serializer = ProducerProfileSerializer(instance=producer_profile)
+        return Response(serializer.data, status.HTTP_200_OK)
 
 
 class SkillMarketListAPIView(generics.ListAPIView):

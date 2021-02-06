@@ -13,11 +13,16 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ProducerProfile',
             fields=[
-                ('name', models.CharField(max_length=120, primary_key=True, serialize=False, verbose_name='製作者名')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.CharField(max_length=120,
+                                          serialize=False, verbose_name='製作者名')),
                 ('introduction', models.TextField(verbose_name='製作者の紹介')),
                 ('logo', models.ImageField(upload_to='images/', verbose_name='ロゴ')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='作成日')),
-                ('updated_at', models.DateTimeField(auto_now=True, verbose_name='更新日')),
+                ('created_at', models.DateTimeField(
+                    auto_now_add=True, verbose_name='作成日')),
+                ('updated_at', models.DateTimeField(
+                    auto_now=True, verbose_name='更新日')),
             ],
             options={
                 'verbose_name_plural': '製作者',
@@ -27,11 +32,14 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='SkillMarket',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=120, verbose_name='スキルマーケット名')),
                 ('url', models.URLField(verbose_name='スキルマーケットURL')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='作成日')),
-                ('updated_at', models.DateTimeField(auto_now=True, verbose_name='更新日')),
+                ('created_at', models.DateTimeField(
+                    auto_now_add=True, verbose_name='作成日')),
+                ('updated_at', models.DateTimeField(
+                    auto_now=True, verbose_name='更新日')),
             ],
             options={
                 'verbose_name_plural': 'スキルマーケット',
@@ -40,11 +48,14 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Sns',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=120, verbose_name='SNS名')),
                 ('url', models.URLField(verbose_name='SNSのURL')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='作成日')),
-                ('updated_at', models.DateTimeField(auto_now=True, verbose_name='更新日')),
+                ('created_at', models.DateTimeField(
+                    auto_now_add=True, verbose_name='作成日')),
+                ('updated_at', models.DateTimeField(
+                    auto_now=True, verbose_name='更新日')),
             ],
             options={
                 'verbose_name_plural': 'SNS',
