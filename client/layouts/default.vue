@@ -1,5 +1,6 @@
 <template>
     <div>
+        <site-header />
         <Nuxt />
     </div>
 </template>
@@ -7,11 +8,7 @@
 <script lang="ts">
 import { Component, Vue } from 'nuxt-property-decorator'
 
-@Component({
-    head: {
-        title: 'head title',
-    },
-})
+@Component({})
 export default class LayoutDefault extends Vue {}
 </script>
 
