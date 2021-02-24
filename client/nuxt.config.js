@@ -35,6 +35,9 @@ export default {
             lang: 'stylus',
         },
     ],
+    styleResources: {
+        stylus: ['~assets/style/variables.styl', '~assets/style/mixins.styl'],
+    },
 
     // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
     plugins: [],
