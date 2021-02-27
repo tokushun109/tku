@@ -29,14 +29,9 @@ export default {
     },
 
     // Global CSS: https://go.nuxtjs.dev/config-css
-    css: [
-        {
-            src: '~assets/style/reset.styl',
-            lang: 'stylus',
-        },
-    ],
+    css: ['ress', '~assets/style/main'],
     styleResources: {
-        stylus: ['~assets/style/variables.styl', '~assets/style/mixins.styl'],
+        stylus: ['~assets/style/variables', '~assets/style/mixins'],
     },
 
     // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
