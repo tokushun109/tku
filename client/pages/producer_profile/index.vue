@@ -2,8 +2,6 @@
     <c-page>
         <div>
             <p>{{ producerProfile }}</p>
-            <p>{{ sns }}</p>
-            <p>{{ salesSite }}</p>
         </div>
     </c-page>
 </template>
