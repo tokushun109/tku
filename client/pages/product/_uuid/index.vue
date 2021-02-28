@@ -1,5 +1,7 @@
 <template>
-    <div>{{ product }}</div>
+    <c-page>
+        <div>{{ product }}</div>
+    </c-page>
 </template>
 
 <script lang="ts">

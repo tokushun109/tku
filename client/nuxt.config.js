@@ -29,9 +29,9 @@ export default {
     },
 
     // Global CSS: https://go.nuxtjs.dev/config-css
-    css: ['ress', '~assets/style/main'],
+    css: ['ress'],
     styleResources: {
-        stylus: ['~assets/style/variables', '~assets/style/mixins'],
+        stylus: ['./assets/style/variables.styl', './assets/style/mixins.styl'],
     },
 
     // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
@@ -50,6 +50,7 @@ export default {
     modules: [
         // https://go.nuxtjs.dev/axios
         '@nuxtjs/axios',
+        '@nuxtjs/style-resources',
     ],
 
     // Axios module configuration: https://go.nuxtjs.dev/config-axios
