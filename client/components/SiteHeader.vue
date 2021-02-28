@@ -1,15 +1,15 @@
 <template>
     <header>
         <div class="header-wrapper">
-            <div v-if="menuOpenFrag" class="open-menu">
-                <ul>
-                    <li><nuxt-link to="/product">商品</nuxt-link></li>
-                    <li><nuxt-link to="/producer_profile">製作者</nuxt-link></li>
-                    <li><nuxt-link to="/order">仕事の依頼</nuxt-link></li>
-                </ul>
-                <img class="close-icon" src="/icon/close.png" alt="close" @click="toggle" />
+            <div v-if="menuOpenFrag" class="open-menu-wrapper">
+                <div class="close-icon">
+                    <img src="/icon/close.png" alt="close" @click="toggle" />
+                </div>
+                <c-open-menu @close-menu="toggle" />
             </div>
-            <img v-else class="menu-icon" src="/icon/menu.png" alt="menu" @click="toggle" />
+            <div v-else class="open-icon">
+                <img src="/icon/menu.png" alt="open" @click="toggle" />
+            </div>
         </div>
     </header>
 </template>
@@ -26,4 +26,18 @@ export default class Header extends Vue {
 }
 </script>
 
-<style lang="stylus"></style>
+<style lang="stylus">
+header
+    padding 80px
+    width 100vw
+    .header-wrapper
+        .open-menu-wrapper
+            .close-icon
+                position relative
+                text-align right
+                z-index 999
+        .open-icon
+            position relative
+            text-align right
+            z-index 999
+</style>
