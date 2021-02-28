@@ -1,7 +1,9 @@
 <template>
-    <div>
-        <p>{{ skillMarket }}</p>
-    </div>
+    <c-page>
+        <div>
+            <p>{{ skillMarket }}</p>
+        </div>
+    </c-page>
 </template>
 
 <script lang="ts">

@@ -1,12 +1,14 @@
 <template>
-    <div>
-        <ul v-for="product in products" :key="product.uuid">
-            <li>{{ product }}</li>
-            <li>
-                <nuxt-link :to="`/product/${product.uuid}`">詳細へ</nuxt-link>
-            </li>
-        </ul>
-    </div>
+    <c-page>
+        <div>
+            <ul v-for="product in products" :key="product.uuid">
+                <li>{{ product }}</li>
+                <li>
+                    <nuxt-link :to="`/product/${product.uuid}`">詳細へ</nuxt-link>
+                </li>
+            </ul>
+        </div>
+    </c-page>
 </template>
 
 <script lang="ts">

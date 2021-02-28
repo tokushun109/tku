@@ -3,7 +3,7 @@
 	"version": "1.0.0",
 	"private": true,
 	"scripts": {
-		"dev": "nuxt-ts",
+		"dev": "nuxt-ts -o",
 		"build": "nuxt-ts build",
 		"start": "nuxt-ts start",
 		"generate": "nuxt-ts generate",
@@ -19,7 +19,7 @@
 		"nuxt-property-decorator": "^2.9.1",
 		"ress": "^3.0.0",
 		"stylus": "^0.54.8",
-		"stylus-loader": "^4.3.3"
+		"stylus-loader": "^3.0.2"
 	},
 	"devDependencies": {
 		"@nuxt/types": "^2.14.12",

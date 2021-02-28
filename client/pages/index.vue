@@ -1,5 +1,7 @@
 <template>
-    <div>Index</div>
+    <c-page>
+        <div>Index</div>
+    </c-page>
 </template>
 
 <script lang="ts">
