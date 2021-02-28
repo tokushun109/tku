@@ -29,7 +29,13 @@ export default {
     },
 
     // Global CSS: https://go.nuxtjs.dev/config-css
-    css: ['ress'],
+    css: [
+        'ress',
+        {
+            src: './assets/style/main.styl',
+            lang: 'stylus',
+        },
+    ],
     styleResources: {
         stylus: ['./assets/style/variables.styl', './assets/style/mixins.styl'],
     },
