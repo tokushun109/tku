@@ -23,8 +23,8 @@ export default class CColumn extends Vue {
             right: this.right,
             center: this.center,
             baseline: this.baseline,
+            [`column-${this.column}`]: true,
         }
-        c[`column-${this.column}`] = true
         return c
     }
 }
