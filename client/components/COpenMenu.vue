@@ -2,10 +2,18 @@
     <div class="c-open-menu">
         <ul class="c-open-menu-wrapper">
             <c-column column="4">
-                <li @click="closeMenu()"><nuxt-link to="/">ホーム</nuxt-link></li>
-                <li @click="closeMenu()"><nuxt-link to="/product">商品</nuxt-link></li>
-                <li @click="closeMenu()"><nuxt-link to="/producer_profile">製作者</nuxt-link></li>
-                <li @click="closeMenu()"><nuxt-link to="/order">仕事の依頼</nuxt-link></li>
+                <li @click="closeMenu()">
+                    <nuxt-link to="/">ホーム</nuxt-link>
+                </li>
+                <li @click="closeMenu()">
+                    <nuxt-link to="/product">商品</nuxt-link>
+                </li>
+                <li @click="closeMenu()">
+                    <nuxt-link to="/producer_profile">製作者</nuxt-link>
+                </li>
+                <li @click="closeMenu()">
+                    <nuxt-link to="/order">仕事の依頼</nuxt-link>
+                </li>
             </c-column>
         </ul>
     </div>
@@ -24,16 +32,16 @@ export default class COpenMenu extends Vue {
 <style lang="stylus">
 .c-open-menu
     position fixed
-    z-index 998
-    background-color white
     top 0
     left 0
+    z-index 998
     width 100vw
     height 100vh
+    background-color white
     .c-open-menu-wrapper
+        position relative
+        top 50%
+        margin 0 auto
         width 50%
-        margin: 0 auto
-        position: relative;
-        top: 50%;
-        text-align: center;
+        text-align center
 </style>

@@ -1,38 +1,31 @@
 /**
  * レスポンシブ
  */
-wide() {
-    @media screen and (max-width: $wide-width) {
+wide()
+    @media screen and (max-width $wide-width)
         {block}
-    }
-}
-pc() {
-    @media screen and (max-width: $pc-width) {
+
+pc()
+    @media screen and (max-width $pc-width)
         {block}
-    }
-}
-tablet() {
-    @media screen and (max-width: $tab-width) {
+
+tablet()
+    @media screen and (max-width $tab-width)
         {block}
-    }
-}
-sp() {
-    @media screen and (max-width: $sp-width) {
+
+sp()
+    @media screen and (max-width $sp-width)
         {block}
-    }
-}
-tiny() {
-    @media screen and (max-width: $tiny-width) {
+
+tiny()
+    @media screen and (max-width $tiny-width)
         {block}
-    }
-}
 
 /**
  * flexレイアウト
  */
-flex-box(justify-content=space-between, flow=row nowrap, align=stretch) {
-    display: flex
-    justify-content: justify-content
-    flex-flow: flow
-    align-items: align
-}
+flex-box(justify-content = space-between, flow = row nowrap, align = stretch)
+    display flex
+    flex-flow flow
+    justify-content justify-content
+    align-items align

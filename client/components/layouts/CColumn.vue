@@ -33,31 +33,32 @@ export default class CColumn extends Vue {
 <style lang="stylus">
 .column-layout
     +tablet()
-        display: block
-        width: 100%
-        margin: auto
+        display block
+        margin auto
+        width 100%
     flex-box(flex-start, row nowrap)
     > *
-        margin-right: $column-spacing
+        margin-right $column-spacing
         +tablet()
-            margin-right: 0
+            margin-right 0
         &:last-child
-            margin-right: 0
-    for num in (1..12)
+            margin-right 0
+    for num in 1 .. 12
         &.column-{num} > *
-            flex: '1 1 calc((100% / %s) - (%s))' % (num $tile-spacing)
+            flex '1 1 calc((100% / %s) - (%s))' % (num $tile-spacing)
             &:nth-child({num}n)
-                margin-right: 0
-        *::-ms-backdrop, &.column-{num} > *
-            width: 'calc((100% / %s) - (%s))' % (num $tile-spacing)
+                margin-right 0
+        *::-ms-backdrop
+        &.column-{num} > *
+            width 'calc((100% / %s) - (%s))' % (num $tile-spacing)
     &.left > *
-        flex: 0 1 auto
+        flex 0 1 auto
     &.right
         flex-box(flex-end, row nowrap)
         > *
-            flex: 0 1 auto
+            flex 0 1 auto
     &.center
-        align-items: center
+        align-items center
     &.baseline
-        align-items: baseline
+        align-items baseline
 </style>
