@@ -34,10 +34,10 @@ header
         .open-menu-wrapper
             .close-icon
                 position relative
-                text-align right
                 z-index 999
+                text-align right
         .open-icon
             position relative
-            text-align right
             z-index 999
+            text-align right
 </style>

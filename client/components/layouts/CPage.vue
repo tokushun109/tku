@@ -19,26 +19,26 @@ export default class CPage extends Vue {
 <style lang="stylus">
 .page-layout
     position relative
-    max-width $wide-width
-    min-height calc(100vh - 103px - 140px)
     margin 0 auto
     padding $page-padding
+    min-height calc(100vh - 103px - 140px)
+    max-width $wide-width
     +sp()
         padding $page-sp-padding
     .page-title
         position relative
-        font-size $font-xxlarge
-        font-weight 400
         text-align $page-title-text-align
+        font-weight 400
+        font-size $font-xxlarge
         if $page-title-underline
             padding-bottom 8px
         margin-bottom $page-title-margin-bottom
         if $page-title-underline
             &after
-                content ''
                 position absolute
-                display block
                 left 50%
+                display block
+                content ''
                 if $page-title-text-align == 'left'
                     left 0
                 else if $page-title-text-align == 'center'
@@ -46,8 +46,8 @@ export default class CPage extends Vue {
                     transform translateX(-50%)
                 else if $page-title-text-align == 'right'
                     right 0
-                width $page-title-underline-width
                 bottom 0
+                width $page-title-underline-width
                 border-bottom 3px solid $page-title-underline-color
     .page-content
         .section-layout
