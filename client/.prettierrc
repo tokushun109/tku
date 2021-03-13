@@ -5,4 +5,4 @@
     singleQuote: true,
     arrowParens: 'always',
     jsxBracketSameLine: true,
-},
+}
