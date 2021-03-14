@@ -54,7 +54,8 @@ class ProducerProfileAPIView(views.APIView):
     def get(self, request, *args, **kwargs):
         # pk=1の製作者のプロフィールを取得する
         producer_profile = get_object_or_404(ProducerProfile, pk=1)
-        serializer = ProducerProfileSerializer(instance=producer_profile)
+        serializer = ProducerProfileSerializer(
+            producer_profile, context={"request": request})
         return Response(serializer.data, status.HTTP_200_OK)
 
 
