@@ -1,6 +1,6 @@
 <template>
     <c-page>
-        <img v-if="producer" width="30%" :src="producer.logo" alt="producerLogo" />
+        <c-top-main :producer="producer" />
     </c-page>
 </template>
 
@@ -13,7 +13,7 @@ import { IProducerProfile } from '~/types'
         title: 'tku',
     },
 })
-export default class PageIndex extends Vue {
+export default class PageTop extends Vue {
     producer: IProducerProfile | null = null
     async asyncData({ app }: Context) {
         try {

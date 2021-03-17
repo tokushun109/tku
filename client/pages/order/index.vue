@@ -15,7 +15,7 @@ import { ISkillMarket } from '~/types'
         title: '仕事の依頼',
     },
 })
-export default class PageProductIndex extends Vue {
+export default class PageOrderIndex extends Vue {
     skillMarket: Array<ISkillMarket> | null = []
     async asyncData({ app }: Context) {
         try {
