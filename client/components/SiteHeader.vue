@@ -33,11 +33,13 @@ header
     .header-wrapper
         .open-menu-wrapper
             .close-icon
-                position relative
+                position fixed
+                top 50px
+                right 50px
                 z-index 999
-                text-align right
         .open-icon
-            position relative
+            position fixed
+            top 50px
+            right 50px
             z-index 999
-            text-align right
 </style>
