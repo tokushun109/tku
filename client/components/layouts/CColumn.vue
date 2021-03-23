@@ -9,7 +9,7 @@ import { Component, Vue, Prop } from 'nuxt-property-decorator'
 @Component({})
 export default class CColumn extends Vue {
     // カラム数
-    @Prop({ type: Number, default: 2 }) column!: number
+    @Prop({ type: String, default: '2' }) column!: string
     // 横位置
     @Prop(Boolean) left!: boolean
     @Prop(Boolean) right!: boolean
