@@ -23,7 +23,7 @@ export default class CTopMain extends Vue {
 
 <style lang="stylus">
 .c-top-main
-    height 100vh
+    height 'calc(100vh - %s)' % $page-padding[0]
     text-align center
     .c-top-main-logo
         .top-logo
