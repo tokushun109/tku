@@ -1,11 +1,11 @@
 <template>
     <div class="c-top-main">
-        <div class="c-top-main-logo">
+        <div class="c-top-main-contents">
             <img v-if="producer" class="producer-logo top-logo" :src="producer.logo" alt="producerLogo" />
             <img v-else class="home-logo top-logo" src="/icon/home.png" alt="homeLogo" />
-        </div>
-        <div class="c-top-main-message">
-            <h1>ここにメッセージが入ります</h1>
+            <div class="c-top-main-message">
+                <h1>ここにメッセージが入ります</h1>
+            </div>
         </div>
     </div>
 </template>
@@ -23,9 +23,17 @@ export default class CTopMain extends Vue {
 
 <style lang="stylus">
 .c-top-main
+    position relative
     height 'calc(100vh - %s)' % $page-padding[0]
     text-align center
-    .c-top-main-logo
+    .c-top-main-contents
+        position absolute
+        top 0
+        right 0
+        bottom 0
+        left 0
+        margin auto
+        height 275px
         .top-logo
             width 250px
             height 250px

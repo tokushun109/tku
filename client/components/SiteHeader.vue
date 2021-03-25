@@ -30,16 +30,17 @@ export default class Header extends Vue {
 header
     position fixed
     z-index 999
-    padding 80px
     width 100vw
     .header-wrapper
         .open-menu-wrapper
             .close-icon
                 position fixed
+                top 60px
                 right 60px
                 z-index 999
         .open-icon
             position fixed
+            top 60px
             right 60px
             z-index 999
 </style>
