@@ -6,7 +6,7 @@ import (
 )
 
 type Product struct {
-	Id          int
+	Id          int       `json:"id,omitempty"`
 	Uuid        string    `json:"uuid,omitempty"`
 	Name        string    `json:"name,omitempty"`
 	Description string    `json:"description,omitempty"`
@@ -21,7 +21,7 @@ func GetProducts() (products Products, err error) {
 			FROM product`
 	rows, err := Db.Query(cmd)
 	if err != nil {
-		log.Println(err)
+		log.Fatalln(err)
 	}
 	for rows.Next() {
 		product := Product{}

@@ -1,11 +1,11 @@
 package main
 
 import (
+	"api/app/controllers"
 	_ "api/app/models"
 	_ "api/config"
-	"fmt"
 )
 
 func main() {
-	fmt.Println("test")
+	controllers.StartMainServer()
 }
