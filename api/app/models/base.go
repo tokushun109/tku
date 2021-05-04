@@ -9,6 +9,8 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
 var DbConnection *sql.DB
@@ -16,25 +18,34 @@ var Db *sql.DB
 
 var err error
 
-func init() {
-	DbConnection, err = sql.Open(config.Config.SQLDriver, "root:@/")
+func gormConnect() *gorm.DB {
+	// DBMS := "mysql"
+	// USER := "root"
+	// PASS := "####"
+	// PROTOCOL := "tcp(##.###.##.###:3306)"
+	// DBNAME := "##"
+
+	CONNECT := "root:@/"
+	DbConnection, err := gorm.Open("mysql", CONNECT)
+
 	if err != nil {
 		log.Fatalln(err)
 	}
-	defer DbConnection.Close()
+	return DbConnection
+}
+
+func init() {
+	// DbConnection, err = sql.Open(config.Config.SQLDriver, "root:@/")
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// }
+	// defer DbConnection.Close()
+	Db := gormConnect()
+	defer Db.Close()
 
 	// DBの作成
 	cmdCreateDB := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", config.Config.DBName)
-	_, err = DbConnection.Exec(cmdCreateDB)
-	if err != nil {
-		panic(err)
-	}
-
-	// DBの接続
-	Db, err = sql.Open(config.Config.SQLDriver, fmt.Sprintf("root:@/%s?parseTime=true", config.Config.DBName))
-	if err != nil {
-		log.Fatalln(err)
-	}
+	Db.Exec(cmdCreateDB)
 }
 
 func createUUID() (uuidobj uuid.UUID) {
