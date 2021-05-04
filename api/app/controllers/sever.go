@@ -9,8 +9,8 @@ import (
 )
 
 func StartMainServer() error {
-	routing := mux.NewRouter().StrictSlash(true)
+	r := mux.NewRouter().StrictSlash(true)
 	port := fmt.Sprintf(":%s", config.Config.Port)
-	routing.HandleFunc("/api/products", ProductsHandler).Methods("GET")
-	return http.ListenAndServe(port, routing)
+	r.HandleFunc("/api/products", getProducts).Methods("GET")
+	return http.ListenAndServe(port, r)
 }
