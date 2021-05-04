@@ -7,7 +7,8 @@ import (
 	"net/http"
 )
 
-func ProductsHandler(w http.ResponseWriter, r *http.Request) {
+// 商品一覧を取得
+func getProducts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	products, err := models.GetProducts()
 	if err != nil {
