@@ -1,55 +1,33 @@
 package models
 
-import (
-	"log"
-	"time"
-)
+import "fmt"
 
 type Product struct {
-	Id                int                `json:"-"`
-	Uuid              string             `json:"uuid,omitempty"`
-	Name              string             `json:"name,omitempty"`
-	Description       string             `json:"description,omitempty"`
-	AccessoryCategory *AccessoryCategory `json:"accessory_category,omitempty"`
-	ProductImage      *ProductImage      `json:"product_image,omitempty"`
-	CreatedAt         time.Time          `json:"created_at"`
-	UpdatedAt         time.Time          `json:"updated_at"`
+	DefaultModel
+	Uuid                string            `json:"uuid"`
+	Name                string            `json:"name"`
+	Description         string            `json:"description"`
+	AccessoryCategoryId int               `json:"accessory_category_id"`
+	AccessoryCategory   AccessoryCategory `json:"accessory_category"`
+	ProductImageId      int               `json:"product_image_id"`
+	ProductImage        ProductImage      `json:"product_image"`
 }
 
 type Products []Product
 
 type ProductImage struct {
-	Id        int       `json:"-"`
-	Uuid      string    `json:"uuid,omitempty"`
-	Name      string    `json:"name,omitempty"`
-	MimeType  string    `json:"-"`
-	Path      string    `json:"path"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	DefaultModel
+	Uuid     string `json:"uuid"`
+	Name     string `json:"name"`
+	MimeType string `json:"-"`
+	Path     string `json:"path"`
 }
 
-func GetProducts() (products Products, err error) {
-	cmd := `SELECT id, uuid, name, description, created_at, updated_at
-			FROM product`
-	rows, err := Db.Query(cmd)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	for rows.Next() {
-		product := Product{}
-		err = rows.Scan(
-			&product.Id,
-			&product.Uuid,
-			&product.Name,
-			&product.Description,
-			&product.CreatedAt,
-			&product.UpdatedAt,
-		)
-		if err != nil {
-			log.Fatalln(err)
-		}
-		products = append(products, product)
-	}
-	rows.Close()
-	return products, err
+func DbTest() {
+	fmt.Println("Db.HasTable(product)", Db.HasTable("product"))
+}
+
+func GetProducts() (products Products) {
+	Db.Preload("AccessoryCategory").Preload("ProductImage").Find(&products)
+	return products
 }

@@ -1,24 +1,19 @@
 package models
 
-import "time"
-
 type SalesSite struct {
-	Name      string    `json:"name,omitempty"`
-	Url       string    `json:"url,omitempty"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	DefaultModel
+	Name string `json:"name"`
+	Url  string `json:"url"`
 }
 
 type SkillMarket struct {
-	Name      string    `json:"name,omitempty"`
-	Url       string    `json:"url,omitempty"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	DefaultModel
+	Name string `json:"name"`
+	Url  string `json:"url"`
 }
 
 type Sns struct {
-	Name      string    `json:"name,omitempty"`
-	Url       string    `json:"url,omitempty"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	DefaultModel
+	Name string `json:"name"`
+	Url  string `json:"url"`
 }

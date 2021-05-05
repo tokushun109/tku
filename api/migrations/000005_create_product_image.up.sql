@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS product_image(
     mime_type VARCHAR(30),
     path VARCHAR(255),
     created_at DATETIME,
-    updated_at DATETIME
+    updated_at DATETIME,
+    deleted_at DATETIME
 );
 
 ALTER TABLE
