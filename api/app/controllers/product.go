@@ -3,12 +3,30 @@ package controllers
 import (
 	"api/app/models"
 	"encoding/json"
+	"log"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 // 商品一覧を取得
-func getProducts(w http.ResponseWriter, r *http.Request) {
+func getAllProductsHandler(w http.ResponseWriter, r *http.Request) {
+	products := models.GetAllProducts()
 	w.Header().Set("Content-Type", "application/json")
-	products := models.GetProducts()
-	json.NewEncoder(w).Encode(products)
+	err := json.NewEncoder(w).Encode(products)
+	if err != nil {
+		log.Fatalln(err)
+	}
+}
+
+// 商品詳細を取得
+func getProductHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	uuid := vars["uuid"]
+	product := models.GetProduct(uuid)
+	w.Header().Set("Content-Type", "application/json")
+	err := json.NewEncoder(w).Encode(product)
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
