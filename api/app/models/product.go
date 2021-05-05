@@ -21,7 +21,12 @@ type ProductImage struct {
 	Path     string `json:"path"`
 }
 
-func GetProducts() (products Products) {
+func GetAllProducts() (products Products) {
 	Db.Preload("AccessoryCategory").Preload("ProductImage").Find(&products)
 	return products
+}
+
+func GetProduct(uuid string) (product Product) {
+	Db.First(&product, "uuid = ?", uuid).Related(&product.AccessoryCategory).Related(&product.ProductImage)
+	return product
 }
