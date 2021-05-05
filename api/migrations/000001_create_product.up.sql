@@ -4,5 +4,6 @@ CREATE TABLE IF NOT EXISTS product(
     name VARCHAR(30),
     description TEXT(1000),
     created_at DATETIME,
-    updated_at DATETIME
+    updated_at DATETIME,
+    deleted_at DATETIME
 );
