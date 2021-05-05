@@ -11,7 +11,7 @@ type Product struct {
 	Name              string             `json:"name,omitempty"`
 	Description       string             `json:"description,omitempty"`
 	AccessoryCategory *AccessoryCategory `json:"accessory_category,omitempty"`
-	MaterialCategory  *MaterialCategory  `json:"material_category,omitempty"`
+	ProductImage      *ProductImage      `json:"product_image,omitempty"`
 	CreatedAt         time.Time          `json:"created_at"`
 	UpdatedAt         time.Time          `json:"updated_at"`
 }

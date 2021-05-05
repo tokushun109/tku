@@ -3,7 +3,6 @@ package models
 import (
 	"api/config"
 	"crypto/sha1"
-	"database/sql"
 	"fmt"
 	"log"
 
@@ -13,39 +12,38 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
-var DbConnection *sql.DB
-var Db *sql.DB
-
-var err error
+var Db *gorm.DB
 
 func gormConnect() *gorm.DB {
-	// DBMS := "mysql"
-	// USER := "root"
-	// PASS := "####"
-	// PROTOCOL := "tcp(##.###.##.###:3306)"
-	// DBNAME := "##"
+	// DB接続設定読み込み
+	Sql := config.Config.Sql
+	DBUser := config.Config.DBUser
+	DBPass := config.Config.DBPass
+	Protocol := config.Config.Protocol
+	DBName := config.Config.DBName
+	SQL_CONNECT := DBUser + ":" + DBPass + "@" + Protocol + "/"
 
-	CONNECT := "root:@/"
-	DbConnection, err := gorm.Open("mysql", CONNECT)
-
+	// SQLに接続
+	DbConnection, err := gorm.Open(Sql, SQL_CONNECT)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	return DbConnection
+	// DBの作成
+	cmdCreateDB := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", DBName)
+	DbConnection.Exec(cmdCreateDB)
+
+	// DBに接続
+	DB_CONNECT := DBUser + ":" + DBPass + "@" + Protocol + "/" + DBName
+	Db, err := gorm.Open(Sql, DB_CONNECT)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return Db
 }
 
 func init() {
-	// DbConnection, err = sql.Open(config.Config.SQLDriver, "root:@/")
-	// if err != nil {
-	// 	log.Fatalln(err)
-	// }
-	// defer DbConnection.Close()
 	Db := gormConnect()
 	defer Db.Close()
-
-	// DBの作成
-	cmdCreateDB := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", config.Config.DBName)
-	Db.Exec(cmdCreateDB)
 }
 
 func createUUID() (uuidobj uuid.UUID) {
