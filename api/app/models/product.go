@@ -1,7 +1,5 @@
 package models
 
-import "fmt"
-
 type Product struct {
 	DefaultModel
 	Uuid                string            `json:"uuid"`
@@ -21,10 +19,6 @@ type ProductImage struct {
 	Name     string `json:"name"`
 	MimeType string `json:"-"`
 	Path     string `json:"path"`
-}
-
-func DbTest() {
-	fmt.Println("Db.HasTable(product)", Db.HasTable("product"))
 }
 
 func GetProducts() (products Products) {
