@@ -23,3 +23,20 @@ type Sns struct {
 }
 
 type SnsList []Sns
+
+func GetAllSalesSites() (salesSites SalesSites) {
+	Db.Find(&salesSites)
+	return salesSites
+}
+
+func GetAllSkillMarkets() (skillMarkets SkillMarkets) {
+	Db.Find(&skillMarkets)
+	return skillMarkets
+}
+
+func GetAllSnsList() (snsList SnsList) {
+	Db.Find(&snsList)
+	return snsList
+}
+
+

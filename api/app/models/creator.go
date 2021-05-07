@@ -6,3 +6,8 @@ type Creator struct {
 	Introduction string `json:"introduction"`
 	Logo         string `json:"logo"`
 }
+
+func GetCreator() (creator Creator) {
+	Db.First(&creator)
+	return creator
+}

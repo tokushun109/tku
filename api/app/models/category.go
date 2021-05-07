@@ -13,3 +13,13 @@ type MaterialCategory struct {
 }
 
 type MaterialCategories []MaterialCategory
+
+func GetAllAccessoryCategories() (accessoryCategories AccessoryCategories) {
+	Db.Find(&accessoryCategories)
+	return accessoryCategories
+}
+
+func GetAllMaterialCategories() (materialCategories MaterialCategories) {
+	Db.Find(&materialCategories)
+	return materialCategories
+}
