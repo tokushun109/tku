@@ -24,7 +24,7 @@ export default class PageProductIndex extends Vue {
     products: Array<IProduct> = []
     async asyncData({ app }: Context) {
         try {
-            const products = await app.$axios.$get(`/product/`)
+            const products = await app.$axios.$get(`/product`)
             return { products }
         } catch (e) {
             return { products: [] }

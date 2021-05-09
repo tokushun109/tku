@@ -1,9 +1,16 @@
+import { IAccessoryCategory, IMaterialCategory, ISalesSite } from 'types'
+
+export interface IProductImage {
+    uuid: string
+    name: string
+    path: string
+}
 export interface IProduct {
     uuid: string
     name: string
     description: string
-    accessoryCategory: number
-    materialCategory: Array<number>
-    productImage: string
-    salesSite: Array<number>
+    accessoryCategory: IAccessoryCategory
+    // materialCategory: Array<IMaterialCategory>
+    productImage: IProductImage
+    // salesSite: Array<ISalesSite>
 }

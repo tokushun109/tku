@@ -9,7 +9,7 @@
                     <nuxt-link to="/product">商品</nuxt-link>
                 </li>
                 <li @click="closeMenu()">
-                    <nuxt-link to="/producer_profile">製作者</nuxt-link>
+                    <nuxt-link to="/creator">製作者</nuxt-link>
                 </li>
                 <li @click="closeMenu()">
                     <nuxt-link to="/order">仕事の依頼</nuxt-link>
