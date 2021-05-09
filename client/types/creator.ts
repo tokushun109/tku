@@ -1,4 +1,4 @@
-export interface IProducerProfile {
+export interface ICreator {
     name: string
     introduction: string
     logo: string

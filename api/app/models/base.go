@@ -17,8 +17,8 @@ var Db *gorm.DB
 // ID, CreatedAt, UpdatedAt, DeletedAtのfieldを持つgorm.Modelを継承
 type DefaultModel struct {
 	ID        uint       `gorm:"primary_key" json:"-"`
-	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt time.Time  `json:"updated_at"`
+	CreatedAt time.Time  `json:"-"`
+	UpdatedAt time.Time  `json:"-"`
 	DeletedAt *time.Time `sql:"index" json:"-"`
 }
 

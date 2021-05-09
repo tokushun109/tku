@@ -6,9 +6,11 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 func StartMainServer() error {
+	// gorilla/muxを使ったルーティング
 	r := mux.NewRouter().StrictSlash(true)
 	port := fmt.Sprintf(":%s", config.Config.Port)
 	r.HandleFunc("/api/product", getAllProductsHandler).Methods("GET")
@@ -20,5 +22,7 @@ func StartMainServer() error {
 	r.HandleFunc("/api/sns", getAllSnsListHandler).Methods("GET")
 	r.HandleFunc("/api/creator", getCreatorHandler).Methods("GET")
 	r.HandleFunc("/api/users", getAllUsersHandler).Methods("GET")
-	return http.ListenAndServe(port, r)
+	// corsの設定
+	c := cors.Default().Handler(r)
+	return http.ListenAndServe(port, c)
 }

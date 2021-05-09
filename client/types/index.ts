@@ -1,5 +1,6 @@
 export * from '~/types/product'
-export * from '~/types/producer_profile'
+export * from '~/types/category'
+export * from '~/types/creator'
 export * from '~/types/sales_site'
 export * from '~/types/skill_market'
 export * from '~/types/sns'

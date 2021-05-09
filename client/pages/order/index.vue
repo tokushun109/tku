@@ -19,7 +19,7 @@ export default class PageOrderIndex extends Vue {
     skillMarket: Array<ISkillMarket> | null = []
     async asyncData({ app }: Context) {
         try {
-            const skillMarket = await app.$axios.$get(`/skill_market/`)
+            const skillMarket = await app.$axios.$get(`/skill_market`)
             return { skillMarket }
         } catch (e) {
             return { skillMarket: [] }

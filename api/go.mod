@@ -12,6 +12,7 @@ require (
 	github.com/joho/godotenv v1.3.0
 	github.com/lib/pq v1.10.1 // indirect
 	github.com/mattn/go-sqlite3 v1.14.7 // indirect
+	github.com/rs/cors v1.7.0 // indirect
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	golang.org/x/crypto v0.0.0-20210421170649-83a5a9bb288b // indirect
 	gopkg.in/go-ini/ini.v1 v1.62.0

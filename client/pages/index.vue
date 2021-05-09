@@ -1,26 +1,26 @@
 <template>
     <c-page>
-        <c-top-main :producer="producer" />
+        <c-top-main :creator="creator" />
     </c-page>
 </template>
 
 <script lang="ts">
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
-import { IProducerProfile } from '~/types'
+import { ICreator } from '~/types'
 @Component({
     head: {
         title: 'tku',
     },
 })
 export default class PageTop extends Vue {
-    producer: IProducerProfile | null = null
+    creator: ICreator | null = null
     async asyncData({ app }: Context) {
         try {
-            const producer = await app.$axios.$get(`producer_profile`)
-            return { producer }
+            const creator = await app.$axios.$get(`creator`)
+            return { creator }
         } catch (e) {
-            return { producer: null }
+            return { creator: null }
         }
     }
 }

@@ -5,9 +5,9 @@ type Product struct {
 	Uuid                string            `json:"uuid"`
 	Name                string            `json:"name"`
 	Description         string            `json:"description"`
-	AccessoryCategoryId int               `json:"accessory_category_id"`
+	AccessoryCategoryId int               `json:"-"`
 	AccessoryCategory   AccessoryCategory `json:"accessory_category"`
-	ProductImageId      int               `json:"product_image_id"`
+	ProductImageId      int               `json:"-"`
 	ProductImage        ProductImage      `json:"product_image"`
 }
 

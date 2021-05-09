@@ -1,7 +1,7 @@
 <template>
     <div class="c-top-main">
         <div class="c-top-main-contents">
-            <img v-if="producer" class="producer-logo top-logo" :src="producer.logo" alt="producerLogo" />
+            <img v-if="creator" class="creator-logo top-logo" :src="creator.logo" alt="creatorLogo" />
             <img v-else class="home-logo top-logo" src="/icon/home.png" alt="homeLogo" />
             <div class="c-top-main-message">
                 <h1>ここにメッセージが入ります</h1>
@@ -12,12 +12,12 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'nuxt-property-decorator'
-import { IProducerProfile } from '~/types'
+import { ICreator } from '~/types'
 
 @Component({})
 export default class CTopMain extends Vue {
     // 製作者情報
-    @Prop(Object) producer!: IProducerProfile
+    @Prop(Object) creator!: ICreator
 }
 </script>
 
