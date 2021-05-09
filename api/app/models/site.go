@@ -38,5 +38,3 @@ func GetAllSnsList() (snsList SnsList) {
 	Db.Find(&snsList)
 	return snsList
 }
-
-
