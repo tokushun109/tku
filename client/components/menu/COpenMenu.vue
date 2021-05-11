@@ -38,7 +38,7 @@ export default class COpenMenu extends Vue {
     width 100vw
     height 100vh
     background-color white
-    .c-open-menu-wrapper
+    &-wrapper
         position relative
         top 50%
         margin 0 auto

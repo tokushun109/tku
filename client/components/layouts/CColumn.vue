@@ -6,7 +6,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'nuxt-property-decorator'
-@Component({})
+@Component
 export default class CColumn extends Vue {
     // カラム数
     @Prop({ type: String, default: '2' }) column!: string
