@@ -9,7 +9,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'nuxt-property-decorator'
-@Component({})
+@Component
 export default class CPage extends Vue {
     // ページタイトル
     @Prop({ type: String, default: null }) title?: string
