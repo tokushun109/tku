@@ -10,16 +10,8 @@ import { Component, Vue, Prop, Emit } from 'nuxt-property-decorator'
 
 @Component({})
 export default class CButton extends Vue {
-    // カラーリング
+    // カラー
     @Prop({ type: Boolean, default: false }) primary!: boolean
-    @Prop({ type: Boolean, default: false }) secondary!: boolean
-    @Prop({ type: Boolean, default: false }) light!: boolean
-    @Prop({ type: Boolean, default: false }) dark!: boolean
-    @Prop({ type: Boolean, default: false }) info!: boolean
-    @Prop({ type: Boolean, default: false }) success!: boolean
-    @Prop({ type: Boolean, default: false }) warning!: boolean
-    @Prop({ type: Boolean, default: false }) danger!: boolean
-    @Prop({ type: Boolean, default: false }) orange!: boolean
     // サイズ
     @Prop({ type: Boolean, default: false }) tiny!: boolean
     @Prop({ type: Boolean, default: false }) small!: boolean
@@ -41,14 +33,6 @@ export default class CButton extends Vue {
     get getClass() {
         return {
             primary: this.primary,
-            secondary: this.secondary,
-            light: this.light,
-            dark: this.dark,
-            info: this.info,
-            success: this.success,
-            warning: this.warning,
-            danger: this.danger,
-            orange: this.orange,
             tiny: this.tiny,
             small: this.small,
             large: this.large,
@@ -67,7 +51,7 @@ export default class CButton extends Vue {
     padding 4px 24px
     border none
     border 1px solid $primary-color
-    border-radius 4px
+    border-radius 20px
     background-color $white-color
     color $primary-color
     text-decoration none
@@ -84,38 +68,6 @@ export default class CButton extends Vue {
     &.primary
         border-color $primary-color
         background $primary-color
-        color $white-color
-    &.secondary
-        border-color $primary-color
-        background-color $white-color
-        color $primary-color
-    &.light
-        border-color $light-bg-colorr
-        background-color $light-bg-colorr
-        color $light-color
-    &.dark
-        border-color $dark-bg-color
-        background-color $dark-bg-color
-        color $dark-color
-    &.info
-        border-color $info-bg-color
-        background-color $info-bg-color
-        color $info-color
-    &.success
-        border-color $primary-color
-        background $primary-color
-        color $white-color
-    &.warning
-        border-color $warning-color
-        background-color $warning-color
-        color $white-color
-    &.danger
-        border-color $danger-color
-        background-color $danger-color
-        color $white-color
-    &.orange
-        border-color $orange-color
-        background-color $orange-color
         color $white-color
     &.tiny
         padding 4px 12px

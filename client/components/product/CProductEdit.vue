@@ -1,13 +1,13 @@
 <template>
     <div class="c-product-edit">
-        <c-modal
-            :visible.sync="modalVisible"
+        <c-dialog
+            :visible.sync="dialogVisible"
             width="1200px"
-            :title="editProductModel === null ? '新しい商品を登録' : editProductModel.name + 'を編集'"
+            :title="productModel === null ? '新しい商品を登録' : productModel.name + 'を編集'"
             class="c-product-edit-modeal"
             @close="$emit('close')"
         >
-        </c-modal>
+        </c-dialog>
     </div>
 </template>
 
@@ -17,8 +17,8 @@ import { IProduct } from '~/types'
 
 @Component({})
 export default class CProductEdit extends Vue {
-    @PropSync('visible') modalVisible!: boolean
-    @PropSync('model') editProductModel!: IProduct | null
+    @PropSync('visible') dialogVisible!: boolean
+    @PropSync('model') productModel!: IProduct | null
 }
 </script>
 

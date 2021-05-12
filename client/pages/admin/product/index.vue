@@ -1,8 +1,8 @@
 <template>
     <c-page>
         <div>
-            <c-button primary @c-click="modalVisible = !modalVisible">新規追加</c-button>
-            <c-product-edit :visible.sync="modalVisible" :model.sync="editProductModel" @close="modalVisible = !modalVisible" />
+            <c-button primary @c-click="toggleHandler">新規追加</c-button>
+            <c-product-edit :visible.sync="dialogVisible" :model.sync="productModel" @close="toggleHandler" />
             <ul v-for="product in products" :key="product.uuid">
                 <li>{{ product }}</li>
             </ul>
@@ -22,8 +22,9 @@ import { IProduct } from '~/types'
 export default class PageAdminProductIndex extends Vue {
     products: Array<IProduct> = []
     // modalの表示切り替え
-    modalVisible: boolean = false
-    editProductModel: IProduct | null = null
+    dialogVisible: boolean = false
+    // form用のproductModel
+    productModel: IProduct | null = null
     async asyncData({ app }: Context) {
         try {
             const products = await app.$axios.$get(`/product`)
@@ -31,6 +32,11 @@ export default class PageAdminProductIndex extends Vue {
         } catch (e) {
             return { products: [] }
         }
+    }
+
+    // ボタンの切り替え
+    toggleHandler() {
+        this.dialogVisible = !this.dialogVisible
     }
 }
 </script>
