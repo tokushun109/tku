@@ -1,6 +1,6 @@
 <template>
     <header>
-        <div class="header-wrapper">
+        <div v-if="!isAdmin" class="header-wrapper">
             <div v-if="menuOpenFrag" class="open-menu-wrapper">
                 <div class="close-icon">
                     <img src="/icon/close.png" alt="close" @click="toggle" />
@@ -22,6 +22,11 @@ export default class Header extends Vue {
     toggle() {
         this.menuOpenFrag = !this.menuOpenFrag
         return this.menuOpenFrag
+    }
+
+    // urlにadminが含まれているかを確認
+    get isAdmin() {
+        return this.$route.path.includes('admin')
     }
 }
 </script>

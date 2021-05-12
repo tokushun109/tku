@@ -1,8 +1,8 @@
 <template>
     <c-page>
         <div>
-            <c-button primary @c-click="toggleHandler">新規追加</c-button>
-            <c-product-edit :visible.sync="dialogVisible" :model.sync="productModel" @close="toggleHandler" />
+            <c-button primary @c-click="toggle">新規追加</c-button>
+            <c-product-edit :visible.sync="dialogVisible" :model.sync="productModel" @close="toggle" />
             <ul v-for="product in products" :key="product.uuid">
                 <li>{{ product }}</li>
             </ul>
@@ -35,7 +35,7 @@ export default class PageAdminProductIndex extends Vue {
     }
 
     // ボタンの切り替え
-    toggleHandler() {
+    toggle() {
         this.dialogVisible = !this.dialogVisible
     }
 }
