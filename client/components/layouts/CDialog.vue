@@ -1,28 +1,28 @@
 <template>
-    <div v-if="syncVisible" class="c-modal">
-        <div class="c-modal-bg" @click="cancelButton()" />
-        <div class="c-modal-container" :style="{ width: width, height: height }">
-            <div v-if="isHeader" class="c-modal-container-title">
+    <div v-if="syncVisible" class="c-dialog">
+        <div class="c-dialog-bg" @click="cancelButton()" />
+        <div class="c-dialog-container" :style="{ width: width, height: height }">
+            <div v-if="isHeader" class="c-dialog-container-title">
                 {{ title }}
             </div>
             <div
-                class="c-modal-container-content"
-                :class="{ 'c-modal-container-content-none-button': !isButton, 'c-modal-container-content-button': isButton }"
+                class="c-dialog-container-content"
+                :class="{ 'c-dialog-container-content-none-button': !isButton, 'c-dialog-container-content-button': isButton }"
             >
                 <slot />
             </div>
-            <div v-if="isButton && !isOnlyClose" class="c-modal-container-bottom">
-                <c-button class="c-modal-container-bottom-button" label="キャンセル" @c-click="cancelButton()" />
+            <div v-if="isButton && !isOnlyClose" class="c-dialog-container-bottom">
+                <c-button class="c-dialog-container-bottom-button" label="キャンセル" @c-click="cancelButton()" />
                 <c-button
-                    class="c-modal-container-bottom-button"
+                    class="c-dialog-container-bottom-button"
                     :disabled="confirmButtonDisabled"
                     :label="confirmButtonTitle"
                     primary
                     @c-click="confirmButton()"
                 />
             </div>
-            <div v-else-if="isOnlyClose" class="c-modal-container-bottom">
-                <c-button class="c-modal-container-bottom-button" label="閉じる" @c-click="cancelButton()" />
+            <div v-else-if="isOnlyClose" class="c-dialog-container-bottom">
+                <c-button class="c-dialog-container-bottom-button" label="閉じる" @c-click="cancelButton()" />
             </div>
         </div>
     </div>
@@ -31,7 +31,7 @@
 <script lang="ts">
 import { Component, Vue, Prop, PropSync, Emit } from 'nuxt-property-decorator'
 @Component
-export default class CModal extends Vue {
+export default class CDialog extends Vue {
     // モーダルの横幅(px)
     @Prop({ type: String, default: '512px' }) width!: string
     // モーダルの縦幅
@@ -63,7 +63,7 @@ export default class CModal extends Vue {
 </script>
 
 <style lang="stylus">
-.c-modal
+.c-dialog
     position fixed
     top 0
     left 0
@@ -108,11 +108,11 @@ export default class CModal extends Vue {
         &-title
             margin 0 auto
             height 56px
-            background $white-color
-            color $primary-color
+            background $primary-color
+            color $white-color
             text-align center
             font-weight bold
-            font-size 16px
+            font-size $font-xxlarge
             line-height 56px
         &-content
             overflow-y scroll
