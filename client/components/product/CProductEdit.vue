@@ -3,10 +3,18 @@
         <c-dialog
             :visible.sync="dialogVisible"
             width="1200px"
-            :title="productModel === null ? '新しい商品を登録' : productModel.name + 'を編集'"
+            :title="productModel.uuid === '' ? '新しい商品を登録' : productModel.name + 'を編集'"
             class="c-product-edit-modeal"
             @close="$emit('close')"
         >
+            <c-form bordered>
+                <c-input-label label="商品名">
+                    <c-input :model.sync="productModel.name" />
+                </c-input-label>
+                <c-input-label label="商品説明">
+                    <c-input :model.sync="productModel.description" multiline />
+                </c-input-label>
+            </c-form>
         </c-dialog>
     </div>
 </template>
@@ -18,7 +26,7 @@ import { IProduct } from '~/types'
 @Component({})
 export default class CProductEdit extends Vue {
     @PropSync('visible') dialogVisible!: boolean
-    @PropSync('model') productModel!: IProduct | null
+    @PropSync('model') productModel!: IProduct
 }
 </script>
 
