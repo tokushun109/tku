@@ -1,7 +1,7 @@
 <template>
     <header>
         <div v-if="!isAdmin" class="header-wrapper">
-            <div v-if="menuOpenFrag" class="open-menu-wrapper">
+            <div v-if="menuOpenFlag" class="open-menu-wrapper">
                 <div class="close-icon">
                     <img src="/icon/close.png" alt="close" @click="toggle" />
                 </div>
@@ -18,10 +18,10 @@
 import { Component, Vue } from 'nuxt-property-decorator'
 @Component({})
 export default class Header extends Vue {
-    menuOpenFrag: boolean = false
+    menuOpenFlag: boolean = false
     toggle() {
-        this.menuOpenFrag = !this.menuOpenFrag
-        return this.menuOpenFrag
+        this.menuOpenFlag = !this.menuOpenFlag
+        return this.menuOpenFlag
     }
 
     // urlにadminが含まれているかを確認

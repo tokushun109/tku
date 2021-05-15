@@ -9,8 +9,8 @@ export interface IProduct {
     uuid: string
     name: string
     description: string
-    accessoryCategory: IAccessoryCategory
-    materialCategory: Array<IMaterialCategory>
-    productImage: IProductImage
-    salesSite: Array<ISalesSite>
+    accessoryCategory: IAccessoryCategory | null
+    materialCategories: Array<IMaterialCategory>
+    productImage: IProductImage | null
+    salesSites: Array<ISalesSite>
 }
