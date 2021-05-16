@@ -1,7 +1,7 @@
 ALTER TABLE
-    product DROP FOREIGN KEY product_ibfk_2;
+    product_image DROP FOREIGN KEY product_image_ibfk_1;
 
 ALTER TABLE
-    product DROP COLUMN product_image_id;
+    product_image DROP COLUMN product_id;
 
 DROP TABLE IF EXISTS product_image;
