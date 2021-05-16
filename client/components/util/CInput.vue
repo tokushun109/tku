@@ -95,7 +95,7 @@ export default class CInput extends Vue {
     input
     textarea
         display block
-        margin 2px
+        margin auto
         padding 8px
         width calc(100% - 22px)
         border 1px solid $light-dark-color

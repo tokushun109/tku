@@ -14,6 +14,9 @@
                 <c-input-label label="商品説明">
                     <c-input :model.sync="productModel.description" multiline />
                 </c-input-label>
+                <c-input-label label="商品画像">
+                    <c-file-upload @c-file-uploaded="fileUploadHandler($event)" />
+                </c-input-label>
             </c-form>
         </c-dialog>
     </div>
@@ -27,6 +30,10 @@ import { IProduct } from '~/types'
 export default class CProductEdit extends Vue {
     @PropSync('visible') dialogVisible!: boolean
     @PropSync('model') productModel!: IProduct
+
+    fileUploadHandler(files: Array<File>) {
+        console.log(files)
+    }
 }
 </script>
 
