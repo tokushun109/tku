@@ -11,6 +11,6 @@ export interface IProduct {
     description: string
     accessoryCategory: IAccessoryCategory | null
     materialCategories: Array<IMaterialCategory>
-    productImage: IProductImage | null
+    productImages: Array<IProductImage>
     salesSites: Array<ISalesSite>
 }

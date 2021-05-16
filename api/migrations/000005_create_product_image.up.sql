@@ -10,11 +10,11 @@ CREATE TABLE IF NOT EXISTS product_image(
 );
 
 ALTER TABLE
-    product
+    product_image
 ADD
-    product_image_id INT NULL;
+    product_id INT NULL;
 
 ALTER TABLE
-    product
+    product_image
 ADD
-    FOREIGN KEY (product_image_id) REFERENCES product_image(id);
+    FOREIGN KEY (product_id) REFERENCES product(id);
