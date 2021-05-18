@@ -9,10 +9,18 @@
         >
             <div class="drag-drop-inside">
                 <p v-dompurify-html="'ファイルを選択、もしくは<br />ドロップ&ドラッグでアップロードする'" class="drag-drop-message"></p>
-                <input id="file-input" type="file" multiple @change="uploadFile($event)" />
+                <input id="file-input" ref="preview" type="file" multiple @change="uploadFile($event)" />
                 <c-button primary @c-click="selectFile">{{ 'ファイルを選択' }}</c-button>
             </div>
         </div>
+        <c-input-label v-if="previewList.length > 0" label="プレビュー">
+            <ul class="preview">
+                <li v-for="(previewUrl, index) in previewList" :key="index" class="preview-item">
+                    <img :src="previewUrl" :alt="`preview${index}`" class="preview-item-image" />
+                    <img src="/icon/preview_close.png" alt="プレビューを削除" class="preview-item-close" @click="deletePreviewItem(index)" />
+                </li>
+            </ul>
+        </c-input-label>
     </div>
 </template>
 
@@ -42,7 +50,22 @@ export default class CTeamFileUpload extends Vue {
         if (this.files.length === 0) {
             return null
         }
+        this.addPreviewList()
         await this.$emit('c-file-uploaded', this.files)
+    }
+
+    previewList: Array<string> = []
+    // プレビューリスト
+    addPreviewList() {
+        for (const file of this.files) {
+            const url = URL.createObjectURL(file)
+            this.previewList.push(url)
+        }
+    }
+
+    // プレビュー画像を削除する
+    deletePreviewItem(index: number) {
+        this.previewList.splice(index, 1)
     }
 
     hovering: boolean = false
@@ -65,9 +88,28 @@ export default class CTeamFileUpload extends Vue {
 .c-file-upload
     input[type=file]
         display none
+    .preview
+        display flex
+        border 1px dashed $light-dark-color
+        border-radius 3px
+        text-align center
+        &-item
+            position relative
+            padding 15px
+            width 100%
+            &-image
+                width 100%
+                object-fit cover
+                aspect-ratio 4 / 3
+            &-close
+                position absolute
+                top 20px
+                right 20px
     .drag-drop-area
-        border 1px solid $light-dark-color
+        margin-bottom 16px
         padding 4px
+        border 1px solid $light-dark-color
+        border-radius 3px
         text-align center
         .drag-drop-inside
             padding 36px 18px
