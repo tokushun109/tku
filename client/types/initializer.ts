@@ -1,3 +1,4 @@
+import { IAccessoryCategory, IMaterialCategory } from './category'
 import { IProduct } from './product'
 
 export function newProduct(): IProduct {
@@ -9,5 +10,17 @@ export function newProduct(): IProduct {
         materialCategories: [],
         productImages: [],
         salesSites: [],
+    }
+}
+
+export function newAccessoryCategory(): IAccessoryCategory {
+    return {
+        name: '',
+    }
+}
+
+export function newMaterialCategory(): IMaterialCategory {
+    return {
+        name: '',
     }
 }
