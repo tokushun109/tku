@@ -7,6 +7,7 @@
             :title="accessoryCategoryModel.name === '' ? '新しいアクセサリーカテゴリーを登録' : accessoryCategoryModel.name + 'を編集'"
             class="c-accessory-edit-modeal"
             @close="$emit('close')"
+            @confirm="saveHandler()"
         >
             <c-form bordered>
                 <c-input :model.sync="accessoryCategoryModel.name" />
@@ -23,6 +24,12 @@ import { IAccessoryCategory } from '~/types'
 export default class CAccessoryCategoryEdit extends Vue {
     @PropSync('visible') dialogVisible!: boolean
     @PropSync('model') accessoryCategoryModel!: IAccessoryCategory
+
+    async saveHandler() {
+        await this.$axios.$post(`/accessory_category`, this.accessoryCategoryModel).catch(() => {})
+        this.dialogVisible = false
+        this.$emit('create', 'accessory_category')
+    }
 }
 </script>
 

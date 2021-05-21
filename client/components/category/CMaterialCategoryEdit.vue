@@ -7,6 +7,7 @@
             :title="materialCategoryModel.name === '' ? '新しい材料カテゴリーを登録' : materialCategoryModel.name + 'を編集'"
             class="c-material-edit-modeal"
             @close="$emit('close')"
+            @confirm="saveHandler()"
         >
             <c-form bordered>
                 <c-input :model.sync="materialCategoryModel.name" />
@@ -23,6 +24,12 @@ import { IMaterialCategory } from '~/types'
 export default class CMaterialCategoryEdit extends Vue {
     @PropSync('visible') dialogVisible!: boolean
     @PropSync('model') materialCategoryModel!: IMaterialCategory
+
+    async saveHandler() {
+        await this.$axios.$post(`/material_category`, this.materialCategoryModel).catch(() => {})
+        this.dialogVisible = false
+        this.$emit('create', 'material_category')
+    }
 }
 </script>
 

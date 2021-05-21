@@ -23,3 +23,13 @@ func GetAllMaterialCategories() (materialCategories MaterialCategories) {
 	Db.Find(&materialCategories)
 	return materialCategories
 }
+
+func InsertAccessoryCategory(accessory_category *AccessoryCategory) {
+	Db.NewRecord(accessory_category)
+	Db.Create(&accessory_category)
+}
+
+func InsertMaterialCategory(material_category *MaterialCategory) {
+	Db.NewRecord(material_category)
+	Db.Create(&material_category)
+}

@@ -2,13 +2,23 @@
     <c-page>
         <div>
             <c-button primary @c-click="accessoryDialogToggle">新規追加</c-button>
-            <c-accessory-category-edit :visible.sync="accessoryDialogVisible" :model.sync="accessoryCategoryModel" @close="accessoryDialogToggle" />
-            <ul v-for="accessoryCategory in accessoryCategories" :key="accessoryCategory.name">
+            <c-accessory-category-edit
+                :visible.sync="accessoryDialogVisible"
+                :model.sync="accessoryCategoryModel"
+                @close="accessoryDialogToggle"
+                @create="loadingCategory($event)"
+            />
+            <ul v-for="(accessoryCategory, index) in accessoryCategories" :key="index">
                 <li>{{ accessoryCategory }}</li>
             </ul>
             <c-button primary @c-click="materialDialogToggle">新規追加</c-button>
-            <c-material-category-edit :visible.sync="materialDialogVisible" :model.sync="materialCategoryModel" @close="materialDialogToggle" />
-            <ul v-for="materialCategory in materialCategories" :key="materialCategory.name">
+            <c-material-category-edit
+                :visible.sync="materialDialogVisible"
+                :model.sync="materialCategoryModel"
+                @close="materialDialogToggle"
+                @create="loadingCategory($event)"
+            />
+            <ul v-for="(materialCategory, index) in materialCategories" :key="index">
                 <li>{{ materialCategory }}</li>
             </ul>
         </div>
@@ -53,6 +63,16 @@ export default class PageAdminCategoryIndex extends Vue {
     // モーダルの切り替え
     materialDialogToggle() {
         this.materialDialogVisible = !this.materialDialogVisible
+    }
+
+    async loadingCategory(mode: string) {
+        if (mode === 'accessory_category') {
+            this.accessoryCategories = await this.$axios.$get(`/accessory_category`)
+            this.accessoryCategoryModel = newAccessoryCategory()
+        } else if (mode === 'material_category') {
+            this.materialCategories = await this.$axios.$get(`/material_category`)
+            this.materialCategoryModel = newMaterialCategory()
+        }
     }
 }
 </script>
