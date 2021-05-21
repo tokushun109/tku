@@ -4,7 +4,7 @@
             :visible.sync="dialogVisible"
             width="1200px"
             height="300px"
-            :title="accessoryCategoryModel.name === '' ? '新しいアクセサリーカテゴリーを登録' : accessoryCategoryModel.name + 'を編集'"
+            :title="accessoryCategoryModel.uuid === '' ? '新しいアクセサリーカテゴリーを登録' : accessoryCategoryModel.name + 'を編集'"
             class="c-accessory-edit-modeal"
             @close="$emit('close')"
             @confirm="saveHandler()"

@@ -2,6 +2,7 @@ package models
 
 type AccessoryCategory struct {
 	DefaultModel
+	Uuid string `json:"uuid"`
 	Name string `json:"name"`
 }
 
@@ -9,6 +10,7 @@ type AccessoryCategories []AccessoryCategory
 
 type MaterialCategory struct {
 	DefaultModel
+	Uuid string `json:"uuid"`
 	Name string `json:"name"`
 }
 
