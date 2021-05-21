@@ -8,7 +8,7 @@
                 @close="accessoryDialogToggle"
                 @create="loadingCategory($event)"
             />
-            <ul v-for="(accessoryCategory, index) in accessoryCategories" :key="index">
+            <ul v-for="accessoryCategory in accessoryCategories" :key="accessoryCategory.uuid">
                 <li>{{ accessoryCategory }}</li>
             </ul>
             <c-button primary @c-click="materialDialogToggle">新規追加</c-button>
@@ -18,7 +18,7 @@
                 @close="materialDialogToggle"
                 @create="loadingCategory($event)"
             />
-            <ul v-for="(materialCategory, index) in materialCategories" :key="index">
+            <ul v-for="materialCategory in materialCategories" :key="materialCategory.uuid">
                 <li>{{ materialCategory }}</li>
             </ul>
         </div>

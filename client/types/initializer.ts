@@ -15,12 +15,14 @@ export function newProduct(): IProduct {
 
 export function newAccessoryCategory(): IAccessoryCategory {
     return {
+        uuid: '',
         name: '',
     }
 }
 
 export function newMaterialCategory(): IMaterialCategory {
     return {
+        uuid: '',
         name: '',
     }
 }

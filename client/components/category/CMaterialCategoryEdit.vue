@@ -4,7 +4,7 @@
             :visible.sync="dialogVisible"
             width="1200px"
             height="300px"
-            :title="materialCategoryModel.name === '' ? '新しい材料カテゴリーを登録' : materialCategoryModel.name + 'を編集'"
+            :title="materialCategoryModel.uuid === '' ? '新しい材料カテゴリーを登録' : materialCategoryModel.name + 'を編集'"
             class="c-material-edit-modeal"
             @close="$emit('close')"
             @confirm="saveHandler()"
