@@ -3,14 +3,16 @@
         <c-dialog
             :visible.sync="dialogVisible"
             width="1200px"
-            height="300px"
+            height="350px"
             :title="materialCategoryModel.uuid === '' ? '新しい材料カテゴリーを登録' : materialCategoryModel.name + 'を編集'"
             class="c-material-edit-modeal"
             @close="$emit('close')"
             @confirm="saveHandler()"
         >
             <c-form bordered>
-                <c-input :model.sync="materialCategoryModel.name" />
+                <c-input-label label="材料カテゴリー名" required>
+                    <c-input :model.sync="materialCategoryModel.name" />
+                </c-input-label>
             </c-form>
         </c-dialog>
     </div>
