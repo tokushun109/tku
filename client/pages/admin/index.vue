@@ -1,6 +1,6 @@
 <template>
     <c-page>
-        <ul v-for="table in tables" :key="table">
+        <ul v-for="table in tables" :key="table.key">
             <li>
                 <nuxt-link :to="`/admin/${table.key}`">{{ table.name }}</nuxt-link>
             </li>
