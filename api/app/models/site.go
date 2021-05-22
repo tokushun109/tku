@@ -2,6 +2,7 @@ package models
 
 type SalesSite struct {
 	DefaultModel
+	Uuid string `json:"uuid"`
 	Name string `json:"name"`
 	Url  string `json:"url"`
 }
@@ -10,6 +11,7 @@ type SalesSites []SalesSite
 
 type SkillMarket struct {
 	DefaultModel
+	Uuid string `json:"uuid"`
 	Name string `json:"name"`
 	Url  string `json:"url"`
 }
@@ -18,6 +20,7 @@ type SkillMarkets []SkillMarket
 
 type Sns struct {
 	DefaultModel
+	Uuid string `json:"uuid"`
 	Name string `json:"name"`
 	Url  string `json:"url"`
 }

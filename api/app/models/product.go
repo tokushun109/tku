@@ -3,7 +3,6 @@ package models
 type Product struct {
 	DefaultModel
 	Uuid                string             `json:"uuid"`
-	Name                string             `json:"name"`
 	Description         string             `json:"description"`
 	AccessoryCategoryId int                `json:"-"`
 	AccessoryCategory   AccessoryCategory  `json:"accessoryCategory"`
