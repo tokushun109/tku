@@ -11,8 +11,7 @@ import (
 func getCreatorHandler(w http.ResponseWriter, r *http.Request) {
 	creator := models.GetCreator()
 	w.Header().Set("Content-Type", "application/json")
-	err := json.NewEncoder(w).Encode(creator)
-	if err != nil {
+	if err := json.NewEncoder(w).Encode(creator); err != nil {
 		log.Fatalln(err)
 	}
 }

@@ -11,8 +11,7 @@ import (
 func getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 	users := models.GetAllUsers()
 	w.Header().Set("Content-Type", "application/json")
-	err := json.NewEncoder(w).Encode(users)
-	if err != nil {
+	if err := json.NewEncoder(w).Encode(users); err != nil {
 		log.Fatalln(err)
 	}
 }

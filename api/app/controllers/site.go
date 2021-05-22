@@ -11,8 +11,7 @@ import (
 func getAllSalesSitesHandler(w http.ResponseWriter, r *http.Request) {
 	salesSites := models.GetAllSalesSites()
 	w.Header().Set("Content-Type", "application/json")
-	err := json.NewEncoder(w).Encode(salesSites)
-	if err != nil {
+	if err := json.NewEncoder(w).Encode(salesSites); err != nil {
 		log.Fatalln(err)
 	}
 }
@@ -21,8 +20,7 @@ func getAllSalesSitesHandler(w http.ResponseWriter, r *http.Request) {
 func getAllSkillMarketsHandler(w http.ResponseWriter, r *http.Request) {
 	skillMarkets := models.GetAllSkillMarkets()
 	w.Header().Set("Content-Type", "application/json")
-	err := json.NewEncoder(w).Encode(skillMarkets)
-	if err != nil {
+	if err := json.NewEncoder(w).Encode(skillMarkets); err != nil {
 		log.Fatalln(err)
 	}
 }
@@ -31,8 +29,7 @@ func getAllSkillMarketsHandler(w http.ResponseWriter, r *http.Request) {
 func getAllSnsListHandler(w http.ResponseWriter, r *http.Request) {
 	snsList := models.GetAllSnsList()
 	w.Header().Set("Content-Type", "application/json")
-	err := json.NewEncoder(w).Encode(snsList)
-	if err != nil {
+	if err := json.NewEncoder(w).Encode(snsList); err != nil {
 		log.Fatalln(err)
 	}
 }

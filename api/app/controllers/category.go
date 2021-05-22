@@ -12,8 +12,7 @@ import (
 func getAllAccessoryCategoriesHandler(w http.ResponseWriter, r *http.Request) {
 	accessoryCategories := models.GetAllAccessoryCategories()
 	w.Header().Set("Content-Type", "application/json")
-	err := json.NewEncoder(w).Encode(accessoryCategories)
-	if err != nil {
+	if err := json.NewEncoder(w).Encode(accessoryCategories); err != nil {
 		log.Fatalln(err)
 	}
 }
@@ -47,8 +46,7 @@ func createAccessoryCategoriesHandler(w http.ResponseWriter, r *http.Request) {
 func getAllMaterialCategoriesHandler(w http.ResponseWriter, r *http.Request) {
 	materialCategories := models.GetAllMaterialCategories()
 	w.Header().Set("Content-Type", "application/json")
-	err := json.NewEncoder(w).Encode(materialCategories)
-	if err != nil {
+	if err := json.NewEncoder(w).Encode(materialCategories); err != nil {
 		log.Fatalln(err)
 	}
 }

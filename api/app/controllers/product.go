@@ -13,8 +13,7 @@ import (
 func getAllProductsHandler(w http.ResponseWriter, r *http.Request) {
 	products := models.GetAllProducts()
 	w.Header().Set("Content-Type", "application/json")
-	err := json.NewEncoder(w).Encode(products)
-	if err != nil {
+	if err := json.NewEncoder(w).Encode(products); err != nil {
 		log.Fatalln(err)
 	}
 }
@@ -25,8 +24,7 @@ func getProductHandler(w http.ResponseWriter, r *http.Request) {
 	uuid := vars["uuid"]
 	product := models.GetProduct(uuid)
 	w.Header().Set("Content-Type", "application/json")
-	err := json.NewEncoder(w).Encode(product)
-	if err != nil {
+	if err := json.NewEncoder(w).Encode(product); err != nil {
 		log.Fatalln(err)
 	}
 }
