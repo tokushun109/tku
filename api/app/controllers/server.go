@@ -3,11 +3,21 @@ package controllers
 import (
 	"api/config"
 	"fmt"
+	"log"
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
 )
+
+func GenerateUuid() (string, error) {
+	uuidObj, err := uuid.NewUUID()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return uuidObj.String(), err
+}
 
 func StartMainServer() error {
 	// gorilla/muxを使ったルーティング
