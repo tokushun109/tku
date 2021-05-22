@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS creator(
     id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(30),
+    name VARCHAR(30) NOT NULL,
     introduction TEXT(1000),
     logo VARCHAR(255),
     created_at DATETIME,

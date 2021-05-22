@@ -1,7 +1,8 @@
 CREATE TABLE IF NOT EXISTS sales_site(
     id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(30),
-    url VARCHAR(255),
+    uuid VARCHAR(36) NOT NULL UNIQUE,
+    name VARCHAR(30) NOT NULL,
+    url VARCHAR(255) NOT NULL,
     created_at DATETIME,
     updated_at DATETIME,
     deleted_at DATETIME
@@ -9,8 +10,9 @@ CREATE TABLE IF NOT EXISTS sales_site(
 
 CREATE TABLE IF NOT EXISTS product_to_sales_site(
     id INT PRIMARY KEY AUTO_INCREMENT,
-    product_id INT,
-    sales_site_id INT,
+    name VARCHAR(30) NOT NULL UNIQUE,
+    product_id INT NOT NULL,
+    sales_site_id INT NOT NULL,
     created_at DATETIME,
     deleted_at DATETIME,
     FOREIGN KEY (product_id) REFERENCES product (id),

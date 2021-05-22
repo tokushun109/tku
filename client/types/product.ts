@@ -1,7 +1,6 @@
 import { IAccessoryCategory, IMaterialCategory, ISalesSite } from 'types'
 
 export interface IProductImage {
-    uuid: string
     name: string
     path: string
 }
