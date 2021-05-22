@@ -3,14 +3,16 @@
         <c-dialog
             :visible.sync="dialogVisible"
             width="1200px"
-            height="300px"
+            height="350px"
             :title="accessoryCategoryModel.uuid === '' ? '新しいアクセサリーカテゴリーを登録' : accessoryCategoryModel.name + 'を編集'"
             class="c-accessory-edit-modeal"
             @close="$emit('close')"
             @confirm="saveHandler()"
         >
             <c-form bordered>
-                <c-input :model.sync="accessoryCategoryModel.name" />
+                <c-input-label label="アクセサリーカテゴリー名" required>
+                    <c-input :model.sync="accessoryCategoryModel.name" />
+                </c-input-label>
             </c-form>
         </c-dialog>
     </div>
