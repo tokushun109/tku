@@ -17,6 +17,9 @@
                 <c-input-label label="商品画像">
                     <c-file-upload @c-file-uploaded="fileUploadHandler($event)" />
                 </c-input-label>
+                <c-input-label label="アクセサリーカテゴリー">
+                    <c-dropdown name="accessory-category" :items="accessoryCategories" :model.sync="productModel.accessoryCategory" property="name" />
+                </c-input-label>
             </c-form>
         </c-dialog>
     </div>
@@ -24,12 +27,19 @@
 
 <script lang="ts">
 import { Component, PropSync, Vue } from 'nuxt-property-decorator'
-import { IProduct } from '~/types'
+import { IAccessoryCategory, IMaterialCategory, IProduct } from '~/types'
 
 @Component({})
 export default class CProductEdit extends Vue {
     @PropSync('visible') dialogVisible!: boolean
     @PropSync('model') productModel!: IProduct
+
+    accessoryCategories: Array<IAccessoryCategory> = []
+    materialCategories: Array<IMaterialCategory> = []
+
+    async mounted() {
+        this.accessoryCategories = await this.$axios.$get(`/accessory_category`)
+    }
 
     fileUploadHandler(files: Array<File>) {
         console.log(files)

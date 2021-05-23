@@ -6,7 +6,7 @@ export function newProduct(): IProduct {
         uuid: '',
         name: '',
         description: '',
-        accessoryCategory: null,
+        accessoryCategory: newAccessoryCategory(),
         materialCategories: [],
         productImages: [],
         salesSites: [],
