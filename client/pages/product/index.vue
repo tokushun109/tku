@@ -14,7 +14,7 @@
 <script lang="ts">
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
-import { IProduct } from '~/types'
+import { IProduct, newProduct } from '~/types'
 @Component({
     head: {
         title: '商品一覧',
@@ -22,6 +22,9 @@ import { IProduct } from '~/types'
 })
 export default class PageProductIndex extends Vue {
     products: Array<IProduct> = []
+    // form用のproductModel
+    productModel: IProduct = newProduct()
+
     async asyncData({ app }: Context) {
         try {
             const products = await app.$axios.$get(`/product`)
