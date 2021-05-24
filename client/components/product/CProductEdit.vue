@@ -18,7 +18,10 @@
                     <c-file-upload @c-file-uploaded="fileUploadHandler($event)" />
                 </c-input-label>
                 <c-input-label label="アクセサリーカテゴリー">
-                    <c-dropdown name="accessory-category" :items="accessoryCategories" :model.sync="productModel.accessoryCategory" property="name" />
+                    <c-dropdown name="accessory-category" :items="accessoryCategories" :model.sync="productModel.accessoryCategory" />
+                </c-input-label>
+                <c-input-label label="材料カテゴリー">
+                    <c-dropdown name="material-category" :items="materialCategories" :model.sync="productModel.materialCategories" multiple />
                 </c-input-label>
             </c-form>
         </c-dialog>
@@ -39,6 +42,7 @@ export default class CProductEdit extends Vue {
 
     async mounted() {
         this.accessoryCategories = await this.$axios.$get(`/accessory_category`)
+        this.materialCategories = await this.$axios.$get(`/material_category`)
     }
 
     fileUploadHandler(files: Array<File>) {
