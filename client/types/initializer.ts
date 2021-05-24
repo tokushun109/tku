@@ -7,7 +7,7 @@ export function newProduct(): IProduct {
         name: '',
         description: '',
         accessoryCategory: newAccessoryCategory(),
-        materialCategories: [],
+        materialCategories: new Array(newMaterialCategory()),
         productImages: [],
         salesSites: [],
     }

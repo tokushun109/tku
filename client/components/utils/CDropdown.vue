@@ -9,7 +9,7 @@
             :disabled="disabled"
             @change="checkedHandler"
         >
-            <option value=""></option>
+            <option v-if="!multiple" value=""></option>
             <option v-for="(item, index) in items" :key="index" :value="item" :selected="index === 0">
                 {{ item[property] }}
             </option>
@@ -33,7 +33,7 @@ export default class CDropdown extends Vue {
     // optionに渡されるリスト
     @Prop({ type: Array, default: null }) items!: Array<any>
     // itemのどのプロパティを使用するか
-    @Prop({ type: String, default: null }) property!: string
+    @Prop({ type: String, default: 'name' }) property!: string
 
     // selectのname属性を取得
     get selectName() {
