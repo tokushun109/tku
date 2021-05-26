@@ -1,11 +1,13 @@
 package models
 
+import "database/sql"
+
 type Product struct {
 	DefaultModel
 	Uuid                string             `json:"uuid"`
 	Name                string             `json:"name"`
 	Description         string             `json:"description"`
-	AccessoryCategoryId int                `json:"-"`
+	AccessoryCategoryId sql.NullInt64      `json:"-"`
 	AccessoryCategory   AccessoryCategory  `json:"accessoryCategory"`
 	MaterialCategories  []MaterialCategory `gorm:"many2many:product_to_material_category" json:"materialCategories"`
 	ProductImages       []ProductImage     `gorm:"hasmany:product_image" json:"productImages"`
@@ -39,4 +41,9 @@ func GetProduct(uuid string) (product Product) {
 		Related(&product.MaterialCategories, "MaterialCategories").
 		Related(&product.SalesSites, "SalesSites")
 	return product
+}
+
+func InsertProduct(product *Product) {
+	Db.NewRecord(product)
+	Db.Create(&product)
 }
