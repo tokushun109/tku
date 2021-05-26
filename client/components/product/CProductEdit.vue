@@ -6,9 +6,10 @@
             :title="productModel.uuid === '' ? '新しい商品を登録' : productModel.name + 'を編集'"
             class="c-product-edit-modeal"
             @close="$emit('close')"
+            @confirm="saveHandler()"
         >
             <c-form bordered>
-                <c-input-label label="商品名">
+                <c-input-label label="商品名" required>
                     <c-input :model.sync="productModel.name" />
                 </c-input-label>
                 <c-input-label label="商品説明">
@@ -43,6 +44,12 @@ export default class CProductEdit extends Vue {
     async mounted() {
         this.accessoryCategories = await this.$axios.$get(`/accessory_category`)
         this.materialCategories = await this.$axios.$get(`/material_category`)
+    }
+
+    async saveHandler() {
+        await this.$axios.$post(`/product`, this.productModel).catch(() => {})
+        this.dialogVisible = false
+        this.$emit('create')
     }
 
     fileUploadHandler(files: Array<File>) {
