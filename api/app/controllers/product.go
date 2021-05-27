@@ -44,6 +44,9 @@ func createProductHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 	product.Uuid = uuid
+	// アクセサリーカテゴリーの設定
+	accesstory_category := models.GetAccessoryCategory(product.AccessoryCategory.Uuid)
+	product.AccessoryCategoryId = &accesstory_category.ID
 	// modelの呼び出し
 	models.InsertProduct(&product)
 	responseBody, err := json.Marshal(product)
