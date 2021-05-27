@@ -12,7 +12,7 @@ import (
 )
 
 func GenerateUuid() (string, error) {
-	uuidObj, err := uuid.NewUUID()
+	uuidObj, err := uuid.NewRandom()
 	if err != nil {
 		log.Fatalln(err)
 	}
