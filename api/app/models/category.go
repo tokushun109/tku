@@ -21,6 +21,11 @@ func GetAllAccessoryCategories() (accessoryCategories AccessoryCategories) {
 	return accessoryCategories
 }
 
+func GetAccessoryCategory(uuid string) (accessory_category AccessoryCategory) {
+	Db.First(&accessory_category, "uuid = ?", uuid)
+	return accessory_category
+}
+
 func GetAllMaterialCategories() (materialCategories MaterialCategories) {
 	Db.Find(&materialCategories)
 	return materialCategories
