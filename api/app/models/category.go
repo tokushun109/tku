@@ -1,5 +1,7 @@
 package models
 
+import "log"
+
 type AccessoryCategory struct {
 	DefaultModel
 	Uuid string `json:"uuid"`
@@ -21,9 +23,21 @@ func GetAllAccessoryCategories() (accessoryCategories AccessoryCategories) {
 	return accessoryCategories
 }
 
-func GetAccessoryCategory(uuid string) (accessory_category AccessoryCategory) {
-	Db.First(&accessory_category, "uuid = ?", uuid)
-	return accessory_category
+func GetAccessoryCategory(uuid string) (accessoryCategory AccessoryCategory) {
+	Db.First(&accessoryCategory, "uuid = ?", uuid)
+	return accessoryCategory
+}
+
+func InsertAccessoryCategory(accessoryCategory *AccessoryCategory) {
+	// uuidの設定
+	uuid, err := GenerateUuid()
+	if err != nil {
+		log.Fatal(err)
+	}
+	accessoryCategory.Uuid = uuid
+
+	Db.NewRecord(accessoryCategory)
+	Db.Create(&accessoryCategory)
 }
 
 func GetAllMaterialCategories() (materialCategories MaterialCategories) {
@@ -31,12 +45,18 @@ func GetAllMaterialCategories() (materialCategories MaterialCategories) {
 	return materialCategories
 }
 
-func InsertAccessoryCategory(accessory_category *AccessoryCategory) {
-	Db.NewRecord(accessory_category)
-	Db.Create(&accessory_category)
+func GetMaterialCategory(uuid string) (materialCategory MaterialCategory) {
+	Db.First(&materialCategory, "uuid = ?", uuid)
+	return materialCategory
 }
 
-func InsertMaterialCategory(material_category *MaterialCategory) {
-	Db.NewRecord(material_category)
-	Db.Create(&material_category)
+func InsertMaterialCategory(materialCategory *MaterialCategory) {
+	// uuidの設定
+	uuid, err := GenerateUuid()
+	if err != nil {
+		log.Fatal(err)
+	}
+	materialCategory.Uuid = uuid
+	Db.NewRecord(materialCategory)
+	Db.Create(&materialCategory)
 }

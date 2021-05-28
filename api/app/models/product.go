@@ -1,5 +1,9 @@
 package models
 
+import (
+	"log"
+)
+
 type Product struct {
 	DefaultModel
 	Uuid                string             `json:"uuid"`
@@ -42,6 +46,25 @@ func GetProduct(uuid string) (product Product) {
 }
 
 func InsertProduct(product *Product) {
+	// uuidの設定
+	uuid, err := GenerateUuid()
+	if err != nil {
+		log.Fatal(err)
+	}
+	product.Uuid = uuid
+	// アクセサリーカテゴリーの設定
+	accesstoryCategory := GetAccessoryCategory(product.AccessoryCategory.Uuid)
+	product.AccessoryCategoryId = accesstoryCategory.ID
+	// リクエストの材料カテゴリー情報を取得しておく
+	materialCategories := product.MaterialCategories
+	// 商品データの作成
 	Db.NewRecord(product)
-	Db.Omit("AccessoryCategory").Create(&product)
+	Db.Omit("AccessoryCategory", "MaterialCategories").Create(&product)
+	// 商品と材料カテゴリーを紐付け
+	for _, materialCategory := range materialCategories {
+		// IDを取得する
+		materialCategoryId := GetMaterialCategory(materialCategory.Uuid).ID
+		var productToMaterialCategory = ProductToMaterialCategory{ProductId: product.ID, MaterialCategoryId: materialCategoryId}
+		Db.Create(&productToMaterialCategory)
+	}
 }
