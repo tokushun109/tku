@@ -38,15 +38,6 @@ func createProductHandler(w http.ResponseWriter, r *http.Request) {
 	if err := json.Unmarshal(reqBody, &product); err != nil {
 		log.Fatal(err)
 	}
-	// uuidの設定
-	uuid, err := GenerateUuid()
-	if err != nil {
-		log.Fatal(err)
-	}
-	product.Uuid = uuid
-	// アクセサリーカテゴリーの設定
-	accesstory_category := models.GetAccessoryCategory(product.AccessoryCategory.Uuid)
-	product.AccessoryCategoryId = &accesstory_category.ID
 	// modelの呼び出し
 	models.InsertProduct(&product)
 	responseBody, err := json.Marshal(product)

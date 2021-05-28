@@ -21,19 +21,13 @@ func getAllAccessoryCategoriesHandler(w http.ResponseWriter, r *http.Request) {
 func createAccessoryCategoriesHandler(w http.ResponseWriter, r *http.Request) {
 	reqBody, _ := ioutil.ReadAll(r.Body)
 
-	var accessory_category models.AccessoryCategory
-	if err := json.Unmarshal(reqBody, &accessory_category); err != nil {
+	var accessoryCategory models.AccessoryCategory
+	if err := json.Unmarshal(reqBody, &accessoryCategory); err != nil {
 		log.Fatal(err)
 	}
-	// uuidの設定
-	uuid, err := GenerateUuid()
-	if err != nil {
-		log.Fatal(err)
-	}
-	accessory_category.Uuid = uuid
 	// modelの呼び出し
-	models.InsertAccessoryCategory(&accessory_category)
-	responseBody, err := json.Marshal(accessory_category)
+	models.InsertAccessoryCategory(&accessoryCategory)
+	responseBody, err := json.Marshal(accessoryCategory)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -55,19 +49,13 @@ func getAllMaterialCategoriesHandler(w http.ResponseWriter, r *http.Request) {
 func createMaterialCategoriesHandler(w http.ResponseWriter, r *http.Request) {
 	reqBody, _ := ioutil.ReadAll(r.Body)
 
-	var material_category models.MaterialCategory
-	if err := json.Unmarshal(reqBody, &material_category); err != nil {
+	var materialCategory models.MaterialCategory
+	if err := json.Unmarshal(reqBody, &materialCategory); err != nil {
 		log.Fatal(err)
 	}
-	// uuidの設定
-	uuid, err := GenerateUuid()
-	if err != nil {
-		log.Fatal(err)
-	}
-	material_category.Uuid = uuid
 	// modelの呼び出し
-	models.InsertMaterialCategory(&material_category)
-	responseBody, err := json.Marshal(material_category)
+	models.InsertMaterialCategory(&materialCategory)
+	responseBody, err := json.Marshal(materialCategory)
 	if err != nil {
 		log.Fatal(err)
 	}

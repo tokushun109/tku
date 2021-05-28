@@ -16,10 +16,18 @@ var Db *gorm.DB
 
 // ID, CreatedAt, UpdatedAt, DeletedAtのfieldを持つgorm.Modelを継承
 type DefaultModel struct {
-	ID        uint       `gorm:"primary_key" json:"-"`
+	ID        *uint      `gorm:"primary_key" json:"-"`
 	CreatedAt time.Time  `json:"-"`
 	UpdatedAt time.Time  `json:"-"`
 	DeletedAt *time.Time `sql:"index" json:"-"`
+}
+
+func GenerateUuid() (string, error) {
+	uuidObj, err := uuid.NewRandom()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return uuidObj.String(), err
 }
 
 func gormConnect() *gorm.DB {
