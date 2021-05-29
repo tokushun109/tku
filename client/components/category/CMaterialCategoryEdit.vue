@@ -1,11 +1,11 @@
 <template>
-    <div class="c-material-edit">
+    <div class="c-material-category-edit">
         <c-dialog
             :visible.sync="dialogVisible"
             width="1200px"
             height="350px"
             :title="materialCategoryModel.uuid === '' ? '新しい材料カテゴリーを登録' : materialCategoryModel.name + 'を編集'"
-            class="c-material-edit-modeal"
+            class="c-material-category-edit-modeal"
             @close="$emit('close')"
             @confirm="saveHandler()"
         >

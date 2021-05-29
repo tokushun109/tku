@@ -3,6 +3,7 @@ package controllers
 import (
 	"api/app/models"
 	"encoding/json"
+	"io/ioutil"
 	"log"
 	"net/http"
 )
@@ -14,6 +15,25 @@ func getAllSalesSitesHandler(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(salesSites); err != nil {
 		log.Fatalln(err)
 	}
+}
+
+// 販売サイトの新規作成
+func createSalesSitesHandler(w http.ResponseWriter, r *http.Request) {
+	reqBody, _ := ioutil.ReadAll(r.Body)
+
+	var salesSite models.SalesSite
+	if err := json.Unmarshal(reqBody, &salesSite); err != nil {
+		log.Fatal(err)
+	}
+	// modelの呼び出し
+	models.InsertSalesSite(&salesSite)
+	responseBody, err := json.Marshal(salesSite)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(responseBody)
 }
 
 // スキルマーケット一覧を取得
