@@ -25,6 +25,7 @@ func StartMainServer() error {
 	r.HandleFunc("/api/material_category", createMaterialCategoriesHandler).Methods("POST")
 	// 販売サイト
 	r.HandleFunc("/api/sales_site", getAllSalesSitesHandler).Methods("GET")
+	r.HandleFunc("/api/sales_site", createSalesSitesHandler).Methods("POST")
 	// スキルマーケット
 	r.HandleFunc("/api/skill_market", getAllSkillMarketsHandler).Methods("GET")
 	// SNS

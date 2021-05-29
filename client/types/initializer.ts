@@ -1,5 +1,4 @@
-import { IAccessoryCategory, IMaterialCategory } from './category'
-import { IProduct } from './product'
+import { IAccessoryCategory, IMaterialCategory, IProduct, ISalesSite } from '~/types'
 
 export function newProduct(): IProduct {
     return {
@@ -24,5 +23,13 @@ export function newMaterialCategory(): IMaterialCategory {
     return {
         uuid: '',
         name: '',
+    }
+}
+
+export function newSalesSite(): ISalesSite {
+    return {
+        uuid: '',
+        name: '',
+        url: '',
     }
 }

@@ -1,11 +1,11 @@
 <template>
-    <div class="c-accessory-edit">
+    <div class="c-accessory-category-edit">
         <c-dialog
             :visible.sync="dialogVisible"
             width="1200px"
             height="350px"
             :title="accessoryCategoryModel.uuid === '' ? '新しいアクセサリーカテゴリーを登録' : accessoryCategoryModel.name + 'を編集'"
-            class="c-accessory-edit-modeal"
+            class="c-accessory-category-edit-modeal"
             @close="$emit('close')"
             @confirm="saveHandler()"
         >
