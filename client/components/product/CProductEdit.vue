@@ -37,7 +37,7 @@ import { Component, PropSync, Vue } from 'nuxt-property-decorator'
 import { IAccessoryCategory, IMaterialCategory, IProduct, ISalesSite } from '~/types'
 
 @Component({})
-export default class CProductEdit extends Vue {
+export default class CSalesSiteEdit extends Vue {
     @PropSync('visible') dialogVisible!: boolean
     @PropSync('model') productModel!: IProduct
 
