@@ -55,16 +55,21 @@ func InsertProduct(product *Product) {
 	// アクセサリーカテゴリーの設定
 	accesstoryCategory := GetAccessoryCategory(product.AccessoryCategory.Uuid)
 	product.AccessoryCategoryId = accesstoryCategory.ID
-	// リクエストの材料カテゴリー情報を取得しておく
-	materialCategories := product.MaterialCategories
-	// 商品データの作成
 	Db.NewRecord(product)
-	Db.Omit("AccessoryCategory", "MaterialCategories").Create(&product)
+	Db.Omit("AccessoryCategory", "MaterialCategories", "SalesSites").Create(&product)
 	// 商品と材料カテゴリーを紐付け
-	for _, materialCategory := range materialCategories {
+	for _, materialCategory := range product.MaterialCategories {
 		// IDを取得する
 		materialCategoryId := GetMaterialCategory(materialCategory.Uuid).ID
 		var productToMaterialCategory = ProductToMaterialCategory{ProductId: product.ID, MaterialCategoryId: materialCategoryId}
 		Db.Create(&productToMaterialCategory)
 	}
+	// 商品と販売サイトを紐付け
+	for _, salesSite := range product.SalesSites {
+		// IDを取得する
+		salesSiteId := GetSalesSite(salesSite.Uuid).ID
+		var productToSalesSite = ProductToSalesSite{ProductId: product.ID, SalesSiteId: salesSiteId}
+		Db.Create(&productToSalesSite)
+	}
+
 }

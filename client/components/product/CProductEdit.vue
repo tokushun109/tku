@@ -24,6 +24,9 @@
                 <c-input-label label="材料カテゴリー">
                     <c-dropdown name="material-category" :items="materialCategories" :model.sync="productModel.materialCategories" multiple />
                 </c-input-label>
+                <c-input-label label="販売サイト">
+                    <c-dropdown name="sales-site" :items="salesSites" :model.sync="productModel.salesSites" multiple />
+                </c-input-label>
             </c-form>
         </c-dialog>
     </div>
@@ -31,7 +34,7 @@
 
 <script lang="ts">
 import { Component, PropSync, Vue } from 'nuxt-property-decorator'
-import { IAccessoryCategory, IMaterialCategory, IProduct } from '~/types'
+import { IAccessoryCategory, IMaterialCategory, IProduct, ISalesSite } from '~/types'
 
 @Component({})
 export default class CProductEdit extends Vue {
@@ -40,10 +43,12 @@ export default class CProductEdit extends Vue {
 
     accessoryCategories: Array<IAccessoryCategory> = []
     materialCategories: Array<IMaterialCategory> = []
+    salesSites: Array<ISalesSite> = []
 
     async mounted() {
         this.accessoryCategories = await this.$axios.$get(`/accessory_category`)
         this.materialCategories = await this.$axios.$get(`/material_category`)
+        this.salesSites = await this.$axios.$get(`/sales_site`)
     }
 
     async saveHandler() {

@@ -34,6 +34,11 @@ func GetAllSalesSites() (salesSites SalesSites) {
 	return salesSites
 }
 
+func GetSalesSite(uuid string) (salesSite SalesSite) {
+	Db.First(&salesSite, "uuid = ?", uuid)
+	return salesSite
+}
+
 func InsertSalesSite(salesSite *SalesSite) {
 	// uuidの設定
 	uuid, err := GenerateUuid()
