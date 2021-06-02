@@ -17,6 +17,8 @@ func StartMainServer() error {
 	r.HandleFunc("/api/product", getAllProductsHandler).Methods("GET")
 	r.HandleFunc("/api/product/{uuid}", getProductHandler).Methods("GET")
 	r.HandleFunc("/api/product", createProductHandler).Methods("POST")
+	// 商品画像
+	r.HandleFunc("/api/product/{uuid}/product_image", createProductImageHandler).Methods("POST")
 	// アクセサリーカテゴリー
 	r.HandleFunc("/api/accessory_category", getAllAccessoryCategoriesHandler).Methods("GET")
 	r.HandleFunc("/api/accessory_category", createAccessoryCategoriesHandler).Methods("POST")

@@ -23,7 +23,7 @@ type ProductImage struct {
 	Uuid      string `json:"uuid"`
 	Name      string `json:"name"`
 	MimeType  string `json:"-"`
-	ProductId int    `json:"-"`
+	ProductId *uint  `json:"-"`
 	Path      string `json:"path"`
 }
 
@@ -71,5 +71,15 @@ func InsertProduct(product *Product) {
 		var productToSalesSite = ProductToSalesSite{ProductId: product.ID, SalesSiteId: salesSiteId}
 		Db.Create(&productToSalesSite)
 	}
+}
 
+func InsertProductImage(productImage *ProductImage) {
+	// uuidの設定
+	uuid, err := GenerateUuid()
+	if err != nil {
+		log.Fatal(err)
+	}
+	productImage.Uuid = uuid
+	Db.NewRecord(productImage)
+	Db.Create(&productImage)
 }
