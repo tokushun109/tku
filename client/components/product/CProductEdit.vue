@@ -44,6 +44,7 @@ export default class CSalesSiteEdit extends Vue {
     accessoryCategories: Array<IAccessoryCategory> = []
     materialCategories: Array<IMaterialCategory> = []
     salesSites: Array<ISalesSite> = []
+    uploadFiles: Array<File> = []
 
     async mounted() {
         this.accessoryCategories = await this.$axios.$get(`/accessory_category`)
@@ -52,13 +53,27 @@ export default class CSalesSiteEdit extends Vue {
     }
 
     async saveHandler() {
-        await this.$axios.$post(`/product`, this.productModel).catch(() => {})
+        const createProduct = await this.$axios.$post(`/product`, this.productModel).catch(() => {})
+        // 画像を選択していたら、アップロードを行う
+        if (this.uploadFiles.length > 0) {
+            const params = new FormData()
+            this.uploadFiles.forEach((file, index) => {
+                params.append(`file${index}`, file)
+            })
+            await this.$axios
+                .$post(`/product/${createProduct.uuid}/product_image`, params, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                })
+                .catch(() => {})
+        }
         this.dialogVisible = false
         this.$emit('create')
     }
 
     fileUploadHandler(files: Array<File>) {
-        console.log(files)
+        this.uploadFiles = files
     }
 }
 </script>
