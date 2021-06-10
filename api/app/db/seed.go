@@ -39,7 +39,7 @@ func main() {
 
 	// product_image
 	var productImage models.ProductImage
-	productImage.MimeType = "test_mime_type"
+	productImage.MimeType = "image/jpeg"
 	productImage.Path = "test_path"
 	productImage.ProductId = product.ID
 	models.InsertProductImage(&productImage)
