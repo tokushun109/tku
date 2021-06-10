@@ -1,6 +1,7 @@
 package models
 
 import (
+	"api/config"
 	"log"
 )
 
@@ -12,7 +13,7 @@ type Product struct {
 	AccessoryCategoryId *uint              `json:"-"`
 	AccessoryCategory   AccessoryCategory  `json:"accessoryCategory"`
 	MaterialCategories  []MaterialCategory `gorm:"many2many:product_to_material_category" json:"materialCategories"`
-	ProductImages       []ProductImage     `gorm:"hasmany:product_image" json:"productImages"`
+	ProductImages       []*ProductImage    `gorm:"hasmany:product_image" json:"productImages"`
 	SalesSites          []SalesSite        `gorm:"many2many:product_to_sales_site" json:"salesSites"`
 }
 
@@ -24,7 +25,18 @@ type ProductImage struct {
 	Name      string `json:"name"`
 	MimeType  string `json:"-"`
 	ProductId *uint  `json:"-"`
-	Path      string `json:"path"`
+	// 画像の保存場所のパス
+	Path string
+	// フロントで画像を取得する時のapiパス
+	ApiPath string `json:"apiPath"`
+}
+
+// 商品に紐づく商品画像に画像取得用のapiをつける
+func setProductImageApiPath(product *Product) {
+	base := config.Config.ApiBaseUrl
+	for _, productImage := range product.ProductImages {
+		productImage.ApiPath = base + "/product_image/" + productImage.Uuid + "/blob"
+	}
 }
 
 func GetAllProducts() (products Products) {
@@ -33,6 +45,9 @@ func GetAllProducts() (products Products) {
 		Preload("MaterialCategories").
 		Preload("SalesSites").
 		Find(&products)
+	for _, product := range products {
+		setProductImageApiPath(&product)
+	}
 	return products
 }
 
@@ -42,6 +57,7 @@ func GetProduct(uuid string) (product Product) {
 		Related(&product.ProductImages, "ProductImages").
 		Related(&product.MaterialCategories, "MaterialCategories").
 		Related(&product.SalesSites, "SalesSites")
+	setProductImageApiPath(&product)
 	return product
 }
 
@@ -71,6 +87,11 @@ func InsertProduct(product *Product) {
 		var productToSalesSite = ProductToSalesSite{ProductId: product.ID, SalesSiteId: salesSiteId}
 		Db.Create(&productToSalesSite)
 	}
+}
+
+func GetProductImage(uuid string) (productImage ProductImage) {
+	Db.First(&productImage, "uuid = ?", uuid)
+	return productImage
 }
 
 func InsertProductImage(productImage *ProductImage) {

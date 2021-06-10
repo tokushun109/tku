@@ -35,25 +35,23 @@ import { IAccessoryCategory, IMaterialCategory, newAccessoryCategory, newMateria
     },
 })
 export default class PageAdminCategoryIndex extends Vue {
+    // アクセサリーカテゴリー一覧
     accessoryCategories: Array<IAccessoryCategory> = []
+
+    // 材料カテゴリー一覧
     materialCategories: Array<IMaterialCategory> = []
+
     // アクセサリーカテゴリー用のmodalの表示切り替え
     accessoryDialogVisible: boolean = false
+
     // 材料カテゴリー用のmodalの表示切り替え
     materialDialogVisible: boolean = false
+
     // form用のaccessoryCategoryModel
     accessoryCategoryModel: IAccessoryCategory = newAccessoryCategory()
+
     // form用のmaterialCategoryModel
     materialCategoryModel: IMaterialCategory = newMaterialCategory()
-    async asyncData({ app }: Context) {
-        try {
-            const accessoryCategories = await app.$axios.$get(`/accessory_category`)
-            const materialCategories = await app.$axios.$get(`/material_category`)
-            return { accessoryCategories, materialCategories }
-        } catch (e) {
-            return { accessoryCategories: [], materialCategories: [] }
-        }
-    }
 
     // モーダルの切り替え
     accessoryDialogToggle() {
@@ -72,6 +70,16 @@ export default class PageAdminCategoryIndex extends Vue {
         } else if (mode === 'material_category') {
             this.materialCategories = await this.$axios.$get(`/material_category`)
             this.materialCategoryModel = newMaterialCategory()
+        }
+    }
+
+    async asyncData({ app }: Context) {
+        try {
+            const accessoryCategories = await app.$axios.$get(`/accessory_category`)
+            const materialCategories = await app.$axios.$get(`/material_category`)
+            return { accessoryCategories, materialCategories }
+        } catch (e) {
+            return { accessoryCategories: [], materialCategories: [] }
         }
     }
 }

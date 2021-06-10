@@ -32,7 +32,7 @@ func getAllProductsHandler(w http.ResponseWriter, r *http.Request) {
 // 商品詳細を取得
 func getProductHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	uuid := vars["uuid"]
+	uuid := vars["product_uuid"]
 	product := models.GetProduct(uuid)
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(product); err != nil {
@@ -58,10 +58,26 @@ func createProductHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(responseBody)
 }
 
+// 商品画像のパスからバイナリデータを返す
+func getProductImageBlobHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	productImageUuid := vars["product_image_uuid"]
+	productImage := models.GetProductImage(productImageUuid)
+	file, err := os.Open(productImage.Path)
+	if err != nil {
+		log.Println(err)
+	}
+	defer file.Close()
+
+	binary, _ := ioutil.ReadAll(file)
+	w.Header().Set("Content-Type", "image/jpeg")
+	w.Write(binary)
+}
+
 // 商品画像の新規作成
 func createProductImageHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	uuid := vars["uuid"]
+	uuid := vars["product_uuid"]
 	// requestのuuidから商品のIDを取得しておく
 	productId := models.GetProduct(uuid).ID
 	i := 0
