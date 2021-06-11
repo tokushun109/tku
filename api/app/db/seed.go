@@ -34,6 +34,13 @@ func main() {
 	models.InsertSkillMarket(&skillMarket)
 	fmt.Println("skill_marketを作成しました")
 
+	// sns
+	var sns models.Sns
+	sns.Name = "example.com"
+	sns.Url = "https://example.com/"
+	models.InsertSns(&sns)
+	fmt.Println("snsを作成しました")
+
 	// product
 	var product models.Product
 	product.Name = "test_product"

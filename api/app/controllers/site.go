@@ -72,3 +72,22 @@ func getAllSnsListHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatalln(err)
 	}
 }
+
+// SNSの新規作成
+func createSnsHandler(w http.ResponseWriter, r *http.Request) {
+	reqBody, _ := ioutil.ReadAll(r.Body)
+
+	var sns models.Sns
+	if err := json.Unmarshal(reqBody, &sns); err != nil {
+		log.Fatal(err)
+	}
+	// modelの呼び出し
+	models.InsertSns(&sns)
+	responseBody, err := json.Marshal(sns)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(responseBody)
+}

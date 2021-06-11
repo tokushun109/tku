@@ -34,6 +34,7 @@ func StartMainServer() error {
 	r.HandleFunc("/api/skill_market", createSkillMarketHandler).Methods("POST")
 	// SNS
 	r.HandleFunc("/api/sns", getAllSnsListHandler).Methods("GET")
+	r.HandleFunc("/api/sns", createSnsHandler).Methods("POST")
 	// 製作者
 	r.HandleFunc("/api/creator", getCreatorHandler).Methods("GET")
 	// ユーザー
