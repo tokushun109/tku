@@ -26,9 +26,9 @@ type ProductImage struct {
 	MimeType  string `json:"-"`
 	ProductId *uint  `json:"-"`
 	// 画像の保存場所のパス
-	Path string
+	Path string `json:"-"`
 	// フロントで画像を取得する時のapiパス
-	ApiPath string `json:"apiPath"`
+	ApiPath string `gorm:"-" json:"apiPath"`
 }
 
 // 商品に紐づく商品画像に画像取得用のapiをつける
