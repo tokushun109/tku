@@ -1,5 +1,5 @@
 export interface ISkillMarket {
-    id: number
+    uuid: string
     name: string
     url: string
 }

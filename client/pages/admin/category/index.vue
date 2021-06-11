@@ -1,6 +1,6 @@
 <template>
     <c-page>
-        <div>
+        <div class="admin-category-list">
             <c-button primary @c-click="accessoryDialogToggle">新規追加</c-button>
             <c-accessory-category-edit
                 :visible.sync="accessoryDialogVisible"

@@ -22,15 +22,16 @@ func StartMainServer() error {
 	r.HandleFunc("/api/product/{product_uuid}/product_image", createProductImageHandler).Methods("POST")
 	// アクセサリーカテゴリー
 	r.HandleFunc("/api/accessory_category", getAllAccessoryCategoriesHandler).Methods("GET")
-	r.HandleFunc("/api/accessory_category", createAccessoryCategoriesHandler).Methods("POST")
+	r.HandleFunc("/api/accessory_category", createAccessoryCategoryHandler).Methods("POST")
 	// 材料カテゴリー
 	r.HandleFunc("/api/material_category", getAllMaterialCategoriesHandler).Methods("GET")
-	r.HandleFunc("/api/material_category", createMaterialCategoriesHandler).Methods("POST")
+	r.HandleFunc("/api/material_category", createMaterialCategoryHandler).Methods("POST")
 	// 販売サイト
 	r.HandleFunc("/api/sales_site", getAllSalesSitesHandler).Methods("GET")
-	r.HandleFunc("/api/sales_site", createSalesSitesHandler).Methods("POST")
+	r.HandleFunc("/api/sales_site", createSalesSiteHandler).Methods("POST")
 	// スキルマーケット
 	r.HandleFunc("/api/skill_market", getAllSkillMarketsHandler).Methods("GET")
+	r.HandleFunc("/api/skill_market", createSkillMarketHandler).Methods("POST")
 	// SNS
 	r.HandleFunc("/api/sns", getAllSnsListHandler).Methods("GET")
 	// 製作者

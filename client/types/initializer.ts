@@ -1,3 +1,4 @@
+import { ISkillMarket } from './skill_market'
 import { IAccessoryCategory, IMaterialCategory, IProduct, ISalesSite } from '~/types'
 
 export function newProduct(): IProduct {
@@ -27,6 +28,14 @@ export function newMaterialCategory(): IMaterialCategory {
 }
 
 export function newSalesSite(): ISalesSite {
+    return {
+        uuid: '',
+        name: '',
+        url: '',
+    }
+}
+
+export function newSkillMarket(): ISkillMarket {
     return {
         uuid: '',
         name: '',

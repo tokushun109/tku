@@ -27,6 +27,13 @@ func main() {
 	models.InsertSalesSite(&salesSite)
 	fmt.Println("sales_siteを作成しました")
 
+	// skill_market
+	var skillMarket models.SkillMarket
+	skillMarket.Name = "example.com"
+	skillMarket.Url = "https://example.com/"
+	models.InsertSkillMarket(&skillMarket)
+	fmt.Println("skill_marketを作成しました")
+
 	// product
 	var product models.Product
 	product.Name = "test_product"
