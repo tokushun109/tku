@@ -18,7 +18,7 @@ func getAllSalesSitesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // 販売サイトの新規作成
-func createSalesSitesHandler(w http.ResponseWriter, r *http.Request) {
+func createSalesSiteHandler(w http.ResponseWriter, r *http.Request) {
 	reqBody, _ := ioutil.ReadAll(r.Body)
 
 	var salesSite models.SalesSite
@@ -45,6 +45,25 @@ func getAllSkillMarketsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// スキルマーケットの新規作成
+func createSkillMarketHandler(w http.ResponseWriter, r *http.Request) {
+	reqBody, _ := ioutil.ReadAll(r.Body)
+
+	var skillmarket models.SkillMarket
+	if err := json.Unmarshal(reqBody, &skillmarket); err != nil {
+		log.Fatal(err)
+	}
+	// modelの呼び出し
+	models.InsertSkillMarket(&skillmarket)
+	responseBody, err := json.Marshal(skillmarket)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(responseBody)
+}
+
 // SNS一覧を取得
 func getAllSnsListHandler(w http.ResponseWriter, r *http.Request) {
 	snsList := models.GetAllSnsList()
@@ -52,4 +71,23 @@ func getAllSnsListHandler(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(snsList); err != nil {
 		log.Fatalln(err)
 	}
+}
+
+// SNSの新規作成
+func createSnsHandler(w http.ResponseWriter, r *http.Request) {
+	reqBody, _ := ioutil.ReadAll(r.Body)
+
+	var sns models.Sns
+	if err := json.Unmarshal(reqBody, &sns); err != nil {
+		log.Fatal(err)
+	}
+	// modelの呼び出し
+	models.InsertSns(&sns)
+	responseBody, err := json.Marshal(sns)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(responseBody)
 }

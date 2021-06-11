@@ -18,7 +18,7 @@ func getAllAccessoryCategoriesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // アクセサリーカテゴリーの新規作成
-func createAccessoryCategoriesHandler(w http.ResponseWriter, r *http.Request) {
+func createAccessoryCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	reqBody, _ := ioutil.ReadAll(r.Body)
 
 	var accessoryCategory models.AccessoryCategory
@@ -46,7 +46,7 @@ func getAllMaterialCategoriesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // 材料カテゴリーの新規作成
-func createMaterialCategoriesHandler(w http.ResponseWriter, r *http.Request) {
+func createMaterialCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	reqBody, _ := ioutil.ReadAll(r.Body)
 
 	var materialCategory models.MaterialCategory

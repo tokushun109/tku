@@ -1,6 +1,6 @@
 <template>
     <c-page>
-        <div>
+        <div class="admin-sales-site-list">
             <c-button primary @c-click="toggle">新規追加</c-button>
             <c-sales-site-edit :visible.sync="dialogVisible" :model.sync="salesSiteModel" @close="toggle" @create="loadingSaleSite()" />
             <ul v-for="salesSite in salesSites" :key="salesSite.uuid">

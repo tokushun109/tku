@@ -56,7 +56,31 @@ func GetAllSkillMarkets() (skillMarkets SkillMarkets) {
 	return skillMarkets
 }
 
+func InsertSkillMarket(skillMarket *SkillMarket) {
+	// uuidの設定
+	uuid, err := GenerateUuid()
+	if err != nil {
+		log.Fatal(err)
+	}
+	skillMarket.Uuid = uuid
+
+	Db.NewRecord(skillMarket)
+	Db.Create(&skillMarket)
+}
+
 func GetAllSnsList() (snsList SnsList) {
 	Db.Find(&snsList)
 	return snsList
+}
+
+func InsertSns(sns *Sns) {
+	// uuidの設定
+	uuid, err := GenerateUuid()
+	if err != nil {
+		log.Fatal(err)
+	}
+	sns.Uuid = uuid
+
+	Db.NewRecord(sns)
+	Db.Create(&sns)
 }

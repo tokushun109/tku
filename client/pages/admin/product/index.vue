@@ -1,6 +1,6 @@
 <template>
     <c-page>
-        <div>
+        <div class="admin-product-list">
             <c-button primary @c-click="toggle">新規追加</c-button>
             <c-product-edit :visible.sync="dialogVisible" :model.sync="productModel" @close="toggle" @create="loadingProduct()" />
             <ul v-for="product in products" :key="product.uuid">
