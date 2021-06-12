@@ -59,16 +59,16 @@ func gormConnect() *gorm.DB {
 	return Db
 }
 
-func init() {
-	Db = gormConnect()
-}
-
-func createUUID() (uuidobj uuid.UUID) {
-	uuidobj, _ = uuid.NewUUID()
-	return uuidobj
-}
-
 func Encrypt(plaintext string) (cryptext string) {
 	cryptext = fmt.Sprintf("%x", sha1.Sum([]byte(plaintext)))
 	return cryptext
+}
+
+func init() {
+	Db = gormConnect()
+
+	if GetCreator().ID == nil {
+		// 製作者の初期データが未作成の場合のみ作成する
+		initialInsertCreator()
+	}
 }
