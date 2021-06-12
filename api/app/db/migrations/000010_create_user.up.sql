@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS user(
     name VARCHAR(30) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
+    is_admin BOOLEAN NOT NULL,
     created_at DATETIME,
     updated_at DATETIME,
     deleted_at DATETIME

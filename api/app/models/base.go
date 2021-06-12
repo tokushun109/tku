@@ -2,7 +2,6 @@ package models
 
 import (
 	"api/config"
-	"crypto/sha1"
 	"fmt"
 	"log"
 	"time"
@@ -57,11 +56,6 @@ func gormConnect() *gorm.DB {
 	// テーブル名を単数系で認識
 	Db.SingularTable(true)
 	return Db
-}
-
-func Encrypt(plaintext string) (cryptext string) {
-	cryptext = fmt.Sprintf("%x", sha1.Sum([]byte(plaintext)))
-	return cryptext
 }
 
 func init() {

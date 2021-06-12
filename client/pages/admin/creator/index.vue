@@ -29,7 +29,7 @@ export default class PageAdminCreatorIndex extends Vue {
         try {
             const creator = await app.$axios.$get(`/creator`)
             const snsList = await app.$axios.$get(`/sns`)
-            const salesSites = await app.$axios.$get(`/sns`)
+            const salesSites = await app.$axios.$get(`/sales_site`)
             return { creator, snsList, salesSites }
         } catch (e) {
             return { creator: null, snsList: [], salesSites: [] }
