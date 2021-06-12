@@ -5,9 +5,8 @@ import (
 	"fmt"
 )
 
+// go run app/db/cmd/seed/create.go
 func main() {
-	// go run app/db/seed.goで初期データを作成
-
 	// accessory_category
 	var accessoryCategory models.AccessoryCategory
 	accessoryCategory.Name = "test_accessory_category"
@@ -58,5 +57,4 @@ func main() {
 	productImage.ProductId = product.ID
 	models.InsertProductImage(&productImage)
 	fmt.Println("product_imageを作成しました")
-
 }
