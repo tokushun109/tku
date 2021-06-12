@@ -10,15 +10,16 @@ import (
 )
 
 type ConfigList struct {
-	Port       string
-	Sql        string
-	LogFile    string
-	Env        string
-	DBUser     string
-	DBName     string
-	DBPass     string
-	Protocol   string
-	ApiBaseUrl string
+	Port        string
+	Sql         string
+	LogFile     string
+	Env         string
+	DBUser      string
+	DBName      string
+	DBPass      string
+	Protocol    string
+	ApiBaseUrl  string
+	CreatorName string
 }
 
 var Config ConfigList
@@ -41,14 +42,15 @@ func LoadConfig() {
 	}
 
 	Config = ConfigList{
-		Port:       cfg.Section("web").Key("port").MustString("8000"),
-		LogFile:    cfg.Section("web").Key("logfile").String(),
-		Sql:        cfg.Section("db").Key("sql").String(),
-		Env:        os.Getenv("ENV"),
-		DBUser:     os.Getenv("DB_USER"),
-		DBName:     os.Getenv("DB_NAME"),
-		DBPass:     os.Getenv("DB_PASS"),
-		Protocol:   os.Getenv("PROTOCOL"),
-		ApiBaseUrl: os.Getenv("API_BASE_URL"),
+		Port:        cfg.Section("web").Key("port").MustString("8000"),
+		LogFile:     cfg.Section("web").Key("logfile").String(),
+		Sql:         cfg.Section("db").Key("sql").String(),
+		Env:         os.Getenv("ENV"),
+		DBUser:      os.Getenv("DB_USER"),
+		DBName:      os.Getenv("DB_NAME"),
+		DBPass:      os.Getenv("DB_PASS"),
+		Protocol:    os.Getenv("PROTOCOL"),
+		ApiBaseUrl:  os.Getenv("API_BASE_URL"),
+		CreatorName: os.Getenv("CREATOR_NAME"),
 	}
 }
