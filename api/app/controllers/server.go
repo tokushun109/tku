@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"api/app/models"
 	"api/config"
 	"fmt"
 	"net/http"
@@ -8,6 +9,17 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
 )
+
+func sessionCheck(uuid string) (session models.Session, err error) {
+	if err == nil {
+		session = models.GetSession(uuid)
+		if !session.IsValidSession() {
+			msg := "無効なsessionです"
+			err = fmt.Errorf("%s", msg)
+		}
+	}
+	return session, err
+}
 
 func StartMainServer() error {
 	// gorilla/muxを使ったルーティング
@@ -38,7 +50,11 @@ func StartMainServer() error {
 	// 製作者
 	r.HandleFunc("/api/creator", getCreatorHandler).Methods("GET")
 	// ユーザー
-	r.HandleFunc("/api/users", getAllUsersHandler).Methods("GET")
+	r.HandleFunc("/api/user", getAllUsersHandler).Methods("GET")
+	// ログイン
+	r.HandleFunc("/api/user/login/{session_uuid}", getLoginUserHandler).Methods("GET")
+	r.HandleFunc("/api/user/login", loginHandler).Methods("POST")
+
 	// corsの設定
 	c := cors.Default().Handler(r)
 	return http.ListenAndServe(port, c)

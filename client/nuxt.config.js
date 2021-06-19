@@ -56,6 +56,7 @@ export default {
         // https://go.nuxtjs.dev/axios
         '@nuxtjs/axios',
         '@nuxtjs/style-resources',
+        ['cookie-universal-nuxt', { parseJSON: false }],
     ],
 
     // Axios module configuration: https://go.nuxtjs.dev/config-axios
@@ -64,4 +65,7 @@ export default {
     },
     // Build Configuration: https://go.nuxtjs.dev/config-build
     build: {},
+    router: {
+        middleware: 'auth',
+    },
 }
