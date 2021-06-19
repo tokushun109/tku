@@ -1,5 +1,5 @@
 <template>
-    <c-page class="page-login">
+    <c-page class="page-login" title="ログイン">
         <c-form bordered slim>
             <c-input-label label="メールアドレス" required>
                 <c-input :model.sync="form.email" />
@@ -22,6 +22,10 @@ interface IloginForm {
     password: string
 }
 
+interface ISession {
+    uuid: string
+}
+
 @Component({
     head: {
         titleTemplate: 'ログイン | admin',
@@ -33,17 +37,12 @@ export default class PageAdminUserLogin extends Vue {
         password: '',
     }
 
-    mounted() {
-        // TODO sessionの確認
-        const hasSession = false
-        if (hasSession) {
-            this.$router.replace('/admin')
-        }
-    }
-
-    onSubmit() {
+    async onSubmit() {
         try {
-            // TODO ログイン情報送信
+            const session: ISession = await this.$axios.$post(`/user/login`, this.form).catch(() => {})
+            await this.$cookies.set('__sess__', session.uuid, {
+                path: '/',
+            })
             this.$router.replace('/admin')
         } catch {}
     }
