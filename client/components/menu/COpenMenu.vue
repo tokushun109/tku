@@ -2,18 +2,20 @@
     <div class="c-open-menu">
         <ul class="c-open-menu-wrapper">
             <c-column column="4">
-                <li @click="closeMenu()">
-                    <nuxt-link to="/">ホーム</nuxt-link>
-                </li>
-                <li @click="closeMenu()">
-                    <nuxt-link to="/product">商品</nuxt-link>
-                </li>
-                <li @click="closeMenu()">
-                    <nuxt-link to="/creator">製作者</nuxt-link>
-                </li>
-                <li @click="closeMenu()">
-                    <nuxt-link to="/order">仕事の依頼</nuxt-link>
-                </li>
+                <ul>
+                    <li @click="closeMenu()">
+                        <nuxt-link to="/">ホーム</nuxt-link>
+                    </li>
+                    <li @click="closeMenu()">
+                        <nuxt-link to="/product">商品</nuxt-link>
+                    </li>
+                    <li @click="closeMenu()">
+                        <nuxt-link to="/creator">製作者</nuxt-link>
+                    </li>
+                    <li @click="closeMenu()">
+                        <nuxt-link to="/order">仕事の依頼</nuxt-link>
+                    </li>
+                </ul>
             </c-column>
         </ul>
     </div>
