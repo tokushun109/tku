@@ -54,6 +54,8 @@ func StartMainServer() error {
 	// ログイン
 	r.HandleFunc("/api/user/login/{session_uuid}", getLoginUserHandler).Methods("GET")
 	r.HandleFunc("/api/user/login", loginHandler).Methods("POST")
+	// ログアウト
+	r.HandleFunc("/api/user/logout/{session_uuid}", logoutHandler).Methods("POST")
 
 	// corsの設定
 	c := cors.Default().Handler(r)

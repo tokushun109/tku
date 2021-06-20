@@ -5,6 +5,7 @@ export * from '~/types/sales_site'
 export * from '~/types/skill_market'
 export * from '~/types/sns'
 export * from '~/types/initializer'
+export * from '~/types/user'
 
 export interface ITable {
     name: string

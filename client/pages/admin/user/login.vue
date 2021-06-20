@@ -16,15 +16,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'nuxt-property-decorator'
-
-interface IloginForm {
-    email: string
-    password: string
-}
-
-interface ISession {
-    uuid: string
-}
+import { ILoginForm } from '~/types'
 
 @Component({
     head: {
@@ -32,7 +24,7 @@ interface ISession {
     },
 })
 export default class PageAdminUserLogin extends Vue {
-    form: IloginForm = {
+    form: ILoginForm = {
         email: '',
         password: '',
     }
@@ -42,11 +34,7 @@ export default class PageAdminUserLogin extends Vue {
 
     async onSubmit() {
         try {
-            const session: ISession = await this.$axios.$post(`/user/login`, this.form).catch(() => {})
-            this.$cookies.set('__sess__', session.uuid, {
-                path: '/',
-            })
-            this.$cookies.get('__sess__')
+            await this.$store.dispatch('user/loginUser', this.form)
             this.$router.replace('/admin')
         } catch {}
     }
