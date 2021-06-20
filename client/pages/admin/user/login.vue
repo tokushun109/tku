@@ -37,12 +37,16 @@ export default class PageAdminUserLogin extends Vue {
         password: '',
     }
 
+    // TODO ログインしていたら、/adminに戻す
+    mounted() {}
+
     async onSubmit() {
         try {
             const session: ISession = await this.$axios.$post(`/user/login`, this.form).catch(() => {})
-            await this.$cookies.set('__sess__', session.uuid, {
+            this.$cookies.set('__sess__', session.uuid, {
                 path: '/',
             })
+            this.$cookies.get('__sess__')
             this.$router.replace('/admin')
         } catch {}
     }
