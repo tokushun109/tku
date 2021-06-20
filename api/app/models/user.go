@@ -13,7 +13,7 @@ type User struct {
 	Name     string `json:"name"`
 	Email    string `json:"email"`
 	Password string `json:"-"`
-	IsAdmin  bool   `json:"is_admin"`
+	IsAdmin  bool   `json:"isAdmin"`
 }
 
 type Users []User

@@ -12,11 +12,13 @@
                     <img src="/icon/menu.png" alt="open" @click="toggle" />
                 </div>
             </div>
-            <!-- TODO ログインしている時だけ表示する -->
-            <div v-else class="admin-menu">
-                <a href="/admin/user/login" @click="logoutHandler">ログアウト</a>
+            <div v-else-if="!$store.getters['user/isGuest']" class="admin-menu">
+                <c-button class="logout-button" label="ログアウト" @c-click="visibleSync = true" />
             </div>
         </div>
+        <c-dialog :visible.sync="visibleSync" height="150px" width="400px" :is-header="false" @confirm="logoutHandler" @close="visibleSync = false">
+            <h4 class="logout-title">ログアウトします。よろしいですか？</h4>
+        </c-dialog>
     </header>
 </template>
 
@@ -24,6 +26,7 @@
 import { Component, Vue } from 'nuxt-property-decorator'
 @Component({})
 export default class Header extends Vue {
+    visibleSync: boolean = false
     menuOpenFlag: boolean = false
     toggle() {
         this.menuOpenFlag = !this.menuOpenFlag
@@ -35,9 +38,9 @@ export default class Header extends Vue {
         return this.$route.path.includes('admin')
     }
 
-    // sessin用のcookieを削除して、ログアウトする
-    logoutHandler() {
-        this.$cookies.remove('__sess__')
+    async logoutHandler() {
+        await this.$store.dispatch('user/logoutUser')
+        this.$router.replace('/admin/user/login')
     }
 }
 </script>

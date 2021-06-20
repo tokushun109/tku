@@ -39,7 +39,7 @@ func getLoginUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// ユーザーのログインとセッションの作成
+// ユーザーのログイン(セッションの作成)
 func loginHandler(w http.ResponseWriter, r *http.Request) {
 	reqBody, _ := ioutil.ReadAll(r.Body)
 
@@ -68,5 +68,17 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write(responseBody)
 	} else {
 		log.Fatalln("パスワードが間違っています")
+	}
+}
+
+// ユーザーのログアウト(セッションの削除)
+func logoutHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	uuid := vars["session_uuid"]
+
+	session := models.GetSession(uuid)
+	// sessionを取得して、有効なsessionなら削除を行う
+	if session.IsValidSession() {
+		session.DeleteSession()
 	}
 }
