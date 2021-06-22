@@ -35,8 +35,6 @@ func InsertAccessoryCategory(accessoryCategory *AccessoryCategory) {
 		log.Fatal(err)
 	}
 	accessoryCategory.Uuid = uuid
-
-	Db.NewRecord(accessoryCategory)
 	Db.Create(&accessoryCategory)
 }
 
@@ -57,6 +55,5 @@ func InsertMaterialCategory(materialCategory *MaterialCategory) {
 		log.Fatal(err)
 	}
 	materialCategory.Uuid = uuid
-	Db.NewRecord(materialCategory)
 	Db.Create(&materialCategory)
 }

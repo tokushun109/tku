@@ -17,6 +17,5 @@ func GetCreator() (creator Creator) {
 func initialInsertCreator() {
 	creator := &Creator{}
 	creator.Name = config.Config.CreatorName
-	Db.NewRecord(creator)
 	Db.Create(&creator)
 }

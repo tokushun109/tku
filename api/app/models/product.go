@@ -61,7 +61,18 @@ func GetProduct(uuid string) (product Product) {
 	return product
 }
 
-func InsertProduct(product *Product) {
+func InsertProduct(product *Product) (err error) {
+	tx := Db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := tx.Error; err != nil {
+		return err
+	}
+
 	// uuidの設定
 	uuid, err := GenerateUuid()
 	if err != nil {
@@ -71,22 +82,31 @@ func InsertProduct(product *Product) {
 	// アクセサリーカテゴリーの設定
 	accesstoryCategory := GetAccessoryCategory(product.AccessoryCategory.Uuid)
 	product.AccessoryCategoryId = accesstoryCategory.ID
-	Db.NewRecord(product)
-	Db.Omit("AccessoryCategory", "MaterialCategories", "SalesSites").Create(&product)
+	if err := tx.Omit("AccessoryCategory", "MaterialCategories", "SalesSites").Create(&product).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
 	// 商品と材料カテゴリーを紐付け
 	for _, materialCategory := range product.MaterialCategories {
 		// IDを取得する
 		materialCategoryId := GetMaterialCategory(materialCategory.Uuid).ID
 		var productToMaterialCategory = ProductToMaterialCategory{ProductId: product.ID, MaterialCategoryId: materialCategoryId}
-		Db.Create(&productToMaterialCategory)
+		if err := tx.Create(&productToMaterialCategory).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
 	}
 	// 商品と販売サイトを紐付け
 	for _, salesSite := range product.SalesSites {
 		// IDを取得する
 		salesSiteId := GetSalesSite(salesSite.Uuid).ID
 		var productToSalesSite = ProductToSalesSite{ProductId: product.ID, SalesSiteId: salesSiteId}
-		Db.Create(&productToSalesSite)
+		if err := tx.Create(&productToSalesSite).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
 	}
+	return tx.Commit().Error
 }
 
 func GetProductImage(uuid string) (productImage ProductImage) {
@@ -101,6 +121,5 @@ func InsertProductImage(productImage *ProductImage) {
 		log.Fatal(err)
 	}
 	productImage.Uuid = uuid
-	Db.NewRecord(productImage)
 	Db.Create(&productImage)
 }

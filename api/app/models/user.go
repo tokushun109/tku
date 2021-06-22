@@ -58,7 +58,6 @@ func InsertUser(user *User, is_admin bool) {
 	user.Uuid = uuid
 	// パスワードの変換を行う
 	user.Password = Encrypt(user.Password)
-	Db.NewRecord(user)
 	Db.Create(&user)
 }
 
@@ -80,7 +79,6 @@ func (user *User) CreateSession() (session Session) {
 	session.UserId = user.ID
 	session.CreatedAt = time.Now()
 
-	Db.NewRecord(session)
 	Db.Create(&session)
 
 	return session
