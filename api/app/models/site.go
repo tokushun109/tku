@@ -47,7 +47,6 @@ func InsertSalesSite(salesSite *SalesSite) {
 	}
 	salesSite.Uuid = uuid
 
-	Db.NewRecord(salesSite)
 	Db.Create(&salesSite)
 }
 
@@ -64,7 +63,6 @@ func InsertSkillMarket(skillMarket *SkillMarket) {
 	}
 	skillMarket.Uuid = uuid
 
-	Db.NewRecord(skillMarket)
 	Db.Create(&skillMarket)
 }
 
@@ -81,6 +79,5 @@ func InsertSns(sns *Sns) {
 	}
 	sns.Uuid = uuid
 
-	Db.NewRecord(sns)
 	Db.Create(&sns)
 }
