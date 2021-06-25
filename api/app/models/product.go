@@ -2,7 +2,6 @@ package models
 
 import (
 	"api/config"
-	"log"
 )
 
 type Product struct {
@@ -39,26 +38,32 @@ func setProductImageApiPath(product *Product) {
 	}
 }
 
-func GetAllProducts() (products Products) {
-	Db.Preload("AccessoryCategory").
+func GetAllProducts() (products Products, err error) {
+	err = Db.Preload("AccessoryCategory").
 		Preload("ProductImages").
 		Preload("MaterialCategories").
 		Preload("SalesSites").
-		Find(&products)
+		Find(&products).Error
+	if err != nil {
+		return products, err
+	}
 	for _, product := range products {
 		setProductImageApiPath(&product)
 	}
-	return products
+	return products, err
 }
 
-func GetProduct(uuid string) (product Product) {
-	Db.First(&product, "uuid = ?", uuid).
+func GetProduct(uuid string) (product Product, err error) {
+	err = Db.First(&product, "uuid = ?", uuid).
 		Related(&product.AccessoryCategory).
 		Related(&product.ProductImages, "ProductImages").
 		Related(&product.MaterialCategories, "MaterialCategories").
-		Related(&product.SalesSites, "SalesSites")
+		Related(&product.SalesSites, "SalesSites").Error
+	if err != nil {
+		return product, err
+	}
 	setProductImageApiPath(&product)
-	return product
+	return product, err
 }
 
 func InsertProduct(product *Product) (err error) {
@@ -76,11 +81,14 @@ func InsertProduct(product *Product) (err error) {
 	// uuidの設定
 	uuid, err := GenerateUuid()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	product.Uuid = uuid
 	// アクセサリーカテゴリーの設定
-	accesstoryCategory := GetAccessoryCategory(product.AccessoryCategory.Uuid)
+	accesstoryCategory, err := GetAccessoryCategory(product.AccessoryCategory.Uuid)
+	if err != nil {
+		return err
+	}
 	product.AccessoryCategoryId = accesstoryCategory.ID
 	if err := tx.Omit("AccessoryCategory", "MaterialCategories", "SalesSites").Create(&product).Error; err != nil {
 		tx.Rollback()
@@ -89,7 +97,11 @@ func InsertProduct(product *Product) (err error) {
 	// 商品と材料カテゴリーを紐付け
 	for _, materialCategory := range product.MaterialCategories {
 		// IDを取得する
-		materialCategoryId := GetMaterialCategory(materialCategory.Uuid).ID
+		materialCategory, err := GetMaterialCategory(materialCategory.Uuid)
+		if err != nil {
+			return err
+		}
+		materialCategoryId := materialCategory.ID
 		var productToMaterialCategory = ProductToMaterialCategory{ProductId: product.ID, MaterialCategoryId: materialCategoryId}
 		if err := tx.Create(&productToMaterialCategory).Error; err != nil {
 			tx.Rollback()
@@ -99,7 +111,11 @@ func InsertProduct(product *Product) (err error) {
 	// 商品と販売サイトを紐付け
 	for _, salesSite := range product.SalesSites {
 		// IDを取得する
-		salesSiteId := GetSalesSite(salesSite.Uuid).ID
+		saleSite, err := GetSalesSite(salesSite.Uuid)
+		if err != nil {
+			return err
+		}
+		salesSiteId := saleSite.ID
 		var productToSalesSite = ProductToSalesSite{ProductId: product.ID, SalesSiteId: salesSiteId}
 		if err := tx.Create(&productToSalesSite).Error; err != nil {
 			tx.Rollback()
@@ -109,17 +125,18 @@ func InsertProduct(product *Product) (err error) {
 	return tx.Commit().Error
 }
 
-func GetProductImage(uuid string) (productImage ProductImage) {
-	Db.First(&productImage, "uuid = ?", uuid)
-	return productImage
+func GetProductImage(uuid string) (productImage ProductImage, err error) {
+	err = Db.First(&productImage, "uuid = ?", uuid).Error
+	return productImage, err
 }
 
-func InsertProductImage(productImage *ProductImage) {
+func InsertProductImage(productImage *ProductImage) (err error) {
 	// uuidの設定
 	uuid, err := GenerateUuid()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	productImage.Uuid = uuid
-	Db.Create(&productImage)
+	err = Db.Create(&productImage).Error
+	return err
 }

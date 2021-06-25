@@ -3,7 +3,6 @@ package models
 import (
 	"crypto/sha1"
 	"fmt"
-	"log"
 	"time"
 )
 
@@ -31,73 +30,78 @@ func Encrypt(plaintext string) (cryptext string) {
 	return cryptext
 }
 
-func (session *Session) GetUserBySession() (user User) {
-	Db.First(&user, "id = ?", session.UserId)
-	return user
+func (session *Session) GetUserBySession() (user User, err error) {
+	err = Db.First(&user, "id = ?", session.UserId).Error
+	return user, err
 
 }
 
-func GetAllUsers() (users Users) {
-	Db.Find(&users)
-	return users
+func GetAllUsers() (users Users, err error) {
+	err = Db.Find(&users).Error
+	return users, err
 }
 
-func GeUserByEmail(email string) (user User) {
-	Db.First(&user, "email = ?", email)
-	return user
+func GeUserByEmail(email string) (user User, err error) {
+	err = Db.First(&user, "email = ?", email).Error
+	return user, err
 }
 
 // is_adminは管理ユーザーならtrue、一般ユーザーならfalse
-func InsertUser(user *User, is_admin bool) {
+func InsertUser(user *User, is_admin bool) (err error) {
 	user.IsAdmin = is_admin
 	// uuidの設定
 	uuid, err := GenerateUuid()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	user.Uuid = uuid
 	// パスワードの変換を行う
 	user.Password = Encrypt(user.Password)
-	Db.Create(&user)
+	err = Db.Create(&user).Error
+	return err
 }
 
-func (user *User) GetSessionByUser() (session Session) {
-	Db.First(&session, "user_id = ?", user.ID)
-	return session
+func (user *User) GetSessionByUser() (session Session, err error) {
+	err = Db.First(&session, "user_id = ?", user.ID).Error
+	return session, err
 
 }
 
 // Sessionデータを作成する
-func (user *User) CreateSession() (session Session) {
+func (user *User) CreateSession() (session Session, err error) {
 	session = Session{}
 	uuid, err := GenerateUuid()
 	if err != nil {
-		log.Fatal(err)
+		return session, err
 	}
 
 	session.Uuid = uuid
 	session.UserId = user.ID
 	session.CreatedAt = time.Now()
 
-	Db.Create(&session)
+	err = Db.Create(&session).Error
 
-	return session
+	return session, err
 }
 
-func GetSession(uuid string) (session Session) {
-	Db.First(&session, "uuid = ?", uuid)
-	return session
+func GetSession(uuid string) (session Session, err error) {
+	err = Db.First(&session, "uuid = ?", uuid).Error
+	return session, err
 }
 
-func (session *Session) IsValidSession() (valid bool) {
+func (session *Session) IsValidSession() (valid bool, err error) {
 	valid = false
-	Db.First(&session, "uuid = ?", session.Uuid)
+	err = Db.First(&session, "uuid = ?", session.Uuid).Error
+	if err != nil {
+		return valid, err
+	}
 	if session != nil {
 		valid = true
 	}
-	return valid
+	return valid, err
 }
 
-func (session *Session) DeleteSession() {
-	Db.Delete(&session)
+func (session *Session) DeleteSession() (err error) {
+	err = Db.Delete(&session).Error
+	return err
 }

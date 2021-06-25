@@ -1,7 +1,5 @@
 package models
 
-import "log"
-
 type AccessoryCategory struct {
 	DefaultModel
 	Uuid string `json:"uuid"`
@@ -18,42 +16,44 @@ type MaterialCategory struct {
 
 type MaterialCategories []MaterialCategory
 
-func GetAllAccessoryCategories() (accessoryCategories AccessoryCategories) {
-	Db.Find(&accessoryCategories)
-	return accessoryCategories
+func GetAllAccessoryCategories() (accessoryCategories AccessoryCategories, err error) {
+	err = Db.Find(&accessoryCategories).Error
+	return accessoryCategories, err
 }
 
-func GetAccessoryCategory(uuid string) (accessoryCategory AccessoryCategory) {
-	Db.First(&accessoryCategory, "uuid = ?", uuid)
-	return accessoryCategory
+func GetAccessoryCategory(uuid string) (accessoryCategory AccessoryCategory, err error) {
+	err = Db.First(&accessoryCategory, "uuid = ?", uuid).Error
+	return accessoryCategory, err
 }
 
-func InsertAccessoryCategory(accessoryCategory *AccessoryCategory) {
+func InsertAccessoryCategory(accessoryCategory *AccessoryCategory) (err error) {
 	// uuidの設定
 	uuid, err := GenerateUuid()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	accessoryCategory.Uuid = uuid
-	Db.Create(&accessoryCategory)
+	err = Db.Create(&accessoryCategory).Error
+	return err
 }
 
-func GetAllMaterialCategories() (materialCategories MaterialCategories) {
-	Db.Find(&materialCategories)
-	return materialCategories
+func GetAllMaterialCategories() (materialCategories MaterialCategories, err error) {
+	err = Db.Find(&materialCategories).Error
+	return materialCategories, err
 }
 
-func GetMaterialCategory(uuid string) (materialCategory MaterialCategory) {
-	Db.First(&materialCategory, "uuid = ?", uuid)
-	return materialCategory
+func GetMaterialCategory(uuid string) (materialCategory MaterialCategory, err error) {
+	err = Db.First(&materialCategory, "uuid = ?", uuid).Error
+	return materialCategory, err
 }
 
-func InsertMaterialCategory(materialCategory *MaterialCategory) {
+func InsertMaterialCategory(materialCategory *MaterialCategory) (err error) {
 	// uuidの設定
 	uuid, err := GenerateUuid()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	materialCategory.Uuid = uuid
-	Db.Create(&materialCategory)
+	err = Db.Create(&materialCategory).Error
+	return err
 }

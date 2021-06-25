@@ -3,7 +3,9 @@ package controllers
 import (
 	"api/app/models"
 	"api/config"
+	"errors"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -11,14 +13,25 @@ import (
 )
 
 func sessionCheck(uuid string) (session models.Session, err error) {
-	if err == nil {
-		session = models.GetSession(uuid)
-		if !session.IsValidSession() {
-			msg := "無効なsessionです"
-			err = fmt.Errorf("%s", msg)
-		}
+	session, err = models.GetSession(uuid)
+	if err != nil {
+		return session, err
+	}
+	valid, err := session.IsValidSession()
+	if err != nil {
+		return session, err
+	}
+	if !valid {
+		err = errors.New("session is invalid")
+		return session, err
 	}
 	return session, err
+}
+
+// エラーをlogとレスポンスに反映する
+func ErrorHandler(w http.ResponseWriter, err error, errCode int) {
+	log.Println(err)
+	http.Error(w, fmt.Sprintf("error: %s", err), errCode)
 }
 
 func StartMainServer() error {

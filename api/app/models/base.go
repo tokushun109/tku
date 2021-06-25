@@ -21,12 +21,10 @@ type DefaultModel struct {
 	DeletedAt *time.Time `sql:"index" json:"-"`
 }
 
-func GenerateUuid() (string, error) {
+func GenerateUuid() (uuidString string, err error) {
 	uuidObj, err := uuid.NewRandom()
-	if err != nil {
-		log.Fatalln(err)
-	}
-	return uuidObj.String(), err
+	uuidString = uuidObj.String()
+	return uuidString, err
 }
 
 func gormConnect() *gorm.DB {
@@ -61,8 +59,15 @@ func gormConnect() *gorm.DB {
 func init() {
 	Db = gormConnect()
 
-	if GetCreator().ID == nil {
+	creator, err := GetCreator()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if creator.ID == nil {
 		// 製作者の初期データが未作成の場合のみ作成する
-		initialInsertCreator()
+		err = initialInsertCreator()
+		if err != nil {
+			log.Fatalln(err)
+		}
 	}
 }
