@@ -3,8 +3,8 @@ package controllers
 import (
 	"api/app/models"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
-	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -17,10 +17,16 @@ type loginForm struct {
 
 // 商品一覧を取得
 func getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
-	users := models.GetAllUsers()
+	users, err := models.GetAllUsers()
+	if err != nil {
+		ErrorHandler(w, err, http.StatusForbidden)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(users); err != nil {
-		log.Fatalln(err)
+		ErrorHandler(w, err, http.StatusForbidden)
+		return
 	}
 }
 
@@ -30,44 +36,70 @@ func getLoginUserHandler(w http.ResponseWriter, r *http.Request) {
 	uuid := vars["session_uuid"]
 	// ログインしているかの確認
 	session, err := sessionCheck(uuid)
-	if err == nil {
-		user := session.GetUserBySession()
+	if err != nil {
+		ErrorHandler(w, err, http.StatusForbidden)
+		return
+	} else {
+		user, err := session.GetUserBySession()
+		if err != nil {
+			ErrorHandler(w, err, http.StatusForbidden)
+			return
+		}
 		w.Header().Set("Content-Type", "application/json")
 		if err := json.NewEncoder(w).Encode(user); err != nil {
-			log.Fatalln(err)
+			ErrorHandler(w, err, http.StatusForbidden)
+			return
 		}
 	}
 }
 
 // ユーザーのログイン(セッションの作成)
 func loginHandler(w http.ResponseWriter, r *http.Request) {
-	reqBody, _ := ioutil.ReadAll(r.Body)
+	reqBody, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		ErrorHandler(w, err, http.StatusForbidden)
+		return
+	}
 
 	var loginForm loginForm
 	if err := json.Unmarshal(reqBody, &loginForm); err != nil {
-		log.Fatal(err)
+		ErrorHandler(w, err, http.StatusForbidden)
+		return
 	}
 
-	user := models.GeUserByEmail(loginForm.Email)
-	if user.ID == nil {
-		log.Fatalln("ユーザーが登録されていません")
+	user, err := models.GeUserByEmail(loginForm.Email)
+	if err != nil {
+		ErrorHandler(w, err, http.StatusUnauthorized)
+		return
 	}
 
 	if user.Password == models.Encrypt(loginForm.Password) {
 		// すでにuserに対応するsessionが作成されている場合は一度削除する
-		if session := user.GetSessionByUser(); session.ID != nil {
+		if session, err := user.GetSessionByUser(); err != nil {
 			session.DeleteSession()
+		} else {
+			ErrorHandler(w, err, http.StatusForbidden)
+			return
 		}
 
-		session := user.CreateSession()
+		session, err := user.CreateSession()
+		if err != nil {
+			ErrorHandler(w, err, http.StatusForbidden)
+			return
+		}
+
 		responseBody, err := json.Marshal(session)
 		if err != nil {
-			log.Fatal(err)
+			ErrorHandler(w, err, http.StatusForbidden)
+			return
+
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(responseBody)
 	} else {
-		log.Fatalln("パスワードが間違っています")
+		err = errors.New("the password is incorrect")
+		ErrorHandler(w, err, http.StatusUnauthorized)
+		return
 	}
 }
 
@@ -76,9 +108,21 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	uuid := vars["session_uuid"]
 
-	session := models.GetSession(uuid)
+	session, err := models.GetSession(uuid)
+	if err != nil {
+		ErrorHandler(w, err, http.StatusForbidden)
+		return
+	}
 	// sessionを取得して、有効なsessionなら削除を行う
-	if session.IsValidSession() {
-		session.DeleteSession()
+	valid, err := session.IsValidSession()
+	if err != nil {
+		ErrorHandler(w, err, http.StatusForbidden)
+		return
+	}
+	if valid {
+		if err = session.DeleteSession(); err != nil {
+			ErrorHandler(w, err, http.StatusForbidden)
+			return
+		}
 	}
 }

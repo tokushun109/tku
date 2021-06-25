@@ -9,13 +9,14 @@ type Creator struct {
 	Logo         string `json:"logo"`
 }
 
-func GetCreator() (creator Creator) {
-	Db.First(&creator)
-	return creator
+func GetCreator() (creator Creator, err error) {
+	err = Db.First(&creator).Error
+	return creator, err
 }
 
-func initialInsertCreator() {
+func initialInsertCreator() (err error) {
 	creator := &Creator{}
 	creator.Name = config.Config.CreatorName
-	Db.Create(&creator)
+	err = Db.Create(&creator).Error
+	return err
 }
