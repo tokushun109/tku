@@ -1,3 +1,5 @@
+export * from '~/types/error'
+export * from '~/types/admin'
 export * from '~/types/product'
 export * from '~/types/category'
 export * from '~/types/creator'
@@ -6,8 +8,3 @@ export * from '~/types/skill_market'
 export * from '~/types/sns'
 export * from '~/types/initializer'
 export * from '~/types/user'
-
-export interface ITable {
-    name: string
-    key: string
-}

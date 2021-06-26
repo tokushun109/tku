@@ -4,7 +4,9 @@ import (
 	"api/app/models"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -19,13 +21,15 @@ type loginForm struct {
 func getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 	users, err := models.GetAllUsers()
 	if err != nil {
-		ErrorHandler(w, err, http.StatusForbidden)
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(users); err != nil {
-		ErrorHandler(w, err, http.StatusForbidden)
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
 }
@@ -37,17 +41,20 @@ func getLoginUserHandler(w http.ResponseWriter, r *http.Request) {
 	// ログインしているかの確認
 	session, err := sessionCheck(uuid)
 	if err != nil {
-		ErrorHandler(w, err, http.StatusForbidden)
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	} else {
 		user, err := session.GetUserBySession()
 		if err != nil {
-			ErrorHandler(w, err, http.StatusForbidden)
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 			return
 		}
 		w.Header().Set("Content-Type", "application/json")
 		if err := json.NewEncoder(w).Encode(user); err != nil {
-			ErrorHandler(w, err, http.StatusForbidden)
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 			return
 		}
 	}
@@ -57,40 +64,42 @@ func getLoginUserHandler(w http.ResponseWriter, r *http.Request) {
 func loginHandler(w http.ResponseWriter, r *http.Request) {
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		ErrorHandler(w, err, http.StatusForbidden)
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
 
 	var loginForm loginForm
 	if err := json.Unmarshal(reqBody, &loginForm); err != nil {
-		ErrorHandler(w, err, http.StatusForbidden)
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
 
 	user, err := models.GeUserByEmail(loginForm.Email)
 	if err != nil {
-		ErrorHandler(w, err, http.StatusUnauthorized)
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusUnauthorized)
 		return
 	}
 
 	if user.Password == models.Encrypt(loginForm.Password) {
 		// すでにuserに対応するsessionが作成されている場合は一度削除する
-		if session, err := user.GetSessionByUser(); err != nil {
+		if session, err := user.GetSessionByUser(); err == nil {
 			session.DeleteSession()
-		} else {
-			ErrorHandler(w, err, http.StatusForbidden)
-			return
 		}
 
 		session, err := user.CreateSession()
 		if err != nil {
-			ErrorHandler(w, err, http.StatusForbidden)
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 			return
 		}
 
 		responseBody, err := json.Marshal(session)
 		if err != nil {
-			ErrorHandler(w, err, http.StatusForbidden)
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 			return
 
 		}
@@ -98,7 +107,8 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write(responseBody)
 	} else {
 		err = errors.New("the password is incorrect")
-		ErrorHandler(w, err, http.StatusUnauthorized)
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusUnauthorized)
 		return
 	}
 }
@@ -110,18 +120,21 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	session, err := models.GetSession(uuid)
 	if err != nil {
-		ErrorHandler(w, err, http.StatusForbidden)
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
 	// sessionを取得して、有効なsessionなら削除を行う
 	valid, err := session.IsValidSession()
 	if err != nil {
-		ErrorHandler(w, err, http.StatusForbidden)
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
 	if valid {
 		if err = session.DeleteSession(); err != nil {
-			ErrorHandler(w, err, http.StatusForbidden)
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 			return
 		}
 	}

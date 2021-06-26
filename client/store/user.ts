@@ -1,5 +1,5 @@
 import { GetterTree, ActionTree, MutationTree } from 'vuex'
-import { IUser, ILoginForm, ISession } from '~/types'
+import { IUser, ILoginForm, ISession, errorCustomize } from '~/types'
 
 export interface State {
     isGuest: boolean
@@ -36,7 +36,10 @@ export const actions: ActionTree<State, RootState> = {
             const user = await this.$axios.$get(`/user/login/${session.uuid}`)
             // store保存
             context.commit('setUser', user)
-        } catch {}
+            return Promise.resolve(user)
+        } catch (e) {
+            return Promise.reject(errorCustomize(e.response, 'メールアドレスかパスワードが間違っています'))
+        }
     },
     setUser(context, user) {
         // store保存

@@ -1,6 +1,7 @@
 <template>
     <c-page class="page-login" title="ログイン">
         <c-form bordered slim>
+            <c-error :errors.sync="errors" />
             <c-input-label label="メールアドレス" required>
                 <c-input :model.sync="form.email" />
             </c-input-label>
@@ -16,7 +17,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'nuxt-property-decorator'
-import { ILoginForm } from '~/types'
+import { IError, ILoginForm, BadRequest } from '~/types'
 
 @Component({
     head: {
@@ -29,14 +30,23 @@ export default class PageAdminUserLogin extends Vue {
         password: '',
     }
 
-    // TODO ログインしていたら、/adminに戻す
-    mounted() {}
+    errors: Array<IError> = []
 
     async onSubmit() {
         try {
+            this.errors = []
+            // バリデーション
+            if (this.form.email.length === 0) {
+                throw new BadRequest('メールアドレスが入力されていません')
+            }
+            if (this.form.password.length === 0) {
+                throw new BadRequest('パスワードが入力されていません')
+            }
             await this.$store.dispatch('user/loginUser', this.form)
             this.$router.replace('/admin')
-        } catch {}
+        } catch (e) {
+            this.errors.push(e)
+        }
     }
 }
 </script>

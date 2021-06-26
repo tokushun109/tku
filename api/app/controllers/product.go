@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -23,12 +24,14 @@ var typeToExtention = map[string]string{
 func getAllProductsHandler(w http.ResponseWriter, r *http.Request) {
 	products, err := models.GetAllProducts()
 	if err != nil {
-		ErrorHandler(w, err, http.StatusForbidden)
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(products); err != nil {
-		ErrorHandler(w, err, http.StatusForbidden)
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
 }
@@ -39,12 +42,14 @@ func getProductHandler(w http.ResponseWriter, r *http.Request) {
 	uuid := vars["product_uuid"]
 	product, err := models.GetProduct(uuid)
 	if err != nil {
-		ErrorHandler(w, err, http.StatusForbidden)
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(product); err != nil {
-		ErrorHandler(w, err, http.StatusForbidden)
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
 }
@@ -53,24 +58,28 @@ func getProductHandler(w http.ResponseWriter, r *http.Request) {
 func createProductHandler(w http.ResponseWriter, r *http.Request) {
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		ErrorHandler(w, err, http.StatusForbidden)
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
 
 	var product models.Product
 	if err := json.Unmarshal(reqBody, &product); err != nil {
-		ErrorHandler(w, err, http.StatusForbidden)
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
 	// modelの呼び出し
 	err = models.InsertProduct(&product)
 	if err != nil {
-		ErrorHandler(w, err, http.StatusForbidden)
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
 	responseBody, err := json.Marshal(product)
 	if err != nil {
-		ErrorHandler(w, err, http.StatusForbidden)
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
@@ -83,19 +92,22 @@ func getProductImageBlobHandler(w http.ResponseWriter, r *http.Request) {
 	productImageUuid := vars["product_image_uuid"]
 	productImage, err := models.GetProductImage(productImageUuid)
 	if err != nil {
-		ErrorHandler(w, err, http.StatusForbidden)
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
 	file, err := os.Open(productImage.Path)
 	if err != nil {
-		ErrorHandler(w, err, http.StatusForbidden)
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
 	defer file.Close()
 
 	binary, err := ioutil.ReadAll(file)
 	if err != nil {
-		ErrorHandler(w, err, http.StatusForbidden)
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
 	w.Header().Set("Content-Type", "image/jpeg")
@@ -109,7 +121,8 @@ func createProductImageHandler(w http.ResponseWriter, r *http.Request) {
 	// requestのuuidから商品のIDを取得しておく
 	product, err := models.GetProduct(uuid)
 	if err != nil {
-		ErrorHandler(w, err, http.StatusForbidden)
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
 	productId := product.ID
@@ -122,20 +135,26 @@ func createProductImageHandler(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 		if err != nil {
-			ErrorHandler(w, err, http.StatusForbidden)
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+
 			return
 		}
 		defer file.Close()
 
 		uuid, err := models.GenerateUuid()
 		if err != nil {
-			ErrorHandler(w, err, http.StatusForbidden)
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+
 			return
 		}
 		savedirectory := fmt.Sprintf("img/%s/%s", uuid[0:1], uuid[1:2])
 		// 保存用のディレクトリがない場合は作成する
 		if err := os.MkdirAll(savedirectory, 0777); err != nil {
-			ErrorHandler(w, err, http.StatusForbidden)
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+
 			return
 		}
 		// fileのMIMETypeを取得
@@ -143,7 +162,9 @@ func createProductImageHandler(w http.ResponseWriter, r *http.Request) {
 		savePath := savedirectory + "/" + uuid + typeToExtention[mimeType]
 		f, err := os.OpenFile(savePath, os.O_WRONLY|os.O_CREATE, 0666)
 		if err != nil {
-			ErrorHandler(w, err, http.StatusForbidden)
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+
 			return
 		}
 		defer f.Close()
@@ -159,7 +180,9 @@ func createProductImageHandler(w http.ResponseWriter, r *http.Request) {
 		// sqlにデータを作成する
 		err = models.InsertProductImage(&productImage)
 		if err != nil {
-			ErrorHandler(w, err, http.StatusForbidden)
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+
 			return
 		}
 		i++
