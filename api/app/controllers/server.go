@@ -5,7 +5,6 @@ import (
 	"api/config"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -26,12 +25,6 @@ func sessionCheck(uuid string) (session models.Session, err error) {
 		return session, err
 	}
 	return session, err
-}
-
-// エラーをlogとレスポンスに反映する
-func ErrorHandler(w http.ResponseWriter, err error, errCode int) {
-	log.Println(err)
-	http.Error(w, fmt.Sprintf("error: %s", err), errCode)
 }
 
 func StartMainServer() error {

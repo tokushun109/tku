@@ -3,6 +3,8 @@ package controllers
 import (
 	"api/app/models"
 	"encoding/json"
+	"fmt"
+	"log"
 	"net/http"
 )
 
@@ -10,12 +12,14 @@ import (
 func getCreatorHandler(w http.ResponseWriter, r *http.Request) {
 	creator, err := models.GetCreator()
 	if err != nil {
-		ErrorHandler(w, err, http.StatusForbidden)
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(creator); err != nil {
-		ErrorHandler(w, err, http.StatusForbidden)
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
 }
