@@ -9,7 +9,7 @@
 <script lang="ts">
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
-import { ICreator, ISns } from '~/types'
+import { ICreator, ISite } from '~/types'
 @Component({
     head: {
         title: '製作者紹介',
@@ -17,7 +17,7 @@ import { ICreator, ISns } from '~/types'
 })
 export default class PageCreatorIndex extends Vue {
     creator: ICreator | null = null
-    sns: Array<ISns> | null = []
+    sns: Array<ISite> | null = []
     async asyncData({ app }: Context) {
         try {
             const creator = await app.$axios.$get(`/creator`)

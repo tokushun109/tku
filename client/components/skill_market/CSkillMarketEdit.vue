@@ -23,21 +23,16 @@
 
 <script lang="ts">
 import { Component, PropSync, Vue, Watch } from 'nuxt-property-decorator'
-import { BadRequest, IError, ISkillMarket } from '~/types'
-
-interface ISkillMarketModelValidation {
-    name: boolean
-    url: boolean
-}
+import { BadRequest, IError, ISiteModelValidation, ISite } from '~/types'
 
 @Component({})
 export default class CSkillMarketEdit extends Vue {
     @PropSync('visible') dialogVisible!: boolean
-    @PropSync('model') skiliMarketModel!: ISkillMarket
+    @PropSync('model') skiliMarketModel!: ISite
 
     errors: Array<IError> = []
 
-    validation: ISkillMarketModelValidation = {
+    validation: ISiteModelValidation = {
         name: false,
         url: false,
     }
@@ -78,7 +73,7 @@ export default class CSkillMarketEdit extends Vue {
             }
             await this.$axios.$post(`/skill_market`, this.skiliMarketModel)
             this.dialogVisible = false
-            this.$emit('create')
+            this.$emit('create', 'skillMarket')
         } catch (e) {
             this.errors.push(e)
         }

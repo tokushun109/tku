@@ -23,21 +23,16 @@
 
 <script lang="ts">
 import { Component, PropSync, Vue, Watch } from 'nuxt-property-decorator'
-import { BadRequest, IError, ISns } from '~/types'
-
-interface ISnsModelValidation {
-    name: boolean
-    url: boolean
-}
+import { BadRequest, IError, ISite, ISiteModelValidation } from '~/types'
 
 @Component({})
 export default class CSnsEdit extends Vue {
     @PropSync('visible') dialogVisible!: boolean
-    @PropSync('model') snsModel!: ISns
+    @PropSync('model') snsModel!: ISite
 
     errors: Array<IError> = []
 
-    validation: ISnsModelValidation = {
+    validation: ISiteModelValidation = {
         name: false,
         url: false,
     }
@@ -78,7 +73,7 @@ export default class CSnsEdit extends Vue {
             }
             await this.$axios.$post(`/sns`, this.snsModel)
             this.dialogVisible = false
-            this.$emit('create')
+            this.$emit('create', 'sns')
         } catch (e) {
             this.errors.push(e)
         }

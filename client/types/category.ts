@@ -1,9 +1,8 @@
-export interface IAccessoryCategory {
+export interface ICategory {
     uuid: string
     name: string
 }
 
-export interface IMaterialCategory {
-    uuid: string
-    name: string
+export interface ICategoryModelValidation {
+    name: boolean
 }

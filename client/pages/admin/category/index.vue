@@ -28,7 +28,7 @@
 <script lang="ts">
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
-import { IAccessoryCategory, IMaterialCategory, newAccessoryCategory, newMaterialCategory } from '~/types'
+import { ICategory, newCategory } from '~/types'
 @Component({
     head: {
         title: '商品一覧',
@@ -36,10 +36,10 @@ import { IAccessoryCategory, IMaterialCategory, newAccessoryCategory, newMateria
 })
 export default class PageAdminCategoryIndex extends Vue {
     // アクセサリーカテゴリー一覧
-    accessoryCategories: Array<IAccessoryCategory> = []
+    accessoryCategories: Array<ICategory> = []
 
     // 材料カテゴリー一覧
-    materialCategories: Array<IMaterialCategory> = []
+    materialCategories: Array<ICategory> = []
 
     // アクセサリーカテゴリー用のmodalの表示切り替え
     accessoryDialogVisible: boolean = false
@@ -48,17 +48,17 @@ export default class PageAdminCategoryIndex extends Vue {
     materialDialogVisible: boolean = false
 
     // form用のaccessoryCategoryModel
-    accessoryCategoryModel: IAccessoryCategory = newAccessoryCategory()
+    accessoryCategoryModel: ICategory = newCategory()
 
     // form用のmaterialCategoryModel
-    materialCategoryModel: IMaterialCategory = newMaterialCategory()
+    materialCategoryModel: ICategory = newCategory()
 
-    // モーダルの切り替え
+    // アクセサリーカテゴリーダイアログの切り替え
     accessoryDialogToggle() {
         this.accessoryDialogVisible = !this.accessoryDialogVisible
     }
 
-    // モーダルの切り替え
+    // 材料カテゴリーダイアログ￥の切り替え
     materialDialogToggle() {
         this.materialDialogVisible = !this.materialDialogVisible
     }
@@ -66,10 +66,10 @@ export default class PageAdminCategoryIndex extends Vue {
     async loadingCategory(mode: string) {
         if (mode === 'accessory_category') {
             this.accessoryCategories = await this.$axios.$get(`/accessory_category`)
-            this.accessoryCategoryModel = newAccessoryCategory()
+            this.accessoryCategoryModel = newCategory()
         } else if (mode === 'material_category') {
             this.materialCategories = await this.$axios.$get(`/material_category`)
-            this.materialCategoryModel = newMaterialCategory()
+            this.materialCategoryModel = newCategory()
         }
     }
 

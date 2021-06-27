@@ -35,7 +35,7 @@
 
 <script lang="ts">
 import { Component, PropSync, Vue, Watch } from 'nuxt-property-decorator'
-import { BadRequest, IAccessoryCategory, IError, IMaterialCategory, IProduct, ISalesSite } from '~/types'
+import { BadRequest, IError, IProduct, ICategory, ISite } from '~/types'
 
 interface IProductValidation {
     name: boolean
@@ -46,9 +46,9 @@ export default class CSalesSiteEdit extends Vue {
     @PropSync('visible') dialogVisible!: boolean
     @PropSync('model') productModel!: IProduct
 
-    accessoryCategories: Array<IAccessoryCategory> = []
-    materialCategories: Array<IMaterialCategory> = []
-    salesSites: Array<ISalesSite> = []
+    accessoryCategories: Array<ICategory> = []
+    materialCategories: Array<ICategory> = []
+    salesSites: Array<ISite> = []
     uploadFiles: Array<File> = []
 
     errors: Array<IError> = []

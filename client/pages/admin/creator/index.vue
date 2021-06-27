@@ -9,7 +9,7 @@
 <script lang="ts">
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
-import { ICreator, ISalesSite, ISns } from '~/types'
+import { ICreator, ISite } from '~/types'
 @Component({
     head: {
         title: '製作者紹介',
@@ -20,10 +20,10 @@ export default class PageAdminCreatorIndex extends Vue {
     creator: ICreator | null = null
 
     // SNSのリスト
-    snsList: Array<ISns> | null = []
+    snsList: Array<ISite> | null = []
 
     // 販売サイトのリスト
-    salesSites: Array<ISalesSite> | null = []
+    salesSites: Array<ISite> | null = []
 
     async asyncData({ app }: Context) {
         try {
