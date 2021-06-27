@@ -1,4 +1,4 @@
-import { IAccessoryCategory, IMaterialCategory, IProduct, ISalesSite, ISkillMarket, ISns } from '~/types'
+import { IProduct, ICategory, ISite } from '~/types'
 
 export function newProduct(): IProduct {
     return {
@@ -12,37 +12,14 @@ export function newProduct(): IProduct {
     }
 }
 
-export function newAccessoryCategory(): IAccessoryCategory {
+export function newCategory(): ICategory {
     return {
         uuid: '',
         name: '',
     }
 }
 
-export function newMaterialCategory(): IMaterialCategory {
-    return {
-        uuid: '',
-        name: '',
-    }
-}
-
-export function newSalesSite(): ISalesSite {
-    return {
-        uuid: '',
-        name: '',
-        url: '',
-    }
-}
-
-export function newSkillMarket(): ISkillMarket {
-    return {
-        uuid: '',
-        name: '',
-        url: '',
-    }
-}
-
-export function newSns(): ISns {
+export function newSite(): ISite {
     return {
         uuid: '',
         name: '',

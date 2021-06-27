@@ -21,9 +21,7 @@ export default class PageAdminIndex extends Vue {
         { name: '製作者', key: 'creator' },
         { name: '商品', key: 'product' },
         { name: 'カテゴリー', key: 'category' },
-        { name: '販売サイト', key: 'sales_site' },
-        { name: 'スキルマーケット', key: 'skill_market' },
-        { name: 'SNS', key: 'sns' },
+        { name: 'サイト', key: 'site' },
     ]
 }
 </script>

@@ -23,21 +23,16 @@
 
 <script lang="ts">
 import { Component, PropSync, Vue, Watch } from 'nuxt-property-decorator'
-import { BadRequest, IError, ISalesSite } from '~/types'
-
-interface ISalesSiteModelValidation {
-    name: boolean
-    url: boolean
-}
+import { BadRequest, IError, ISite, ISiteModelValidation } from '~/types'
 
 @Component({})
 export default class CSalesSiteEdit extends Vue {
     @PropSync('visible') dialogVisible!: boolean
-    @PropSync('model') salesSiteModel!: ISalesSite
+    @PropSync('model') salesSiteModel!: ISite
 
     errors: Array<IError> = []
 
-    validation: ISalesSiteModelValidation = {
+    validation: ISiteModelValidation = {
         name: false,
         url: false,
     }
@@ -78,7 +73,7 @@ export default class CSalesSiteEdit extends Vue {
             }
             await this.$axios.$post(`/sales_site`, this.salesSiteModel)
             this.dialogVisible = false
-            this.$emit('create')
+            this.$emit('create', 'salesSite')
         } catch (e) {
             this.errors.push(e)
         }

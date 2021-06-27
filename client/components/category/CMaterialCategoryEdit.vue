@@ -20,20 +20,16 @@
 
 <script lang="ts">
 import { Component, PropSync, Vue, Watch } from 'nuxt-property-decorator'
-import { BadRequest, IError, IMaterialCategory } from '~/types'
-
-interface IMaterialCategoryValidation {
-    name: boolean
-}
+import { BadRequest, IError, ICategory, ICategoryModelValidation } from '~/types'
 
 @Component({})
 export default class CMaterialCategoryEdit extends Vue {
     @PropSync('visible') dialogVisible!: boolean
-    @PropSync('model') materialCategoryModel!: IMaterialCategory
+    @PropSync('model') materialCategoryModel!: ICategory
 
     errors: Array<IError> = []
 
-    validation: IMaterialCategoryValidation = {
+    validation: ICategoryModelValidation = {
         name: false,
     }
 
