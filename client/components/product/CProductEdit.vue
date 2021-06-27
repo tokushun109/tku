@@ -8,6 +8,7 @@
             @close="$emit('close')"
             @confirm="saveHandler()"
         >
+            <c-error :errors.sync="errors" />
             <c-form bordered>
                 <c-input-label label="商品名" required>
                     <c-input :model.sync="productModel.name" />
@@ -33,8 +34,12 @@
 </template>
 
 <script lang="ts">
-import { Component, PropSync, Vue } from 'nuxt-property-decorator'
-import { IAccessoryCategory, IMaterialCategory, IProduct, ISalesSite } from '~/types'
+import { Component, PropSync, Vue, Watch } from 'nuxt-property-decorator'
+import { BadRequest, IAccessoryCategory, IError, IMaterialCategory, IProduct, ISalesSite } from '~/types'
+
+interface IProductValidation {
+    name: boolean
+}
 
 @Component({})
 export default class CSalesSiteEdit extends Vue {
@@ -46,6 +51,27 @@ export default class CSalesSiteEdit extends Vue {
     salesSites: Array<ISalesSite> = []
     uploadFiles: Array<File> = []
 
+    errors: Array<IError> = []
+
+    validation: IProductValidation = {
+        name: false,
+    }
+
+    validationReset() {
+        this.errors = []
+        this.validation.name = false
+    }
+
+    // 入力時のバリデーション
+    @Watch('productModel', { deep: true })
+    checkValidation() {
+        this.validationReset()
+        if (this.productModel.name.length > 20 && !this.validation.name) {
+            this.errors.push(new BadRequest('商品名は20文字以内で入力してください'))
+            this.validation.name = true
+        }
+    }
+
     async mounted() {
         this.accessoryCategories = await this.$axios.$get(`/accessory_category`)
         this.materialCategories = await this.$axios.$get(`/material_category`)
@@ -53,23 +79,30 @@ export default class CSalesSiteEdit extends Vue {
     }
 
     async saveHandler() {
-        const createProduct = await this.$axios.$post(`/product`, this.productModel).catch(() => {})
-        // 画像を選択していたら、アップロードを行う
-        if (this.uploadFiles.length > 0) {
-            const params = new FormData()
-            this.uploadFiles.forEach((file, index) => {
-                params.append(`file${index}`, file)
-            })
-            await this.$axios
-                .$post(`/product/${createProduct.uuid}/product_image`, params, {
+        try {
+            this.errors = []
+            // 送信時のバリデーション
+            if (this.productModel.name.length === 0) {
+                throw new BadRequest('商品名が入力されていません')
+            }
+            const createProduct = await this.$axios.$post(`/product`, this.productModel)
+            // 画像を選択していたら、アップロードを行う
+            if (this.uploadFiles.length > 0) {
+                const params = new FormData()
+                this.uploadFiles.forEach((file, index) => {
+                    params.append(`file${index}`, file)
+                })
+                await this.$axios.$post(`/product/${createProduct.uuid}/product_image`, params, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
                 })
-                .catch(() => {})
+            }
+            this.dialogVisible = false
+            this.$emit('create')
+        } catch (e) {
+            this.errors.push(e)
         }
-        this.dialogVisible = false
-        this.$emit('create')
     }
 
     fileUploadHandler(files: Array<File>) {

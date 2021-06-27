@@ -12,6 +12,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"gopkg.in/go-playground/validator.v9"
 )
 
 var typeToExtention = map[string]string{
@@ -69,6 +70,15 @@ func createProductHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
+
+	// validationの確認
+	validate := validator.New()
+	if errors := validate.Struct(product); errors != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
+		return
+	}
+
 	// modelの呼び出し
 	err = models.InsertProduct(&product)
 	if err != nil {

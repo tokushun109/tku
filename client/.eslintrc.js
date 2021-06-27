@@ -37,6 +37,8 @@ module.exports = {
         'keyword-spacing': 2,
         // 使ってない変数は警告
         'no-unused-vars': 0,
+        // 正規表現の警告を無視する
+        'no-control-regex': 0,
         '@typescript-eslint/no-unused-vars': 1,
         // prettier
         'prettier/prettier': [

@@ -7,6 +7,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+
+	"gopkg.in/go-playground/validator.v9"
 )
 
 // アクセサリーカテゴリー一覧を取得
@@ -41,12 +43,22 @@ func createAccessoryCategoryHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
+
+	// validationの確認
+	validate := validator.New()
+	if errors := validate.Struct(accessoryCategory); errors != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
+		return
+	}
+
 	// modelの呼び出し
 	if err = models.InsertAccessoryCategory(&accessoryCategory); err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
+
 	responseBody, err := json.Marshal(accessoryCategory)
 	if err != nil {
 		log.Println(err)
@@ -89,6 +101,15 @@ func createMaterialCategoryHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
+
+	// validationの確認
+	validate := validator.New()
+	if err := validate.Struct(materialCategory); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
+		return
+	}
+
 	// modelの呼び出し
 	models.InsertMaterialCategory(&materialCategory)
 	responseBody, err := json.Marshal(materialCategory)

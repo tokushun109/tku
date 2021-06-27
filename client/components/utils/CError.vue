@@ -3,7 +3,6 @@
         <ul class="errors">
             <li v-for="(error, index) in errors" :key="index" class="error">
                 <span v-dompurify-html="error.message.replace(/\n/g, '<br />')"></span>
-                <em v-if="error.statusCode > 0">({{ error.statusCode }})</em>
             </li>
         </ul>
     </section>

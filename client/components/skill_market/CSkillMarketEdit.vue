@@ -3,17 +3,17 @@
         <c-dialog
             :visible.sync="dialogVisible"
             width="1200px"
-            height="450px"
             :title="skiliMarketModel.uuid === '' ? '新しいスキルマーケットを登録' : skiliMarketModel.name + 'を編集'"
             class="c-skill-market-edit-modeal"
             @close="$emit('close')"
             @confirm="saveHandler()"
         >
+            <c-error :errors.sync="errors" />
             <c-form bordered>
                 <c-input-label label="スキルマーケット名" required>
                     <c-input :model.sync="skiliMarketModel.name" />
                 </c-input-label>
-                <c-input-label label="url" required>
+                <c-input-label label="URL" required>
                     <c-input :model.sync="skiliMarketModel.url" />
                 </c-input-label>
             </c-form>
@@ -22,18 +22,66 @@
 </template>
 
 <script lang="ts">
-import { Component, PropSync, Vue } from 'nuxt-property-decorator'
-import { ISkillMarket } from '~/types'
+import { Component, PropSync, Vue, Watch } from 'nuxt-property-decorator'
+import { BadRequest, IError, ISkillMarket } from '~/types'
+
+interface ISkillMarketModelValidation {
+    name: boolean
+    url: boolean
+}
 
 @Component({})
 export default class CSkillMarketEdit extends Vue {
     @PropSync('visible') dialogVisible!: boolean
     @PropSync('model') skiliMarketModel!: ISkillMarket
 
+    errors: Array<IError> = []
+
+    validation: ISkillMarketModelValidation = {
+        name: false,
+        url: false,
+    }
+
+    validationReset() {
+        this.errors = []
+        this.validation.name = false
+        this.validation.url = false
+    }
+
+    // 入力時のバリデーション
+    @Watch('snsModel', { deep: true })
+    checkValidation() {
+        this.validationReset()
+        if (this.skiliMarketModel.name.length > 20 && !this.validation.name) {
+            this.errors.push(new BadRequest('スキルマーケット名は20文字以内で入力してください'))
+            this.validation.name = true
+        }
+        if (this.skiliMarketModel.url.match(/^[^\x01-\x7E\xA1-\xDF]+$/) && !this.validation.url) {
+            this.errors.push(new BadRequest('URLに全角文字が含まれています'))
+            this.validation.url = true
+        }
+        if (this.skiliMarketModel.url.match(/\s+/) && !this.validation.url) {
+            this.errors.push(new BadRequest('URLにスペースが含まれています'))
+            this.validation.url = true
+        }
+    }
+
     async saveHandler() {
-        await this.$axios.$post(`/skill_market`, this.skiliMarketModel).catch(() => {})
-        this.dialogVisible = false
-        this.$emit('create')
+        try {
+            this.errors = []
+            // 送信時のバリデーション
+            if (this.skiliMarketModel.name.length === 0) {
+                throw new BadRequest('スキルマーケット名が入力されていません')
+            }
+            if (this.skiliMarketModel.url.length === 0) {
+                throw new BadRequest('URLが入力されていません')
+            }
+            await this.$axios.$post(`/skill_market`, this.skiliMarketModel)
+            this.dialogVisible = false
+            this.$emit('create')
+        } catch (e) {
+            this.errors.push(e)
+        }
     }
 }
 </script>

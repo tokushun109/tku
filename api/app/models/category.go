@@ -3,7 +3,7 @@ package models
 type AccessoryCategory struct {
 	DefaultModel
 	Uuid string `json:"uuid"`
-	Name string `json:"name"`
+	Name string `json:"name" validate:"min=1,max=20"`
 }
 
 type AccessoryCategories []AccessoryCategory
@@ -11,7 +11,7 @@ type AccessoryCategories []AccessoryCategory
 type MaterialCategory struct {
 	DefaultModel
 	Uuid string `json:"uuid"`
-	Name string `json:"name"`
+	Name string `json:"name" validate:"min=1,max=20"`
 }
 
 type MaterialCategories []MaterialCategory

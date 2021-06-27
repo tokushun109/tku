@@ -35,7 +35,7 @@ export default class CDialog extends Vue {
     // モーダルの横幅(px)
     @Prop({ type: String, default: '512px' }) width!: string
     // モーダルの縦幅
-    @Prop({ type: String, default: '90%' }) height!: string
+    @Prop({ type: String, default: 'initial' }) height!: string
     // 選択ボタンの有無
     @Prop({ default: true }) isButton!: boolean
     // 閉じるボタンの有無
