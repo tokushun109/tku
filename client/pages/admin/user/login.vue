@@ -35,7 +35,7 @@ export default class PageAdminUserLogin extends Vue {
     async onSubmit() {
         try {
             this.errors = []
-            // バリデーション
+            // 送信時のバリデーション
             if (this.form.email.length === 0) {
                 throw new BadRequest('メールアドレスが入力されていません')
             }

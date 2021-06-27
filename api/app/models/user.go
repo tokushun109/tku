@@ -9,9 +9,9 @@ import (
 type User struct {
 	DefaultModel
 	Uuid     string `json:"uuid"`
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Password string `json:"-"`
+	Name     string `json:"name" validate:"min=1,max=20"`
+	Email    string `json:"email" validate:"email"`
+	Password string `json:"-" validate:"min=1,max=20"`
 	IsAdmin  bool   `json:"isAdmin"`
 }
 

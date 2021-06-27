@@ -7,6 +7,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+
+	"gopkg.in/go-playground/validator.v9"
 )
 
 // 販売サイト一覧を取得
@@ -40,6 +42,15 @@ func createSalesSiteHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
+
+	// validationの確認
+	validate := validator.New()
+	if err := validate.Struct(salesSite); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
+		return
+	}
+
 	// modelの呼び出し
 	err = models.InsertSalesSite(&salesSite)
 	if err != nil {
@@ -89,6 +100,15 @@ func createSkillMarketHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
+
+	// validationの確認
+	validate := validator.New()
+	if err := validate.Struct(skillmarket); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
+		return
+	}
+
 	// modelの呼び出し
 	err = models.InsertSkillMarket(&skillmarket)
 	if err != nil {
@@ -138,6 +158,15 @@ func createSnsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
+
+	// validationの確認
+	validate := validator.New()
+	if err := validate.Struct(sns); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
+		return
+	}
+
 	// modelの呼び出し
 	err = models.InsertSns(&sns)
 	if err != nil {

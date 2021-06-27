@@ -7,7 +7,7 @@ import (
 type Product struct {
 	DefaultModel
 	Uuid                string             `json:"uuid"`
-	Name                string             `json:"name"`
+	Name                string             `json:"name" validate:"min=1,max=20"`
 	Description         string             `json:"description"`
 	AccessoryCategoryId *uint              `json:"-"`
 	AccessoryCategory   AccessoryCategory  `json:"accessoryCategory"`

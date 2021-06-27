@@ -4,8 +4,11 @@ import (
 	"api/app/models"
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"strings"
+
+	"gopkg.in/go-playground/validator.v9"
 )
 
 // go run app/db/cmd/admin/create.goで管理ユーザーを作成
@@ -37,8 +40,16 @@ func main() {
 	password := StrStdin()
 	user.Password = password
 
+	// validationの確認
+	validate := validator.New()
+	if errors := validate.Struct(user); errors != nil {
+		log.Fatalln(errors)
+	}
+
 	// userの作成用のメソッド
-	models.InsertUser(user, true)
+	if err := models.InsertUser(user, true); err != nil {
+		log.Fatalln(err)
+	}
 
 	fmt.Println("管理ユーザーを作成しました")
 }

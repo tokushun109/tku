@@ -3,8 +3,8 @@ package models
 type SalesSite struct {
 	DefaultModel
 	Uuid string `json:"uuid"`
-	Name string `json:"name"`
-	Url  string `json:"url"`
+	Name string `json:"name" validate:"min=1,max=20"`
+	Url  string `json:"url" validate:"url"`
 }
 
 type SalesSites []SalesSite
@@ -12,8 +12,8 @@ type SalesSites []SalesSite
 type SkillMarket struct {
 	DefaultModel
 	Uuid string `json:"uuid"`
-	Name string `json:"name"`
-	Url  string `json:"url"`
+	Name string `json:"name" validate:"min=1,max=20"`
+	Url  string `json:"url" validate:"url"`
 }
 
 type SkillMarkets []SkillMarket
@@ -21,8 +21,8 @@ type SkillMarkets []SkillMarket
 type Sns struct {
 	DefaultModel
 	Uuid string `json:"uuid"`
-	Name string `json:"name"`
-	Url  string `json:"url"`
+	Name string `json:"name" validate:"min=1,max=20"`
+	Url  string `json:"url" validate:"url"`
 }
 
 type SnsList []Sns
