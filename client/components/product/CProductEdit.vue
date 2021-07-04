@@ -3,6 +3,7 @@
         <c-dialog
             :visible.sync="dialogVisible"
             width="1200px"
+            height="1200px"
             :title="productModel.uuid === '' ? '新しい商品を登録' : productModel.name + 'を編集'"
             class="c-product-edit-modeal"
             @close="$emit('close')"

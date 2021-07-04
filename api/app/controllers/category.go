@@ -13,13 +13,7 @@ import (
 
 // アクセサリーカテゴリー一覧を取得
 func getAllAccessoryCategoriesHandler(w http.ResponseWriter, r *http.Request) {
-	accessoryCategories, err := models.GetAllAccessoryCategories()
-	if err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-		return
-	}
-
+	accessoryCategories := models.GetAllAccessoryCategories()
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(accessoryCategories); err != nil {
 		log.Println(err)
@@ -59,25 +53,15 @@ func createAccessoryCategoryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responseBody, err := json.Marshal(accessoryCategory)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-		return
-	}
-
+	// responseBodyで処理の成功を返す
+	responseBody := getSuccessResponse()
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(responseBody)
 }
 
 // 材料カテゴリー一覧を取得
 func getAllMaterialCategoriesHandler(w http.ResponseWriter, r *http.Request) {
-	materialCategories, err := models.GetAllMaterialCategories()
-	if err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-		return
-	}
+	materialCategories := models.GetAllMaterialCategories()
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(materialCategories); err != nil {
 		log.Println(err)
@@ -112,13 +96,9 @@ func createMaterialCategoryHandler(w http.ResponseWriter, r *http.Request) {
 
 	// modelの呼び出し
 	models.InsertMaterialCategory(&materialCategory)
-	responseBody, err := json.Marshal(materialCategory)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-		return
-	}
 
+	// responseBodyで処理の成功を返す
+	responseBody := getSuccessResponse()
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(responseBody)
 }

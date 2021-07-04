@@ -23,12 +23,7 @@ var typeToExtention = map[string]string{
 
 // 商品一覧を取得
 func getAllProductsHandler(w http.ResponseWriter, r *http.Request) {
-	products, err := models.GetAllProducts()
-	if err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-		return
-	}
+	products := models.GetAllProducts()
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(products); err != nil {
 		log.Println(err)
@@ -41,12 +36,7 @@ func getAllProductsHandler(w http.ResponseWriter, r *http.Request) {
 func getProductHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	uuid := vars["product_uuid"]
-	product, err := models.GetProduct(uuid)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-		return
-	}
+	product := models.GetProduct(uuid)
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(product); err != nil {
 		log.Println(err)
@@ -74,8 +64,8 @@ func createProductHandler(w http.ResponseWriter, r *http.Request) {
 	// validationの確認
 	validate := validator.New()
 	if errors := validate.Struct(product); errors != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
+		log.Println(errors)
+		http.Error(w, fmt.Sprintf("error: %s", errors), http.StatusBadRequest)
 		return
 	}
 
@@ -100,12 +90,7 @@ func createProductHandler(w http.ResponseWriter, r *http.Request) {
 func getProductImageBlobHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	productImageUuid := vars["product_image_uuid"]
-	productImage, err := models.GetProductImage(productImageUuid)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-		return
-	}
+	productImage := models.GetProductImage(productImageUuid)
 	file, err := os.Open(productImage.Path)
 	if err != nil {
 		log.Println(err)
@@ -129,12 +114,7 @@ func createProductImageHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	uuid := vars["product_uuid"]
 	// requestのuuidから商品のIDを取得しておく
-	product, err := models.GetProduct(uuid)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-		return
-	}
+	product := models.GetProduct(uuid)
 	productId := product.ID
 	i := 0
 	for {
@@ -192,9 +172,14 @@ func createProductImageHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Println(err)
 			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-
 			return
 		}
 		i++
 	}
+
+	// responseBodyで処理の成功を返す
+	responseBody := getSuccessResponse()
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(responseBody)
+
 }

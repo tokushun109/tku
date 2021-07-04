@@ -16,14 +16,14 @@ type MaterialCategory struct {
 
 type MaterialCategories []MaterialCategory
 
-func GetAllAccessoryCategories() (accessoryCategories AccessoryCategories, err error) {
-	err = Db.Find(&accessoryCategories).Error
-	return accessoryCategories, err
+func GetAllAccessoryCategories() (accessoryCategories AccessoryCategories) {
+	Db.Find(&accessoryCategories)
+	return accessoryCategories
 }
 
-func GetAccessoryCategory(uuid string) (accessoryCategory AccessoryCategory, err error) {
-	err = Db.First(&accessoryCategory, "uuid = ?", uuid).Error
-	return accessoryCategory, err
+func GetAccessoryCategory(uuid string) (accessoryCategory AccessoryCategory) {
+	Db.First(&accessoryCategory, "uuid = ?", uuid)
+	return accessoryCategory
 }
 
 func InsertAccessoryCategory(accessoryCategory *AccessoryCategory) (err error) {
@@ -37,14 +37,14 @@ func InsertAccessoryCategory(accessoryCategory *AccessoryCategory) (err error) {
 	return err
 }
 
-func GetAllMaterialCategories() (materialCategories MaterialCategories, err error) {
-	err = Db.Find(&materialCategories).Error
-	return materialCategories, err
+func GetAllMaterialCategories() (materialCategories MaterialCategories) {
+	Db.Find(&materialCategories)
+	return materialCategories
 }
 
-func GetMaterialCategory(uuid string) (materialCategory MaterialCategory, err error) {
-	err = Db.First(&materialCategory, "uuid = ?", uuid).Error
-	return materialCategory, err
+func GetMaterialCategory(uuid string) (materialCategory MaterialCategory) {
+	Db.First(&materialCategory, "uuid = ?", uuid)
+	return materialCategory
 }
 
 func InsertMaterialCategory(materialCategory *MaterialCategory) (err error) {

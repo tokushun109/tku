@@ -19,13 +19,7 @@ type loginForm struct {
 
 // 商品一覧を取得
 func getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
-	users, err := models.GetAllUsers()
-	if err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-		return
-	}
-
+	users := models.GetAllUsers()
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(users); err != nil {
 		log.Println(err)
@@ -45,12 +39,7 @@ func getLoginUserHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	} else {
-		user, err := session.GetUserBySession()
-		if err != nil {
-			log.Println(err)
-			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-			return
-		}
+		user := session.GetUserBySession()
 		w.Header().Set("Content-Type", "application/json")
 		if err := json.NewEncoder(w).Encode(user); err != nil {
 			log.Println(err)
@@ -76,16 +65,10 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := models.GeUserByEmail(loginForm.Email)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusUnauthorized)
-		return
-	}
-
+	user := models.GeUserByEmail(loginForm.Email)
 	if user.Password == models.Encrypt(loginForm.Password) {
 		// すでにuserに対応するsessionが作成されている場合は一度削除する
-		if session, err := user.GetSessionByUser(); err == nil {
+		if session := user.GetSessionByUser(); session.ID != nil {
 			session.DeleteSession()
 		}
 
@@ -118,21 +101,10 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	uuid := vars["session_uuid"]
 
-	session, err := models.GetSession(uuid)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-		return
-	}
+	session := models.GetSession(uuid)
 	// sessionを取得して、有効なsessionなら削除を行う
-	valid, err := session.IsValidSession()
-	if err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-		return
-	}
-	if valid {
-		if err = session.DeleteSession(); err != nil {
+	if valid := session.IsValidSession(); valid {
+		if err := session.DeleteSession(); err != nil {
 			log.Println(err)
 			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 			return
