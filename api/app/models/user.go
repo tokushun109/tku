@@ -30,20 +30,20 @@ func Encrypt(plaintext string) (cryptext string) {
 	return cryptext
 }
 
-func (session *Session) GetUserBySession() (user User, err error) {
-	err = Db.First(&user, "id = ?", session.UserId).Error
-	return user, err
+func (session *Session) GetUserBySession() (user User) {
+	Db.First(&user, "id = ?", session.UserId)
+	return user
 
 }
 
-func GetAllUsers() (users Users, err error) {
-	err = Db.Find(&users).Error
-	return users, err
+func GetAllUsers() (users Users) {
+	Db.Find(&users)
+	return users
 }
 
-func GeUserByEmail(email string) (user User, err error) {
-	err = Db.First(&user, "email = ?", email).Error
-	return user, err
+func GeUserByEmail(email string) (user User) {
+	Db.First(&user, "email = ?", email)
+	return user
 }
 
 // is_adminは管理ユーザーならtrue、一般ユーザーならfalse
@@ -61,9 +61,9 @@ func InsertUser(user *User, is_admin bool) (err error) {
 	return err
 }
 
-func (user *User) GetSessionByUser() (session Session, err error) {
-	err = Db.First(&session, "user_id = ?", user.ID).Error
-	return session, err
+func (user *User) GetSessionByUser() (session Session) {
+	Db.First(&session, "user_id = ?", user.ID)
+	return session
 
 }
 
@@ -84,21 +84,18 @@ func (user *User) CreateSession() (session Session, err error) {
 	return session, err
 }
 
-func GetSession(uuid string) (session Session, err error) {
-	err = Db.First(&session, "uuid = ?", uuid).Error
-	return session, err
+func GetSession(uuid string) (session Session) {
+	Db.First(&session, "uuid = ?", uuid)
+	return session
 }
 
-func (session *Session) IsValidSession() (valid bool, err error) {
+func (session *Session) IsValidSession() (valid bool) {
 	valid = false
-	err = Db.First(&session, "uuid = ?", session.Uuid).Error
-	if err != nil {
-		return valid, err
-	}
+	Db.First(&session, "uuid = ?", session.Uuid)
 	if session != nil {
 		valid = true
 	}
-	return valid, err
+	return valid
 }
 
 func (session *Session) DeleteSession() (err error) {

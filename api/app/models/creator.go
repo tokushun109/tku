@@ -9,9 +9,9 @@ type Creator struct {
 	Logo         string `json:"logo"`
 }
 
-func GetCreator() (creator Creator, err error) {
-	err = Db.First(&creator).Error
-	return creator, err
+func GetCreator() (creator Creator) {
+	Db.First(&creator)
+	return creator
 }
 
 func initialInsertCreator() (err error) {

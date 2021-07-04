@@ -27,14 +27,14 @@ type Sns struct {
 
 type SnsList []Sns
 
-func GetAllSalesSites() (salesSites SalesSites, err error) {
-	err = Db.Find(&salesSites).Error
-	return salesSites, err
+func GetAllSalesSites() (salesSites SalesSites) {
+	Db.Find(&salesSites)
+	return salesSites
 }
 
-func GetSalesSite(uuid string) (salesSite SalesSite, err error) {
-	err = Db.First(&salesSite, "uuid = ?", uuid).Error
-	return salesSite, err
+func GetSalesSite(uuid string) (salesSite SalesSite) {
+	Db.First(&salesSite, "uuid = ?", uuid)
+	return salesSite
 }
 
 func InsertSalesSite(salesSite *SalesSite) (err error) {
@@ -49,9 +49,9 @@ func InsertSalesSite(salesSite *SalesSite) (err error) {
 	return err
 }
 
-func GetAllSkillMarkets() (skillMarkets SkillMarkets, err error) {
-	err = Db.Find(&skillMarkets).Error
-	return skillMarkets, err
+func GetAllSkillMarkets() (skillMarkets SkillMarkets) {
+	Db.Find(&skillMarkets)
+	return skillMarkets
 }
 
 func InsertSkillMarket(skillMarket *SkillMarket) (err error) {
@@ -66,9 +66,9 @@ func InsertSkillMarket(skillMarket *SkillMarket) (err error) {
 	return err
 }
 
-func GetAllSnsList() (snsList SnsList, err error) {
-	err = Db.Find(&snsList).Error
-	return snsList, err
+func GetAllSnsList() (snsList SnsList) {
+	Db.Find(&snsList)
+	return snsList
 }
 
 func InsertSns(sns *Sns) (err error) {

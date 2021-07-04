@@ -59,13 +59,10 @@ func gormConnect() *gorm.DB {
 func init() {
 	Db = gormConnect()
 
-	creator, err := GetCreator()
-	if err != nil {
-		log.Fatalln(err)
-	}
+	creator := GetCreator()
 	if creator.ID == nil {
 		// 製作者の初期データが未作成の場合のみ作成する
-		err = initialInsertCreator()
+		err := initialInsertCreator()
 		if err != nil {
 			log.Fatalln(err)
 		}

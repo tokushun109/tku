@@ -3,7 +3,6 @@
         <div class="admin-sns-list">
             <c-button primary @c-click="snsDialogToggle">新規追加</c-button>
             <c-sns-edit :visible.sync="snsDialogVisible" :model.sync="snsModel" @close="snsDialogToggle" @create="loadingSite($event)" />
-            {{ snsList }}
             <ul v-for="sns in snsList" :key="sns.uuid">
                 <li>{{ sns }}</li>
             </ul>

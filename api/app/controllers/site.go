@@ -13,12 +13,7 @@ import (
 
 // 販売サイト一覧を取得
 func getAllSalesSitesHandler(w http.ResponseWriter, r *http.Request) {
-	salesSites, err := models.GetAllSalesSites()
-	if err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-		return
-	}
+	salesSites := models.GetAllSalesSites()
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(salesSites); err != nil {
 		log.Println(err)
@@ -58,25 +53,16 @@ func createSalesSiteHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
-	responseBody, err := json.Marshal(salesSite)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-		return
-	}
 
+	// responseBodyで処理の成功を返す
+	responseBody := getSuccessResponse()
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(responseBody)
 }
 
 // スキルマーケット一覧を取得
 func getAllSkillMarketsHandler(w http.ResponseWriter, r *http.Request) {
-	skillMarkets, err := models.GetAllSkillMarkets()
-	if err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-		return
-	}
+	skillMarkets := models.GetAllSkillMarkets()
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(skillMarkets); err != nil {
 		log.Println(err)
@@ -116,25 +102,15 @@ func createSkillMarketHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
-	responseBody, err := json.Marshal(skillmarket)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-		return
-	}
-
+	// responseBodyで処理の成功を返す
+	responseBody := getSuccessResponse()
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(responseBody)
 }
 
 // SNS一覧を取得
 func getAllSnsListHandler(w http.ResponseWriter, r *http.Request) {
-	snsList, err := models.GetAllSnsList()
-	if err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-		return
-	}
+	snsList := models.GetAllSnsList()
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(snsList); err != nil {
 		log.Println(err)
@@ -174,13 +150,8 @@ func createSnsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
-	responseBody, err := json.Marshal(sns)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-		return
-	}
-
+	// responseBodyで処理の成功を返す
+	responseBody := getSuccessResponse()
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(responseBody)
 }

@@ -3,6 +3,7 @@ package controllers
 import (
 	"api/app/models"
 	"api/config"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -11,13 +12,14 @@ import (
 	"github.com/rs/cors"
 )
 
+type successResponse struct {
+	Success bool `json:"success"`
+}
+
 func sessionCheck(uuid string) (session models.Session, err error) {
-	session, err = models.GetSession(uuid)
-	if err != nil {
-		return session, err
-	}
-	valid, err := session.IsValidSession()
-	if err != nil {
+	session = models.GetSession(uuid)
+	valid := session.IsValidSession()
+	if session.ID == nil {
 		return session, err
 	}
 	if !valid {
@@ -25,6 +27,14 @@ func sessionCheck(uuid string) (session models.Session, err error) {
 		return session, err
 	}
 	return session, err
+}
+
+// 処理の成功結果をレスポンスで返す
+func getSuccessResponse() (responseBody []byte) {
+	var successResponse successResponse
+	successResponse.Success = true
+	responseBody, _ = json.Marshal(successResponse)
+	return responseBody
 }
 
 func StartMainServer() error {
