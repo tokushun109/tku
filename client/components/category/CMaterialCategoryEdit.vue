@@ -20,7 +20,7 @@
 
 <script lang="ts">
 import { Component, PropSync, Vue, Watch } from 'nuxt-property-decorator'
-import { BadRequest, IError, ICategory, ICategoryModelValidation } from '~/types'
+import { BadRequest, IError, ICategory, CategoryType, ICategoryModelValidation } from '~/types'
 
 @Component({})
 export default class CMaterialCategoryEdit extends Vue {
@@ -57,7 +57,7 @@ export default class CMaterialCategoryEdit extends Vue {
             }
             await this.$axios.$post(`/material_category`, this.materialCategoryModel)
             this.dialogVisible = false
-            this.$emit('create', 'material_category')
+            this.$emit('create', CategoryType.Material)
         } catch (e) {
             this.errors.push(e)
         }

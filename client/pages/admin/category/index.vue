@@ -9,7 +9,12 @@
                 @create="loadingCategory($event)"
             />
             <ul v-for="accessoryCategory in accessoryCategories" :key="accessoryCategory.uuid">
-                <li>{{ accessoryCategory }}</li>
+                <c-column>
+                    <li>{{ accessoryCategory.name }}</li>
+                    <div class="button-wrapper">
+                        <c-button class="delete-button" label="削除" @c-click="accssoryCategoryDeleteHandler(accessoryCategory)" />
+                    </div>
+                </c-column>
             </ul>
             <c-button primary @c-click="materialDialogToggle">新規追加</c-button>
             <c-material-category-edit
@@ -19,7 +24,12 @@
                 @create="loadingCategory($event)"
             />
             <ul v-for="materialCategory in materialCategories" :key="materialCategory.uuid">
-                <li>{{ materialCategory }}</li>
+                <c-column>
+                    <li>{{ materialCategory.name }}</li>
+                    <div class="button-wrapper">
+                        <c-button class="delete-button" label="削除" @c-click="materialCategoryDeleteHandler(materialCategory)" />
+                    </div>
+                </c-column>
             </ul>
         </div>
     </c-page>
@@ -28,7 +38,7 @@
 <script lang="ts">
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
-import { ICategory, newCategory } from '~/types'
+import { ICategory, newCategory, CategoryType } from '~/types'
 @Component({
     head: {
         title: '商品一覧',
@@ -58,16 +68,32 @@ export default class PageAdminCategoryIndex extends Vue {
         this.accessoryDialogVisible = !this.accessoryDialogVisible
     }
 
-    // 材料カテゴリーダイアログ￥の切り替え
+    // 材料カテゴリーダイアログの切り替え
     materialDialogToggle() {
         this.materialDialogVisible = !this.materialDialogVisible
     }
 
-    async loadingCategory(mode: string) {
-        if (mode === 'accessory_category') {
+    // アクセサリーカテゴリーの削除
+    async accssoryCategoryDeleteHandler(accessoryCategory: ICategory) {
+        if (confirm(`${accessoryCategory.name}を削除します。よろしいですか？`)) {
+            await this.$axios.$delete(`/accessory_category/${accessoryCategory.uuid}`)
+            this.loadingCategory(CategoryType.Accessory)
+        }
+    }
+
+    // 材料カテゴリーの削除
+    async materialCategoryDeleteHandler(materialCategory: ICategory) {
+        if (confirm(`${materialCategory.name}を削除します。よろしいですか？`)) {
+            await this.$axios.$delete(`/material_category/${materialCategory.uuid}`)
+            this.loadingCategory(CategoryType.Material)
+        }
+    }
+
+    async loadingCategory(type: string) {
+        if (type === CategoryType.Accessory) {
             this.accessoryCategories = await this.$axios.$get(`/accessory_category`)
             this.accessoryCategoryModel = newCategory()
-        } else if (mode === 'material_category') {
+        } else if (type === CategoryType.Material) {
             this.materialCategories = await this.$axios.$get(`/material_category`)
             this.materialCategoryModel = newCategory()
         }

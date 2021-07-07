@@ -51,9 +51,11 @@ func StartMainServer() error {
 	// アクセサリーカテゴリー
 	r.HandleFunc("/api/accessory_category", getAllAccessoryCategoriesHandler).Methods("GET")
 	r.HandleFunc("/api/accessory_category", createAccessoryCategoryHandler).Methods("POST")
+	r.HandleFunc("/api/accessory_category/{accessory_category_uuid}", deleteAccessoryCategoryHandler).Methods("DELETE")
 	// 材料カテゴリー
 	r.HandleFunc("/api/material_category", getAllMaterialCategoriesHandler).Methods("GET")
 	r.HandleFunc("/api/material_category", createMaterialCategoryHandler).Methods("POST")
+	r.HandleFunc("/api/material_category/{material_category_uuid}", deleteMaterialCategoryHandler).Methods("DELETE")
 	// 販売サイト
 	r.HandleFunc("/api/sales_site", getAllSalesSitesHandler).Methods("GET")
 	r.HandleFunc("/api/sales_site", createSalesSiteHandler).Methods("POST")
@@ -74,6 +76,9 @@ func StartMainServer() error {
 	r.HandleFunc("/api/user/logout/{session_uuid}", logoutHandler).Methods("POST")
 
 	// corsの設定
-	c := cors.Default().Handler(r)
+	customizeCors := cors.New(cors.Options{
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
+	})
+	c := customizeCors.Handler(r)
 	return http.ListenAndServe(port, c)
 }
