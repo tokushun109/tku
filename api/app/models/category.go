@@ -37,6 +37,11 @@ func InsertAccessoryCategory(accessoryCategory *AccessoryCategory) (err error) {
 	return err
 }
 
+func (accessoryCategory *AccessoryCategory) DeleteAccessoryCategory() (err error) {
+	err = Db.Delete(&accessoryCategory).Error
+	return err
+}
+
 func GetAllMaterialCategories() (materialCategories MaterialCategories) {
 	Db.Find(&materialCategories)
 	return materialCategories
@@ -55,5 +60,10 @@ func InsertMaterialCategory(materialCategory *MaterialCategory) (err error) {
 	}
 	materialCategory.Uuid = uuid
 	err = Db.Create(&materialCategory).Error
+	return err
+}
+
+func (materialCategory *MaterialCategory) DeleteMaterialCategory() (err error) {
+	err = Db.Delete(&materialCategory).Error
 	return err
 }

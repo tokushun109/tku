@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	"gopkg.in/go-playground/validator.v9"
 )
 
@@ -57,6 +58,32 @@ func createAccessoryCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	responseBody := getSuccessResponse()
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(responseBody)
+}
+
+// アクセサリーカテゴリーの削除
+func deleteAccessoryCategoryHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	uuid := vars["accessory_category_uuid"]
+
+	accessoryCategory := models.GetAccessoryCategory(uuid)
+	if err := accessoryCategory.DeleteAccessoryCategory(); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+}
+
+// 材料カテゴリーの削除
+func deleteMaterialCategoryHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	uuid := vars["material_category_uuid"]
+
+	materialCategory := models.GetMaterialCategory(uuid)
+	if err := materialCategory.DeleteMaterialCategory(); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
 }
 
 // 材料カテゴリー一覧を取得

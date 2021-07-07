@@ -6,3 +6,8 @@ export interface ICategory {
 export interface ICategoryModelValidation {
     name: boolean
 }
+
+export enum CategoryType {
+    Accessory = 'accessory_category',
+    Material = 'material_category',
+}
