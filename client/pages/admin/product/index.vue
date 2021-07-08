@@ -4,7 +4,12 @@
             <c-button primary @c-click="toggle">新規追加</c-button>
             <c-product-edit :visible.sync="dialogVisible" :model.sync="productModel" @close="toggle" @create="loadingProduct()" />
             <ul v-for="product in products" :key="product.uuid">
-                <li>{{ product }}</li>
+                <c-column>
+                    <li>{{ product.name }}</li>
+                    <div class="button-wrapper">
+                        <c-button class="delete-button" label="削除" @c-click="productDeleteHandler(product)" />
+                    </div>
+                </c-column>
             </ul>
         </div>
     </c-page>
@@ -42,6 +47,14 @@ export default class PageAdminProductIndex extends Vue {
     // ボタンの切り替え
     toggle() {
         this.dialogVisible = !this.dialogVisible
+    }
+
+    // 商品の削除
+    async productDeleteHandler(product: IProduct) {
+        if (confirm(`${product.name}を削除します。よろしいですか？`)) {
+            await this.$axios.$delete(`/product/${product.uuid}`)
+            this.loadingProduct()
+        }
     }
 }
 </script>
