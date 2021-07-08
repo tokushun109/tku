@@ -47,6 +47,13 @@ func createAccessoryCategoryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// データの重複確認
+	if isUnique, err := models.AccessoryCategoryUniqueCheck(accessoryCategory.Name); !isUnique {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
+		return
+	}
+
 	// modelの呼び出し
 	if err = models.InsertAccessoryCategory(&accessoryCategory); err != nil {
 		log.Println(err)
@@ -71,19 +78,11 @@ func deleteAccessoryCategoryHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
-}
 
-// 材料カテゴリーの削除
-func deleteMaterialCategoryHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	uuid := vars["material_category_uuid"]
-
-	materialCategory := models.GetMaterialCategory(uuid)
-	if err := materialCategory.DeleteMaterialCategory(); err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-		return
-	}
+	// responseBodyで処理の成功を返す
+	responseBody := getSuccessResponse()
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(responseBody)
 }
 
 // 材料カテゴリー一覧を取得
@@ -121,8 +120,33 @@ func createMaterialCategoryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// データの重複確認
+	if isUnique, err := models.MaterialCategoryUniqueCheck(materialCategory.Name); !isUnique {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
+		return
+	}
+
 	// modelの呼び出し
 	models.InsertMaterialCategory(&materialCategory)
+
+	// responseBodyで処理の成功を返す
+	responseBody := getSuccessResponse()
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(responseBody)
+}
+
+// 材料カテゴリーの削除
+func deleteMaterialCategoryHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	uuid := vars["material_category_uuid"]
+
+	materialCategory := models.GetMaterialCategory(uuid)
+	if err := materialCategory.DeleteMaterialCategory(); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
 
 	// responseBodyで処理の成功を返す
 	responseBody := getSuccessResponse()

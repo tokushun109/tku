@@ -2,6 +2,7 @@ package models
 
 import (
 	"api/config"
+	"errors"
 )
 
 type Product struct {
@@ -60,6 +61,16 @@ func GetProduct(uuid string) (product Product) {
 	return product
 }
 
+func ProductUniqueCheck(name string) (isUnique bool, err error) {
+	var product Product
+	Db.First(&product, "name = ?", name)
+	isUnique = product.ID == nil
+	if !isUnique {
+		err = errors.New("name is duplicate")
+	}
+	return isUnique, err
+}
+
 func InsertProduct(product *Product) (err error) {
 	tx := Db.Begin()
 	defer func() {
@@ -108,6 +119,11 @@ func InsertProduct(product *Product) (err error) {
 		}
 	}
 	return tx.Commit().Error
+}
+
+func (product *Product) DeleteProduct() (err error) {
+	err = Db.Delete(&product).Error
+	return err
 }
 
 func GetProductImage(uuid string) (productImage ProductImage) {

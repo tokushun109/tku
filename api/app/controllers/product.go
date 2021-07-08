@@ -69,6 +69,13 @@ func createProductHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// データの重複確認
+	if isUnique, err := models.ProductUniqueCheck(product.Name); !isUnique {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
+		return
+	}
+
 	// modelの呼び出し
 	err = models.InsertProduct(&product)
 	if err != nil {
@@ -181,5 +188,22 @@ func createProductImageHandler(w http.ResponseWriter, r *http.Request) {
 	responseBody := getSuccessResponse()
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(responseBody)
+}
 
+// 商品の削除
+func deleteProductHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	uuid := vars["product_uuid"]
+
+	product := models.GetProduct(uuid)
+	if err := product.DeleteProduct(); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
+	// responseBodyで処理の成功を返す
+	responseBody := getSuccessResponse()
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(responseBody)
 }
