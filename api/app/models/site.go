@@ -1,5 +1,7 @@
 package models
 
+import "errors"
+
 type SalesSite struct {
 	DefaultModel
 	Uuid string `json:"uuid"`
@@ -37,6 +39,16 @@ func GetSalesSite(uuid string) (salesSite SalesSite) {
 	return salesSite
 }
 
+func SalesSiteUniqueCheck(name string) (isUnique bool, err error) {
+	var salesSite SalesSite
+	Db.First(&salesSite, "name = ?", name)
+	isUnique = salesSite.ID == nil
+	if !isUnique {
+		err = errors.New("name is duplicate")
+	}
+	return isUnique, err
+}
+
 func InsertSalesSite(salesSite *SalesSite) (err error) {
 	// uuidの設定
 	uuid, err := GenerateUuid()
@@ -49,9 +61,29 @@ func InsertSalesSite(salesSite *SalesSite) (err error) {
 	return err
 }
 
+func (salesSite *SalesSite) DeleteSalesSite() (err error) {
+	err = Db.Delete(&salesSite).Error
+	return err
+}
+
 func GetAllSkillMarkets() (skillMarkets SkillMarkets) {
 	Db.Find(&skillMarkets)
 	return skillMarkets
+}
+
+func GetSkillMarket(uuid string) (skillMarket SkillMarket) {
+	Db.First(&skillMarket, "uuid = ?", uuid)
+	return skillMarket
+}
+
+func SkillMarketUniqueCheck(name string) (isUnique bool, err error) {
+	var skillMarket SkillMarket
+	Db.First(&skillMarket, "name = ?", name)
+	isUnique = skillMarket.ID == nil
+	if !isUnique {
+		err = errors.New("name is duplicate")
+	}
+	return isUnique, err
 }
 
 func InsertSkillMarket(skillMarket *SkillMarket) (err error) {
@@ -66,9 +98,29 @@ func InsertSkillMarket(skillMarket *SkillMarket) (err error) {
 	return err
 }
 
+func (skillMarket *SkillMarket) DeleteSkillMarket() (err error) {
+	err = Db.Delete(&skillMarket).Error
+	return err
+}
+
 func GetAllSnsList() (snsList SnsList) {
 	Db.Find(&snsList)
 	return snsList
+}
+
+func GetSns(uuid string) (sns Sns) {
+	Db.First(&sns, "uuid = ?", uuid)
+	return sns
+}
+
+func SnsUniqueCheck(name string) (isUnique bool, err error) {
+	var sns Sns
+	Db.First(&sns, "name = ?", name)
+	isUnique = sns.ID == nil
+	if !isUnique {
+		err = errors.New("name is duplicate")
+	}
+	return isUnique, err
 }
 
 func InsertSns(sns *Sns) (err error) {
@@ -80,5 +132,10 @@ func InsertSns(sns *Sns) (err error) {
 	sns.Uuid = uuid
 
 	err = Db.Create(&sns).Error
+	return err
+}
+
+func (sns *Sns) DeleteSns() (err error) {
+	err = Db.Debug().Delete(&sns).Error
 	return err
 }

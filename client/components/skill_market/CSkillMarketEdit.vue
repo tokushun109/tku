@@ -23,7 +23,7 @@
 
 <script lang="ts">
 import { Component, PropSync, Vue, Watch } from 'nuxt-property-decorator'
-import { BadRequest, IError, ISiteModelValidation, ISite } from '~/types'
+import { BadRequest, IError, ISiteModelValidation, ISite, SiteType } from '~/types'
 
 @Component({})
 export default class CSkillMarketEdit extends Vue {
@@ -73,7 +73,7 @@ export default class CSkillMarketEdit extends Vue {
             }
             await this.$axios.$post(`/skill_market`, this.skiliMarketModel)
             this.dialogVisible = false
-            this.$emit('create', 'skillMarket')
+            this.$emit('create', SiteType.SkillMarket)
         } catch (e) {
             this.errors.push(e)
         }

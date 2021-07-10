@@ -23,7 +23,7 @@
 
 <script lang="ts">
 import { Component, PropSync, Vue, Watch } from 'nuxt-property-decorator'
-import { BadRequest, IError, ISite, ISiteModelValidation } from '~/types'
+import { BadRequest, IError, ISite, ISiteModelValidation, SiteType } from '~/types'
 
 @Component({})
 export default class CSnsEdit extends Vue {
@@ -73,7 +73,7 @@ export default class CSnsEdit extends Vue {
             }
             await this.$axios.$post(`/sns`, this.snsModel)
             this.dialogVisible = false
-            this.$emit('create', 'sns')
+            this.$emit('create', SiteType.Sns)
         } catch (e) {
             this.errors.push(e)
         }
