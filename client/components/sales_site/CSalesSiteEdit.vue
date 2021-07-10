@@ -23,7 +23,7 @@
 
 <script lang="ts">
 import { Component, PropSync, Vue, Watch } from 'nuxt-property-decorator'
-import { BadRequest, IError, ISite, ISiteModelValidation } from '~/types'
+import { BadRequest, IError, ISite, ISiteModelValidation, SiteType } from '~/types'
 
 @Component({})
 export default class CSalesSiteEdit extends Vue {
@@ -73,7 +73,7 @@ export default class CSalesSiteEdit extends Vue {
             }
             await this.$axios.$post(`/sales_site`, this.salesSiteModel)
             this.dialogVisible = false
-            this.$emit('create', 'salesSite')
+            this.$emit('create', SiteType.SalesSite)
         } catch (e) {
             this.errors.push(e)
         }

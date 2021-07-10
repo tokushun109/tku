@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	"gopkg.in/go-playground/validator.v9"
 )
 
@@ -46,6 +47,13 @@ func createSalesSiteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// データの重複確認
+	if isUnique, err := models.SalesSiteUniqueCheck(salesSite.Name); !isUnique {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
+		return
+	}
+
 	// modelの呼び出し
 	err = models.InsertSalesSite(&salesSite)
 	if err != nil {
@@ -54,6 +62,23 @@ func createSalesSiteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// responseBodyで処理の成功を返す
+	responseBody := getSuccessResponse()
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(responseBody)
+}
+
+// 販売サイトの削除
+func deleteSalesSiteHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	uuid := vars["sales_site_uuid"]
+
+	salesSite := models.GetSalesSite(uuid)
+	if err := salesSite.DeleteSalesSite(); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
 	// responseBodyで処理の成功を返す
 	responseBody := getSuccessResponse()
 	w.Header().Set("Content-Type", "application/json")
@@ -95,9 +120,33 @@ func createSkillMarketHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// データの重複確認
+	if isUnique, err := models.SkillMarketUniqueCheck(skillmarket.Name); !isUnique {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
+		return
+	}
+
 	// modelの呼び出し
 	err = models.InsertSkillMarket(&skillmarket)
 	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+	// responseBodyで処理の成功を返す
+	responseBody := getSuccessResponse()
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(responseBody)
+}
+
+// スキルマーケットの削除
+func deleteSkillMarketHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	uuid := vars["skill_market_uuid"]
+
+	skillMarket := models.GetSkillMarket(uuid)
+	if err := skillMarket.DeleteSkillMarket(); err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
@@ -143,9 +192,33 @@ func createSnsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// データの重複確認
+	if isUnique, err := models.SnsUniqueCheck(sns.Name); !isUnique {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
+		return
+	}
+
 	// modelの呼び出し
 	err = models.InsertSns(&sns)
 	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+	// responseBodyで処理の成功を返す
+	responseBody := getSuccessResponse()
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(responseBody)
+}
+
+// SNSの削除
+func deleteSnsHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	uuid := vars["sns_uuid"]
+
+	sns := models.GetSns(uuid)
+	if err := sns.DeleteSns(); err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return

@@ -4,7 +4,12 @@
             <c-button primary @c-click="snsDialogToggle">新規追加</c-button>
             <c-sns-edit :visible.sync="snsDialogVisible" :model.sync="snsModel" @close="snsDialogToggle" @create="loadingSite($event)" />
             <ul v-for="sns in snsList" :key="sns.uuid">
-                <li>{{ sns }}</li>
+                <c-column>
+                    <li>{{ sns.name }}</li>
+                    <div class="button-wrapper">
+                        <c-button class="delete-button" label="削除" @c-click="snsDeleteHandler(sns)" />
+                    </div>
+                </c-column>
             </ul>
         </div>
         <div class="admin-sales-site-list">
@@ -16,7 +21,12 @@
                 @create="loadingSite($event)"
             />
             <ul v-for="salesSite in salesSites" :key="salesSite.uuid">
-                <li>{{ salesSite }}</li>
+                <c-column>
+                    <li>{{ salesSite.name }}</li>
+                    <div class="button-wrapper">
+                        <c-button class="delete-button" label="削除" @c-click="salesSiteDeleteHandler(salesSite)" />
+                    </div>
+                </c-column>
             </ul>
         </div>
         <div class="admin-skill-market-list">
@@ -28,7 +38,12 @@
                 @create="loadingSite($event)"
             />
             <ul v-for="skillMarket in skillMarkets" :key="skillMarket.uuid">
-                <li>{{ skillMarket }}</li>
+                <c-column>
+                    <li>{{ skillMarket.name }}</li>
+                    <div class="button-wrapper">
+                        <c-button class="delete-button" label="削除" @c-click="skillMarketDeleteHandler(skillMarket)" />
+                    </div>
+                </c-column>
             </ul>
         </div>
     </c-page>
@@ -37,7 +52,7 @@
 <script lang="ts">
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
-import { ISite, newSite } from '~/types'
+import { ISite, newSite, SiteType } from '~/types'
 @Component({
     head: {
         title: 'サイト一覧',
@@ -80,14 +95,38 @@ export default class PageAdminSiteIndex extends Vue {
         this.skillMarketDialogVisible = !this.skillMarketDialogVisible
     }
 
-    async loadingSite(mode: string) {
-        if (mode === 'sns') {
+    // SNSの削除
+    async snsDeleteHandler(sns: ISite) {
+        if (confirm(`${sns.name}を削除します。よろしいですか？`)) {
+            await this.$axios.$delete(`/sns/${sns.uuid}`)
+            this.loadingSite(SiteType.Sns)
+        }
+    }
+
+    // 販売サイトの削除
+    async salesSiteDeleteHandler(salesSite: ISite) {
+        if (confirm(`${salesSite.name}を削除します。よろしいですか？`)) {
+            await this.$axios.$delete(`/sales_site/${salesSite.uuid}`)
+            this.loadingSite(SiteType.SalesSite)
+        }
+    }
+
+    // スキルマーケットの削除
+    async skillMarketDeleteHandler(skillMarket: ISite) {
+        if (confirm(`${skillMarket.name}を削除します。よろしいですか？`)) {
+            await this.$axios.$delete(`/skill_market/${skillMarket.uuid}`)
+            this.loadingSite(SiteType.SkillMarket)
+        }
+    }
+
+    async loadingSite(type: string) {
+        if (type === SiteType.Sns) {
             this.snsList = await this.$axios.$get(`/sns`)
             this.snsModel = newSite()
-        } else if (mode === 'skillMarket') {
+        } else if (type === SiteType.SkillMarket) {
             this.skillMarkets = await this.$axios.$get(`/skill_market`)
             this.skilMarketModel = newSite()
-        } else if (mode === 'salesSite') {
+        } else if (type === SiteType.SalesSite) {
             this.salesSites = await this.$axios.$get(`/sales_site`)
             this.salesSiteModel = newSite()
         }
