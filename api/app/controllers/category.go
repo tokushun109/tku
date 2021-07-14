@@ -54,8 +54,53 @@ func createAccessoryCategoryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// modelの呼び出し
 	if err = models.InsertAccessoryCategory(&accessoryCategory); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
+	// responseBodyで処理の成功を返す
+	responseBody := getSuccessResponse()
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(responseBody)
+}
+
+// アクセサリーカテゴリーの更新
+func updateAccessoryCategoryHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	uuid := vars["accessory_category_uuid"]
+
+	reqBody, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
+	var accessoryCategory models.AccessoryCategory
+	if err := json.Unmarshal(reqBody, &accessoryCategory); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
+	// validationの確認
+	validate := validator.New()
+	if errors := validate.Struct(accessoryCategory); errors != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
+		return
+	}
+
+	// データの重複確認
+	if isUnique, err := models.AccessoryCategoryUniqueCheck(accessoryCategory.Name); !isUnique {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
+		return
+	}
+
+	if err = models.UpdateAccessoryCategory(&accessoryCategory, uuid); err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
@@ -127,8 +172,57 @@ func createMaterialCategoryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// modelの呼び出し
-	models.InsertMaterialCategory(&materialCategory)
+	if err = models.InsertMaterialCategory(&materialCategory); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
+		return
+	}
+
+	// responseBodyで処理の成功を返す
+	responseBody := getSuccessResponse()
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(responseBody)
+}
+
+// 材料カテゴリーの更新
+func updateMaterialCategoryHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	uuid := vars["material_category_uuid"]
+
+	reqBody, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
+	var materialCategory models.MaterialCategory
+	if err := json.Unmarshal(reqBody, &materialCategory); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
+	// validationの確認
+	validate := validator.New()
+	if err := validate.Struct(materialCategory); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
+		return
+	}
+
+	// データの重複確認
+	if isUnique, err := models.MaterialCategoryUniqueCheck(materialCategory.Name); !isUnique {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
+		return
+	}
+
+	if err = models.UpdateMaterialCategory(&materialCategory, uuid); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
+		return
+	}
 
 	// responseBodyで処理の成功を返す
 	responseBody := getSuccessResponse()

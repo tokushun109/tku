@@ -55,7 +55,12 @@ export default class CMaterialCategoryEdit extends Vue {
             if (this.materialCategoryModel.name.length === 0) {
                 throw new BadRequest('材料カテゴリー名が入力されていません')
             }
-            await this.$axios.$post(`/material_category`, this.materialCategoryModel)
+            if (this.materialCategoryModel.uuid === '') {
+                await this.$axios.$post(`/material_category`, this.materialCategoryModel)
+            } else {
+                await this.$axios.$put(`/material_category/${this.materialCategoryModel.uuid}`, this.materialCategoryModel)
+            }
+
             this.dialogVisible = false
             this.$emit('create', CategoryType.Material)
         } catch (e) {

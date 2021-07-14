@@ -55,7 +55,11 @@ export default class CAccessoryCategoryEdit extends Vue {
             if (this.accessoryCategoryModel.name.length === 0) {
                 throw new BadRequest('材料カテゴリー名が入力されていません')
             }
-            await this.$axios.$post(`/accessory_category`, this.accessoryCategoryModel)
+            if (this.accessoryCategoryModel.uuid === '') {
+                await this.$axios.$post(`/accessory_category`, this.accessoryCategoryModel)
+            } else {
+                await this.$axios.$put(`/accessory_category/${this.accessoryCategoryModel.uuid}`, this.accessoryCategoryModel)
+            }
             this.dialogVisible = false
             this.$emit('create', CategoryType.Accessory)
         } catch (e) {
