@@ -1,7 +1,7 @@
 <template>
     <c-page>
         <div class="admin-category-list">
-            <c-button primary @c-click="accessoryDialogToggle">新規追加</c-button>
+            <c-button primary @c-click="accssoryCategoryCreateHandler">新規追加</c-button>
             <c-accessory-category-edit
                 :visible.sync="accessoryDialogVisible"
                 :model.sync="accessoryCategoryModel"
@@ -12,11 +12,12 @@
                 <c-column>
                     <li>{{ accessoryCategory.name }}</li>
                     <div class="button-wrapper">
+                        <c-button class="edit-button" label="修正" primary @c-click="accssoryCategoryEditHandler(accessoryCategory)" />
                         <c-button class="delete-button" label="削除" @c-click="accssoryCategoryDeleteHandler(accessoryCategory)" />
                     </div>
                 </c-column>
             </ul>
-            <c-button primary @c-click="materialDialogToggle">新規追加</c-button>
+            <c-button primary @c-click="materialCategoryCreateHandler">新規追加</c-button>
             <c-material-category-edit
                 :visible.sync="materialDialogVisible"
                 :model.sync="materialCategoryModel"
@@ -27,6 +28,7 @@
                 <c-column>
                     <li>{{ materialCategory.name }}</li>
                     <div class="button-wrapper">
+                        <c-button class="edit-button" label="修正" primary @c-click="materialCategoryEditHandler(materialCategory)" />
                         <c-button class="delete-button" label="削除" @c-click="materialCategoryDeleteHandler(materialCategory)" />
                     </div>
                 </c-column>
@@ -38,6 +40,7 @@
 <script lang="ts">
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
+import _ from 'lodash'
 import { ICategory, newCategory, CategoryType } from '~/types'
 @Component({
     head: {
@@ -66,11 +69,24 @@ export default class PageAdminCategoryIndex extends Vue {
     // アクセサリーカテゴリーダイアログの切り替え
     accessoryDialogToggle() {
         this.accessoryDialogVisible = !this.accessoryDialogVisible
+        // 編集画面から切り替えるときはmodelの中身を空にする
     }
 
     // 材料カテゴリーダイアログの切り替え
     materialDialogToggle() {
         this.materialDialogVisible = !this.materialDialogVisible
+    }
+
+    // アクセサリーカテゴリの新規追加
+    accssoryCategoryCreateHandler() {
+        this.accessoryCategoryModel = newCategory()
+        this.accessoryDialogToggle()
+    }
+
+    // アクセサリーカテゴリの更新
+    accssoryCategoryEditHandler(accessoryCategory: ICategory) {
+        this.accessoryCategoryModel = _.cloneDeep(accessoryCategory)
+        this.accessoryDialogToggle()
     }
 
     // アクセサリーカテゴリーの削除
@@ -79,6 +95,18 @@ export default class PageAdminCategoryIndex extends Vue {
             await this.$axios.$delete(`/accessory_category/${accessoryCategory.uuid}`)
             this.loadingCategory(CategoryType.Accessory)
         }
+    }
+
+    // 材料カテゴリーの新規追加
+    materialCategoryCreateHandler() {
+        this.materialCategoryModel = newCategory()
+        this.materialDialogToggle()
+    }
+
+    // 材料カテゴリーの更新
+    materialCategoryEditHandler(materialCategory: ICategory) {
+        this.materialCategoryModel = _.cloneDeep(materialCategory)
+        this.materialDialogToggle()
     }
 
     // 材料カテゴリーの削除
