@@ -1,18 +1,20 @@
 <template>
-    <c-page class="page-login" title="ログイン">
-        <c-form bordered slim>
-            <c-error :errors.sync="errors" />
-            <c-input-label label="メールアドレス" required>
-                <c-input :model.sync="form.email" />
-            </c-input-label>
-            <c-input-label label="パスワード" required>
-                <c-input :model.sync="form.password" password />
-            </c-input-label>
-            <div class="form-actions">
-                <c-button label="ログイン" primary @c-click="onSubmit" />
-            </div>
-        </c-form>
-    </c-page>
+    <v-main>
+        <v-container>
+            <c-form bordered slim>
+                <c-error :errors.sync="errors" />
+                <c-input-label label="メールアドレス" required>
+                    <c-input :model.sync="form.email" />
+                </c-input-label>
+                <c-input-label label="パスワード" required>
+                    <c-input :model.sync="form.password" password />
+                </c-input-label>
+                <div class="form-actions">
+                    <c-button label="ログイン" primary @c-click="onSubmit" />
+                </div>
+            </c-form>
+        </v-container>
+    </v-main>
 </template>
 
 <script lang="ts">
