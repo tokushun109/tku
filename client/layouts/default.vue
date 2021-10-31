@@ -5,10 +5,10 @@
             <Nuxt />
         </template>
         <v-app v-else>
-            <v-app>
-                <admin-site-header />
-                <Nuxt />
-            </v-app>
+            <admin-header />
+            <admin-side-bar v-if="!$store.getters['user/isGuest']" />
+            <Nuxt />
+            <admin-footer />
         </v-app>
     </div>
 </template>

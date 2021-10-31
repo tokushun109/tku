@@ -1,9 +1,14 @@
 <template>
-    <c-page>
-        <div>
-            <p>{{ creator }}</p>
-        </div>
-    </c-page>
+    <v-main>
+        <v-container class="grey py-8 px-6" fluid>
+            <v-sheet width="640" height="800" class="pa-4 lighten-4 mx-auto">
+                <div class="mx-auto">
+                    <v-avatar color="grey darken-1" size="200"></v-avatar>
+                    <div>john@vuetifyjs.com</div>
+                </div>
+            </v-sheet>
+        </v-container>
+    </v-main>
 </template>
 
 <script lang="ts">
