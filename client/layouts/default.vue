@@ -6,7 +6,6 @@
         </template>
         <v-app v-else>
             <admin-header />
-            <admin-side-bar v-if="!$store.getters['user/isGuest']" />
             <Nuxt />
             <admin-footer />
         </v-app>
