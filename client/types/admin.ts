@@ -1,4 +1,5 @@
 export interface ITable {
     name: string
-    key: string
+    link: string
+    icon: string
 }
