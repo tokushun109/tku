@@ -15,9 +15,9 @@
                     <v-card>
                         <v-card-title class="text-h5 justify-center blue white--text">製作者の編集</v-card-title>
                         <v-card-text class="pt-5">
-                            <v-file-input v-model="creator.logo" label="ロゴ画像" outlined />
+                            <v-file-input v-model="creator.uploadFile" label="ロゴ画像" outlined />
                             <v-textarea v-model="creator.introduction" label="紹介文" outlined />
-                            <div class="text-center"><v-btn color="primary">登録</v-btn></div>
+                            <div class="text-center"><v-btn color="primary" @click="saveHandler">登録</v-btn></div>
                         </v-card-text>
                     </v-card>
                 </v-dialog>
@@ -29,7 +29,7 @@
 <script lang="ts">
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
-import { ICreator, ISite, newCreator } from '~/types'
+import { ICreator, IError, ISite, newCreator } from '~/types'
 @Component({
     head: {
         title: '製作者紹介',
@@ -47,6 +47,8 @@ export default class PageAdminCreatorIndex extends Vue {
     // 販売サイトのリスト
     salesSites: Array<ISite> | null = []
 
+    errors: Array<IError> = []
+
     async asyncData({ app }: Context) {
         try {
             const creator = await app.$axios.$get(`/creator`)
@@ -55,6 +57,19 @@ export default class PageAdminCreatorIndex extends Vue {
             return { creator, snsList, salesSites }
         } catch (e) {
             return { creator: null, snsList: [], salesSites: [] }
+        }
+    }
+
+    async saveHandler() {
+        try {
+            this.errors = []
+            await this.$axios.$put(`/creator`, this.creator, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            })
+        } catch (e) {
+            this.errors.push(e)
         }
     }
 }

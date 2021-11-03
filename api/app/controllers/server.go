@@ -73,6 +73,7 @@ func StartMainServer() error {
 	r.HandleFunc("/api/sns/{sns_uuid}", deleteSnsHandler).Methods("DELETE")
 	// 製作者
 	r.HandleFunc("/api/creator", getCreatorHandler).Methods("GET")
+	r.HandleFunc("/api/creator", updateCreatorHandler).Methods("PUT")
 	// ユーザー
 	r.HandleFunc("/api/user", getAllUsersHandler).Methods("GET")
 	// ログイン
