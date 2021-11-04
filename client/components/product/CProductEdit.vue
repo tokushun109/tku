@@ -43,7 +43,7 @@ interface IProductValidation {
 }
 
 @Component({})
-export default class CSalesSiteEdit extends Vue {
+export default class CProductEdit extends Vue {
     @PropSync('visible') dialogVisible!: boolean
     @PropSync('model') productModel!: IProduct
 

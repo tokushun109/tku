@@ -2,7 +2,7 @@
     <div class="admin-header">
         <v-app-bar app color="primary" dark clipped-left>
             <v-app-bar-nav-icon v-if="!$store.getters['user/isGuest']" @click="sidebarVisible = !sidebarVisible"></v-app-bar-nav-icon>
-            <v-tool-bar-title class="text-h5">tku</v-tool-bar-title>
+            <v-app-bar-title>tku</v-app-bar-title>
             <v-spacer />
             <v-dialog v-if="!$store.getters['user/isGuest']" v-model="dialogVisible" width="400">
                 <template #activator="{ on, attrs }">

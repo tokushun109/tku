@@ -112,7 +112,7 @@ func getProductImageBlobHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
-	w.Header().Set("Content-Type", "image/jpeg")
+	w.Header().Set("Content-Type", productImage.MimeType)
 	w.Write(binary)
 }
 
@@ -134,7 +134,6 @@ func createProductImageHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Println(err)
 			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-
 			return
 		}
 		defer file.Close()
@@ -143,7 +142,6 @@ func createProductImageHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Println(err)
 			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-
 			return
 		}
 		savedirectory := fmt.Sprintf("img/%s/%s", uuid[0:1], uuid[1:2])
@@ -151,7 +149,6 @@ func createProductImageHandler(w http.ResponseWriter, r *http.Request) {
 		if err := os.MkdirAll(savedirectory, 0777); err != nil {
 			log.Println(err)
 			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-
 			return
 		}
 		// fileのMIMETypeを取得
@@ -161,7 +158,6 @@ func createProductImageHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Println(err)
 			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-
 			return
 		}
 		defer f.Close()
