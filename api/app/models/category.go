@@ -94,7 +94,7 @@ func InsertMaterialCategory(materialCategory *MaterialCategory) (err error) {
 
 func UpdateMaterialCategory(materialCategory *MaterialCategory, uuid string) (err error) {
 	err = Db.Model(&materialCategory).Where("uuid = ?", uuid).Updates(
-		AccessoryCategory{Name: materialCategory.Name},
+		MaterialCategory{Name: materialCategory.Name},
 	).Error
 	return err
 }

@@ -4,6 +4,7 @@ export function newCreator(): ICreator {
         name: '',
         introduction: '',
         logo: '',
+        apiPath: '',
     }
 }
 export function newProduct(): IProduct {
