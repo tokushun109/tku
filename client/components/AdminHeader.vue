@@ -23,12 +23,10 @@
             <v-container>
                 <v-list-item>
                     <v-list-item-content>
-                        <v-list-item-title class="title grey--text text--darken-2"> 設定 </v-list-item-title>
+                        <v-list-item-title class="title green--text text--darken-3"> 設定 </v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
-
                 <v-divider />
-
                 <v-list dense nav>
                     <v-list-item v-for="(table, index) in tables" :key="index" :to="`/admin/${table.link}`">
                         <v-list-item-icon>

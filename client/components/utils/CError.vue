@@ -18,7 +18,7 @@ export default class CError extends Vue {
 }
 </script>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
 .c-error
     padding 16px
     border 1px solid $danger-border-color
