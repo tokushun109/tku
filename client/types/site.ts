@@ -4,13 +4,12 @@ export interface ISite {
     url: string
 }
 
-export interface ISiteModelValidation {
-    name: boolean
-    url: boolean
+export interface ISiteType {
+    [key: string]: { name: string; value: string }
 }
 
-export enum SiteType {
-    Sns = 'sns',
-    SkillMarket = 'skillMarket',
-    SalesSite = 'salesSite',
-}
+export const SiteType: ISiteType = {
+    Sns: { name: 'sns', value: 'SNS' },
+    SalesSite: { name: 'salesSite', value: '販売サイト' },
+    SkillMarket: { name: 'skillMarket', value: 'スキルマーケット' },
+} as const

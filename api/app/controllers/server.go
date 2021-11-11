@@ -62,14 +62,17 @@ func StartMainServer() error {
 	// 販売サイト
 	r.HandleFunc("/api/sales_site", getAllSalesSitesHandler).Methods("GET")
 	r.HandleFunc("/api/sales_site", createSalesSiteHandler).Methods("POST")
+	r.HandleFunc("/api/sales_site/{sales_site_uuid}", updateSalesSiteHandler).Methods("PUT")
 	r.HandleFunc("/api/sales_site/{sales_site_uuid}", deleteSalesSiteHandler).Methods("DELETE")
 	// スキルマーケット
 	r.HandleFunc("/api/skill_market", getAllSkillMarketsHandler).Methods("GET")
 	r.HandleFunc("/api/skill_market", createSkillMarketHandler).Methods("POST")
+	r.HandleFunc("/api/skill_market/{skill_market_uuid}", updateSkillMarketHandler).Methods("PUT")
 	r.HandleFunc("/api/skill_market/{skill_market_uuid}", deleteSkillMarketHandler).Methods("DELETE")
 	// SNS
 	r.HandleFunc("/api/sns", getAllSnsListHandler).Methods("GET")
 	r.HandleFunc("/api/sns", createSnsHandler).Methods("POST")
+	r.HandleFunc("/api/sns/{sns_uuid}", updateSnsHandler).Methods("PUT")
 	r.HandleFunc("/api/sns/{sns_uuid}", deleteSnsHandler).Methods("DELETE")
 	// 製作者
 	r.HandleFunc("/api/creator", getCreatorHandler).Methods("GET")

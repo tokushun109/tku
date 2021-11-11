@@ -2,31 +2,27 @@
     <v-main class="grey lighten-4">
         <v-container>
             <v-sheet class="pa-4 lighten-4">
-                <h3 class="title">サイトロゴ</h3>
+                <h3 class="title green--text text--darken-3">サイトロゴ</h3>
                 <v-divider />
                 <div class="text-center">
                     <v-avatar color="grey darken-1" class="my-4" size="240">
                         <img v-if="creator.apiPath" :src="creator.apiPath" style="object-fit: cover" alt="ロゴ画像" />
                     </v-avatar>
                 </div>
-                <h3 class="title">紹介文</h3>
+                <h3 class="title green--text text--darken-3">紹介文</h3>
                 <v-divider />
                 <div class="my-4">
                     <pre>{{ creator.introduction }}</pre>
                 </div>
-                <v-dialog v-if="!$store.getters['user/isGuest']" v-model="dialogVisible" width="800" height="800">
-                    <template #activator="{ on, attrs }">
-                        <div class="text-center"><v-btn color="primary" v-bind="attrs" v-on="on">編集</v-btn></div>
+                <c-dialog-2 :visible.sync="dialogVisible" title="製作者の編集" width="800" @confirm="saveHandler" @close="closeHandler">
+                    <template #trigger>
+                        <v-btn color="primary" @click="setInit"><c-icon type="edit" />編集</v-btn>
                     </template>
-                    <v-card>
-                        <v-card-title class="text-h5 justify-center blue white--text">製作者の編集</v-card-title>
-                        <v-card-text class="pt-5">
-                            <v-file-input v-model="uploadFile" label="ロゴ画像" outlined />
-                            <v-textarea v-model="creator.introduction" label="紹介文" outlined />
-                            <div class="text-center"><v-btn color="primary" @click="saveHandler">登録</v-btn></div>
-                        </v-card-text>
-                    </v-card>
-                </v-dialog>
+                    <template #content>
+                        <v-file-input v-model="uploadFile" label="ロゴ画像" outlined />
+                        <v-textarea v-model="creator.introduction" label="紹介文" outlined />
+                    </template>
+                </c-dialog-2>
             </v-sheet>
         </v-container>
         <c-notification :visible.sync="notificationVisible">製作者を更新しました</c-notification>
@@ -35,7 +31,7 @@
 
 <script lang="ts">
 import { Context } from '@nuxt/types'
-import { Component, Vue, Watch } from 'nuxt-property-decorator'
+import { Component, Vue } from 'nuxt-property-decorator'
 import _ from 'lodash'
 import { ICreator, IError, ISite, newCreator } from '~/types'
 @Component({
@@ -44,8 +40,6 @@ import { ICreator, IError, ISite, newCreator } from '~/types'
     },
 })
 export default class PageAdminCreatorIndex extends Vue {
-    dialogVisible: boolean = false
-
     // 製作者
     creator: ICreator = newCreator()
 
@@ -60,6 +54,9 @@ export default class PageAdminCreatorIndex extends Vue {
 
     // 販売サイトのリスト
     salesSites: Array<ISite> | null = []
+
+    // 製作者編集ダイアログの表示
+    dialogVisible: boolean = false
 
     // 通知の表示
     notificationVisible: boolean = false
@@ -108,9 +105,12 @@ export default class PageAdminCreatorIndex extends Vue {
         this.initCreator = _.cloneDeep(this.creator)
     }
 
-    @Watch('dialogVisible')
     setInit() {
         this.creator = _.cloneDeep(this.initCreator)
+    }
+
+    closeHandler() {
+        this.dialogVisible = false
     }
 }
 </script>

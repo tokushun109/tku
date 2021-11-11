@@ -30,4 +30,5 @@ export default class CNotification extends Vue {
 
 .v-card__title
     padding 16px 24px !important
+    border solid 5px $accent
 </style>

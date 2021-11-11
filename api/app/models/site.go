@@ -61,6 +61,13 @@ func InsertSalesSite(salesSite *SalesSite) (err error) {
 	return err
 }
 
+func UpdateSalesSite(sales_site *SalesSite, uuid string) (err error) {
+	err = Db.Model(&sales_site).Where("uuid = ?", uuid).Updates(
+		SalesSite{Name: sales_site.Name},
+	).Error
+	return err
+}
+
 func (salesSite *SalesSite) DeleteSalesSite() (err error) {
 	err = Db.Delete(&salesSite).Error
 	return err
@@ -98,6 +105,13 @@ func InsertSkillMarket(skillMarket *SkillMarket) (err error) {
 	return err
 }
 
+func UpdateSkillMarket(skill_market *SkillMarket, uuid string) (err error) {
+	err = Db.Model(&skill_market).Where("uuid = ?", uuid).Updates(
+		SkillMarket{Name: skill_market.Name},
+	).Error
+	return err
+}
+
 func (skillMarket *SkillMarket) DeleteSkillMarket() (err error) {
 	err = Db.Delete(&skillMarket).Error
 	return err
@@ -132,6 +146,13 @@ func InsertSns(sns *Sns) (err error) {
 	sns.Uuid = uuid
 
 	err = Db.Create(&sns).Error
+	return err
+}
+
+func UpdateSns(sns *Sns, uuid string) (err error) {
+	err = Db.Model(&sns).Where("uuid = ?", uuid).Updates(
+		Sns{Name: sns.Name},
+	).Error
 	return err
 }
 
