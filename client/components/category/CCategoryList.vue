@@ -2,11 +2,11 @@
     <v-container>
         <v-sheet class="pa-4 lighten-4">
             <div class="d-flex">
-                <h3 class="title green--text text--darken-3">{{ siteTypeValue }}</h3>
+                <h3 class="title green--text text--darken-3">{{ categoryTypeValue }}</h3>
                 <v-spacer />
                 <c-dialog-2
                     :visible.sync="createDialogVisible"
-                    :title="`${siteTypeValue}の追加`"
+                    :title="`${categoryTypeValue}の追加`"
                     width="800"
                     @confirm="saveHandler"
                     @close="closeHandler"
@@ -15,8 +15,7 @@
                         <c-icon type="new" @c-click="setInit" />
                     </template>
                     <template #content>
-                        <v-text-field v-model="modalItem.name" :rules="nameRules" label="サイト名" outlined counter="20" />
-                        <v-text-field v-model="modalItem.url" :rules="urlRules" label="URL" outlined />
+                        <v-text-field v-model="modalItem.name" :rules="nameRules" label="カテゴリー名" outlined counter="20" />
                     </template>
                 </c-dialog-2>
             </div>
@@ -30,7 +29,7 @@
                             <v-spacer />
                             <c-dialog-2
                                 :visible.sync="editDialogVisible"
-                                :title="`${siteTypeValue}の追加`"
+                                :title="`${categoryTypeValue}の追加`"
                                 width="800"
                                 @confirm="editHandler"
                                 @close="closeHandler"
@@ -39,8 +38,7 @@
                                     <c-icon type="edit" @c-click="setItem(listItem)" />
                                 </template>
                                 <template #content>
-                                    <v-text-field v-model="modalItem.name" :rules="nameRules" label="サイト名" outlined counter="20" />
-                                    <v-text-field v-model="modalItem.url" :rules="urlRules" label="URL" outlined />
+                                    <v-text-field v-model="modalItem.name" :rules="nameRules" label="カテゴリー名" outlined counter="20" />
                                 </template>
                             </c-dialog-2>
                             <c-dialog-2
@@ -72,10 +70,10 @@
 <script lang="ts">
 import { Component, Prop, PropSync, Vue } from 'nuxt-property-decorator'
 import _ from 'lodash'
-import { IError, ISite, newSite, SiteType } from '~/types'
+import { CategoryType, ICategory, IError, ISite, newCategory } from '~/types'
 import { min20, nonDoubleByte, nonSpace, required } from '~/methods'
 @Component({})
-export default class CSiteList extends Vue {
+export default class CCategoryList extends Vue {
     @PropSync('items') listItems!: Array<ISite>
     @Prop({ type: String, default: '' }) type!: string
 
@@ -97,7 +95,7 @@ export default class CSiteList extends Vue {
     // 削除通知の表示
     deleteNotificationVisible: boolean = false
 
-    modalItem: ISite = newSite()
+    modalItem: ICategory = newCategory()
 
     errors: Array<IError> = []
 
@@ -105,27 +103,24 @@ export default class CSiteList extends Vue {
 
     urlRules = [nonDoubleByte, nonSpace]
 
-    get siteTypeValue(): string {
-        let siteType = ''
-        for (const type in SiteType) {
-            if (this.type === SiteType[type].name) {
-                siteType = SiteType[type].value
+    get categoryTypeValue(): string {
+        let categoryType = ''
+        for (const type in CategoryType) {
+            if (this.type === CategoryType[type].name) {
+                categoryType = CategoryType[type].value
             }
         }
-        return siteType
+        return categoryType
     }
 
     async saveHandler() {
         try {
-            if (this.siteTypeValue === SiteType.Sns.value) {
-                await this.$axios.$post(`/sns`, this.modalItem)
-                this.$emit('c-change', SiteType.Sns.name)
-            } else if (this.siteTypeValue === SiteType.SalesSite.value) {
-                await this.$axios.$post(`/sales_site`, this.modalItem)
-                this.$emit('c-change', SiteType.SalesSite.name)
-            } else if (this.siteTypeValue === SiteType.SkillMarket.value) {
-                await this.$axios.$post(`/skill_market`, this.modalItem)
-                this.$emit('c-change', SiteType.SkillMarket.name)
+            if (this.categoryTypeValue === CategoryType.Accessory.value) {
+                await this.$axios.$post(`/accessory_category`, this.modalItem)
+                this.$emit('c-change', CategoryType.Accessory.name)
+            } else if (this.categoryTypeValue === CategoryType.Material.value) {
+                await this.$axios.$post(`/material_category`, this.modalItem)
+                this.$emit('c-change', CategoryType.Material.name)
             }
             this.createNotificationVisible = true
             this.createDialogVisible = false
@@ -136,15 +131,12 @@ export default class CSiteList extends Vue {
 
     async editHandler() {
         try {
-            if (this.siteTypeValue === SiteType.Sns.value) {
-                await this.$axios.$put(`/sns/${this.modalItem.uuid}`, this.modalItem)
-                this.$emit('c-change', SiteType.Sns.name)
-            } else if (this.siteTypeValue === SiteType.SalesSite.value) {
-                await this.$axios.$put(`/sales_site/${this.modalItem.uuid}`, this.modalItem)
-                this.$emit('c-change', SiteType.SalesSite.name)
-            } else if (this.siteTypeValue === SiteType.SkillMarket.value) {
-                await this.$axios.$put(`/skill_market/${this.modalItem.uuid}`, this.modalItem)
-                this.$emit('c-change', SiteType.SkillMarket.name)
+            if (this.categoryTypeValue === CategoryType.Accessory.value) {
+                await this.$axios.$put(`/accessory_category/${this.modalItem}`, this.modalItem)
+                this.$emit('c-change', CategoryType.Accessory.name)
+            } else if (this.categoryTypeValue === CategoryType.Material.value) {
+                await this.$axios.$put(`/material_category/${this.modalItem}`, this.modalItem)
+                this.$emit('c-change', CategoryType.Material.name)
             }
             this.editNotificationVisible = true
             this.editDialogVisible = false
@@ -155,15 +147,12 @@ export default class CSiteList extends Vue {
 
     async deleteHandler() {
         try {
-            if (this.siteTypeValue === SiteType.Sns.value) {
-                await this.$axios.$delete(`/sns/${this.modalItem.uuid}`)
-                this.$emit('c-change', SiteType.Sns.name)
-            } else if (this.siteTypeValue === SiteType.SalesSite.value) {
-                await this.$axios.$delete(`/sales_site/${this.modalItem.uuid}`)
-                this.$emit('c-change', SiteType.SalesSite.name)
-            } else if (this.siteTypeValue === SiteType.SkillMarket.value) {
-                await this.$axios.$delete(`/skill_market/${this.modalItem.uuid}`)
-                this.$emit('c-change', SiteType.SkillMarket.name)
+            if (this.categoryTypeValue === CategoryType.Accessory.value) {
+                await this.$axios.$delete(`/accessory_category/${this.modalItem.uuid}`)
+                this.$emit('c-change', CategoryType.Accessory.name)
+            } else if (this.categoryTypeValue === CategoryType.Material.value) {
+                await this.$axios.$delete(`/material_category/${this.modalItem.uuid}`)
+                this.$emit('c-change', CategoryType.Material.name)
             }
             this.deleteNotificationVisible = true
             this.deleteDialogVisible = false
@@ -173,7 +162,7 @@ export default class CSiteList extends Vue {
     }
 
     setInit() {
-        this.modalItem = newSite()
+        this.modalItem = newCategory()
     }
 
     setItem(item: ISite) {

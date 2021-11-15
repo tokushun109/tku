@@ -3,11 +3,11 @@ export interface ICategory {
     name: string
 }
 
-export interface ICategoryModelValidation {
-    name: boolean
+export interface ICategoryType {
+    [key: string]: { name: string; value: string }
 }
 
-export enum CategoryType {
-    Accessory = 'accessoryCategory',
-    Material = 'materialCategory',
-}
+export const CategoryType: ICategoryType = {
+    Accessory: { name: 'accessory', value: 'アクセサリーカテゴリー' },
+    Material: { name: 'material', value: '材料カテゴリー' },
+} as const
