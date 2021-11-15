@@ -101,8 +101,6 @@ export default class CCategoryList extends Vue {
 
     nameRules = [required, min20]
 
-    urlRules = [nonDoubleByte, nonSpace]
-
     get categoryTypeValue(): string {
         let categoryType = ''
         for (const type in CategoryType) {
@@ -132,10 +130,10 @@ export default class CCategoryList extends Vue {
     async editHandler() {
         try {
             if (this.categoryTypeValue === CategoryType.Accessory.value) {
-                await this.$axios.$put(`/accessory_category/${this.modalItem}`, this.modalItem)
+                await this.$axios.$put(`/accessory_category/${this.modalItem.uuid}`, this.modalItem)
                 this.$emit('c-change', CategoryType.Accessory.name)
             } else if (this.categoryTypeValue === CategoryType.Material.value) {
-                await this.$axios.$put(`/material_category/${this.modalItem}`, this.modalItem)
+                await this.$axios.$put(`/material_category/${this.modalItem.uuid}`, this.modalItem)
                 this.$emit('c-change', CategoryType.Material.name)
             }
             this.editNotificationVisible = true
