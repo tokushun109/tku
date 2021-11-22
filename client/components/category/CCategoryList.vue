@@ -4,20 +4,7 @@
             <div class="d-flex">
                 <h3 class="title green--text text--darken-3">{{ categoryTypeValue }}</h3>
                 <v-spacer />
-                <c-dialog-2
-                    :visible.sync="createDialogVisible"
-                    :title="`${categoryTypeValue}の追加`"
-                    width="800"
-                    @confirm="saveHandler"
-                    @close="closeHandler"
-                >
-                    <template #trigger>
-                        <c-icon type="new" @c-click="setInit" />
-                    </template>
-                    <template #content>
-                        <v-text-field v-model="modalItem.name" :rules="nameRules" label="カテゴリー名" outlined counter="20" />
-                    </template>
-                </c-dialog-2>
+                <c-icon type="new" @c-click="openHandler(ExecutionType.Create)" />
             </div>
             <v-divider />
             <v-list dense>
@@ -27,73 +14,49 @@
                         <v-list-item-title class="d-flex">
                             <div>{{ listItem.name }}</div>
                             <v-spacer />
-                            <c-dialog-2
-                                :visible.sync="editDialogVisible"
-                                :title="`${categoryTypeValue}の追加`"
-                                width="800"
-                                @confirm="editHandler"
-                                @close="closeHandler"
-                            >
-                                <template #trigger>
-                                    <c-icon type="edit" @c-click="setItem(listItem)" />
-                                </template>
-                                <template #content>
-                                    <v-text-field v-model="modalItem.name" :rules="nameRules" label="カテゴリー名" outlined counter="20" />
-                                </template>
-                            </c-dialog-2>
-                            <c-dialog-2
-                                :visible.sync="deleteDialogVisible"
-                                :title="`${listItem.name}の更新`"
-                                width="400"
-                                @confirm="deleteHandler"
-                                @close="closeHandler"
-                            >
-                                <template #trigger>
-                                    <c-icon type="delete" @c-click="setItem(listItem)" />
-                                </template>
-                                <template #content>
-                                    <p>削除してもよろしいですか？</p>
-                                </template>
-                            </c-dialog-2>
+                            <c-icon type="edit" @c-click="openHandler(ExecutionType.Edit, listItem)" />
+                            <c-icon type="delete" @c-click="openHandler(ExecutionType.Delete, listItem)" />
                         </v-list-item-title>
                         <v-divider />
                     </v-list-item-content>
                 </v-list-item>
             </v-list>
         </v-sheet>
-        <c-notification :visible.sync="createNotificationVisible">{{ `${modalItem.name}を作成しました` }}</c-notification>
-        <c-notification :visible.sync="editNotificationVisible">{{ `${modalItem.name}を更新しました` }}</c-notification>
-        <c-notification :visible.sync="deleteNotificationVisible">{{ `${modalItem.name}を削除しました` }}</c-notification>
+        <c-dialog :visible.sync="dialogVisible" :title="modalTitle" @confirm="confirmHandler" @close="closeHandler">
+            <template #content>
+                <v-text-field
+                    v-if="executionType === ExecutionType.Create || executionType === ExecutionType.Edit"
+                    v-model="modalItem.name"
+                    :rules="nameRules"
+                    label="カテゴリー名"
+                    outlined
+                    counter="20"
+                />
+                <p v-else-if="executionType === ExecutionType.Delete">削除してもよろしいですか？</p>
+            </template>
+        </c-dialog>
+        <c-notification :visible.sync="notificationVisible">{{ notificationMessage }}</c-notification>
     </v-container>
 </template>
 
 <script lang="ts">
 import { Component, Prop, PropSync, Vue } from 'nuxt-property-decorator'
 import _ from 'lodash'
-import { CategoryType, ICategory, IError, ISite, newCategory } from '~/types'
-import { min20, nonDoubleByte, nonSpace, required } from '~/methods'
+import { CategoryType, ExecutionType, ICategory, IError, newCategory, TExecutionType } from '~/types'
+import { min20, required } from '~/methods'
 @Component({})
 export default class CCategoryList extends Vue {
-    @PropSync('items') listItems!: Array<ISite>
+    @PropSync('items') listItems!: Array<ICategory>
     @Prop({ type: String, default: '' }) type!: string
 
-    // 新規作成ダイアログの表示
-    createDialogVisible: boolean = false
+    ExecutionType: typeof ExecutionType = ExecutionType
+    executionType: TExecutionType = ExecutionType.Create
 
-    // 更新ダイアログの表示
-    editDialogVisible: boolean = false
+    // ダイアログの表示
+    dialogVisible: boolean = false
 
-    // 削除ダイアログの表示
-    deleteDialogVisible: boolean = false
-
-    // 新規作成通知の表示
-    createNotificationVisible: boolean = false
-
-    // 更新通知の表示
-    editNotificationVisible: boolean = false
-
-    // 削除通知の表示
-    deleteNotificationVisible: boolean = false
+    // 通知の表示
+    notificationVisible: boolean = false
 
     modalItem: ICategory = newCategory()
 
@@ -111,66 +74,88 @@ export default class CCategoryList extends Vue {
         return categoryType
     }
 
-    async saveHandler() {
-        try {
-            if (this.categoryTypeValue === CategoryType.Accessory.value) {
-                await this.$axios.$post(`/accessory_category`, this.modalItem)
-                this.$emit('c-change', CategoryType.Accessory.name)
-            } else if (this.categoryTypeValue === CategoryType.Material.value) {
-                await this.$axios.$post(`/material_category`, this.modalItem)
-                this.$emit('c-change', CategoryType.Material.name)
+    get modalTitle(): string {
+        let title = ''
+        for (const type in ExecutionType) {
+            if (this.executionType === ExecutionType[type]) {
+                title = `${this.categoryTypeValue}の${ExecutionType[type]}`
             }
-            this.createNotificationVisible = true
-            this.createDialogVisible = false
-        } catch (e) {
-            this.errors.push(e)
         }
+        return title
     }
 
-    async editHandler() {
-        try {
-            if (this.categoryTypeValue === CategoryType.Accessory.value) {
-                await this.$axios.$put(`/accessory_category/${this.modalItem.uuid}`, this.modalItem)
-                this.$emit('c-change', CategoryType.Accessory.name)
-            } else if (this.categoryTypeValue === CategoryType.Material.value) {
-                await this.$axios.$put(`/material_category/${this.modalItem.uuid}`, this.modalItem)
-                this.$emit('c-change', CategoryType.Material.name)
+    get notificationMessage(): string {
+        let message = ''
+        for (const type in ExecutionType) {
+            if (this.executionType === ExecutionType[type]) {
+                message = `${this.modalItem.name}を${ExecutionType[type]}しました`
             }
-            this.editNotificationVisible = true
-            this.editDialogVisible = false
-        } catch (e) {
-            this.errors.push(e)
         }
-    }
-
-    async deleteHandler() {
-        try {
-            if (this.categoryTypeValue === CategoryType.Accessory.value) {
-                await this.$axios.$delete(`/accessory_category/${this.modalItem.uuid}`)
-                this.$emit('c-change', CategoryType.Accessory.name)
-            } else if (this.categoryTypeValue === CategoryType.Material.value) {
-                await this.$axios.$delete(`/material_category/${this.modalItem.uuid}`)
-                this.$emit('c-change', CategoryType.Material.name)
-            }
-            this.deleteNotificationVisible = true
-            this.deleteDialogVisible = false
-        } catch (e) {
-            this.errors.push(e)
-        }
+        return message
     }
 
     setInit() {
         this.modalItem = newCategory()
     }
 
-    setItem(item: ISite) {
+    setItem(item: ICategory) {
         this.modalItem = _.cloneDeep(item)
     }
 
+    openHandler(executionType: TExecutionType, item: ICategory | null = null) {
+        if (executionType === ExecutionType.Create) {
+            this.setInit()
+        } else {
+            this.setItem(item!)
+        }
+        this.executionType = executionType
+        this.dialogVisible = true
+    }
+
     closeHandler() {
-        this.createDialogVisible = false
-        this.editDialogVisible = false
-        this.deleteDialogVisible = false
+        this.dialogVisible = false
+    }
+
+    async confirmHandler() {
+        if (this.executionType === ExecutionType.Create) {
+            try {
+                if (this.categoryTypeValue === CategoryType.Accessory.value) {
+                    await this.$axios.$post(`/accessory_category`, this.modalItem)
+                    this.$emit('c-change', CategoryType.Accessory.name)
+                } else if (this.categoryTypeValue === CategoryType.Material.value) {
+                    await this.$axios.$post(`/material_category`, this.modalItem)
+                    this.$emit('c-change', CategoryType.Material.name)
+                }
+            } catch (e) {
+                this.errors.push(e)
+            }
+        } else if (this.executionType === ExecutionType.Edit) {
+            try {
+                if (this.categoryTypeValue === CategoryType.Accessory.value) {
+                    await this.$axios.$put(`/accessory_category/${this.modalItem.uuid}`, this.modalItem)
+                    this.$emit('c-change', CategoryType.Accessory.name)
+                } else if (this.categoryTypeValue === CategoryType.Material.value) {
+                    await this.$axios.$put(`/material_category/${this.modalItem.uuid}`, this.modalItem)
+                    this.$emit('c-change', CategoryType.Material.name)
+                }
+            } catch (e) {
+                this.errors.push(e)
+            }
+        } else if (this.executionType === ExecutionType.Delete) {
+            try {
+                if (this.categoryTypeValue === CategoryType.Accessory.value) {
+                    await this.$axios.$delete(`/accessory_category/${this.modalItem.uuid}`)
+                    this.$emit('c-change', CategoryType.Accessory.name)
+                } else if (this.categoryTypeValue === CategoryType.Material.value) {
+                    await this.$axios.$delete(`/material_category/${this.modalItem.uuid}`)
+                    this.$emit('c-change', CategoryType.Material.name)
+                }
+            } catch (e) {
+                this.errors.push(e)
+            }
+        }
+        this.notificationVisible = true
+        this.dialogVisible = false
     }
 }
 </script>

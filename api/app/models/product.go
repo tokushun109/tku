@@ -3,6 +3,7 @@ package models
 import (
 	"api/config"
 	"errors"
+	"os"
 )
 
 type Product struct {
@@ -52,11 +53,12 @@ func GetAllProducts() (products Products) {
 }
 
 func GetProduct(uuid string) (product Product) {
-	Db.First(&product, "uuid = ?", uuid).
-		Related(&product.AccessoryCategory).
-		Related(&product.ProductImages, "ProductImages").
-		Related(&product.MaterialCategories, "MaterialCategories").
-		Related(&product.SalesSites, "SalesSites")
+	Db.Preload("AccessoryCategory").
+		Preload("ProductImages").
+		Preload("MaterialCategories").
+		Preload("SalesSites").
+		First(&product, "uuid = ?", uuid)
+
 	setProductImageApiPath(&product)
 	return product
 }
@@ -122,8 +124,40 @@ func InsertProduct(product *Product) (err error) {
 }
 
 func (product *Product) DeleteProduct() (err error) {
-	err = Db.Delete(&product).Error
-	return err
+	tx := Db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := tx.Error; err != nil {
+		return err
+	}
+
+	err = tx.Delete(&product).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	productImageIds := []uint{}
+	// まずは商品画像ファイルを削除する
+	for _, productImage := range product.ProductImages {
+		if _, err := os.Stat(productImage.Path); err == nil {
+			if err := os.Remove(productImage.Path); err != nil {
+				return err
+			}
+		}
+		productImageIds = append(productImageIds, *productImage.ID)
+	}
+
+	err = tx.Delete(&product.ProductImages, productImageIds).Error
+	if err := tx.Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit().Error
 }
 
 func GetProductImage(uuid string) (productImage ProductImage) {
