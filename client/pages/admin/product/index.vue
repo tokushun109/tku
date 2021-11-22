@@ -1,24 +1,20 @@
 <template>
-    <c-page>
-        <div class="admin-product-list">
-            <c-button primary @c-click="toggle">新規追加</c-button>
-            <c-product-edit :visible.sync="dialogVisible" :model.sync="productModel" @close="toggle" @create="loadingProduct()" />
-            <ul v-for="product in products" :key="product.uuid">
-                <c-column>
-                    <li>{{ product.name }}</li>
-                    <div class="button-wrapper">
-                        <c-button class="delete-button" label="削除" @c-click="productDeleteHandler(product)" />
-                    </div>
-                </c-column>
-            </ul>
-        </div>
-    </c-page>
+    <v-main class="grey lighten-4">
+        <c-product-list
+            :items="products"
+            :accessory-categories="accessoryCategories"
+            :material-categories="materialCategories"
+            :sales-sites="salesSites"
+            @c-change="loadingProduct"
+        />
+    </v-main>
 </template>
 
 <script lang="ts">
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
-import { IProduct, newProduct } from '~/types'
+import { min20, required } from '~/methods'
+import { ICategory, IProduct, ISite } from '~/types'
 @Component({
     head: {
         title: '商品一覧',
@@ -26,27 +22,27 @@ import { IProduct, newProduct } from '~/types'
 })
 export default class PageAdminProductIndex extends Vue {
     products: Array<IProduct> = []
-    // modalの表示切り替え
-    dialogVisible: boolean = false
-    // form用のproductModel
-    productModel: IProduct = newProduct()
+
+    accessoryCategories: Array<ICategory> = []
+    materialCategories: Array<ICategory> = []
+    salesSites: Array<ISite> = []
+
+    // 新規作成ダイアログの表示
+    createDialogVisible: boolean = false
     async asyncData({ app }: Context) {
         try {
             const products = await app.$axios.$get(`/product`)
-            return { products }
+            const accessoryCategories = await app.$axios.$get(`/accessory_category`)
+            const materialCategories = await app.$axios.$get(`/material_category`)
+            const salesSites = await app.$axios.$get(`/sales_site`)
+            return { products, accessoryCategories, materialCategories, salesSites }
         } catch (e) {
-            return { products: [] }
+            return { products: [], accessoryCategories: [], materialCategories: [], salesSites: [] }
         }
     }
 
     async loadingProduct() {
         this.products = await this.$axios.$get(`/product`)
-        this.productModel = newProduct()
-    }
-
-    // ボタンの切り替え
-    toggle() {
-        this.dialogVisible = !this.dialogVisible
     }
 
     // 商品の削除
@@ -59,4 +55,11 @@ export default class PageAdminProductIndex extends Vue {
 }
 </script>
 
-<style lang="stylus"></style>
+<style lang="stylus">
+.v-image
+    aspect-ratio 16 / 9
+
+.preview
+    border 1px dashed $light-dark-color
+    border-radius 3px
+</style>

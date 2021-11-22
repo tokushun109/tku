@@ -157,6 +157,6 @@ func UpdateSns(sns *Sns, uuid string) (err error) {
 }
 
 func (sns *Sns) DeleteSns() (err error) {
-	err = Db.Debug().Delete(&sns).Error
+	err = Db.Delete(&sns).Error
 	return err
 }
