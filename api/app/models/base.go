@@ -4,21 +4,23 @@ import (
 	"api/config"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 )
 
 var Db *gorm.DB
 
-// ID, CreatedAt, UpdatedAt, DeletedAtのfieldを持つgorm.Modelを継承
+// ID, CreatedAt, UpdatedAt, DeletedAtのfieldを持つDefaultModelを継承
 type DefaultModel struct {
-	ID        *uint      `gorm:"primary_key" json:"-"`
-	CreatedAt time.Time  `json:"-"`
-	UpdatedAt time.Time  `json:"-"`
-	DeletedAt *time.Time `sql:"index" json:"-"`
+	ID        *uint          `gorm:"primary_key" json:"-"`
+	CreatedAt time.Time      `json:"-"`
+	UpdatedAt time.Time      `json:"-"`
+	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
 
 func GenerateUuid() (uuidString string, err error) {
@@ -29,7 +31,6 @@ func GenerateUuid() (uuidString string, err error) {
 
 func gormConnect() *gorm.DB {
 	// DB接続設定読み込み
-	Sql := config.Config.Sql
 	DBUser := config.Config.DBUser
 	DBPass := config.Config.DBPass
 	Protocol := config.Config.Protocol
@@ -37,7 +38,9 @@ func gormConnect() *gorm.DB {
 	SQL_CONNECT := DBUser + ":" + DBPass + "@" + Protocol + "/" + "?charset=utf8&parseTime=True&loc=Local"
 
 	// SQLに接続
-	DbConnection, err := gorm.Open(Sql, SQL_CONNECT)
+	DbConnection, err := gorm.Open(mysql.Open(SQL_CONNECT), &gorm.Config{NamingStrategy: schema.NamingStrategy{
+		SingularTable: true,
+	}})
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -47,13 +50,22 @@ func gormConnect() *gorm.DB {
 
 	// DBに接続
 	DB_CONNECT := DBUser + ":" + DBPass + "@" + Protocol + "/" + DBName + "?charset=utf8&parseTime=True&loc=Local"
-	Db, err := gorm.Open(Sql, DB_CONNECT)
+	Db, err := gorm.Open(mysql.Open(DB_CONNECT), &gorm.Config{NamingStrategy: schema.NamingStrategy{
+		SingularTable: true,
+	}})
 	if err != nil {
 		log.Fatalln(err)
 	}
-	// テーブル名を単数系で認識
-	Db.SingularTable(true)
-	return Db
+	return Db.Debug()
+}
+
+func removeFile(path string) (err error) {
+	if _, err := os.Stat(path); err == nil {
+		if err := os.Remove(path); err != nil {
+			return err
+		}
+	}
+	return err
 }
 
 func init() {

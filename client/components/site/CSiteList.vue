@@ -24,14 +24,10 @@
         </v-sheet>
         <c-dialog :visible.sync="dialogVisible" :title="modalTitle" @confirm="confirmHandler" @close="closeHandler">
             <template #content>
-                <v-text-field
-                    v-if="executionType === ExecutionType.Create || executionType === ExecutionType.Edit"
-                    v-model="modalItem.name"
-                    :rules="nameRules"
-                    label="カテゴリー名"
-                    outlined
-                    counter="20"
-                />
+                <template v-if="executionType === ExecutionType.Create || executionType === ExecutionType.Edit">
+                    <v-text-field v-model="modalItem.name" :rules="nameRules" label="サイト名" outlined counter="20" />
+                    <v-text-field v-model="modalItem.url" :rules="urlRules" label="URL" outlined />
+                </template>
                 <p v-else-if="executionType === ExecutionType.Delete">削除してもよろしいですか？</p>
             </template>
         </c-dialog>

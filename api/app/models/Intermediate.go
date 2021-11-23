@@ -8,6 +8,6 @@ type ProductToMaterialCategory struct {
 
 type ProductToSalesSite struct {
 	DefaultModel
-	ProductId    *uint `json:"-"`
+	ProductId   *uint `json:"-"`
 	SalesSiteId *uint `json:"-"`
 }
