@@ -2,7 +2,6 @@ package models
 
 import (
 	"api/config"
-	"os"
 	"strings"
 )
 
@@ -28,7 +27,7 @@ func setCreatorLogoApiPath(creator *Creator) {
 }
 
 func GetCreator() (creator Creator) {
-	Db.First(&creator)
+	Db.Limit(1).Find(&creator)
 	setCreatorLogoApiPath(&creator)
 	return creator
 }
@@ -51,10 +50,9 @@ func UpdateCreator(creator *Creator) (err error) {
 func UpdateCreatorLogo(creator *Creator) (err error) {
 	beforeCreator := GetCreator()
 	// ロゴ画像を更新したら既存の画像を削除
-	if _, err := os.Stat(beforeCreator.Logo); err == nil {
-		if err := os.Remove(beforeCreator.Logo); err != nil {
-			return err
-		}
+	if err := removeFile(beforeCreator.Logo); err != nil {
+		Db.Rollback()
+		return err
 	}
 	err = Db.Model(&Creator{}).Where("id = ?", beforeCreator.ID).Updates(
 		Creator{MimeType: creator.MimeType, Logo: creator.Logo},

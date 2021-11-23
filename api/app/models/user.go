@@ -31,7 +31,7 @@ func Encrypt(plaintext string) (cryptext string) {
 }
 
 func (session *Session) GetUserBySession() (user User) {
-	Db.First(&user, "id = ?", session.UserId)
+	Db.Limit(1).Find(&user, "id = ?", session.UserId)
 	return user
 
 }
@@ -42,7 +42,7 @@ func GetAllUsers() (users Users) {
 }
 
 func GeUserByEmail(email string) (user User) {
-	Db.First(&user, "email = ?", email)
+	Db.Limit(1).Find(&user, "email = ?", email)
 	return user
 }
 
@@ -62,7 +62,7 @@ func InsertUser(user *User, is_admin bool) (err error) {
 }
 
 func (user *User) GetSessionByUser() (session Session) {
-	Db.First(&session, "user_id = ?", user.ID)
+	Db.Limit(1).Find(&session, "user_id = ?", user.ID)
 	return session
 
 }
@@ -85,13 +85,13 @@ func (user *User) CreateSession() (session Session, err error) {
 }
 
 func GetSession(uuid string) (session Session) {
-	Db.First(&session, "uuid = ?", uuid)
+	Db.Limit(1).Find(&session, "uuid = ?", uuid)
 	return session
 }
 
 func (session *Session) IsValidSession() (valid bool) {
 	valid = false
-	Db.First(&session, "uuid = ?", session.Uuid)
+	Db.Limit(1).Find(&session, "uuid = ?", session.Uuid)
 	if session != nil {
 		valid = true
 	}

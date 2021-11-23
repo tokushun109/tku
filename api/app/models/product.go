@@ -3,7 +3,6 @@ package models
 import (
 	"api/config"
 	"errors"
-	"os"
 )
 
 type Product struct {
@@ -65,7 +64,7 @@ func GetProduct(uuid string) (product Product) {
 
 func ProductUniqueCheck(name string) (isUnique bool, err error) {
 	var product Product
-	Db.First(&product, "name = ?", name)
+	Db.Limit(1).Find(&product, "name = ?", name)
 	isUnique = product.ID == nil
 	if !isUnique {
 		err = errors.New("name is duplicate")
@@ -94,28 +93,42 @@ func InsertProduct(product *Product) (err error) {
 	// アクセサリーカテゴリーの設定
 	accesstoryCategory := GetAccessoryCategory(product.AccessoryCategory.Uuid)
 	product.AccessoryCategoryId = accesstoryCategory.ID
-	if err := tx.Omit("AccessoryCategory", "MaterialCategories", "SalesSites").Create(&product).Error; err != nil {
+	if err := tx.Omit("AccessoryCategory", "MaterialCategories", "ProductImages", "SalesSites").Create(&product).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
+
+	var productToMaterialCategories []ProductToMaterialCategory
 	// 商品と材料カテゴリーを紐付け
 	for _, materialCategory := range product.MaterialCategories {
-		// IDを取得する
-		materialCategory := GetMaterialCategory(materialCategory.Uuid)
-		materialCategoryId := materialCategory.ID
-		var productToMaterialCategory = ProductToMaterialCategory{ProductId: product.ID, MaterialCategoryId: materialCategoryId}
-		if err := tx.Create(&productToMaterialCategory).Error; err != nil {
+		productToMaterialCategories = append(
+			productToMaterialCategories,
+			ProductToMaterialCategory{
+				ProductId:          product.ID,
+				MaterialCategoryId: GetMaterialCategory(materialCategory.Uuid).ID,
+			},
+		)
+	}
+	if len(productToMaterialCategories) > 0 {
+		if err := tx.Create(&productToMaterialCategories).Error; err != nil {
 			tx.Rollback()
 			return err
 		}
 	}
+
+	var productToSalesSites []ProductToSalesSite
 	// 商品と販売サイトを紐付け
 	for _, salesSite := range product.SalesSites {
-		// IDを取得する
-		saleSite := GetSalesSite(salesSite.Uuid)
-		salesSiteId := saleSite.ID
-		var productToSalesSite = ProductToSalesSite{ProductId: product.ID, SalesSiteId: salesSiteId}
-		if err := tx.Create(&productToSalesSite).Error; err != nil {
+		productToSalesSites = append(
+			productToSalesSites,
+			ProductToSalesSite{
+				ProductId:   product.ID,
+				SalesSiteId: GetSalesSite(salesSite.Uuid).ID,
+			},
+		)
+	}
+	if len(productToSalesSites) > 0 {
+		if err := tx.Create(&productToSalesSites).Error; err != nil {
 			tx.Rollback()
 			return err
 		}
@@ -135,23 +148,19 @@ func (product *Product) DeleteProduct() (err error) {
 		return err
 	}
 
-	err = tx.Delete(&product).Error
-	if err != nil {
+	// 商品を削除する
+	if err = tx.Debug().Select("MaterialCategories", "SalesSites", "ProductImages").Delete(&product).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
-	productImageIds := []uint{}
-	// まずは商品画像ファイルを削除する
+
 	for _, productImage := range product.ProductImages {
-		if _, err := os.Stat(productImage.Path); err == nil {
-			if err := os.Remove(productImage.Path); err != nil {
-				return err
-			}
+		if err := removeFile(productImage.Path); err != nil {
+			tx.Rollback()
+			return err
 		}
-		productImageIds = append(productImageIds, *productImage.ID)
 	}
 
-	err = tx.Delete(&product.ProductImages, productImageIds).Error
 	if err := tx.Error; err != nil {
 		tx.Rollback()
 		return err
@@ -161,7 +170,7 @@ func (product *Product) DeleteProduct() (err error) {
 }
 
 func GetProductImage(uuid string) (productImage ProductImage) {
-	Db.First(&productImage, "uuid = ?", uuid)
+	Db.Limit(1).Find(&productImage, "uuid = ?", uuid)
 	return productImage
 }
 

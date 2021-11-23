@@ -1,6 +1,8 @@
 package models
 
-import "errors"
+import (
+	"errors"
+)
 
 type AccessoryCategory struct {
 	DefaultModel
@@ -24,13 +26,13 @@ func GetAllAccessoryCategories() (accessoryCategories AccessoryCategories) {
 }
 
 func GetAccessoryCategory(uuid string) (accessoryCategory AccessoryCategory) {
-	Db.First(&accessoryCategory, "uuid = ?", uuid)
+	Db.Limit(1).Find(&accessoryCategory, "uuid = ?", uuid)
 	return accessoryCategory
 }
 
 func AccessoryCategoryUniqueCheck(name string) (isUnique bool, err error) {
 	var accessoryCategory AccessoryCategory
-	Db.First(&accessoryCategory, "name = ?", name)
+	Db.Limit(1).Find(&accessoryCategory, "name = ?", name)
 	isUnique = accessoryCategory.ID == nil
 	if !isUnique {
 		err = errors.New("name is duplicate")
@@ -67,13 +69,13 @@ func GetAllMaterialCategories() (materialCategories MaterialCategories) {
 }
 
 func GetMaterialCategory(uuid string) (materialCategory MaterialCategory) {
-	Db.First(&materialCategory, "uuid = ?", uuid)
+	Db.Limit(1).Find(&materialCategory, "uuid = ?", uuid)
 	return materialCategory
 }
 
 func MaterialCategoryUniqueCheck(name string) (isUnique bool, err error) {
 	var materialCategory MaterialCategory
-	Db.First(&materialCategory, "name = ?", name)
+	Db.Limit(1).Find(&materialCategory, "name = ?", name)
 	isUnique = materialCategory.ID == nil
 	if !isUnique {
 		err = errors.New("name is duplicate")

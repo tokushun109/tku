@@ -1,6 +1,8 @@
 package models
 
-import "errors"
+import (
+	"errors"
+)
 
 type SalesSite struct {
 	DefaultModel
@@ -35,13 +37,13 @@ func GetAllSalesSites() (salesSites SalesSites) {
 }
 
 func GetSalesSite(uuid string) (salesSite SalesSite) {
-	Db.First(&salesSite, "uuid = ?", uuid)
+	Db.Limit(1).Find(&salesSite, "uuid = ?", uuid)
 	return salesSite
 }
 
 func SalesSiteUniqueCheck(name string) (isUnique bool, err error) {
 	var salesSite SalesSite
-	Db.First(&salesSite, "name = ?", name)
+	Db.Limit(1).Find(&salesSite, "name = ?", name)
 	isUnique = salesSite.ID == nil
 	if !isUnique {
 		err = errors.New("name is duplicate")
@@ -79,13 +81,13 @@ func GetAllSkillMarkets() (skillMarkets SkillMarkets) {
 }
 
 func GetSkillMarket(uuid string) (skillMarket SkillMarket) {
-	Db.First(&skillMarket, "uuid = ?", uuid)
+	Db.Limit(1).Find(&skillMarket, "uuid = ?", uuid)
 	return skillMarket
 }
 
 func SkillMarketUniqueCheck(name string) (isUnique bool, err error) {
 	var skillMarket SkillMarket
-	Db.First(&skillMarket, "name = ?", name)
+	Db.Limit(1).Find(&skillMarket, "name = ?", name)
 	isUnique = skillMarket.ID == nil
 	if !isUnique {
 		err = errors.New("name is duplicate")
@@ -123,13 +125,13 @@ func GetAllSnsList() (snsList SnsList) {
 }
 
 func GetSns(uuid string) (sns Sns) {
-	Db.First(&sns, "uuid = ?", uuid)
+	Db.Limit(1).Find(&sns, "uuid = ?", uuid)
 	return sns
 }
 
 func SnsUniqueCheck(name string) (isUnique bool, err error) {
 	var sns Sns
-	Db.First(&sns, "name = ?", name)
+	Db.Limit(1).Find(&sns, "name = ?", name)
 	isUnique = sns.ID == nil
 	if !isUnique {
 		err = errors.New("name is duplicate")
