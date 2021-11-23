@@ -25,13 +25,13 @@
         <c-dialog :visible.sync="dialogVisible" :title="modalTitle" @confirm="confirmHandler" @close="closeHandler">
             <template #content>
                 <template v-if="executionType === ExecutionType.Create || executionType === ExecutionType.Edit">
+                    <c-error :errors.sync="errors" />
                     <v-text-field v-model="modalItem.name" :rules="nameRules" label="サイト名" outlined counter="20" />
                     <v-text-field v-model="modalItem.url" :rules="urlRules" label="URL" outlined />
                 </template>
                 <p v-else-if="executionType === ExecutionType.Delete">削除してもよろしいですか？</p>
             </template>
         </c-dialog>
-
         <c-notification :visible.sync="notificationVisible">{{ notificationMessage }}</c-notification>
     </v-container>
 </template>
@@ -102,6 +102,7 @@ export default class CSiteList extends Vue {
     }
 
     openHandler(executionType: TExecutionType, item: ISite | null = null) {
+        this.errors = []
         if (executionType === ExecutionType.Create) {
             this.setInit()
         } else {
@@ -128,6 +129,8 @@ export default class CSiteList extends Vue {
                     await this.$axios.$post(`/skill_market`, this.modalItem)
                     this.$emit('c-change', SiteType.SkillMarket.name)
                 }
+                this.notificationVisible = true
+                this.dialogVisible = false
             } catch (e) {
                 this.errors.push(e)
             }
@@ -143,6 +146,8 @@ export default class CSiteList extends Vue {
                     await this.$axios.$put(`/skill_market/${this.modalItem.uuid}`, this.modalItem)
                     this.$emit('c-change', SiteType.SkillMarket.name)
                 }
+                this.notificationVisible = true
+                this.dialogVisible = false
             } catch (e) {
                 this.errors.push(e)
             }
@@ -158,12 +163,12 @@ export default class CSiteList extends Vue {
                     await this.$axios.$delete(`/skill_market/${this.modalItem.uuid}`)
                     this.$emit('c-change', SiteType.SkillMarket.name)
                 }
+                this.notificationVisible = true
+                this.dialogVisible = false
             } catch (e) {
                 this.errors.push(e)
             }
         }
-        this.notificationVisible = true
-        this.dialogVisible = false
     }
 }
 </script>
