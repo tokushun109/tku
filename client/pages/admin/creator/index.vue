@@ -14,17 +14,17 @@
                 <div class="my-4">
                     <pre>{{ creator.introduction }}</pre>
                 </div>
-                <c-dialog :visible.sync="dialogVisible" title="製作者の編集" width="800" @confirm="saveHandler" @close="closeHandler">
-                    <template #trigger>
-                        <v-btn color="primary" @click="setInit"><c-icon type="edit" />編集</v-btn>
-                    </template>
-                    <template #content>
-                        <v-file-input v-model="uploadFile" label="ロゴ画像" prepend-icon="mdi-camera" outlined />
-                        <v-textarea v-model="creator.introduction" label="紹介文" outlined />
-                    </template>
-                </c-dialog>
+                <div class="text-center">
+                    <v-btn color="primary" @click="openHandler"><c-icon type="edit" />編集</v-btn>
+                </div>
             </v-sheet>
         </v-container>
+        <c-dialog :visible.sync="dialogVisible" title="製作者の編集" width="800" @confirm="saveHandler" @close="closeHandler">
+            <template #content>
+                <v-file-input v-model="uploadFile" label="ロゴ画像" prepend-icon="mdi-camera" outlined />
+                <v-textarea v-model="creator.introduction" label="紹介文" outlined />
+            </template>
+        </c-dialog>
         <c-notification :visible.sync="notificationVisible">製作者を更新しました</c-notification>
     </v-main>
 </template>
@@ -107,6 +107,13 @@ export default class PageAdminCreatorIndex extends Vue {
 
     setInit() {
         this.creator = _.cloneDeep(this.initCreator)
+        this.uploadFile = null
+    }
+
+    openHandler() {
+        this.errors = []
+        this.setInit()
+        this.dialogVisible = true
     }
 
     closeHandler() {

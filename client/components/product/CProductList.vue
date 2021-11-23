@@ -53,6 +53,7 @@
         </v-sheet>
         <c-dialog :visible.sync="dialogVisible" :title="modalTitle" @confirm="confirmHandler" @close="closeHandler">
             <template #content>
+                <c-error :errors.sync="errors" />
                 <template v-if="executionType === ExecutionType.Create || executionType === ExecutionType.Edit">
                     <v-text-field v-model="modalItem.name" :rules="nameRules" label="商品名" outlined counter="20" />
                     <v-textarea v-model="modalItem.description" label="商品説明" outlined />
@@ -166,13 +167,16 @@ export default class CProductList extends Vue {
 
     setInit() {
         this.modalItem = newProduct()
+        this.uploadFiles = []
     }
 
     setItem(item: IProduct) {
         this.modalItem = _.cloneDeep(item)
+        this.uploadFiles = []
     }
 
     openHandler(executionType: TExecutionType, item: IProduct | null = null) {
+        this.errors = []
         if (executionType === ExecutionType.Create) {
             this.setInit()
         } else {
@@ -203,6 +207,8 @@ export default class CProductList extends Vue {
                     })
                 }
                 this.$emit('c-change')
+                this.notificationVisible = true
+                this.dialogVisible = false
             } catch (e) {
                 this.errors.push(e)
             }
@@ -210,6 +216,8 @@ export default class CProductList extends Vue {
             // try {
             //     await this.$axios.$put(`/product/${this.modalItem.uuid}`, this.modalItem)
             //     this.$emit('c-change')
+            //     this.notificationVisible = true
+            //     this.dialogVisible = false
             // } catch (e) {
             //     this.errors.push(e)
             // }
@@ -217,12 +225,12 @@ export default class CProductList extends Vue {
             try {
                 await this.$axios.$delete(`/product/${this.modalItem.uuid}`)
                 this.$emit('c-change')
+                this.notificationVisible = true
+                this.dialogVisible = false
             } catch (e) {
                 this.errors.push(e)
             }
         }
-        this.notificationVisible = true
-        this.dialogVisible = false
     }
 }
 </script>

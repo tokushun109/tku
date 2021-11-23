@@ -24,6 +24,7 @@
         </v-sheet>
         <c-dialog :visible.sync="dialogVisible" :title="modalTitle" @confirm="confirmHandler" @close="closeHandler">
             <template #content>
+                <c-error :errors.sync="errors" />
                 <v-text-field
                     v-if="executionType === ExecutionType.Create || executionType === ExecutionType.Edit"
                     v-model="modalItem.name"
@@ -103,6 +104,7 @@ export default class CCategoryList extends Vue {
     }
 
     openHandler(executionType: TExecutionType, item: ICategory | null = null) {
+        this.errors = []
         if (executionType === ExecutionType.Create) {
             this.setInit()
         } else {
@@ -126,6 +128,8 @@ export default class CCategoryList extends Vue {
                     await this.$axios.$post(`/material_category`, this.modalItem)
                     this.$emit('c-change', CategoryType.Material.name)
                 }
+                this.notificationVisible = true
+                this.dialogVisible = false
             } catch (e) {
                 this.errors.push(e)
             }
@@ -138,6 +142,8 @@ export default class CCategoryList extends Vue {
                     await this.$axios.$put(`/material_category/${this.modalItem.uuid}`, this.modalItem)
                     this.$emit('c-change', CategoryType.Material.name)
                 }
+                this.notificationVisible = true
+                this.dialogVisible = false
             } catch (e) {
                 this.errors.push(e)
             }
@@ -150,12 +156,12 @@ export default class CCategoryList extends Vue {
                     await this.$axios.$delete(`/material_category/${this.modalItem.uuid}`)
                     this.$emit('c-change', CategoryType.Material.name)
                 }
+                this.notificationVisible = true
+                this.dialogVisible = false
             } catch (e) {
                 this.errors.push(e)
             }
         }
-        this.notificationVisible = true
-        this.dialogVisible = false
     }
 }
 </script>
