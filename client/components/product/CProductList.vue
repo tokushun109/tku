@@ -106,7 +106,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, PropSync, Vue } from 'nuxt-property-decorator'
+import { Component, Prop, PropSync, Vue, Watch } from 'nuxt-property-decorator'
 import _ from 'lodash'
 import { ExecutionType, ICategory, IError, IProduct, ISite, newProduct, TExecutionType } from '~/types'
 import { min20, required } from '~/methods'
@@ -177,6 +177,14 @@ export default class CProductList extends Vue {
         this.uploadFiles = []
     }
 
+    @Watch('dialogVisible')
+    resetValidation() {
+        if (!this.dialogVisible && this.executionType !== ExecutionType.Delete) {
+            const refs: any = this.$refs.form
+            refs.resetValidation()
+        }
+    }
+
     openHandler(executionType: TExecutionType, item: IProduct | null = null) {
         this.errors = []
         if (executionType === ExecutionType.Create) {
@@ -212,7 +220,6 @@ export default class CProductList extends Vue {
                 this.notificationVisible = true
                 this.dialogVisible = false
             } catch (e) {
-                console.log(e.response)
                 this.errors.push(e.response)
             }
         } else if (this.executionType === ExecutionType.Edit) {

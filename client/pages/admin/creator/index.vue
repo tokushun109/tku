@@ -126,7 +126,6 @@ export default class PageAdminCreatorIndex extends Vue {
     resetValidation() {
         if (!this.dialogVisible) {
             const refs: any = this.$refs.form
-            console.log(refs)
             refs.resetValidation()
         }
     }

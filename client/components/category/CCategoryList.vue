@@ -107,7 +107,7 @@ export default class CCategoryList extends Vue {
 
     @Watch('dialogVisible')
     resetValidation() {
-        if (!this.dialogVisible) {
+        if (!this.dialogVisible && this.executionType !== ExecutionType.Delete) {
             const refs: any = this.$refs.form
             refs.resetValidation()
         }
