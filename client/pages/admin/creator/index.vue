@@ -21,8 +21,11 @@
         </v-container>
         <c-dialog :visible.sync="dialogVisible" title="製作者の編集" width="800" @confirm="saveHandler" @close="closeHandler">
             <template #content>
-                <v-file-input v-model="uploadFile" label="ロゴ画像" prepend-icon="mdi-camera" outlined />
-                <v-textarea v-model="creator.introduction" label="紹介文" outlined />
+                <c-error :errors.sync="errors" />
+                <v-form ref="form" v-model="valid" lazy-validation>
+                    <v-file-input v-model="uploadFile" label="ロゴ画像" prepend-icon="mdi-camera" outlined />
+                    <v-textarea v-model="creator.introduction" label="紹介文" outlined />
+                </v-form>
             </template>
         </c-dialog>
         <c-notification :visible.sync="notificationVisible">製作者を更新しました</c-notification>
@@ -31,7 +34,7 @@
 
 <script lang="ts">
 import { Context } from '@nuxt/types'
-import { Component, Vue } from 'nuxt-property-decorator'
+import { Component, Vue, Watch } from 'nuxt-property-decorator'
 import _ from 'lodash'
 import { ICreator, IError, ISite, newCreator } from '~/types'
 @Component({
@@ -60,6 +63,8 @@ export default class PageAdminCreatorIndex extends Vue {
 
     // 通知の表示
     notificationVisible: boolean = false
+
+    valid: boolean = true
 
     errors: Array<IError> = []
     async asyncData({ app }: Context) {
@@ -108,6 +113,14 @@ export default class PageAdminCreatorIndex extends Vue {
     setInit() {
         this.creator = _.cloneDeep(this.initCreator)
         this.uploadFile = null
+    }
+
+    @Watch('dialogVisible')
+    resetValidation() {
+        if (!this.dialogVisible) {
+            const refs: any = this.$refs.form
+            refs.resetValidation()
+        }
     }
 
     openHandler() {

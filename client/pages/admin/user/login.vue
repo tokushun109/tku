@@ -45,7 +45,7 @@ export default class PageAdminUserLogin extends Vue {
                 throw new BadRequest('パスワードが入力されていません')
             }
             await this.$store.dispatch('user/loginUser', this.form)
-            this.$router.replace('/admin')
+            this.$router.replace('/admin/product')
         } catch (e) {
             this.errors.push(e)
         }

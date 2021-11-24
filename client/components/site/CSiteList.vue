@@ -24,11 +24,16 @@
         </v-sheet>
         <c-dialog :visible.sync="dialogVisible" :title="modalTitle" @confirm="confirmHandler" @close="closeHandler">
             <template #content>
-                <template v-if="executionType === ExecutionType.Create || executionType === ExecutionType.Edit">
-                    <c-error :errors.sync="errors" />
-                    <v-text-field v-model="modalItem.name" :rules="nameRules" label="サイト名" outlined counter="20" />
+                <c-error :errors.sync="errors" />
+                <v-form
+                    v-if="executionType === ExecutionType.Create || executionType === ExecutionType.Edit"
+                    ref="form"
+                    v-model="valid"
+                    lazy-validation
+                >
+                    <v-text-field v-model="modalItem.name" :rules="nameRules" label="サイト名(必須)" outlined counter="20" />
                     <v-text-field v-model="modalItem.url" :rules="urlRules" label="URL" outlined />
-                </template>
+                </v-form>
                 <p v-else-if="executionType === ExecutionType.Delete">削除してもよろしいですか？</p>
             </template>
         </c-dialog>
@@ -37,7 +42,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, PropSync, Vue } from 'nuxt-property-decorator'
+import { Component, Prop, PropSync, Vue, Watch } from 'nuxt-property-decorator'
 import _ from 'lodash'
 import { ExecutionType, IError, ISite, newSite, SiteType, TExecutionType } from '~/types'
 import { min20, nonDoubleByte, nonSpace, required } from '~/methods'
@@ -56,6 +61,8 @@ export default class CSiteList extends Vue {
     notificationVisible: boolean = false
 
     modalItem: ISite = newSite()
+
+    valid: boolean = true
 
     errors: Array<IError> = []
 
@@ -99,6 +106,14 @@ export default class CSiteList extends Vue {
 
     setItem(item: ISite) {
         this.modalItem = _.cloneDeep(item)
+    }
+
+    @Watch('dialogVisible')
+    resetValidation() {
+        if (!this.dialogVisible) {
+            const refs: any = this.$refs.form
+            refs.resetValidation()
+        }
     }
 
     openHandler(executionType: TExecutionType, item: ISite | null = null) {
