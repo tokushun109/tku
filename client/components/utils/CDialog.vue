@@ -5,7 +5,7 @@
             <v-card-text class="pt-5">
                 <div class="title text-center"><slot name="content" /></div>
                 <div v-if="isButton" class="text-center">
-                    <v-btn color="primary" @click="confirmButton">{{ confirmButtonTitle }}</v-btn>
+                    <v-btn color="primary" :disabled="confirmButtonDisabled" @click="confirmButton">{{ confirmButtonTitle }}</v-btn>
                     <v-btn color="primary" outlined @click="cancelButton">キャンセル</v-btn>
                     <v-btn v-if="subConfirmButtonTitle" color="secondary" @click="subConfirmButton">{{ subConfirmButtonTitle }}</v-btn>
                 </div>
@@ -17,7 +17,7 @@
 <script lang="ts">
 import { Component, Vue, Prop, PropSync, Emit } from 'nuxt-property-decorator'
 @Component
-export default class CDialog2 extends Vue {
+export default class CDialog extends Vue {
     // 表示フラグ
     @PropSync('visible', { type: Boolean }) dialogVisible!: boolean
     // モーダルの横幅(px)

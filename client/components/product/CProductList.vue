@@ -15,34 +15,32 @@
                             <v-list-item>
                                 <v-card width="100%" color="light-green lighten-5">
                                     <v-card-text>
-                                        <v-container>
-                                            <div class="my-4">
-                                                <div class="d-flex">
-                                                    <h3 class="green--text text--darken-3">{{ listItem.name }}</h3>
-                                                    <v-spacer />
-                                                    <div>
-                                                        <c-icon type="edit" @c-click="openHandler(ExecutionType.Edit, listItem)" />
-                                                        <c-icon type="delete" @c-click="openHandler(ExecutionType.Delete, listItem)" />
-                                                    </div>
+                                        <div class="my-4">
+                                            <div class="d-flex">
+                                                <h3 class="green--text text--darken-3">{{ listItem.name }}</h3>
+                                                <v-spacer />
+                                                <div>
+                                                    <c-icon type="edit" @c-click="openHandler(ExecutionType.Edit, listItem)" />
+                                                    <c-icon type="delete" @c-click="openHandler(ExecutionType.Delete, listItem)" />
                                                 </div>
-                                                <v-divider />
                                             </div>
-                                            <v-carousel
-                                                v-if="listItem.productImages.length > 0"
-                                                :show-arrows="listItem.productImages.length > 1"
-                                                height="auto"
-                                                hide-delimiters
-                                            >
-                                                <v-carousel-item v-for="image in listItem.productImages" :key="image.uuid">
-                                                    <v-img :src="image.apiPath" :alt="image.uuid" />
-                                                </v-carousel-item>
-                                            </v-carousel>
-                                            <v-carousel v-else :show-arrows="false" height="auto" hide-delimiters>
-                                                <v-carousel-item>
-                                                    <v-img src="/img/product/no-image.png" />
-                                                </v-carousel-item>
-                                            </v-carousel>
-                                        </v-container>
+                                            <v-divider />
+                                        </div>
+                                        <v-carousel
+                                            v-if="listItem.productImages.length > 0"
+                                            :show-arrows="listItem.productImages.length > 1"
+                                            height="auto"
+                                            hide-delimiters
+                                        >
+                                            <v-carousel-item v-for="image in listItem.productImages" :key="image.uuid">
+                                                <v-img :src="image.apiPath" :alt="image.uuid" />
+                                            </v-carousel-item>
+                                        </v-carousel>
+                                        <v-carousel v-else :show-arrows="false" height="auto" hide-delimiters>
+                                            <v-carousel-item>
+                                                <v-img src="/img/product/no-image.png" />
+                                            </v-carousel-item>
+                                        </v-carousel>
                                     </v-card-text>
                                 </v-card>
                             </v-list-item>
@@ -51,7 +49,7 @@
                 </v-list>
             </v-container>
         </v-sheet>
-        <c-dialog :visible.sync="dialogVisible" :title="modalTitle" @confirm="confirmHandler" @close="closeHandler">
+        <c-dialog :visible.sync="dialogVisible" :title="modalTitle" :confirm-button-disabled="!valid" @confirm="confirmHandler" @close="closeHandler">
             <template #content>
                 <c-error :errors.sync="errors" />
                 <v-form
@@ -108,7 +106,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, PropSync, Vue } from 'nuxt-property-decorator'
+import { Component, Prop, PropSync, Vue, Watch } from 'nuxt-property-decorator'
 import _ from 'lodash'
 import { ExecutionType, ICategory, IError, IProduct, ISite, newProduct, TExecutionType } from '~/types'
 import { min20, required } from '~/methods'
@@ -130,7 +128,6 @@ export default class CProductList extends Vue {
     uploadFiles: Array<File> = []
     // ダイアログの表示
     dialogVisible: boolean = false
-
     // 通知の表示
     notificationVisible: boolean = false
 
@@ -180,6 +177,14 @@ export default class CProductList extends Vue {
         this.uploadFiles = []
     }
 
+    @Watch('dialogVisible')
+    resetValidation() {
+        if (!this.dialogVisible && this.executionType !== ExecutionType.Delete) {
+            const refs: any = this.$refs.form
+            refs.resetValidation()
+        }
+    }
+
     openHandler(executionType: TExecutionType, item: IProduct | null = null) {
         this.errors = []
         if (executionType === ExecutionType.Create) {
@@ -215,7 +220,7 @@ export default class CProductList extends Vue {
                 this.notificationVisible = true
                 this.dialogVisible = false
             } catch (e) {
-                this.errors.push(e)
+                this.errors.push(e.response)
             }
         } else if (this.executionType === ExecutionType.Edit) {
             // try {

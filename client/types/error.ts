@@ -1,39 +1,39 @@
 export interface IError {
     name: string
-    statusCode: number
-    message: string
+    status: number
+    data: string
 }
 class Error {
     public name: string = 'Error'
-    public statusCode: number = 0
-    public message: string
+    public status: number = 0
+    public data: string
 
     constructor(initMessage: string) {
-        this.message = initMessage
+        this.data = initMessage
     }
 
     toString() {
-        return `${this.name} ${this.message} (${this.statusCode})`
+        return `${this.name} ${this.data} (${this.status})`
     }
 }
 
 export class BadRequest extends Error {
     public name: string = 'BadRequest'
-    public statusCode: number = 400
+    public status: number = 400
 }
 
 export class Unauthorized extends Error {
     public name: string = 'Unauthorized'
-    public statusCode: number = 401
+    public status: number = 401
 }
 
 export class ApplicationError extends Error {
     public name: string = 'ApplicationError'
-    public statusCode: number = 403
+    public status: number = 403
 }
 export class InternalServerError extends Error {
     public name: string = 'InternalServerError'
-    public statusCode: number = 500
+    public status: number = 500
 }
 
 interface IErrorResponse {
@@ -43,12 +43,12 @@ interface IErrorResponse {
 }
 
 // バックエンドから返ってきたエラーをカスタマイズする
-export function errorCustomize(errorResponse: IErrorResponse, message: string = errorResponse.data) {
+export function errorCustomize(errorResponse: IErrorResponse, data: string = errorResponse.data) {
     let error: IError = new Error('')
     error = {
         name: errorResponse.statusText,
-        statusCode: errorResponse.status,
-        message,
+        status: errorResponse.status,
+        data,
     }
     return error
 }

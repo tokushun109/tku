@@ -4,22 +4,29 @@
             <v-sheet class="pa-4 lighten-4">
                 <h3 class="title green--text text--darken-3">サイトロゴ</h3>
                 <v-divider />
-                <div class="text-center">
+                <v-container class="text-center">
                     <v-avatar color="grey darken-1" class="my-4" size="240">
                         <img v-if="creator.apiPath" :src="creator.apiPath" style="object-fit: cover" alt="ロゴ画像" />
                     </v-avatar>
-                </div>
+                </v-container>
                 <h3 class="title green--text text--darken-3">紹介文</h3>
                 <v-divider />
-                <div class="my-4">
-                    <pre>{{ creator.introduction }}</pre>
-                </div>
+                <v-container>
+                    <pre style="white-space: pre-wrap; word-break: break-all">{{ creator.introduction }}</pre>
+                </v-container>
                 <div class="text-center">
                     <v-btn color="primary" @click="openHandler"><c-icon type="edit" />編集</v-btn>
                 </div>
             </v-sheet>
         </v-container>
-        <c-dialog :visible.sync="dialogVisible" title="製作者の編集" width="800" @confirm="saveHandler" @close="closeHandler">
+        <c-dialog
+            :visible.sync="dialogVisible"
+            title="製作者の編集"
+            width="800"
+            :confirm-button-disabled="!valid"
+            @confirm="saveHandler"
+            @close="closeHandler"
+        >
             <template #content>
                 <c-error :errors.sync="errors" />
                 <v-form ref="form" v-model="valid" lazy-validation>
