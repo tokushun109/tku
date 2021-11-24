@@ -14,7 +14,7 @@
                         <v-col v-for="listItem in listItems" :key="listItem.uuid" cols="12" sm="6" md="4">
                             <v-list-item>
                                 <v-card width="100%" color="light-green lighten-5">
-                                    <v-cart-text>
+                                    <v-card-text>
                                         <v-container>
                                             <div class="my-4">
                                                 <div class="d-flex">
@@ -43,7 +43,7 @@
                                                 </v-carousel-item>
                                             </v-carousel>
                                         </v-container>
-                                    </v-cart-text>
+                                    </v-card-text>
                                 </v-card>
                             </v-list-item>
                         </v-col>
@@ -54,8 +54,13 @@
         <c-dialog :visible.sync="dialogVisible" :title="modalTitle" @confirm="confirmHandler" @close="closeHandler">
             <template #content>
                 <c-error :errors.sync="errors" />
-                <template v-if="executionType === ExecutionType.Create || executionType === ExecutionType.Edit">
-                    <v-text-field v-model="modalItem.name" :rules="nameRules" label="商品名" outlined counter="20" />
+                <v-form
+                    v-if="executionType === ExecutionType.Create || executionType === ExecutionType.Edit"
+                    ref="form"
+                    v-model="valid"
+                    lazy-validation
+                >
+                    <v-text-field v-model="modalItem.name" :rules="nameRules" label="商品名(必須)" outlined counter="20" />
                     <v-textarea v-model="modalItem.description" label="商品説明" outlined />
                     <v-file-input v-model="uploadFiles" label="商品画像" prepend-icon="mdi-camera" multiple outlined />
                     <v-container v-if="previewList.length > 0" class="preview mb-4">
@@ -94,7 +99,7 @@
                         label="販売サイト"
                         outlined
                     />
-                </template>
+                </v-form>
                 <p v-else-if="executionType === ExecutionType.Delete">削除してもよろしいですか？</p>
             </template>
         </c-dialog>
