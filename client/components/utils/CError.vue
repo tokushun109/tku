@@ -3,7 +3,7 @@
         <c-message v-if="errors && errors.length > 0" color="error">
             <ul class="errors">
                 <li v-for="(error, index) in errors" :key="index" class="error">
-                    <span v-dompurify-html="error.message.replace(/\n/g, '<br />')"></span>
+                    <span v-dompurify-html="error.data.replace(/\n/g, '<br />')"></span>
                 </li>
             </ul>
         </c-message>

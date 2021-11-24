@@ -22,7 +22,7 @@
                 </v-list-item>
             </v-list>
         </v-sheet>
-        <c-dialog :visible.sync="dialogVisible" :title="modalTitle" @confirm="confirmHandler" @close="closeHandler">
+        <c-dialog :visible.sync="dialogVisible" :title="modalTitle" :confirm-button-disabled="!valid" @confirm="confirmHandler" @close="closeHandler">
             <template #content>
                 <c-error :errors.sync="errors" />
                 <v-form
