@@ -4,7 +4,7 @@
             <div class="d-flex">
                 <h3 class="title green--text text--darken-3">{{ siteTypeValue }}</h3>
                 <v-spacer />
-                <c-icon type="new" @c-click="openHandler(ExecutionType.Create)" />
+                <c-icon :type="IconType.New.name" @c-click="openHandler(ExecutionType.Create)" />
             </div>
             <v-divider />
             <v-list dense>
@@ -14,8 +14,8 @@
                         <v-list-item-title class="d-flex">
                             <div>{{ listItem.name }}</div>
                             <v-spacer />
-                            <c-icon type="edit" @c-click="openHandler(ExecutionType.Edit, listItem)" />
-                            <c-icon type="delete" @c-click="openHandler(ExecutionType.Delete, listItem)" />
+                            <c-icon :type="IconType.Edit.name" @c-click="openHandler(ExecutionType.Edit, listItem)" />
+                            <c-icon :type="IconType.Delete.name" @c-click="openHandler(ExecutionType.Delete, listItem)" />
                         </v-list-item-title>
                         <v-divider />
                     </v-list-item-content>
@@ -44,13 +44,14 @@
 <script lang="ts">
 import { Component, Prop, PropSync, Vue, Watch } from 'nuxt-property-decorator'
 import _ from 'lodash'
-import { ExecutionType, IError, ISite, newSite, SiteType, TExecutionType } from '~/types'
+import { ExecutionType, IconType, IError, ISite, newSite, SiteType, TExecutionType } from '~/types'
 import { min20, nonDoubleByte, nonSpace, required } from '~/methods'
 @Component({})
 export default class CSiteList extends Vue {
     @PropSync('items') listItems!: Array<ISite>
     @Prop({ type: String, default: '' }) type!: string
 
+    IconType: typeof IconType = IconType
     ExecutionType: typeof ExecutionType = ExecutionType
     executionType: TExecutionType = ExecutionType.Create
 

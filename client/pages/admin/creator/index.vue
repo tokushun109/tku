@@ -15,7 +15,7 @@
                     <pre style="white-space: pre-wrap; word-break: break-all">{{ creator.introduction }}</pre>
                 </v-container>
                 <div class="text-center">
-                    <v-btn color="primary" @click="openHandler"><c-icon type="edit" />編集</v-btn>
+                    <v-btn color="primary" @click="openHandler"><c-icon :type="IconType.Edit.name" />編集</v-btn>
                 </div>
             </v-sheet>
         </v-container>
@@ -43,13 +43,15 @@
 import { Context } from '@nuxt/types'
 import { Component, Vue, Watch } from 'nuxt-property-decorator'
 import _ from 'lodash'
-import { ICreator, IError, ISite, newCreator } from '~/types'
+import { IconType, ICreator, IError, ISite, newCreator } from '~/types'
 @Component({
     head: {
         title: '製作者紹介',
     },
 })
 export default class PageAdminCreatorIndex extends Vue {
+    IconType: typeof IconType = IconType
+
     // 製作者
     creator: ICreator = newCreator()
 

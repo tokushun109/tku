@@ -1,7 +1,8 @@
 import { GetterTree, ActionTree, MutationTree } from 'vuex'
 import { IUser, ILoginForm, ISession, errorCustomize } from '~/types'
 
-export interface State {
+interface RootState {}
+interface State {
     isGuest: boolean
     user: IUser | null
 }
@@ -11,16 +12,19 @@ export const state = (): State => ({
     user: null,
 })
 
-export interface RootState {}
-
+function newState(): State {
+    return {
+        isGuest: true,
+        user: null,
+    }
+}
 export const mutations: MutationTree<State> = {
     setUser(state, user: IUser | null) {
         if (user !== null) {
             state.isGuest = false
             state.user = user
         } else {
-            state.isGuest = true
-            state.user = null
+            newState()
         }
     },
 }
@@ -60,10 +64,10 @@ export const actions: ActionTree<State, RootState> = {
 }
 
 export const getters: GetterTree<State, RootState> = {
-    isGuest(state) {
+    isGuest(state: State) {
         return state.isGuest
     },
-    user(state): IUser | null {
+    user(state: State): IUser | null {
         return state.user
     },
 }

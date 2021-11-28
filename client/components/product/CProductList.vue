@@ -5,7 +5,7 @@
                 <div class="d-flex">
                     <h3 class="title green--text text--darken-3">商品</h3>
                     <v-spacer />
-                    <c-icon type="new" @c-click="openHandler(ExecutionType.Create)" />
+                    <c-icon :type="IconType.New.name" @c-click="openHandler(ExecutionType.Create)" />
                 </div>
                 <v-divider />
                 <v-list>
@@ -20,8 +20,8 @@
                                                 <h3 class="green--text text--darken-3">{{ listItem.name }}</h3>
                                                 <v-spacer />
                                                 <div>
-                                                    <c-icon type="edit" @c-click="openHandler(ExecutionType.Edit, listItem)" />
-                                                    <c-icon type="delete" @c-click="openHandler(ExecutionType.Delete, listItem)" />
+                                                    <c-icon :type="IconType.Edit.name" @c-click="openHandler(ExecutionType.Edit, listItem)" />
+                                                    <c-icon :type="IconType.Delete.name" @c-click="openHandler(ExecutionType.Delete, listItem)" />
                                                 </div>
                                             </div>
                                             <v-divider />
@@ -61,13 +61,12 @@
                     <v-text-field v-model="modalItem.name" :rules="nameRules" label="商品名(必須)" outlined counter="20" />
                     <v-textarea v-model="modalItem.description" label="商品説明" outlined />
                     <v-file-input v-model="uploadFiles" label="商品画像" prepend-icon="mdi-camera" multiple outlined />
-                    <v-container v-if="previewList.length > 0" class="preview mb-4">
-                        <v-row>
-                            <v-col v-for="(previewUrl, index) in previewList" :key="index" class="preview-item" cols="12" sm="4" md="4">
-                                <v-img :src="previewUrl" :alt="`preview${index}`" class="preview-item-image" />
-                            </v-col>
-                        </v-row>
-                    </v-container>
+                    <c-image-list
+                        title="現在の登録"
+                        :registered-list="registeredList"
+                        :preview-list="previewList"
+                        @c-delete-image-handler="deleteImageHandler"
+                    />
                     <v-select
                         v-model="modalItem.accessoryCategory"
                         :items="accessoryCategories"
@@ -108,7 +107,8 @@
 <script lang="ts">
 import { Component, Prop, PropSync, Vue, Watch } from 'nuxt-property-decorator'
 import _ from 'lodash'
-import { ExecutionType, ICategory, IError, IProduct, ISite, newProduct, TExecutionType } from '~/types'
+import { ExecutionType, ICategory, IconType, IError, ImageType, IProduct, ISite, newProduct, TExecutionType, TImageType } from '~/types'
+import { ConfirmState } from '~/store'
 import { min20, required } from '~/methods'
 @Component({})
 export default class CProductList extends Vue {
@@ -118,6 +118,7 @@ export default class CProductList extends Vue {
     @Prop({ type: Array, default: [] }) salesSites!: Array<ISite>
     @Prop({ type: String, default: '' }) type!: string
 
+    IconType: typeof IconType = IconType
     ExecutionType: typeof ExecutionType = ExecutionType
     executionType: TExecutionType = ExecutionType.Create
 
@@ -130,12 +131,19 @@ export default class CProductList extends Vue {
     dialogVisible: boolean = false
     // 通知の表示
     notificationVisible: boolean = false
+    // 確認ダイアログの表示
+    confirmVisible: boolean = true
 
     valid: boolean = true
 
     errors: Array<IError> = []
 
     nameRules = [required, min20]
+
+    // 既存登録リスト
+    get registeredList(): Array<string> {
+        return this.modalItem.productImages.map((i) => i.apiPath)
+    }
 
     // プレビューリスト
     get previewList(): Array<string> {
@@ -242,7 +250,24 @@ export default class CProductList extends Vue {
             }
         }
     }
+
+    async deleteImageHandler(index: number, imageType: TImageType) {
+        if (imageType === ImageType.Registered) {
+            await this.$store.dispatch('confirm', {
+                confirmMessage: '登録画像を削除してもよろしいですか？',
+                confirmAction: () => {
+                    this.$axios.$delete(`product/${this.modalItem.uuid}/product_image/${this.modalItem.productImages[index].uuid}`)
+                },
+                cancelAction: () => {},
+            } as ConfirmState)
+        } else {
+            this.uploadFiles.splice(index, 1)
+        }
+    }
 }
 </script>
 
-<style lang="stylus"></style>
+<style lang="stylus">
+.v-image
+    aspect-ratio 16 / 9
+</style>

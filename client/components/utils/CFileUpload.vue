@@ -28,7 +28,7 @@
 import { Component, Vue, Prop } from 'nuxt-property-decorator'
 
 @Component
-export default class CTeamFileUpload extends Vue {
+export default class CFileUpload extends Vue {
     // アップロードしたファイルのリスト
     files: Array<File> = []
     // 無効状態か否か
