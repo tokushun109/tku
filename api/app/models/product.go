@@ -51,15 +51,15 @@ func GetAllProducts() (products Products) {
 	return products
 }
 
-func GetProduct(uuid string) (product Product) {
-	Db.Preload("AccessoryCategory").
+func GetProduct(uuid string) (product Product, err error) {
+	err = Db.Preload("AccessoryCategory").
 		Preload("ProductImages").
 		Preload("MaterialCategories").
 		Preload("SalesSites").
-		First(&product, "uuid = ?", uuid)
+		First(&product, "uuid = ?", uuid).Error
 
 	setProductImageApiPath(&product)
-	return product
+	return product, err
 }
 
 func ProductUniqueCheck(name string) (isUnique bool, err error) {
@@ -169,9 +169,9 @@ func (product *Product) DeleteProduct() (err error) {
 	return tx.Commit().Error
 }
 
-func GetProductImage(uuid string) (productImage ProductImage) {
-	Db.Limit(1).Find(&productImage, "uuid = ?", uuid)
-	return productImage
+func GetProductImage(uuid string) (productImage ProductImage, err error) {
+	err = Db.First(&productImage, "uuid = ?", uuid).Error
+	return productImage, err
 }
 
 func InsertProductImage(productImage *ProductImage) (err error) {
@@ -183,4 +183,19 @@ func InsertProductImage(productImage *ProductImage) (err error) {
 	productImage.Uuid = uuid
 	err = Db.Create(&productImage).Error
 	return err
+}
+
+func (productImage *ProductImage) DeleteProductImage() (err error) {
+	tx := Db.Begin()
+	if err = tx.Delete(&productImage).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := removeFile(productImage.Path); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit().Error
 }

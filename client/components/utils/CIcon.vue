@@ -1,24 +1,17 @@
 <template>
-    <v-icon @click="$emit('c-click')">{{ getIcon }}</v-icon>
+    <v-icon :color="color" @click="$emit('c-click')">{{ getIcon }}</v-icon>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'nuxt-property-decorator'
-
-interface IIconType {
-    [key: string]: { name: string; icon: string }
-}
-
-const IconType: IIconType = {
-    New: { name: 'new', icon: 'mdi-note-plus' },
-    Edit: { name: 'edit', icon: 'mdi-pencil' },
-    Delete: { name: 'delete', icon: 'mdi-delete' },
-} as const
+import { IconType, TColorType } from '~/types'
 
 @Component
-export default class CMessage extends Vue {
+export default class CIcon extends Vue {
     // アイコンの種類
     @Prop({ type: String, default: IconType.New.name }) type!: string
+    // 色の種類
+    @Prop({ type: String }) color?: TColorType
     // アイコンの取得
     get getIcon(): string {
         let icon = ''

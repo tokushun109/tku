@@ -36,7 +36,13 @@ func getAllProductsHandler(w http.ResponseWriter, r *http.Request) {
 func getProductHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	uuid := vars["product_uuid"]
-	product := models.GetProduct(uuid)
+	product, err := models.GetProduct(uuid)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(product); err != nil {
 		log.Println(err)
@@ -93,11 +99,41 @@ func createProductHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(responseBody)
 }
 
+// 商品の削除
+func deleteProductHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	uuid := vars["product_uuid"]
+
+	product, err := models.GetProduct(uuid)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
+	if err := product.DeleteProduct(); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
+	// responseBodyで処理の成功を返す
+	responseBody := getSuccessResponse()
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(responseBody)
+}
+
 // 商品画像のパスからバイナリデータを返す
 func getProductImageBlobHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	productImageUuid := vars["product_image_uuid"]
-	productImage := models.GetProductImage(productImageUuid)
+	productImage, err := models.GetProductImage(productImageUuid)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
 	file, err := os.Open(productImage.Path)
 	if err != nil {
 		log.Println(err)
@@ -121,7 +157,13 @@ func createProductImageHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	uuid := vars["product_uuid"]
 	// requestのuuidから商品のIDを取得しておく
-	product := models.GetProduct(uuid)
+	product, err := models.GetProduct(uuid)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
 	productId := product.ID
 	i := 0
 	for {
@@ -187,12 +229,23 @@ func createProductImageHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // 商品の削除
-func deleteProductHandler(w http.ResponseWriter, r *http.Request) {
+func deleteProductImageHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	uuid := vars["product_uuid"]
+	productUuid := vars["product_uuid"]
+	productImageUuid := vars["product_image_uuid"]
+	if _, err := models.GetProduct(productUuid); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+	productImage, err := models.GetProductImage(productImageUuid)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
 
-	product := models.GetProduct(uuid)
-	if err := product.DeleteProduct(); err != nil {
+	if err := productImage.DeleteProductImage(); err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return

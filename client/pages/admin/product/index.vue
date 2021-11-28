@@ -13,7 +13,6 @@
 <script lang="ts">
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
-import { min20, required } from '~/methods'
 import { ICategory, IProduct, ISite } from '~/types'
 @Component({
     head: {
@@ -55,11 +54,4 @@ export default class PageAdminProductIndex extends Vue {
 }
 </script>
 
-<style lang="stylus">
-.v-image
-    aspect-ratio 16 / 9
-
-.preview
-    border 1px dashed $light-dark-color
-    border-radius 3px
-</style>
+<style lang="stylus" scoped></style>

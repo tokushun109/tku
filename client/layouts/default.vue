@@ -9,6 +9,7 @@
             <Nuxt />
             <admin-footer />
         </v-app>
+        <c-confirm />
     </div>
 </template>
 
