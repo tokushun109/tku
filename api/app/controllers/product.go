@@ -75,13 +75,6 @@ func createProductHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// データの重複確認
-	if isUnique, err := models.ProductUniqueCheck(product.Name); !isUnique {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
-		return
-	}
-
 	// modelの呼び出し
 	err = models.InsertProduct(&product)
 	if err != nil {
@@ -95,6 +88,45 @@ func createProductHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(responseBody)
+}
+
+// 商品の更新
+func updateProductHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	uuid := vars["product_uuid"]
+
+	reqBody, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
+	var product models.Product
+	if err := json.Unmarshal(reqBody, &product); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
+	// validationの確認
+	validate := validator.New()
+	if errors := validate.Struct(product); errors != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
+		return
+	}
+
+	if err = models.UpdateProduct(&product, uuid); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
+	// responseBodyで処理の成功を返す
+	responseBody := getSuccessResponse()
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(responseBody)
 }

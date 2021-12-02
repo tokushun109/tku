@@ -136,6 +136,153 @@ func InsertProduct(product *Product) (err error) {
 	return tx.Commit().Error
 }
 
+func UpdateProduct(product *Product, uuid string) (err error) {
+	tx := Db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := tx.Error; err != nil {
+		return err
+	}
+
+	err = tx.Model(&product).
+		Omit("AccessoryCategory", "MaterialCategories", "ProductImages", "SalesSites").
+		Where("uuid = ?", uuid).
+		Updates(
+			Product{
+				Name:                product.Name,
+				Description:         product.Description,
+				AccessoryCategoryId: GetAccessoryCategory(product.AccessoryCategory.Uuid).ID,
+			},
+		).
+		Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	registeredProduct, err := GetProduct(uuid)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// 登録されている中間テーブルを全て物理削除する
+	if err = tx.Where("product_id = ?", registeredProduct.ID).
+		Unscoped().
+		Delete(&ProductToMaterialCategory{}).
+		Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// 商品と材料カテゴリーを紐付け
+	var productToMaterialCategories []ProductToMaterialCategory
+	for _, materialCategory := range product.MaterialCategories {
+		productToMaterialCategories = append(
+			productToMaterialCategories,
+			ProductToMaterialCategory{
+				ProductId:          registeredProduct.ID,
+				MaterialCategoryId: GetMaterialCategory(materialCategory.Uuid).ID,
+			},
+		)
+	}
+
+	if len(productToMaterialCategories) > 0 {
+		if err := tx.Create(&productToMaterialCategories).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	// 登録されている中間テーブルを全て物理削除する
+	if err = tx.Where("product_id = ?", registeredProduct.ID).
+		Unscoped().
+		Delete(&ProductToSalesSite{}).
+		Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// 商品と販売サイトを紐付け
+	var productToSalesSites []ProductToSalesSite
+	for _, salesSite := range product.SalesSites {
+		productToSalesSites = append(
+			productToSalesSites,
+			ProductToSalesSite{
+				ProductId:   registeredProduct.ID,
+				SalesSiteId: GetSalesSite(salesSite.Uuid).ID,
+			},
+		)
+	}
+
+	if len(productToSalesSites) > 0 {
+		if err := tx.Create(&productToSalesSites).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	// 残しておく商品画像のuuidリストを作成
+	var leaveProductImageUuids []string
+	for _, productImage := range product.ProductImages {
+		leaveProductImageUuids = append(
+			leaveProductImageUuids, productImage.Uuid,
+		)
+	}
+
+	// 残しておく商品画像の有無で処理を分岐
+	if len(product.ProductImages) == 0 {
+		// 全ての商品画像のファイルを削除する
+		for _, productImage := range product.ProductImages {
+			if err := removeFile(productImage.Path); err != nil {
+				tx.Rollback()
+				return err
+			}
+		}
+
+		// 全ての商品画像のレコードを削除する
+		if err = tx.Where("product_id = ?", registeredProduct.ID).
+			Delete(&ProductImage{}).
+			Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	} else {
+		// 削除する商品画像のリストを取得
+		var deleteProductImages []ProductImage
+		err = tx.Where("product_id = ?", registeredProduct.ID).
+			Where("uuid not in ?", leaveProductImageUuids).
+			Find(&deleteProductImages).Error
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+
+		// 商品画像のファイルを削除する
+		for _, productImage := range deleteProductImages {
+			if err := removeFile(productImage.Path); err != nil {
+				tx.Rollback()
+				return err
+			}
+		}
+
+		// 商品画像のレコードを削除する
+		if err = tx.Where("product_id = ?", registeredProduct.ID).
+			Where("uuid not in ?", leaveProductImageUuids).
+			Delete(&ProductImage{}).
+			Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	return tx.Commit().Error
+}
+
 func (product *Product) DeleteProduct() (err error) {
 	tx := Db.Begin()
 	defer func() {
@@ -149,7 +296,7 @@ func (product *Product) DeleteProduct() (err error) {
 	}
 
 	// 商品を削除する
-	if err = tx.Debug().Select("MaterialCategories", "SalesSites", "ProductImages").Delete(&product).Error; err != nil {
+	if err = tx.Select("MaterialCategories", "SalesSites", "ProductImages").Delete(&product).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
