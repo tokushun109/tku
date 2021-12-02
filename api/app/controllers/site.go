@@ -47,13 +47,6 @@ func createSalesSiteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// データの重複確認
-	if isUnique, err := models.SalesSiteUniqueCheck(salesSite.Name); !isUnique {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
-		return
-	}
-
 	// modelの呼び出し
 	err = models.InsertSalesSite(&salesSite)
 	if err != nil {
@@ -90,13 +83,6 @@ func updateSalesSiteHandler(w http.ResponseWriter, r *http.Request) {
 	// validationの確認
 	validate := validator.New()
 	if err := validate.Struct(sales_site); err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
-		return
-	}
-
-	// データの重複確認
-	if isUnique, err := models.SalesSiteUniqueCheck(sales_site.Name); !isUnique {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
 		return
@@ -166,13 +152,6 @@ func createSkillMarketHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// データの重複確認
-	if isUnique, err := models.SkillMarketUniqueCheck(skillmarket.Name); !isUnique {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
-		return
-	}
-
 	// modelの呼び出し
 	err = models.InsertSkillMarket(&skillmarket)
 	if err != nil {
@@ -208,13 +187,6 @@ func updateSkillMarketHandler(w http.ResponseWriter, r *http.Request) {
 	// validationの確認
 	validate := validator.New()
 	if err := validate.Struct(skill_market); err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
-		return
-	}
-
-	// データの重複確認
-	if isUnique, err := models.SalesSiteUniqueCheck(skill_market.Name); !isUnique {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
 		return
@@ -284,13 +256,6 @@ func createSnsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// データの重複確認
-	if isUnique, err := models.SnsUniqueCheck(sns.Name); !isUnique {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
-		return
-	}
-
 	// modelの呼び出し
 	err = models.InsertSns(&sns)
 	if err != nil {
@@ -326,13 +291,6 @@ func updateSnsHandler(w http.ResponseWriter, r *http.Request) {
 	// validationの確認
 	validate := validator.New()
 	if err := validate.Struct(sns); err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
-		return
-	}
-
-	// データの重複確認
-	if isUnique, err := models.SalesSiteUniqueCheck(sns.Name); !isUnique {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
 		return

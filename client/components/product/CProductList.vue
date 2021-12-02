@@ -231,14 +231,26 @@ export default class CProductList extends Vue {
                 this.errors.push(e.response)
             }
         } else if (this.executionType === ExecutionType.Edit) {
-            // try {
-            //     await this.$axios.$put(`/product/${this.modalItem.uuid}`, this.modalItem)
-            //     this.$emit('c-change')
-            //     this.notificationVisible = true
-            //     this.dialogVisible = false
-            // } catch (e) {
-            //     this.errors.push(e)
-            // }
+            try {
+                await this.$axios.$put(`/product/${this.modalItem.uuid}`, this.modalItem)
+                // 画像を選択していたら、アップロードを行う
+                if (this.uploadFiles.length > 0) {
+                    const params = new FormData()
+                    this.uploadFiles.forEach((file, index) => {
+                        params.append(`file${index}`, file)
+                    })
+                    await this.$axios.$post(`/product/${this.modalItem.uuid}/product_image`, params, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    })
+                }
+                this.$emit('c-change')
+                this.notificationVisible = true
+                this.dialogVisible = false
+            } catch (e) {
+                this.errors.push(e.response)
+            }
         } else if (this.executionType === ExecutionType.Delete) {
             try {
                 await this.$axios.$delete(`/product/${this.modalItem.uuid}`)
@@ -251,15 +263,9 @@ export default class CProductList extends Vue {
         }
     }
 
-    async deleteImageHandler(index: number, imageType: TImageType) {
+    deleteImageHandler(index: number, imageType: TImageType) {
         if (imageType === ImageType.Registered) {
-            await this.$store.dispatch('confirm', {
-                confirmMessage: '登録画像を削除してもよろしいですか？',
-                confirmAction: () => {
-                    this.$axios.$delete(`product/${this.modalItem.uuid}/product_image/${this.modalItem.productImages[index].uuid}`)
-                },
-                cancelAction: () => {},
-            } as ConfirmState)
+            this.modalItem.productImages.splice(index, 1)
         } else {
             this.uploadFiles.splice(index, 1)
         }

@@ -47,13 +47,6 @@ func createAccessoryCategoryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// データの重複確認
-	if isUnique, err := models.AccessoryCategoryUniqueCheck(accessoryCategory.Name); !isUnique {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
-		return
-	}
-
 	if err = models.InsertAccessoryCategory(&accessoryCategory); err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
@@ -88,13 +81,6 @@ func updateAccessoryCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	// validationの確認
 	validate := validator.New()
 	if errors := validate.Struct(accessoryCategory); errors != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
-		return
-	}
-
-	// データの重複確認
-	if isUnique, err := models.AccessoryCategoryUniqueCheck(accessoryCategory.Name); !isUnique {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
 		return
@@ -165,13 +151,6 @@ func createMaterialCategoryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// データの重複確認
-	if isUnique, err := models.MaterialCategoryUniqueCheck(materialCategory.Name); !isUnique {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
-		return
-	}
-
 	if err = models.InsertMaterialCategory(&materialCategory); err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
@@ -206,13 +185,6 @@ func updateMaterialCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	// validationの確認
 	validate := validator.New()
 	if err := validate.Struct(materialCategory); err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
-		return
-	}
-
-	// データの重複確認
-	if isUnique, err := models.MaterialCategoryUniqueCheck(materialCategory.Name); !isUnique {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
 		return
