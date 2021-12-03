@@ -80,6 +80,7 @@ export default {
                     warning: '#fff9c4',
                     info: '#a7ffeb',
                     success: '#b3e5fc',
+                    error: '#ff80ab',
                 },
             },
         },

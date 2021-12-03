@@ -1,13 +1,13 @@
 <template>
-    <c-page></c-page>
+    <v-main> </v-main>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'nuxt-property-decorator'
-import { ITable } from '~/types'
+import {} from '~/types'
 @Component({
     head: {
-        title: 'テーブル一覧',
+        title: 'ダッシュボード',
     },
 })
 export default class PageAdminIndex extends Vue {}
