@@ -29,7 +29,7 @@ export default class PageAdminCategoryIndex extends Vue {
 
     async asyncData({ app }: Context) {
         try {
-            const accessoryCategories = await app.$axios.$get(`/accessory_category`)
+            const accessoryCategories = await app.$axios.$get(`/category`)
             const tags = await app.$axios.$get(`/tag`)
             return { accessoryCategories, tags }
         } catch (e) {
@@ -39,7 +39,7 @@ export default class PageAdminCategoryIndex extends Vue {
 
     async loadingCategory(type: string) {
         if (type === CategoryType.Accessory.name) {
-            this.accessoryCategories = await this.$axios.$get(`/accessory_category`)
+            this.accessoryCategories = await this.$axios.$get(`/category`)
         } else if (type === CategoryType.Tag.name) {
             this.tags = await this.$axios.$get(`/tag`)
         }

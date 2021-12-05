@@ -62,7 +62,7 @@ func createAccessoryCategoryHandler(w http.ResponseWriter, r *http.Request) {
 // カテゴリーの更新
 func updateAccessoryCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	uuid := vars["accessory_category_uuid"]
+	uuid := vars["category_uuid"]
 
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -101,7 +101,7 @@ func updateAccessoryCategoryHandler(w http.ResponseWriter, r *http.Request) {
 // カテゴリーの削除
 func deleteAccessoryCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	uuid := vars["accessory_category_uuid"]
+	uuid := vars["category_uuid"]
 
 	accessoryCategory := models.GetAccessoryCategory(uuid)
 	if err := accessoryCategory.DeleteAccessoryCategory(); err != nil {
