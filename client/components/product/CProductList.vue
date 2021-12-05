@@ -237,6 +237,7 @@ export default class CProductList extends Vue {
     }
 
     async confirmHandler() {
+        this.errors = []
         if (this.executionType === ExecutionType.Create) {
             try {
                 const createProduct = await this.$axios.$post(`/product`, this.modalItem)

@@ -130,6 +130,7 @@ export default class CClassificationList extends Vue {
     }
 
     async confirmHandler() {
+        this.errors = []
         if (this.executionType === ExecutionType.Create) {
             try {
                 if (this.categoryTypeValue === CategoryType.Category.value) {

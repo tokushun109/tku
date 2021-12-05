@@ -133,6 +133,7 @@ export default class CSiteList extends Vue {
     }
 
     async confirmHandler() {
+        this.errors = []
         if (this.executionType === ExecutionType.Create) {
             try {
                 if (this.siteTypeValue === SiteType.Sns.value) {
