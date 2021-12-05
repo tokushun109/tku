@@ -118,9 +118,9 @@ func deleteAccessoryCategoryHandler(w http.ResponseWriter, r *http.Request) {
 
 // タグ一覧を取得
 func getAllTagsHandler(w http.ResponseWriter, r *http.Request) {
-	materialCategories := models.GetAllTags()
+	tags := models.GetAllTags()
 	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(materialCategories); err != nil {
+	if err := json.NewEncoder(w).Encode(tags); err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return

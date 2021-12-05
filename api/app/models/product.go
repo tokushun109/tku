@@ -12,7 +12,7 @@ type Product struct {
 	Description         string            `json:"description"`
 	AccessoryCategoryId *uint             `json:"-"`
 	AccessoryCategory   AccessoryCategory `json:"accessoryCategory" validate:"-"`
-	Tags                []Tag             `gorm:"many2many:product_to_tag" json:"materialCategories"`
+	Tags                []Tag             `gorm:"many2many:product_to_tag" json:"tags"`
 	ProductImages       []*ProductImage   `gorm:"hasmany:product_image" json:"productImages"`
 	SalesSites          []SalesSite       `gorm:"many2many:product_to_sales_site" json:"salesSites"`
 }

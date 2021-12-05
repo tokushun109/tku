@@ -3,7 +3,7 @@
         <c-product-list
             :items="products"
             :accessory-categories="accessoryCategories"
-            :material-categories="materialCategories"
+            :material-categories="tags"
             :sales-sites="salesSites"
             @c-change="loadingProduct"
         />
@@ -23,7 +23,7 @@ export default class PageAdminProductIndex extends Vue {
     products: Array<IProduct> = []
 
     accessoryCategories: Array<ICategory> = []
-    materialCategories: Array<ICategory> = []
+    tags: Array<ICategory> = []
     salesSites: Array<ISite> = []
 
     // 新規作成ダイアログの表示
@@ -32,11 +32,11 @@ export default class PageAdminProductIndex extends Vue {
         try {
             const products = await app.$axios.$get(`/product`)
             const accessoryCategories = await app.$axios.$get(`/accessory_category`)
-            const materialCategories = await app.$axios.$get(`/tag`)
+            const tags = await app.$axios.$get(`/tag`)
             const salesSites = await app.$axios.$get(`/sales_site`)
-            return { products, accessoryCategories, materialCategories, salesSites }
+            return { products, accessoryCategories, tags, salesSites }
         } catch (e) {
-            return { products: [], accessoryCategories: [], materialCategories: [], salesSites: [] }
+            return { products: [], accessoryCategories: [], tags: [], salesSites: [] }
         }
     }
 

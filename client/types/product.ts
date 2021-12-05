@@ -10,7 +10,7 @@ export interface IProduct {
     name: string
     description: string
     accessoryCategory: ICategory | null
-    materialCategories: Array<ICategory>
+    tags: Array<ICategory>
     productImages: Array<IProductImage>
     salesSites: Array<ISite>
 }

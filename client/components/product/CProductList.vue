@@ -76,16 +76,7 @@
                         label="アクセサリーカテゴリー"
                         outlined
                     />
-                    <v-select
-                        v-model="modalItem.materialCategories"
-                        :items="materialCategories"
-                        item-text="name"
-                        return-object
-                        chips
-                        multiple
-                        label="タグ"
-                        outlined
-                    />
+                    <v-select v-model="modalItem.tags" :items="tags" item-text="name" return-object chips multiple label="タグ" outlined />
                     <v-select
                         v-model="modalItem.salesSites"
                         :items="salesSites"
@@ -114,7 +105,7 @@ import { min20, required } from '~/methods'
 export default class CProductList extends Vue {
     @PropSync('items') listItems!: Array<IProduct>
     @Prop({ type: Array, default: [] }) accessoryCategories!: Array<ICategory>
-    @Prop({ type: Array, default: [] }) materialCategories!: Array<ICategory>
+    @Prop({ type: Array, default: [] }) tags!: Array<ICategory>
     @Prop({ type: Array, default: [] }) salesSites!: Array<ISite>
     @Prop({ type: String, default: '' }) type!: string
 

@@ -5,7 +5,7 @@
                 <c-category-list type="accessory" :items="accessoryCategories" @c-change="loadingCategory" />
             </v-col>
             <v-col cols="12" sm="12" md="6">
-                <c-category-list type="material" :items="materialCategories" @c-change="loadingCategory" />
+                <c-category-list type="material" :items="tags" @c-change="loadingCategory" />
             </v-col>
         </v-row>
     </v-main>
@@ -25,15 +25,15 @@ export default class PageAdminCategoryIndex extends Vue {
     accessoryCategories: Array<ICategory> = []
 
     // タグ一覧
-    materialCategories: Array<ICategory> = []
+    tags: Array<ICategory> = []
 
     async asyncData({ app }: Context) {
         try {
             const accessoryCategories = await app.$axios.$get(`/accessory_category`)
-            const materialCategories = await app.$axios.$get(`/tag`)
-            return { accessoryCategories, materialCategories }
+            const tags = await app.$axios.$get(`/tag`)
+            return { accessoryCategories, tags }
         } catch (e) {
-            return { accessoryCategories: [], materialCategories: [] }
+            return { accessoryCategories: [], tags: [] }
         }
     }
 
@@ -41,7 +41,7 @@ export default class PageAdminCategoryIndex extends Vue {
         if (type === CategoryType.Accessory.name) {
             this.accessoryCategories = await this.$axios.$get(`/accessory_category`)
         } else if (type === CategoryType.Material.name) {
-            this.materialCategories = await this.$axios.$get(`/tag`)
+            this.tags = await this.$axios.$get(`/tag`)
         }
     }
 }

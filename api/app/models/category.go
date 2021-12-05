@@ -63,9 +63,9 @@ func (accessoryCategory *AccessoryCategory) DeleteAccessoryCategory() (err error
 	return err
 }
 
-func GetAllTags() (materialCategories Tags) {
-	Db.Find(&materialCategories)
-	return materialCategories
+func GetAllTags() (tags Tags) {
+	Db.Find(&tags)
+	return tags
 }
 
 func GetTag(uuid string) (tag Tag) {

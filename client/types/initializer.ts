@@ -13,7 +13,7 @@ export function newProduct(): IProduct {
         name: '',
         description: '',
         accessoryCategory: null,
-        materialCategories: [],
+        tags: [],
         productImages: [],
         salesSites: [],
     }
