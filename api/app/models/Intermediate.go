@@ -1,9 +1,9 @@
 package models
 
-type ProductToMaterialCategory struct {
+type ProductToTag struct {
 	DefaultModel
-	ProductId          *uint `json:"-"`
-	MaterialCategoryId *uint `json:"-"`
+	ProductId *uint `json:"-"`
+	TagId     *uint `json:"-"`
 }
 
 type ProductToSalesSite struct {

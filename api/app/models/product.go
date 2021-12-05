@@ -7,14 +7,14 @@ import (
 
 type Product struct {
 	DefaultModel
-	Uuid                string             `json:"uuid"`
-	Name                string             `json:"name" validate:"min=1,max=20"`
-	Description         string             `json:"description"`
-	AccessoryCategoryId *uint              `json:"-"`
-	AccessoryCategory   AccessoryCategory  `json:"accessoryCategory" validate:"-"`
-	MaterialCategories  []MaterialCategory `gorm:"many2many:product_to_tag" json:"materialCategories"`
-	ProductImages       []*ProductImage    `gorm:"hasmany:product_image" json:"productImages"`
-	SalesSites          []SalesSite        `gorm:"many2many:product_to_sales_site" json:"salesSites"`
+	Uuid                string            `json:"uuid"`
+	Name                string            `json:"name" validate:"min=1,max=20"`
+	Description         string            `json:"description"`
+	AccessoryCategoryId *uint             `json:"-"`
+	AccessoryCategory   AccessoryCategory `json:"accessoryCategory" validate:"-"`
+	MaterialCategories  []Tag             `gorm:"many2many:product_to_tag" json:"materialCategories"`
+	ProductImages       []*ProductImage   `gorm:"hasmany:product_image" json:"productImages"`
+	SalesSites          []SalesSite       `gorm:"many2many:product_to_sales_site" json:"salesSites"`
 }
 
 type Products []Product
@@ -98,14 +98,14 @@ func InsertProduct(product *Product) (err error) {
 		return err
 	}
 
-	var productToMaterialCategories []ProductToMaterialCategory
+	var productToMaterialCategories []ProductToTag
 	// 商品とタグを紐付け
 	for _, materialCategory := range product.MaterialCategories {
 		productToMaterialCategories = append(
 			productToMaterialCategories,
-			ProductToMaterialCategory{
-				ProductId:          product.ID,
-				MaterialCategoryId: GetMaterialCategory(materialCategory.Uuid).ID,
+			ProductToTag{
+				ProductId: product.ID,
+				TagId:     GetTag(materialCategory.Uuid).ID,
 			},
 		)
 	}
@@ -173,20 +173,20 @@ func UpdateProduct(product *Product, uuid string) (err error) {
 	// 登録されている中間テーブルを全て物理削除する
 	if err = tx.Where("product_id = ?", registeredProduct.ID).
 		Unscoped().
-		Delete(&ProductToMaterialCategory{}).
+		Delete(&ProductToTag{}).
 		Error; err != nil {
 		tx.Rollback()
 		return err
 	}
 
 	// 商品とタグを紐付け
-	var productToMaterialCategories []ProductToMaterialCategory
+	var productToMaterialCategories []ProductToTag
 	for _, materialCategory := range product.MaterialCategories {
 		productToMaterialCategories = append(
 			productToMaterialCategories,
-			ProductToMaterialCategory{
-				ProductId:          registeredProduct.ID,
-				MaterialCategoryId: GetMaterialCategory(materialCategory.Uuid).ID,
+			ProductToTag{
+				ProductId: registeredProduct.ID,
+				TagId:     GetTag(materialCategory.Uuid).ID,
 			},
 		)
 	}

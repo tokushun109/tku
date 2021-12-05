@@ -12,13 +12,13 @@ type AccessoryCategory struct {
 
 type AccessoryCategories []AccessoryCategory
 
-type MaterialCategory struct {
+type Tag struct {
 	DefaultModel
 	Uuid string `json:"uuid"`
 	Name string `json:"name" validate:"min=1,max=20"`
 }
 
-type MaterialCategories []MaterialCategory
+type MaterialCategories []Tag
 
 func GetAllAccessoryCategories() (accessoryCategories AccessoryCategories) {
 	Db.Find(&accessoryCategories)
@@ -68,13 +68,13 @@ func GetAllMaterialCategories() (materialCategories MaterialCategories) {
 	return materialCategories
 }
 
-func GetMaterialCategory(uuid string) (materialCategory MaterialCategory) {
+func GetTag(uuid string) (materialCategory Tag) {
 	Db.Limit(1).Find(&materialCategory, "uuid = ?", uuid)
 	return materialCategory
 }
 
-func MaterialCategoryUniqueCheck(name string) (isUnique bool, err error) {
-	var materialCategory MaterialCategory
+func TagUniqueCheck(name string) (isUnique bool, err error) {
+	var materialCategory Tag
 	Db.Limit(1).Find(&materialCategory, "name = ?", name)
 	isUnique = materialCategory.ID == nil
 	if !isUnique {
@@ -83,7 +83,7 @@ func MaterialCategoryUniqueCheck(name string) (isUnique bool, err error) {
 	return isUnique, err
 }
 
-func InsertMaterialCategory(materialCategory *MaterialCategory) (err error) {
+func InsertTag(materialCategory *Tag) (err error) {
 	// uuidの設定
 	uuid, err := GenerateUuid()
 	if err != nil {
@@ -94,14 +94,14 @@ func InsertMaterialCategory(materialCategory *MaterialCategory) (err error) {
 	return err
 }
 
-func UpdateMaterialCategory(materialCategory *MaterialCategory, uuid string) (err error) {
+func UpdateTag(materialCategory *Tag, uuid string) (err error) {
 	err = Db.Model(&materialCategory).Where("uuid = ?", uuid).Updates(
-		MaterialCategory{Name: materialCategory.Name},
+		Tag{Name: materialCategory.Name},
 	).Error
 	return err
 }
 
-func (materialCategory *MaterialCategory) DeleteMaterialCategory() (err error) {
+func (materialCategory *Tag) DeleteTag() (err error) {
 	err = Db.Delete(&materialCategory).Error
 	return err
 }
