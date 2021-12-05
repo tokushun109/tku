@@ -38,7 +38,7 @@ export default class PageAdminCategoryIndex extends Vue {
     }
 
     async loadingCategory(type: string) {
-        if (type === CategoryType.Accessory.name) {
+        if (type === CategoryType.Category.name) {
             this.categories = await this.$axios.$get(`/category`)
         } else if (type === CategoryType.Tag.name) {
             this.tags = await this.$axios.$get(`/tag`)

@@ -132,9 +132,9 @@ export default class CCategoryList extends Vue {
     async confirmHandler() {
         if (this.executionType === ExecutionType.Create) {
             try {
-                if (this.categoryTypeValue === CategoryType.Accessory.value) {
+                if (this.categoryTypeValue === CategoryType.Category.value) {
                     await this.$axios.$post(`/category`, this.modalItem)
-                    this.$emit('c-change', CategoryType.Accessory.name)
+                    this.$emit('c-change', CategoryType.Category.name)
                 } else if (this.categoryTypeValue === CategoryType.Tag.value) {
                     await this.$axios.$post(`/tag`, this.modalItem)
                     this.$emit('c-change', CategoryType.Tag.name)
@@ -146,9 +146,9 @@ export default class CCategoryList extends Vue {
             }
         } else if (this.executionType === ExecutionType.Edit) {
             try {
-                if (this.categoryTypeValue === CategoryType.Accessory.value) {
+                if (this.categoryTypeValue === CategoryType.Category.value) {
                     await this.$axios.$put(`/category/${this.modalItem.uuid}`, this.modalItem)
-                    this.$emit('c-change', CategoryType.Accessory.name)
+                    this.$emit('c-change', CategoryType.Category.name)
                 } else if (this.categoryTypeValue === CategoryType.Tag.value) {
                     await this.$axios.$put(`/tag/${this.modalItem.uuid}`, this.modalItem)
                     this.$emit('c-change', CategoryType.Tag.name)
@@ -160,9 +160,9 @@ export default class CCategoryList extends Vue {
             }
         } else if (this.executionType === ExecutionType.Delete) {
             try {
-                if (this.categoryTypeValue === CategoryType.Accessory.value) {
+                if (this.categoryTypeValue === CategoryType.Category.value) {
                     await this.$axios.$delete(`/category/${this.modalItem.uuid}`)
-                    this.$emit('c-change', CategoryType.Accessory.name)
+                    this.$emit('c-change', CategoryType.Category.name)
                 } else if (this.categoryTypeValue === CategoryType.Tag.value) {
                     await this.$axios.$delete(`/tag/${this.modalItem.uuid}`)
                     this.$emit('c-change', CategoryType.Tag.name)
