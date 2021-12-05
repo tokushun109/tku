@@ -20,9 +20,9 @@ type Tag struct {
 
 type Tags []Tag
 
-func GetAllCategories() (accessoryCategories Categories) {
-	Db.Find(&accessoryCategories)
-	return accessoryCategories
+func GetAllCategories() (categories Categories) {
+	Db.Find(&categories)
+	return categories
 }
 
 func GetCategory(uuid string) (category Category) {

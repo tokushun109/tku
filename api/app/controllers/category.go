@@ -14,9 +14,9 @@ import (
 
 // カテゴリー一覧を取得
 func getAllCategoriesHandler(w http.ResponseWriter, r *http.Request) {
-	accessoryCategories := models.GetAllCategories()
+	categories := models.GetAllCategories()
 	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(accessoryCategories); err != nil {
+	if err := json.NewEncoder(w).Encode(categories); err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return

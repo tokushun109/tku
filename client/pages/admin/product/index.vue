@@ -1,12 +1,6 @@
 <template>
     <v-main class="grey lighten-4">
-        <c-product-list
-            :items="products"
-            :accessory-categories="accessoryCategories"
-            :tags="tags"
-            :sales-sites="salesSites"
-            @c-change="loadingProduct"
-        />
+        <c-product-list :items="products" :accessory-categories="categories" :tags="tags" :sales-sites="salesSites" @c-change="loadingProduct" />
     </v-main>
 </template>
 
@@ -22,7 +16,7 @@ import { ICategory, IProduct, ISite } from '~/types'
 export default class PageAdminProductIndex extends Vue {
     products: Array<IProduct> = []
 
-    accessoryCategories: Array<ICategory> = []
+    categories: Array<ICategory> = []
     tags: Array<ICategory> = []
     salesSites: Array<ISite> = []
 
@@ -31,12 +25,12 @@ export default class PageAdminProductIndex extends Vue {
     async asyncData({ app }: Context) {
         try {
             const products = await app.$axios.$get(`/product`)
-            const accessoryCategories = await app.$axios.$get(`/category`)
+            const categories = await app.$axios.$get(`/category`)
             const tags = await app.$axios.$get(`/tag`)
             const salesSites = await app.$axios.$get(`/sales_site`)
-            return { products, accessoryCategories, tags, salesSites }
+            return { products, categories, tags, salesSites }
         } catch (e) {
-            return { products: [], accessoryCategories: [], tags: [], salesSites: [] }
+            return { products: [], categories: [], tags: [], salesSites: [] }
         }
     }
 

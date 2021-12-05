@@ -67,15 +67,7 @@
                         :preview-list="previewList"
                         @c-delete-image-handler="deleteImageHandler"
                     />
-                    <v-select
-                        v-model="modalItem.category"
-                        :items="accessoryCategories"
-                        item-text="name"
-                        return-object
-                        chips
-                        label="カテゴリー"
-                        outlined
-                    />
+                    <v-select v-model="modalItem.category" :items="categories" item-text="name" return-object chips label="カテゴリー" outlined />
                     <v-select v-model="modalItem.tags" :items="tags" item-text="name" return-object chips multiple label="タグ" outlined />
                     <v-select
                         v-model="modalItem.salesSites"
@@ -104,7 +96,7 @@ import { min20, required } from '~/methods'
 @Component({})
 export default class CProductList extends Vue {
     @PropSync('items') listItems!: Array<IProduct>
-    @Prop({ type: Array, default: [] }) accessoryCategories!: Array<ICategory>
+    @Prop({ type: Array, default: [] }) categories!: Array<ICategory>
     @Prop({ type: Array, default: [] }) tags!: Array<ICategory>
     @Prop({ type: Array, default: [] }) salesSites!: Array<ISite>
     @Prop({ type: String, default: '' }) type!: string

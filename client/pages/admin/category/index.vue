@@ -2,7 +2,7 @@
     <v-main class="grey lighten-4">
         <v-row>
             <v-col cols="12" sm="12" md="6">
-                <c-category-list type="accessory" :items="accessoryCategories" @c-change="loadingCategory" />
+                <c-category-list type="accessory" :items="categories" @c-change="loadingCategory" />
             </v-col>
             <v-col cols="12" sm="12" md="6">
                 <c-category-list type="tag" :items="tags" @c-change="loadingCategory" />
@@ -22,24 +22,24 @@ import { ICategory, CategoryType } from '~/types'
 })
 export default class PageAdminCategoryIndex extends Vue {
     // カテゴリー一覧
-    accessoryCategories: Array<ICategory> = []
+    categories: Array<ICategory> = []
 
     // タグ一覧
     tags: Array<ICategory> = []
 
     async asyncData({ app }: Context) {
         try {
-            const accessoryCategories = await app.$axios.$get(`/category`)
+            const categories = await app.$axios.$get(`/category`)
             const tags = await app.$axios.$get(`/tag`)
-            return { accessoryCategories, tags }
+            return { categories, tags }
         } catch (e) {
-            return { accessoryCategories: [], tags: [] }
+            return { categories: [], tags: [] }
         }
     }
 
     async loadingCategory(type: string) {
         if (type === CategoryType.Accessory.name) {
-            this.accessoryCategories = await this.$axios.$get(`/category`)
+            this.categories = await this.$axios.$get(`/category`)
         } else if (type === CategoryType.Tag.name) {
             this.tags = await this.$axios.$get(`/tag`)
         }
