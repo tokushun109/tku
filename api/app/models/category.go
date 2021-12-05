@@ -68,40 +68,40 @@ func GetAllTags() (materialCategories Tags) {
 	return materialCategories
 }
 
-func GetTag(uuid string) (materialCategory Tag) {
-	Db.Limit(1).Find(&materialCategory, "uuid = ?", uuid)
-	return materialCategory
+func GetTag(uuid string) (tag Tag) {
+	Db.Limit(1).Find(&tag, "uuid = ?", uuid)
+	return tag
 }
 
 func TagUniqueCheck(name string) (isUnique bool, err error) {
-	var materialCategory Tag
-	Db.Limit(1).Find(&materialCategory, "name = ?", name)
-	isUnique = materialCategory.ID == nil
+	var tag Tag
+	Db.Limit(1).Find(&tag, "name = ?", name)
+	isUnique = tag.ID == nil
 	if !isUnique {
 		err = errors.New("name is duplicate")
 	}
 	return isUnique, err
 }
 
-func InsertTag(materialCategory *Tag) (err error) {
+func InsertTag(tag *Tag) (err error) {
 	// uuidの設定
 	uuid, err := GenerateUuid()
 	if err != nil {
 		return err
 	}
-	materialCategory.Uuid = uuid
-	err = Db.Create(&materialCategory).Error
+	tag.Uuid = uuid
+	err = Db.Create(&tag).Error
 	return err
 }
 
-func UpdateTag(materialCategory *Tag, uuid string) (err error) {
-	err = Db.Model(&materialCategory).Where("uuid = ?", uuid).Updates(
-		Tag{Name: materialCategory.Name},
+func UpdateTag(tag *Tag, uuid string) (err error) {
+	err = Db.Model(&tag).Where("uuid = ?", uuid).Updates(
+		Tag{Name: tag.Name},
 	).Error
 	return err
 }
 
-func (materialCategory *Tag) DeleteTag() (err error) {
-	err = Db.Delete(&materialCategory).Error
+func (tag *Tag) DeleteTag() (err error) {
+	err = Db.Delete(&tag).Error
 	return err
 }

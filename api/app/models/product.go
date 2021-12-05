@@ -100,12 +100,12 @@ func InsertProduct(product *Product) (err error) {
 
 	var productToTagList []ProductToTag
 	// 商品とタグを紐付け
-	for _, materialCategory := range product.Tags {
+	for _, tag := range product.Tags {
 		productToTagList = append(
 			productToTagList,
 			ProductToTag{
 				ProductId: product.ID,
-				TagId:     GetTag(materialCategory.Uuid).ID,
+				TagId:     GetTag(tag.Uuid).ID,
 			},
 		)
 	}
@@ -181,12 +181,12 @@ func UpdateProduct(product *Product, uuid string) (err error) {
 
 	// 商品とタグを紐付け
 	var productToTagList []ProductToTag
-	for _, materialCategory := range product.Tags {
+	for _, tag := range product.Tags {
 		productToTagList = append(
 			productToTagList,
 			ProductToTag{
 				ProductId: registeredProduct.ID,
-				TagId:     GetTag(materialCategory.Uuid).ID,
+				TagId:     GetTag(tag.Uuid).ID,
 			},
 		)
 	}

@@ -136,8 +136,8 @@ func createTagHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var materialCategory models.Tag
-	if err := json.Unmarshal(reqBody, &materialCategory); err != nil {
+	var tag models.Tag
+	if err := json.Unmarshal(reqBody, &tag); err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
@@ -145,13 +145,13 @@ func createTagHandler(w http.ResponseWriter, r *http.Request) {
 
 	// validationの確認
 	validate := validator.New()
-	if err := validate.Struct(materialCategory); err != nil {
+	if err := validate.Struct(tag); err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
 		return
 	}
 
-	if err = models.InsertTag(&materialCategory); err != nil {
+	if err = models.InsertTag(&tag); err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
 		return
@@ -175,8 +175,8 @@ func updateTagHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var materialCategory models.Tag
-	if err := json.Unmarshal(reqBody, &materialCategory); err != nil {
+	var tag models.Tag
+	if err := json.Unmarshal(reqBody, &tag); err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
@@ -184,13 +184,13 @@ func updateTagHandler(w http.ResponseWriter, r *http.Request) {
 
 	// validationの確認
 	validate := validator.New()
-	if err := validate.Struct(materialCategory); err != nil {
+	if err := validate.Struct(tag); err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
 		return
 	}
 
-	if err = models.UpdateTag(&materialCategory, uuid); err != nil {
+	if err = models.UpdateTag(&tag, uuid); err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
 		return
@@ -207,8 +207,8 @@ func deleteTagHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	uuid := vars["tag_uuid"]
 
-	materialCategory := models.GetTag(uuid)
-	if err := materialCategory.DeleteTag(); err != nil {
+	tag := models.GetTag(uuid)
+	if err := tag.DeleteTag(); err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return

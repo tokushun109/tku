@@ -17,9 +17,9 @@ func main() {
 	fmt.Println("accessory_categoryを作成しました")
 
 	// tag
-	var materialCategory models.Tag
-	materialCategory.Name = "test_tag"
-	if err := models.InsertTag(&materialCategory); err != nil {
+	var tag models.Tag
+	tag.Name = "test_tag"
+	if err := models.InsertTag(&tag); err != nil {
 		log.Fatalln(err)
 	}
 	fmt.Println("tagを作成しました")
@@ -56,7 +56,7 @@ func main() {
 	product.Name = "test_product"
 	product.Description = "test_descriptiontest_descriptiontest_descriptiontest_descriptiontest_description"
 	product.AccessoryCategory = accessoryCategory
-	product.Tags = []models.Tag{materialCategory}
+	product.Tags = []models.Tag{tag}
 	product.SalesSites = []models.SalesSite{salesSite}
 	if err := models.InsertProduct(&product); err != nil {
 		log.Fatalln(err)
