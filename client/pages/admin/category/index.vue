@@ -2,7 +2,7 @@
     <v-main class="grey lighten-4">
         <v-row>
             <v-col cols="12" sm="12" md="6">
-                <c-category-list type="accessory" :items="categories" @c-change="loadingCategory" />
+                <c-category-list type="category" :items="categories" @c-change="loadingCategory" />
             </v-col>
             <v-col cols="12" sm="12" md="6">
                 <c-category-list type="tag" :items="tags" @c-change="loadingCategory" />
