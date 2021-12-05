@@ -20,7 +20,7 @@ import { IClassification, CategoryType } from '~/types'
         title: '商品一覧',
     },
 })
-export default class PageAdminCategoryIndex extends Vue {
+export default class PageAdminClassificationIndex extends Vue {
     // カテゴリー一覧
     categories: Array<IClassification> = []
 
