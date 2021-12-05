@@ -53,9 +53,9 @@ func StartMainServer() error {
 	r.HandleFunc("/api/product/{product_uuid}/product_image/{product_image_uuid}", deleteProductImageHandler).Methods("DELETE")
 	// カテゴリー
 	r.HandleFunc("/api/category", getAllAccessoryCategoriesHandler).Methods("GET")
-	r.HandleFunc("/api/category", createAccessoryCategoryHandler).Methods("POST")
-	r.HandleFunc("/api/category/{category_uuid}", updateAccessoryCategoryHandler).Methods("PUT")
-	r.HandleFunc("/api/category/{category_uuid}", deleteAccessoryCategoryHandler).Methods("DELETE")
+	r.HandleFunc("/api/category", createCategoryHandler).Methods("POST")
+	r.HandleFunc("/api/category/{category_uuid}", updateCategoryHandler).Methods("PUT")
+	r.HandleFunc("/api/category/{category_uuid}", deleteCategoryHandler).Methods("DELETE")
 	// タグ
 	r.HandleFunc("/api/tag", getAllTagsHandler).Methods("GET")
 	r.HandleFunc("/api/tag", createTagHandler).Methods("POST")

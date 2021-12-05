@@ -7,14 +7,14 @@ import (
 
 type Product struct {
 	DefaultModel
-	Uuid                string            `json:"uuid"`
-	Name                string            `json:"name" validate:"min=1,max=20"`
-	Description         string            `json:"description"`
-	AccessoryCategoryId *uint             `json:"-"`
-	AccessoryCategory   AccessoryCategory `json:"accessoryCategory" validate:"-"`
-	Tags                []Tag             `gorm:"many2many:product_to_tag" json:"tags"`
-	ProductImages       []*ProductImage   `gorm:"hasmany:product_image" json:"productImages"`
-	SalesSites          []SalesSite       `gorm:"many2many:product_to_sales_site" json:"salesSites"`
+	Uuid          string          `json:"uuid"`
+	Name          string          `json:"name" validate:"min=1,max=20"`
+	Description   string          `json:"description"`
+	CategoryId    *uint           `json:"-"`
+	Category      Category        `json:"accessoryCategory" validate:"-"`
+	Tags          []Tag           `gorm:"many2many:product_to_tag" json:"tags"`
+	ProductImages []*ProductImage `gorm:"hasmany:product_image" json:"productImages"`
+	SalesSites    []SalesSite     `gorm:"many2many:product_to_sales_site" json:"salesSites"`
 }
 
 type Products []Product
@@ -40,7 +40,7 @@ func setProductImageApiPath(product *Product) {
 }
 
 func GetAllProducts() (products Products) {
-	Db.Preload("AccessoryCategory").
+	Db.Preload("Category").
 		Preload("ProductImages").
 		Preload("Tags").
 		Preload("SalesSites").
@@ -52,7 +52,7 @@ func GetAllProducts() (products Products) {
 }
 
 func GetProduct(uuid string) (product Product, err error) {
-	err = Db.Preload("AccessoryCategory").
+	err = Db.Preload("Category").
 		Preload("ProductImages").
 		Preload("Tags").
 		Preload("SalesSites").
@@ -91,9 +91,9 @@ func InsertProduct(product *Product) (err error) {
 	}
 	product.Uuid = uuid
 	// カテゴリーの設定
-	accesstoryCategory := GetAccessoryCategory(product.AccessoryCategory.Uuid)
-	product.AccessoryCategoryId = accesstoryCategory.ID
-	if err := tx.Omit("AccessoryCategory", "Tags", "ProductImages", "SalesSites").Create(&product).Error; err != nil {
+	accesstoryCategory := GetCategory(product.Category.Uuid)
+	product.CategoryId = accesstoryCategory.ID
+	if err := tx.Omit("Category", "Tags", "ProductImages", "SalesSites").Create(&product).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -149,13 +149,13 @@ func UpdateProduct(product *Product, uuid string) (err error) {
 	}
 
 	err = tx.Model(&product).
-		Omit("AccessoryCategory", "Tags", "ProductImages", "SalesSites").
+		Omit("Category", "Tags", "ProductImages", "SalesSites").
 		Where("uuid = ?", uuid).
 		Updates(
 			Product{
-				Name:                product.Name,
-				Description:         product.Description,
-				AccessoryCategoryId: GetAccessoryCategory(product.AccessoryCategory.Uuid).ID,
+				Name:        product.Name,
+				Description: product.Description,
+				CategoryId:  GetCategory(product.Category.Uuid).ID,
 			},
 		).
 		Error

@@ -4,13 +4,13 @@ import (
 	"errors"
 )
 
-type AccessoryCategory struct {
+type Category struct {
 	DefaultModel
 	Uuid string `json:"uuid"`
 	Name string `json:"name" validate:"min=1,max=20"`
 }
 
-type AccessoryCategories []AccessoryCategory
+type AccessoryCategories []Category
 
 type Tag struct {
 	DefaultModel
@@ -25,13 +25,13 @@ func GetAllAccessoryCategories() (accessoryCategories AccessoryCategories) {
 	return accessoryCategories
 }
 
-func GetAccessoryCategory(uuid string) (accessoryCategory AccessoryCategory) {
+func GetCategory(uuid string) (accessoryCategory Category) {
 	Db.Limit(1).Find(&accessoryCategory, "uuid = ?", uuid)
 	return accessoryCategory
 }
 
-func AccessoryCategoryUniqueCheck(name string) (isUnique bool, err error) {
-	var accessoryCategory AccessoryCategory
+func CategoryUniqueCheck(name string) (isUnique bool, err error) {
+	var accessoryCategory Category
 	Db.Limit(1).Find(&accessoryCategory, "name = ?", name)
 	isUnique = accessoryCategory.ID == nil
 	if !isUnique {
@@ -40,7 +40,7 @@ func AccessoryCategoryUniqueCheck(name string) (isUnique bool, err error) {
 	return isUnique, err
 }
 
-func InsertAccessoryCategory(accessoryCategory *AccessoryCategory) (err error) {
+func InsertCategory(accessoryCategory *Category) (err error) {
 	// uuidの設定
 	uuid, err := GenerateUuid()
 	if err != nil {
@@ -51,14 +51,14 @@ func InsertAccessoryCategory(accessoryCategory *AccessoryCategory) (err error) {
 	return err
 }
 
-func UpdateAccessoryCategory(accessoryCategory *AccessoryCategory, uuid string) (err error) {
+func UpdateCategory(accessoryCategory *Category, uuid string) (err error) {
 	err = Db.Model(&accessoryCategory).Where("uuid = ?", uuid).Updates(
-		AccessoryCategory{Name: accessoryCategory.Name},
+		Category{Name: accessoryCategory.Name},
 	).Error
 	return err
 }
 
-func (accessoryCategory *AccessoryCategory) DeleteAccessoryCategory() (err error) {
+func (accessoryCategory *Category) DeleteCategory() (err error) {
 	err = Db.Delete(&accessoryCategory).Error
 	return err
 }
