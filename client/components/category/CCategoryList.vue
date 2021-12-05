@@ -135,9 +135,9 @@ export default class CCategoryList extends Vue {
                 if (this.categoryTypeValue === CategoryType.Accessory.value) {
                     await this.$axios.$post(`/accessory_category`, this.modalItem)
                     this.$emit('c-change', CategoryType.Accessory.name)
-                } else if (this.categoryTypeValue === CategoryType.Material.value) {
+                } else if (this.categoryTypeValue === CategoryType.Tag.value) {
                     await this.$axios.$post(`/tag`, this.modalItem)
-                    this.$emit('c-change', CategoryType.Material.name)
+                    this.$emit('c-change', CategoryType.Tag.name)
                 }
                 this.notificationVisible = true
                 this.dialogVisible = false
@@ -149,9 +149,9 @@ export default class CCategoryList extends Vue {
                 if (this.categoryTypeValue === CategoryType.Accessory.value) {
                     await this.$axios.$put(`/accessory_category/${this.modalItem.uuid}`, this.modalItem)
                     this.$emit('c-change', CategoryType.Accessory.name)
-                } else if (this.categoryTypeValue === CategoryType.Material.value) {
+                } else if (this.categoryTypeValue === CategoryType.Tag.value) {
                     await this.$axios.$put(`/tag/${this.modalItem.uuid}`, this.modalItem)
-                    this.$emit('c-change', CategoryType.Material.name)
+                    this.$emit('c-change', CategoryType.Tag.name)
                 }
                 this.notificationVisible = true
                 this.dialogVisible = false
@@ -163,9 +163,9 @@ export default class CCategoryList extends Vue {
                 if (this.categoryTypeValue === CategoryType.Accessory.value) {
                     await this.$axios.$delete(`/accessory_category/${this.modalItem.uuid}`)
                     this.$emit('c-change', CategoryType.Accessory.name)
-                } else if (this.categoryTypeValue === CategoryType.Material.value) {
+                } else if (this.categoryTypeValue === CategoryType.Tag.value) {
                     await this.$axios.$delete(`/tag/${this.modalItem.uuid}`)
-                    this.$emit('c-change', CategoryType.Material.name)
+                    this.$emit('c-change', CategoryType.Tag.name)
                 }
                 this.notificationVisible = true
                 this.dialogVisible = false
