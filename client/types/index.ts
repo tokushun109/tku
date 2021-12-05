@@ -35,6 +35,9 @@ export const ColorType = {
     Green: 'green',
     Blue: 'blue',
     Purple: 'purple',
+    Black: 'black',
+    Grey: 'grey',
+    White: 'white',
 } as const
 
 export type TColorType = typeof ColorType[keyof typeof ColorType]

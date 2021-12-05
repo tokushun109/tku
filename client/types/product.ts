@@ -9,8 +9,10 @@ export interface IProduct {
     uuid: string
     name: string
     description: string
+    price: number
     category: IClassification | null
     tags: Array<IClassification>
     productImages: Array<IProductImage>
     salesSites: Array<ISite>
+    isActive: boolean
 }

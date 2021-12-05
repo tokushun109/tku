@@ -17,3 +17,13 @@ export function nonDoubleByte(value: string) {
 export function nonSpace(value: string) {
     return !value.match(/\s+/) || `URLにスペースが含まれています`
 }
+
+// 金額
+export function price(value: number) {
+    return value.toString().match(/^([1-9]\d*|0)(\.\d+)?$/) || `金額を入力してください`
+}
+
+// 最大金額
+export function maxPrice(value: number) {
+    return !(value > 1000000) || `最大金額を超えています`
+}
