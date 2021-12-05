@@ -13,11 +13,16 @@
                     <v-row>
                         <v-col v-for="listItem in listItems" :key="listItem.uuid" cols="12" sm="6" md="4">
                             <v-list-item>
-                                <v-card width="100%" color="light-green lighten-5">
+                                <v-card width="100%" :color="getColor(listItem)">
                                     <v-card-text>
                                         <div class="my-4">
                                             <div class="d-flex">
-                                                <h3 class="green--text text--darken-3">{{ listItem.name }}</h3>
+                                                <div class="green--text text--darken-3">
+                                                    {{ listItem.name }}
+                                                    <v-chip v-if="!listItem.isActive" x-small :color="ColorType.Grey" :text-color="ColorType.White"
+                                                        >展示</v-chip
+                                                    >
+                                                </div>
                                                 <v-spacer />
                                                 <div>
                                                     <c-icon :type="IconType.Edit.name" @c-click="openHandler(ExecutionType.Edit, listItem)" />
@@ -41,6 +46,9 @@
                                                 <v-img src="/img/product/no-image.png" />
                                             </v-carousel-item>
                                         </v-carousel>
+                                        <div class="text-right">
+                                            <p>{{ listItem.price | priceFormat }}円</p>
+                                        </div>
                                     </v-card-text>
                                 </v-card>
                             </v-list-item>
@@ -60,6 +68,22 @@
                 >
                     <v-text-field v-model="modalItem.name" :rules="nameRules" label="商品名(必須)" outlined counter="20" />
                     <v-textarea v-model="modalItem.description" label="商品説明" outlined />
+                    <v-row>
+                        <v-col cols="7">
+                            <v-text-field
+                                v-model.number="modalItem.price"
+                                :rules="priceRules"
+                                label="税込価格(必須)"
+                                outlined
+                                :min="1"
+                                :max="1000000"
+                                type="number"
+                            />
+                        </v-col>
+                        <v-col class="text-right" cols="5">
+                            <p class="pt-3">{{ modalItem.price | priceFormat }}円</p>
+                        </v-col>
+                    </v-row>
                     <v-file-input v-model="uploadFiles" label="商品画像" prepend-icon="mdi-camera" multiple outlined />
                     <c-image-list
                         title="現在の登録"
@@ -79,6 +103,9 @@
                         label="販売サイト"
                         outlined
                     />
+                    <div class="d-flex justify-center outlined">
+                        <v-checkbox v-model="modalItem.isActive" label="販売中" dense />
+                    </div>
                 </v-form>
                 <p v-else-if="executionType === ExecutionType.Delete">削除してもよろしいですか？</p>
             </template>
@@ -90,9 +117,20 @@
 <script lang="ts">
 import { Component, Prop, PropSync, Vue, Watch } from 'nuxt-property-decorator'
 import _ from 'lodash'
-import { ExecutionType, IClassification, IconType, IError, ImageType, IProduct, ISite, newProduct, TExecutionType, TImageType } from '~/types'
-import { ConfirmState } from '~/store'
-import { min20, required } from '~/methods'
+import {
+    ColorType,
+    ExecutionType,
+    IClassification,
+    IconType,
+    IError,
+    ImageType,
+    IProduct,
+    ISite,
+    newProduct,
+    TExecutionType,
+    TImageType,
+} from '~/types'
+import { maxPrice, min20, price, required } from '~/methods'
 @Component({})
 export default class CProductList extends Vue {
     @PropSync('items') listItems!: Array<IProduct>
@@ -101,6 +139,7 @@ export default class CProductList extends Vue {
     @Prop({ type: Array, default: [] }) salesSites!: Array<ISite>
     @Prop({ type: String, default: '' }) type!: string
 
+    ColorType: typeof ColorType = ColorType
     IconType: typeof IconType = IconType
     ExecutionType: typeof ExecutionType = ExecutionType
     executionType: TExecutionType = ExecutionType.Create
@@ -122,6 +161,8 @@ export default class CProductList extends Vue {
     errors: Array<IError> = []
 
     nameRules = [required, min20]
+
+    priceRules = [required, price, maxPrice]
 
     // 既存登録リスト
     get registeredList(): Array<string> {
@@ -156,6 +197,10 @@ export default class CProductList extends Vue {
             }
         }
         return message
+    }
+
+    getColor(listItem: IProduct): string {
+        return listItem.isActive ? 'light-green lighten-5' : 'grey lighten-3'
     }
 
     setInit() {

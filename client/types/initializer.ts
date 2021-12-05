@@ -12,10 +12,12 @@ export function newProduct(): IProduct {
         uuid: '',
         name: '',
         description: '',
+        price: 1,
         category: null,
         tags: [],
         productImages: [],
         salesSites: [],
+        isActive: true,
     }
 }
 

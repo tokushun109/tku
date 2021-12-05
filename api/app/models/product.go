@@ -10,6 +10,8 @@ type Product struct {
 	Uuid          string          `json:"uuid"`
 	Name          string          `json:"name" validate:"min=1,max=20"`
 	Description   string          `json:"description"`
+	Price         int             `json:"price" validate:"min=1,max=1000000"`
+	IsActive      bool            `json:"isActive"`
 	CategoryId    *uint           `json:"-"`
 	Category      Category        `json:"category" validate:"-"`
 	Tags          []Tag           `gorm:"many2many:product_to_tag" json:"tags"`
@@ -155,6 +157,8 @@ func UpdateProduct(product *Product, uuid string) (err error) {
 			Product{
 				Name:        product.Name,
 				Description: product.Description,
+				Price:       product.Price,
+				IsActive:    product.IsActive,
 				CategoryId:  GetCategory(product.Category.Uuid).ID,
 			},
 		).
