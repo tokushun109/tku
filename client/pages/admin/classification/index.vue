@@ -2,10 +2,10 @@
     <v-main class="grey lighten-4">
         <v-row>
             <v-col cols="12" sm="12" md="6">
-                <c-classification-list type="category" :items="categories" @c-change="loadingCategory" />
+                <c-classification-list :type="CategoryType.Category.name" :items="categories" @c-change="loadingCategory" />
             </v-col>
             <v-col cols="12" sm="12" md="6">
-                <c-classification-list type="tag" :items="tags" @c-change="loadingCategory" />
+                <c-classification-list :type="CategoryType.Tag.name" :items="tags" @c-change="loadingCategory" />
             </v-col>
         </v-row>
     </v-main>
@@ -17,10 +17,12 @@ import { Component, Vue } from 'nuxt-property-decorator'
 import { IClassification, CategoryType } from '~/types'
 @Component({
     head: {
-        title: '商品一覧',
+        title: '分類一覧',
     },
 })
 export default class PageAdminClassificationIndex extends Vue {
+    CategoryType: typeof CategoryType = CategoryType
+
     // カテゴリー一覧
     categories: Array<IClassification> = []
 

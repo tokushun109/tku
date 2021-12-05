@@ -2,13 +2,13 @@
     <v-main class="grey lighten-4">
         <v-row>
             <v-col cols="12" sm="12" md="4">
-                <c-site-list type="sns" :items="snsList" @c-change="loadingSite" />
+                <c-site-list :type="SiteType.Sns.name" :items="snsList" @c-change="loadingSite" />
             </v-col>
             <v-col cols="12" sm="12" md="4">
-                <c-site-list type="salesSite" :items="salesSites" @c-change="loadingSite" />
+                <c-site-list :type="SiteType.SalesSite.name" :items="salesSites" @c-change="loadingSite" />
             </v-col>
             <v-col cols="12" sm="12" md="4">
-                <c-site-list type="skillMarket" :items="skillMarkets" @c-change="loadingSite" />
+                <c-site-list :type="SiteType.SkillMarket.name" :items="skillMarkets" @c-change="loadingSite" />
             </v-col>
         </v-row>
     </v-main>
@@ -24,6 +24,8 @@ import { ISite, SiteType } from '~/types'
     },
 })
 export default class PageAdminSiteIndex extends Vue {
+    SiteType: typeof SiteType = SiteType
+
     // SNS一覧
     snsList: Array<ISite> = []
     // 販売サイト一覧
