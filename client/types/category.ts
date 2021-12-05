@@ -8,6 +8,6 @@ export interface ICategoryType {
 }
 
 export const CategoryType: ICategoryType = {
-    Accessory: { name: 'accessory', value: 'アクセサリーカテゴリー' },
+    Accessory: { name: 'accessory', value: 'カテゴリー' },
     Tag: { name: 'tag', value: 'タグ' },
 } as const

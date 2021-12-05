@@ -73,7 +73,7 @@
                         item-text="name"
                         return-object
                         chips
-                        label="アクセサリーカテゴリー"
+                        label="カテゴリー"
                         outlined
                     />
                     <v-select v-model="modalItem.tags" :items="tags" item-text="name" return-object chips multiple label="タグ" outlined />

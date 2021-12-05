@@ -12,7 +12,7 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
-// アクセサリーカテゴリー一覧を取得
+// カテゴリー一覧を取得
 func getAllAccessoryCategoriesHandler(w http.ResponseWriter, r *http.Request) {
 	accessoryCategories := models.GetAllAccessoryCategories()
 	w.Header().Set("Content-Type", "application/json")
@@ -23,7 +23,7 @@ func getAllAccessoryCategoriesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// アクセサリーカテゴリーの新規作成
+// カテゴリーの新規作成
 func createAccessoryCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -59,7 +59,7 @@ func createAccessoryCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(responseBody)
 }
 
-// アクセサリーカテゴリーの更新
+// カテゴリーの更新
 func updateAccessoryCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	uuid := vars["accessory_category_uuid"]
@@ -98,7 +98,7 @@ func updateAccessoryCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(responseBody)
 }
 
-// アクセサリーカテゴリーの削除
+// カテゴリーの削除
 func deleteAccessoryCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	uuid := vars["accessory_category_uuid"]

@@ -21,7 +21,7 @@ import { ICategory, CategoryType } from '~/types'
     },
 })
 export default class PageAdminCategoryIndex extends Vue {
-    // アクセサリーカテゴリー一覧
+    // カテゴリー一覧
     accessoryCategories: Array<ICategory> = []
 
     // タグ一覧

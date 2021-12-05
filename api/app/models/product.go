@@ -90,7 +90,7 @@ func InsertProduct(product *Product) (err error) {
 		return err
 	}
 	product.Uuid = uuid
-	// アクセサリーカテゴリーの設定
+	// カテゴリーの設定
 	accesstoryCategory := GetAccessoryCategory(product.AccessoryCategory.Uuid)
 	product.AccessoryCategoryId = accesstoryCategory.ID
 	if err := tx.Omit("AccessoryCategory", "Tags", "ProductImages", "SalesSites").Create(&product).Error; err != nil {
