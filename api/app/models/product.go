@@ -98,19 +98,19 @@ func InsertProduct(product *Product) (err error) {
 		return err
 	}
 
-	var productToTags []ProductToTag
+	var productToTagList []ProductToTag
 	// 商品とタグを紐付け
 	for _, materialCategory := range product.Tags {
-		productToTags = append(
-			productToTags,
+		productToTagList = append(
+			productToTagList,
 			ProductToTag{
 				ProductId: product.ID,
 				TagId:     GetTag(materialCategory.Uuid).ID,
 			},
 		)
 	}
-	if len(productToTags) > 0 {
-		if err := tx.Create(&productToTags).Error; err != nil {
+	if len(productToTagList) > 0 {
+		if err := tx.Create(&productToTagList).Error; err != nil {
 			tx.Rollback()
 			return err
 		}
@@ -180,10 +180,10 @@ func UpdateProduct(product *Product, uuid string) (err error) {
 	}
 
 	// 商品とタグを紐付け
-	var productToTags []ProductToTag
+	var productToTagList []ProductToTag
 	for _, materialCategory := range product.Tags {
-		productToTags = append(
-			productToTags,
+		productToTagList = append(
+			productToTagList,
 			ProductToTag{
 				ProductId: registeredProduct.ID,
 				TagId:     GetTag(materialCategory.Uuid).ID,
@@ -191,8 +191,8 @@ func UpdateProduct(product *Product, uuid string) (err error) {
 		)
 	}
 
-	if len(productToTags) > 0 {
-		if err := tx.Create(&productToTags).Error; err != nil {
+	if len(productToTagList) > 0 {
+		if err := tx.Create(&productToTagList).Error; err != nil {
 			tx.Rollback()
 			return err
 		}
