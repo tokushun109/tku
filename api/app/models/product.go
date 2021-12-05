@@ -11,7 +11,7 @@ type Product struct {
 	Name          string          `json:"name" validate:"min=1,max=20"`
 	Description   string          `json:"description"`
 	CategoryId    *uint           `json:"-"`
-	Category      Category        `json:"accessoryCategory" validate:"-"`
+	Category      Category        `json:"category" validate:"-"`
 	Tags          []Tag           `gorm:"many2many:product_to_tag" json:"tags"`
 	ProductImages []*ProductImage `gorm:"hasmany:product_image" json:"productImages"`
 	SalesSites    []SalesSite     `gorm:"many2many:product_to_sales_site" json:"salesSites"`

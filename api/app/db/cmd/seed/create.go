@@ -9,9 +9,9 @@ import (
 // go run app/db/cmd/seed/create.go
 func main() {
 	// category
-	var accessoryCategory models.Category
-	accessoryCategory.Name = "test_category"
-	if err := models.InsertCategory(&accessoryCategory); err != nil {
+	var category models.Category
+	category.Name = "test_category"
+	if err := models.InsertCategory(&category); err != nil {
 		log.Fatalln(err)
 	}
 	fmt.Println("categoryを作成しました")
@@ -55,7 +55,7 @@ func main() {
 	var product models.Product
 	product.Name = "test_product"
 	product.Description = "test_descriptiontest_descriptiontest_descriptiontest_descriptiontest_description"
-	product.Category = accessoryCategory
+	product.Category = category
 	product.Tags = []models.Tag{tag}
 	product.SalesSites = []models.SalesSite{salesSite}
 	if err := models.InsertProduct(&product); err != nil {

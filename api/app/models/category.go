@@ -25,41 +25,41 @@ func GetAllCategories() (accessoryCategories Categories) {
 	return accessoryCategories
 }
 
-func GetCategory(uuid string) (accessoryCategory Category) {
-	Db.Limit(1).Find(&accessoryCategory, "uuid = ?", uuid)
-	return accessoryCategory
+func GetCategory(uuid string) (category Category) {
+	Db.Limit(1).Find(&category, "uuid = ?", uuid)
+	return category
 }
 
 func CategoryUniqueCheck(name string) (isUnique bool, err error) {
-	var accessoryCategory Category
-	Db.Limit(1).Find(&accessoryCategory, "name = ?", name)
-	isUnique = accessoryCategory.ID == nil
+	var category Category
+	Db.Limit(1).Find(&category, "name = ?", name)
+	isUnique = category.ID == nil
 	if !isUnique {
 		err = errors.New("name is duplicate")
 	}
 	return isUnique, err
 }
 
-func InsertCategory(accessoryCategory *Category) (err error) {
+func InsertCategory(category *Category) (err error) {
 	// uuidの設定
 	uuid, err := GenerateUuid()
 	if err != nil {
 		return err
 	}
-	accessoryCategory.Uuid = uuid
-	err = Db.Create(&accessoryCategory).Error
+	category.Uuid = uuid
+	err = Db.Create(&category).Error
 	return err
 }
 
-func UpdateCategory(accessoryCategory *Category, uuid string) (err error) {
-	err = Db.Model(&accessoryCategory).Where("uuid = ?", uuid).Updates(
-		Category{Name: accessoryCategory.Name},
+func UpdateCategory(category *Category, uuid string) (err error) {
+	err = Db.Model(&category).Where("uuid = ?", uuid).Updates(
+		Category{Name: category.Name},
 	).Error
 	return err
 }
 
-func (accessoryCategory *Category) DeleteCategory() (err error) {
-	err = Db.Delete(&accessoryCategory).Error
+func (category *Category) DeleteCategory() (err error) {
+	err = Db.Delete(&category).Error
 	return err
 }
 

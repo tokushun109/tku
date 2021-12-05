@@ -32,8 +32,8 @@ func createCategoryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var accessoryCategory models.Category
-	if err := json.Unmarshal(reqBody, &accessoryCategory); err != nil {
+	var category models.Category
+	if err := json.Unmarshal(reqBody, &category); err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
@@ -41,13 +41,13 @@ func createCategoryHandler(w http.ResponseWriter, r *http.Request) {
 
 	// validationの確認
 	validate := validator.New()
-	if errors := validate.Struct(accessoryCategory); errors != nil {
+	if errors := validate.Struct(category); errors != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
 		return
 	}
 
-	if err = models.InsertCategory(&accessoryCategory); err != nil {
+	if err = models.InsertCategory(&category); err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
@@ -71,8 +71,8 @@ func updateCategoryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var accessoryCategory models.Category
-	if err := json.Unmarshal(reqBody, &accessoryCategory); err != nil {
+	var category models.Category
+	if err := json.Unmarshal(reqBody, &category); err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
@@ -80,13 +80,13 @@ func updateCategoryHandler(w http.ResponseWriter, r *http.Request) {
 
 	// validationの確認
 	validate := validator.New()
-	if errors := validate.Struct(accessoryCategory); errors != nil {
+	if errors := validate.Struct(category); errors != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
 		return
 	}
 
-	if err = models.UpdateCategory(&accessoryCategory, uuid); err != nil {
+	if err = models.UpdateCategory(&category, uuid); err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
@@ -103,8 +103,8 @@ func deleteCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	uuid := vars["category_uuid"]
 
-	accessoryCategory := models.GetCategory(uuid)
-	if err := accessoryCategory.DeleteCategory(); err != nil {
+	category := models.GetCategory(uuid)
+	if err := category.DeleteCategory(); err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return

@@ -12,7 +12,7 @@ export function newProduct(): IProduct {
         uuid: '',
         name: '',
         description: '',
-        accessoryCategory: null,
+        category: null,
         tags: [],
         productImages: [],
         salesSites: [],

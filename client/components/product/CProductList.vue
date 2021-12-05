@@ -68,7 +68,7 @@
                         @c-delete-image-handler="deleteImageHandler"
                     />
                     <v-select
-                        v-model="modalItem.accessoryCategory"
+                        v-model="modalItem.category"
                         :items="accessoryCategories"
                         item-text="name"
                         return-object

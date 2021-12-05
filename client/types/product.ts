@@ -9,7 +9,7 @@ export interface IProduct {
     uuid: string
     name: string
     description: string
-    accessoryCategory: ICategory | null
+    category: ICategory | null
     tags: Array<ICategory>
     productImages: Array<IProductImage>
     salesSites: Array<ISite>
