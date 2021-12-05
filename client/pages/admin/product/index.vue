@@ -3,7 +3,7 @@
         <c-product-list
             :items="products"
             :accessory-categories="accessoryCategories"
-            :material-categories="tags"
+            :tags="tags"
             :sales-sites="salesSites"
             @c-change="loadingProduct"
         />
