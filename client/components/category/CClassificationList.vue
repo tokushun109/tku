@@ -43,7 +43,7 @@
 <script lang="ts">
 import { Component, Prop, PropSync, Vue, Watch } from 'nuxt-property-decorator'
 import _ from 'lodash'
-import { CategoryType, ExecutionType, IClassification, IconType, IError, newCategory, TExecutionType } from '~/types'
+import { CategoryType, ExecutionType, IClassification, IconType, IError, newClassification, TExecutionType } from '~/types'
 import { min20, required } from '~/methods'
 @Component({})
 export default class CClassificationList extends Vue {
@@ -60,7 +60,7 @@ export default class CClassificationList extends Vue {
     // 通知の表示
     notificationVisible: boolean = false
 
-    modalItem: IClassification = newCategory()
+    modalItem: IClassification = newClassification()
 
     valid: boolean = true
 
@@ -99,7 +99,7 @@ export default class CClassificationList extends Vue {
     }
 
     setInit() {
-        this.modalItem = newCategory()
+        this.modalItem = newClassification()
     }
 
     setItem(item: IClassification) {

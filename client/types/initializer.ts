@@ -19,7 +19,7 @@ export function newProduct(): IProduct {
     }
 }
 
-export function newCategory(): IClassification {
+export function newClassification(): IClassification {
     return {
         uuid: '',
         name: '',
