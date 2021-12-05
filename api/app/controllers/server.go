@@ -57,10 +57,10 @@ func StartMainServer() error {
 	r.HandleFunc("/api/accessory_category/{accessory_category_uuid}", updateAccessoryCategoryHandler).Methods("PUT")
 	r.HandleFunc("/api/accessory_category/{accessory_category_uuid}", deleteAccessoryCategoryHandler).Methods("DELETE")
 	// タグ
-	r.HandleFunc("/api/material_category", getAllMaterialCategoriesHandler).Methods("GET")
-	r.HandleFunc("/api/material_category", createMaterialCategoryHandler).Methods("POST")
-	r.HandleFunc("/api/material_category/{material_category_uuid}", updateMaterialCategoryHandler).Methods("PUT")
-	r.HandleFunc("/api/material_category/{material_category_uuid}", deleteMaterialCategoryHandler).Methods("DELETE")
+	r.HandleFunc("/api/tag", getAllMaterialCategoriesHandler).Methods("GET")
+	r.HandleFunc("/api/tag", createMaterialCategoryHandler).Methods("POST")
+	r.HandleFunc("/api/tag/{tag_uuid}", updateMaterialCategoryHandler).Methods("PUT")
+	r.HandleFunc("/api/tag/{tag_uuid}", deleteMaterialCategoryHandler).Methods("DELETE")
 	// 販売サイト
 	r.HandleFunc("/api/sales_site", getAllSalesSitesHandler).Methods("GET")
 	r.HandleFunc("/api/sales_site", createSalesSiteHandler).Methods("POST")

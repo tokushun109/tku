@@ -32,7 +32,7 @@ export default class PageAdminProductIndex extends Vue {
         try {
             const products = await app.$axios.$get(`/product`)
             const accessoryCategories = await app.$axios.$get(`/accessory_category`)
-            const materialCategories = await app.$axios.$get(`/material_category`)
+            const materialCategories = await app.$axios.$get(`/tag`)
             const salesSites = await app.$axios.$get(`/sales_site`)
             return { products, accessoryCategories, materialCategories, salesSites }
         } catch (e) {

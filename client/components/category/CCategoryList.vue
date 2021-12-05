@@ -136,7 +136,7 @@ export default class CCategoryList extends Vue {
                     await this.$axios.$post(`/accessory_category`, this.modalItem)
                     this.$emit('c-change', CategoryType.Accessory.name)
                 } else if (this.categoryTypeValue === CategoryType.Material.value) {
-                    await this.$axios.$post(`/material_category`, this.modalItem)
+                    await this.$axios.$post(`/tag`, this.modalItem)
                     this.$emit('c-change', CategoryType.Material.name)
                 }
                 this.notificationVisible = true
@@ -150,7 +150,7 @@ export default class CCategoryList extends Vue {
                     await this.$axios.$put(`/accessory_category/${this.modalItem.uuid}`, this.modalItem)
                     this.$emit('c-change', CategoryType.Accessory.name)
                 } else if (this.categoryTypeValue === CategoryType.Material.value) {
-                    await this.$axios.$put(`/material_category/${this.modalItem.uuid}`, this.modalItem)
+                    await this.$axios.$put(`/tag/${this.modalItem.uuid}`, this.modalItem)
                     this.$emit('c-change', CategoryType.Material.name)
                 }
                 this.notificationVisible = true
@@ -164,7 +164,7 @@ export default class CCategoryList extends Vue {
                     await this.$axios.$delete(`/accessory_category/${this.modalItem.uuid}`)
                     this.$emit('c-change', CategoryType.Accessory.name)
                 } else if (this.categoryTypeValue === CategoryType.Material.value) {
-                    await this.$axios.$delete(`/material_category/${this.modalItem.uuid}`)
+                    await this.$axios.$delete(`/tag/${this.modalItem.uuid}`)
                     this.$emit('c-change', CategoryType.Material.name)
                 }
                 this.notificationVisible = true

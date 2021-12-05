@@ -16,13 +16,13 @@ func main() {
 	}
 	fmt.Println("accessory_categoryを作成しました")
 
-	// material_category
+	// tag
 	var materialCategory models.MaterialCategory
-	materialCategory.Name = "test_material_category"
+	materialCategory.Name = "test_tag"
 	if err := models.InsertMaterialCategory(&materialCategory); err != nil {
 		log.Fatalln(err)
 	}
-	fmt.Println("material_categoryを作成しました")
+	fmt.Println("tagを作成しました")
 
 	// sales_site
 	var salesSite models.SalesSite

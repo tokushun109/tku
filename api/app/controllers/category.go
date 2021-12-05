@@ -166,7 +166,7 @@ func createMaterialCategoryHandler(w http.ResponseWriter, r *http.Request) {
 // タグの更新
 func updateMaterialCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	uuid := vars["material_category_uuid"]
+	uuid := vars["tag_uuid"]
 
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -205,7 +205,7 @@ func updateMaterialCategoryHandler(w http.ResponseWriter, r *http.Request) {
 // タグの削除
 func deleteMaterialCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	uuid := vars["material_category_uuid"]
+	uuid := vars["tag_uuid"]
 
 	materialCategory := models.GetMaterialCategory(uuid)
 	if err := materialCategory.DeleteMaterialCategory(); err != nil {
