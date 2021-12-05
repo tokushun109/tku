@@ -46,7 +46,7 @@ import _ from 'lodash'
 import { CategoryType, ExecutionType, ICategory, IconType, IError, newCategory, TExecutionType } from '~/types'
 import { min20, required } from '~/methods'
 @Component({})
-export default class CCategoryList extends Vue {
+export default class CClassificationList extends Vue {
     @PropSync('items') listItems!: Array<ICategory>
     @Prop({ type: String, default: '' }) type!: string
 
