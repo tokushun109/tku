@@ -5,7 +5,7 @@
                 <c-category-list type="accessory" :items="accessoryCategories" @c-change="loadingCategory" />
             </v-col>
             <v-col cols="12" sm="12" md="6">
-                <c-category-list type="material" :items="tags" @c-change="loadingCategory" />
+                <c-category-list type="tag" :items="tags" @c-change="loadingCategory" />
             </v-col>
         </v-row>
     </v-main>
