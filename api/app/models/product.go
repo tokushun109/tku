@@ -116,19 +116,19 @@ func InsertProduct(product *Product) (err error) {
 		}
 	}
 
-	var productToSalesSites []ProductToSalesSite
+	var productToSalesSiteList []ProductToSalesSite
 	// 商品と販売サイトを紐付け
 	for _, salesSite := range product.SalesSites {
-		productToSalesSites = append(
-			productToSalesSites,
+		productToSalesSiteList = append(
+			productToSalesSiteList,
 			ProductToSalesSite{
 				ProductId:   product.ID,
 				SalesSiteId: GetSalesSite(salesSite.Uuid).ID,
 			},
 		)
 	}
-	if len(productToSalesSites) > 0 {
-		if err := tx.Create(&productToSalesSites).Error; err != nil {
+	if len(productToSalesSiteList) > 0 {
+		if err := tx.Create(&productToSalesSiteList).Error; err != nil {
 			tx.Rollback()
 			return err
 		}
@@ -208,10 +208,10 @@ func UpdateProduct(product *Product, uuid string) (err error) {
 	}
 
 	// 商品と販売サイトを紐付け
-	var productToSalesSites []ProductToSalesSite
+	var productToSalesSiteList []ProductToSalesSite
 	for _, salesSite := range product.SalesSites {
-		productToSalesSites = append(
-			productToSalesSites,
+		productToSalesSiteList = append(
+			productToSalesSiteList,
 			ProductToSalesSite{
 				ProductId:   registeredProduct.ID,
 				SalesSiteId: GetSalesSite(salesSite.Uuid).ID,
@@ -219,8 +219,8 @@ func UpdateProduct(product *Product, uuid string) (err error) {
 		)
 	}
 
-	if len(productToSalesSites) > 0 {
-		if err := tx.Create(&productToSalesSites).Error; err != nil {
+	if len(productToSalesSiteList) > 0 {
+		if err := tx.Create(&productToSalesSiteList).Error; err != nil {
 			tx.Rollback()
 			return err
 		}
