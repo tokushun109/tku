@@ -43,11 +43,11 @@
 <script lang="ts">
 import { Component, Prop, PropSync, Vue, Watch } from 'nuxt-property-decorator'
 import _ from 'lodash'
-import { CategoryType, ExecutionType, ICategory, IconType, IError, newCategory, TExecutionType } from '~/types'
+import { CategoryType, ExecutionType, IClassification, IconType, IError, newCategory, TExecutionType } from '~/types'
 import { min20, required } from '~/methods'
 @Component({})
 export default class CClassificationList extends Vue {
-    @PropSync('items') listItems!: Array<ICategory>
+    @PropSync('items') listItems!: Array<IClassification>
     @Prop({ type: String, default: '' }) type!: string
 
     IconType: typeof IconType = IconType
@@ -60,7 +60,7 @@ export default class CClassificationList extends Vue {
     // 通知の表示
     notificationVisible: boolean = false
 
-    modalItem: ICategory = newCategory()
+    modalItem: IClassification = newCategory()
 
     valid: boolean = true
 
@@ -102,7 +102,7 @@ export default class CClassificationList extends Vue {
         this.modalItem = newCategory()
     }
 
-    setItem(item: ICategory) {
+    setItem(item: IClassification) {
         this.modalItem = _.cloneDeep(item)
     }
 
@@ -114,7 +114,7 @@ export default class CClassificationList extends Vue {
         }
     }
 
-    openHandler(executionType: TExecutionType, item: ICategory | null = null) {
+    openHandler(executionType: TExecutionType, item: IClassification | null = null) {
         this.errors = []
         if (executionType === ExecutionType.Create) {
             this.setInit()

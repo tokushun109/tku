@@ -14,7 +14,7 @@
 <script lang="ts">
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
-import { ICategory, CategoryType } from '~/types'
+import { IClassification, CategoryType } from '~/types'
 @Component({
     head: {
         title: '商品一覧',
@@ -22,10 +22,10 @@ import { ICategory, CategoryType } from '~/types'
 })
 export default class PageAdminCategoryIndex extends Vue {
     // カテゴリー一覧
-    categories: Array<ICategory> = []
+    categories: Array<IClassification> = []
 
     // タグ一覧
-    tags: Array<ICategory> = []
+    tags: Array<IClassification> = []
 
     async asyncData({ app }: Context) {
         try {

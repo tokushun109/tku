@@ -90,14 +90,14 @@
 <script lang="ts">
 import { Component, Prop, PropSync, Vue, Watch } from 'nuxt-property-decorator'
 import _ from 'lodash'
-import { ExecutionType, ICategory, IconType, IError, ImageType, IProduct, ISite, newProduct, TExecutionType, TImageType } from '~/types'
+import { ExecutionType, IClassification, IconType, IError, ImageType, IProduct, ISite, newProduct, TExecutionType, TImageType } from '~/types'
 import { ConfirmState } from '~/store'
 import { min20, required } from '~/methods'
 @Component({})
 export default class CProductList extends Vue {
     @PropSync('items') listItems!: Array<IProduct>
-    @Prop({ type: Array, default: [] }) categories!: Array<ICategory>
-    @Prop({ type: Array, default: [] }) tags!: Array<ICategory>
+    @Prop({ type: Array, default: [] }) categories!: Array<IClassification>
+    @Prop({ type: Array, default: [] }) tags!: Array<IClassification>
     @Prop({ type: Array, default: [] }) salesSites!: Array<ISite>
     @Prop({ type: String, default: '' }) type!: string
 

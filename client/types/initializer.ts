@@ -1,4 +1,4 @@
-import { IProduct, ICategory, ISite, ICreator } from '~/types'
+import { IProduct, IClassification, ISite, ICreator } from '~/types'
 export function newCreator(): ICreator {
     return {
         name: '',
@@ -19,7 +19,7 @@ export function newProduct(): IProduct {
     }
 }
 
-export function newCategory(): ICategory {
+export function newCategory(): IClassification {
     return {
         uuid: '',
         name: '',

@@ -7,7 +7,7 @@
 <script lang="ts">
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
-import { ICategory, IProduct, ISite } from '~/types'
+import { IClassification, IProduct, ISite } from '~/types'
 @Component({
     head: {
         title: '商品一覧',
@@ -16,8 +16,8 @@ import { ICategory, IProduct, ISite } from '~/types'
 export default class PageAdminProductIndex extends Vue {
     products: Array<IProduct> = []
 
-    categories: Array<ICategory> = []
-    tags: Array<ICategory> = []
+    categories: Array<IClassification> = []
+    tags: Array<IClassification> = []
     salesSites: Array<ISite> = []
 
     // 新規作成ダイアログの表示

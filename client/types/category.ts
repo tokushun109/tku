@@ -1,13 +1,13 @@
-export interface ICategory {
+export interface IClassification {
     uuid: string
     name: string
 }
 
-export interface ICategoryType {
+export interface IClassificationType {
     [key: string]: { name: string; value: string }
 }
 
-export const CategoryType: ICategoryType = {
+export const CategoryType: IClassificationType = {
     Category: { name: 'category', value: 'カテゴリー' },
     Tag: { name: 'tag', value: 'タグ' },
 } as const
