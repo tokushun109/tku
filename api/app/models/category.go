@@ -10,7 +10,7 @@ type Category struct {
 	Name string `json:"name" validate:"min=1,max=20"`
 }
 
-type AccessoryCategories []Category
+type Categories []Category
 
 type Tag struct {
 	DefaultModel
@@ -20,7 +20,7 @@ type Tag struct {
 
 type Tags []Tag
 
-func GetAllAccessoryCategories() (accessoryCategories AccessoryCategories) {
+func GetAllCategories() (accessoryCategories Categories) {
 	Db.Find(&accessoryCategories)
 	return accessoryCategories
 }

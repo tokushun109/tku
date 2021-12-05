@@ -52,7 +52,7 @@ func StartMainServer() error {
 	r.HandleFunc("/api/product/{product_uuid}/product_image", createProductImageHandler).Methods("POST")
 	r.HandleFunc("/api/product/{product_uuid}/product_image/{product_image_uuid}", deleteProductImageHandler).Methods("DELETE")
 	// カテゴリー
-	r.HandleFunc("/api/category", getAllAccessoryCategoriesHandler).Methods("GET")
+	r.HandleFunc("/api/category", getAllCategoriesHandler).Methods("GET")
 	r.HandleFunc("/api/category", createCategoryHandler).Methods("POST")
 	r.HandleFunc("/api/category/{category_uuid}", updateCategoryHandler).Methods("PUT")
 	r.HandleFunc("/api/category/{category_uuid}", deleteCategoryHandler).Methods("DELETE")

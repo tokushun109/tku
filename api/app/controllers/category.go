@@ -13,8 +13,8 @@ import (
 )
 
 // カテゴリー一覧を取得
-func getAllAccessoryCategoriesHandler(w http.ResponseWriter, r *http.Request) {
-	accessoryCategories := models.GetAllAccessoryCategories()
+func getAllCategoriesHandler(w http.ResponseWriter, r *http.Request) {
+	accessoryCategories := models.GetAllCategories()
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(accessoryCategories); err != nil {
 		log.Println(err)
