@@ -12,7 +12,7 @@ type Product struct {
 	Description         string            `json:"description"`
 	AccessoryCategoryId *uint             `json:"-"`
 	AccessoryCategory   AccessoryCategory `json:"accessoryCategory" validate:"-"`
-	MaterialCategories  []Tag             `gorm:"many2many:product_to_tag" json:"materialCategories"`
+	Tags                []Tag             `gorm:"many2many:product_to_tag" json:"materialCategories"`
 	ProductImages       []*ProductImage   `gorm:"hasmany:product_image" json:"productImages"`
 	SalesSites          []SalesSite       `gorm:"many2many:product_to_sales_site" json:"salesSites"`
 }
@@ -42,7 +42,7 @@ func setProductImageApiPath(product *Product) {
 func GetAllProducts() (products Products) {
 	Db.Preload("AccessoryCategory").
 		Preload("ProductImages").
-		Preload("MaterialCategories").
+		Preload("Tags").
 		Preload("SalesSites").
 		Find(&products)
 	for _, product := range products {
@@ -54,7 +54,7 @@ func GetAllProducts() (products Products) {
 func GetProduct(uuid string) (product Product, err error) {
 	err = Db.Preload("AccessoryCategory").
 		Preload("ProductImages").
-		Preload("MaterialCategories").
+		Preload("Tags").
 		Preload("SalesSites").
 		First(&product, "uuid = ?", uuid).Error
 
@@ -93,24 +93,24 @@ func InsertProduct(product *Product) (err error) {
 	// アクセサリーカテゴリーの設定
 	accesstoryCategory := GetAccessoryCategory(product.AccessoryCategory.Uuid)
 	product.AccessoryCategoryId = accesstoryCategory.ID
-	if err := tx.Omit("AccessoryCategory", "MaterialCategories", "ProductImages", "SalesSites").Create(&product).Error; err != nil {
+	if err := tx.Omit("AccessoryCategory", "Tags", "ProductImages", "SalesSites").Create(&product).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	var productToMaterialCategories []ProductToTag
+	var productToTags []ProductToTag
 	// 商品とタグを紐付け
-	for _, materialCategory := range product.MaterialCategories {
-		productToMaterialCategories = append(
-			productToMaterialCategories,
+	for _, materialCategory := range product.Tags {
+		productToTags = append(
+			productToTags,
 			ProductToTag{
 				ProductId: product.ID,
 				TagId:     GetTag(materialCategory.Uuid).ID,
 			},
 		)
 	}
-	if len(productToMaterialCategories) > 0 {
-		if err := tx.Create(&productToMaterialCategories).Error; err != nil {
+	if len(productToTags) > 0 {
+		if err := tx.Create(&productToTags).Error; err != nil {
 			tx.Rollback()
 			return err
 		}
@@ -149,7 +149,7 @@ func UpdateProduct(product *Product, uuid string) (err error) {
 	}
 
 	err = tx.Model(&product).
-		Omit("AccessoryCategory", "MaterialCategories", "ProductImages", "SalesSites").
+		Omit("AccessoryCategory", "Tags", "ProductImages", "SalesSites").
 		Where("uuid = ?", uuid).
 		Updates(
 			Product{
@@ -180,10 +180,10 @@ func UpdateProduct(product *Product, uuid string) (err error) {
 	}
 
 	// 商品とタグを紐付け
-	var productToMaterialCategories []ProductToTag
-	for _, materialCategory := range product.MaterialCategories {
-		productToMaterialCategories = append(
-			productToMaterialCategories,
+	var productToTags []ProductToTag
+	for _, materialCategory := range product.Tags {
+		productToTags = append(
+			productToTags,
 			ProductToTag{
 				ProductId: registeredProduct.ID,
 				TagId:     GetTag(materialCategory.Uuid).ID,
@@ -191,8 +191,8 @@ func UpdateProduct(product *Product, uuid string) (err error) {
 		)
 	}
 
-	if len(productToMaterialCategories) > 0 {
-		if err := tx.Create(&productToMaterialCategories).Error; err != nil {
+	if len(productToTags) > 0 {
+		if err := tx.Create(&productToTags).Error; err != nil {
 			tx.Rollback()
 			return err
 		}
@@ -296,7 +296,7 @@ func (product *Product) DeleteProduct() (err error) {
 	}
 
 	// 商品を削除する
-	if err = tx.Select("MaterialCategories", "SalesSites", "ProductImages").Delete(&product).Error; err != nil {
+	if err = tx.Select("Tags", "SalesSites", "ProductImages").Delete(&product).Error; err != nil {
 		tx.Rollback()
 		return err
 	}

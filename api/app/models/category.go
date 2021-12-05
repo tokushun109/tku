@@ -18,7 +18,7 @@ type Tag struct {
 	Name string `json:"name" validate:"min=1,max=20"`
 }
 
-type MaterialCategories []Tag
+type Tags []Tag
 
 func GetAllAccessoryCategories() (accessoryCategories AccessoryCategories) {
 	Db.Find(&accessoryCategories)
@@ -63,7 +63,7 @@ func (accessoryCategory *AccessoryCategory) DeleteAccessoryCategory() (err error
 	return err
 }
 
-func GetAllMaterialCategories() (materialCategories MaterialCategories) {
+func GetAllTags() (materialCategories Tags) {
 	Db.Find(&materialCategories)
 	return materialCategories
 }

@@ -56,7 +56,7 @@ func main() {
 	product.Name = "test_product"
 	product.Description = "test_descriptiontest_descriptiontest_descriptiontest_descriptiontest_description"
 	product.AccessoryCategory = accessoryCategory
-	product.MaterialCategories = []models.Tag{materialCategory}
+	product.Tags = []models.Tag{materialCategory}
 	product.SalesSites = []models.SalesSite{salesSite}
 	if err := models.InsertProduct(&product); err != nil {
 		log.Fatalln(err)

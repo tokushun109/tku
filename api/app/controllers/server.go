@@ -57,7 +57,7 @@ func StartMainServer() error {
 	r.HandleFunc("/api/accessory_category/{accessory_category_uuid}", updateAccessoryCategoryHandler).Methods("PUT")
 	r.HandleFunc("/api/accessory_category/{accessory_category_uuid}", deleteAccessoryCategoryHandler).Methods("DELETE")
 	// タグ
-	r.HandleFunc("/api/tag", getAllMaterialCategoriesHandler).Methods("GET")
+	r.HandleFunc("/api/tag", getAllTagsHandler).Methods("GET")
 	r.HandleFunc("/api/tag", createTagHandler).Methods("POST")
 	r.HandleFunc("/api/tag/{tag_uuid}", updateTagHandler).Methods("PUT")
 	r.HandleFunc("/api/tag/{tag_uuid}", deleteTagHandler).Methods("DELETE")
