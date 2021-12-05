@@ -43,11 +43,11 @@
 <script lang="ts">
 import { Component, Prop, PropSync, Vue, Watch } from 'nuxt-property-decorator'
 import _ from 'lodash'
-import { CategoryType, ExecutionType, ICategory, IconType, IError, newCategory, TExecutionType } from '~/types'
+import { CategoryType, ExecutionType, IClassification, IconType, IError, newClassification, TExecutionType } from '~/types'
 import { min20, required } from '~/methods'
 @Component({})
-export default class CCategoryList extends Vue {
-    @PropSync('items') listItems!: Array<ICategory>
+export default class CClassificationList extends Vue {
+    @PropSync('items') listItems!: Array<IClassification>
     @Prop({ type: String, default: '' }) type!: string
 
     IconType: typeof IconType = IconType
@@ -60,7 +60,7 @@ export default class CCategoryList extends Vue {
     // 通知の表示
     notificationVisible: boolean = false
 
-    modalItem: ICategory = newCategory()
+    modalItem: IClassification = newClassification()
 
     valid: boolean = true
 
@@ -99,10 +99,10 @@ export default class CCategoryList extends Vue {
     }
 
     setInit() {
-        this.modalItem = newCategory()
+        this.modalItem = newClassification()
     }
 
-    setItem(item: ICategory) {
+    setItem(item: IClassification) {
         this.modalItem = _.cloneDeep(item)
     }
 
@@ -114,7 +114,7 @@ export default class CCategoryList extends Vue {
         }
     }
 
-    openHandler(executionType: TExecutionType, item: ICategory | null = null) {
+    openHandler(executionType: TExecutionType, item: IClassification | null = null) {
         this.errors = []
         if (executionType === ExecutionType.Create) {
             this.setInit()
@@ -132,12 +132,12 @@ export default class CCategoryList extends Vue {
     async confirmHandler() {
         if (this.executionType === ExecutionType.Create) {
             try {
-                if (this.categoryTypeValue === CategoryType.Accessory.value) {
-                    await this.$axios.$post(`/accessory_category`, this.modalItem)
-                    this.$emit('c-change', CategoryType.Accessory.name)
-                } else if (this.categoryTypeValue === CategoryType.Material.value) {
-                    await this.$axios.$post(`/material_category`, this.modalItem)
-                    this.$emit('c-change', CategoryType.Material.name)
+                if (this.categoryTypeValue === CategoryType.Category.value) {
+                    await this.$axios.$post(`/category`, this.modalItem)
+                    this.$emit('c-change', CategoryType.Category.name)
+                } else if (this.categoryTypeValue === CategoryType.Tag.value) {
+                    await this.$axios.$post(`/tag`, this.modalItem)
+                    this.$emit('c-change', CategoryType.Tag.name)
                 }
                 this.notificationVisible = true
                 this.dialogVisible = false
@@ -146,12 +146,12 @@ export default class CCategoryList extends Vue {
             }
         } else if (this.executionType === ExecutionType.Edit) {
             try {
-                if (this.categoryTypeValue === CategoryType.Accessory.value) {
-                    await this.$axios.$put(`/accessory_category/${this.modalItem.uuid}`, this.modalItem)
-                    this.$emit('c-change', CategoryType.Accessory.name)
-                } else if (this.categoryTypeValue === CategoryType.Material.value) {
-                    await this.$axios.$put(`/material_category/${this.modalItem.uuid}`, this.modalItem)
-                    this.$emit('c-change', CategoryType.Material.name)
+                if (this.categoryTypeValue === CategoryType.Category.value) {
+                    await this.$axios.$put(`/category/${this.modalItem.uuid}`, this.modalItem)
+                    this.$emit('c-change', CategoryType.Category.name)
+                } else if (this.categoryTypeValue === CategoryType.Tag.value) {
+                    await this.$axios.$put(`/tag/${this.modalItem.uuid}`, this.modalItem)
+                    this.$emit('c-change', CategoryType.Tag.name)
                 }
                 this.notificationVisible = true
                 this.dialogVisible = false
@@ -160,12 +160,12 @@ export default class CCategoryList extends Vue {
             }
         } else if (this.executionType === ExecutionType.Delete) {
             try {
-                if (this.categoryTypeValue === CategoryType.Accessory.value) {
-                    await this.$axios.$delete(`/accessory_category/${this.modalItem.uuid}`)
-                    this.$emit('c-change', CategoryType.Accessory.name)
-                } else if (this.categoryTypeValue === CategoryType.Material.value) {
-                    await this.$axios.$delete(`/material_category/${this.modalItem.uuid}`)
-                    this.$emit('c-change', CategoryType.Material.name)
+                if (this.categoryTypeValue === CategoryType.Category.value) {
+                    await this.$axios.$delete(`/category/${this.modalItem.uuid}`)
+                    this.$emit('c-change', CategoryType.Category.name)
+                } else if (this.categoryTypeValue === CategoryType.Tag.value) {
+                    await this.$axios.$delete(`/tag/${this.modalItem.uuid}`)
+                    this.$emit('c-change', CategoryType.Tag.name)
                 }
                 this.notificationVisible = true
                 this.dialogVisible = false

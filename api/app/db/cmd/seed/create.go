@@ -8,21 +8,21 @@ import (
 
 // go run app/db/cmd/seed/create.go
 func main() {
-	// accessory_category
-	var accessoryCategory models.AccessoryCategory
-	accessoryCategory.Name = "test_accessory_category"
-	if err := models.InsertAccessoryCategory(&accessoryCategory); err != nil {
+	// category
+	var category models.Category
+	category.Name = "test_category"
+	if err := models.InsertCategory(&category); err != nil {
 		log.Fatalln(err)
 	}
-	fmt.Println("accessory_categoryを作成しました")
+	fmt.Println("categoryを作成しました")
 
-	// material_category
-	var materialCategory models.MaterialCategory
-	materialCategory.Name = "test_material_category"
-	if err := models.InsertMaterialCategory(&materialCategory); err != nil {
+	// tag
+	var tag models.Tag
+	tag.Name = "test_tag"
+	if err := models.InsertTag(&tag); err != nil {
 		log.Fatalln(err)
 	}
-	fmt.Println("material_categoryを作成しました")
+	fmt.Println("tagを作成しました")
 
 	// sales_site
 	var salesSite models.SalesSite
@@ -55,8 +55,8 @@ func main() {
 	var product models.Product
 	product.Name = "test_product"
 	product.Description = "test_descriptiontest_descriptiontest_descriptiontest_descriptiontest_description"
-	product.AccessoryCategory = accessoryCategory
-	product.MaterialCategories = []models.MaterialCategory{materialCategory}
+	product.Category = category
+	product.Tags = []models.Tag{tag}
 	product.SalesSites = []models.SalesSite{salesSite}
 	if err := models.InsertProduct(&product); err != nil {
 		log.Fatalln(err)

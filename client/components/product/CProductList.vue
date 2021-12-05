@@ -67,25 +67,8 @@
                         :preview-list="previewList"
                         @c-delete-image-handler="deleteImageHandler"
                     />
-                    <v-select
-                        v-model="modalItem.accessoryCategory"
-                        :items="accessoryCategories"
-                        item-text="name"
-                        return-object
-                        chips
-                        label="アクセサリーカテゴリー"
-                        outlined
-                    />
-                    <v-select
-                        v-model="modalItem.materialCategories"
-                        :items="materialCategories"
-                        item-text="name"
-                        return-object
-                        chips
-                        multiple
-                        label="材料カテゴリー"
-                        outlined
-                    />
+                    <v-select v-model="modalItem.category" :items="categories" item-text="name" return-object chips label="カテゴリー" outlined />
+                    <v-select v-model="modalItem.tags" :items="tags" item-text="name" return-object chips multiple label="タグ" outlined />
                     <v-select
                         v-model="modalItem.salesSites"
                         :items="salesSites"
@@ -107,14 +90,14 @@
 <script lang="ts">
 import { Component, Prop, PropSync, Vue, Watch } from 'nuxt-property-decorator'
 import _ from 'lodash'
-import { ExecutionType, ICategory, IconType, IError, ImageType, IProduct, ISite, newProduct, TExecutionType, TImageType } from '~/types'
+import { ExecutionType, IClassification, IconType, IError, ImageType, IProduct, ISite, newProduct, TExecutionType, TImageType } from '~/types'
 import { ConfirmState } from '~/store'
 import { min20, required } from '~/methods'
 @Component({})
 export default class CProductList extends Vue {
     @PropSync('items') listItems!: Array<IProduct>
-    @Prop({ type: Array, default: [] }) accessoryCategories!: Array<ICategory>
-    @Prop({ type: Array, default: [] }) materialCategories!: Array<ICategory>
+    @Prop({ type: Array, default: [] }) categories!: Array<IClassification>
+    @Prop({ type: Array, default: [] }) tags!: Array<IClassification>
     @Prop({ type: Array, default: [] }) salesSites!: Array<ISite>
     @Prop({ type: String, default: '' }) type!: string
 

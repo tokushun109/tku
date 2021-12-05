@@ -4,104 +4,104 @@ import (
 	"errors"
 )
 
-type AccessoryCategory struct {
+type Category struct {
 	DefaultModel
 	Uuid string `json:"uuid"`
 	Name string `json:"name" validate:"min=1,max=20"`
 }
 
-type AccessoryCategories []AccessoryCategory
+type Categories []Category
 
-type MaterialCategory struct {
+type Tag struct {
 	DefaultModel
 	Uuid string `json:"uuid"`
 	Name string `json:"name" validate:"min=1,max=20"`
 }
 
-type MaterialCategories []MaterialCategory
+type Tags []Tag
 
-func GetAllAccessoryCategories() (accessoryCategories AccessoryCategories) {
-	Db.Find(&accessoryCategories)
-	return accessoryCategories
+func GetAllCategories() (categories Categories) {
+	Db.Find(&categories)
+	return categories
 }
 
-func GetAccessoryCategory(uuid string) (accessoryCategory AccessoryCategory) {
-	Db.Limit(1).Find(&accessoryCategory, "uuid = ?", uuid)
-	return accessoryCategory
+func GetCategory(uuid string) (category Category) {
+	Db.Limit(1).Find(&category, "uuid = ?", uuid)
+	return category
 }
 
-func AccessoryCategoryUniqueCheck(name string) (isUnique bool, err error) {
-	var accessoryCategory AccessoryCategory
-	Db.Limit(1).Find(&accessoryCategory, "name = ?", name)
-	isUnique = accessoryCategory.ID == nil
+func CategoryUniqueCheck(name string) (isUnique bool, err error) {
+	var category Category
+	Db.Limit(1).Find(&category, "name = ?", name)
+	isUnique = category.ID == nil
 	if !isUnique {
 		err = errors.New("name is duplicate")
 	}
 	return isUnique, err
 }
 
-func InsertAccessoryCategory(accessoryCategory *AccessoryCategory) (err error) {
+func InsertCategory(category *Category) (err error) {
 	// uuidの設定
 	uuid, err := GenerateUuid()
 	if err != nil {
 		return err
 	}
-	accessoryCategory.Uuid = uuid
-	err = Db.Create(&accessoryCategory).Error
+	category.Uuid = uuid
+	err = Db.Create(&category).Error
 	return err
 }
 
-func UpdateAccessoryCategory(accessoryCategory *AccessoryCategory, uuid string) (err error) {
-	err = Db.Model(&accessoryCategory).Where("uuid = ?", uuid).Updates(
-		AccessoryCategory{Name: accessoryCategory.Name},
+func UpdateCategory(category *Category, uuid string) (err error) {
+	err = Db.Model(&category).Where("uuid = ?", uuid).Updates(
+		Category{Name: category.Name},
 	).Error
 	return err
 }
 
-func (accessoryCategory *AccessoryCategory) DeleteAccessoryCategory() (err error) {
-	err = Db.Delete(&accessoryCategory).Error
+func (category *Category) DeleteCategory() (err error) {
+	err = Db.Delete(&category).Error
 	return err
 }
 
-func GetAllMaterialCategories() (materialCategories MaterialCategories) {
-	Db.Find(&materialCategories)
-	return materialCategories
+func GetAllTags() (tags Tags) {
+	Db.Find(&tags)
+	return tags
 }
 
-func GetMaterialCategory(uuid string) (materialCategory MaterialCategory) {
-	Db.Limit(1).Find(&materialCategory, "uuid = ?", uuid)
-	return materialCategory
+func GetTag(uuid string) (tag Tag) {
+	Db.Limit(1).Find(&tag, "uuid = ?", uuid)
+	return tag
 }
 
-func MaterialCategoryUniqueCheck(name string) (isUnique bool, err error) {
-	var materialCategory MaterialCategory
-	Db.Limit(1).Find(&materialCategory, "name = ?", name)
-	isUnique = materialCategory.ID == nil
+func TagUniqueCheck(name string) (isUnique bool, err error) {
+	var tag Tag
+	Db.Limit(1).Find(&tag, "name = ?", name)
+	isUnique = tag.ID == nil
 	if !isUnique {
 		err = errors.New("name is duplicate")
 	}
 	return isUnique, err
 }
 
-func InsertMaterialCategory(materialCategory *MaterialCategory) (err error) {
+func InsertTag(tag *Tag) (err error) {
 	// uuidの設定
 	uuid, err := GenerateUuid()
 	if err != nil {
 		return err
 	}
-	materialCategory.Uuid = uuid
-	err = Db.Create(&materialCategory).Error
+	tag.Uuid = uuid
+	err = Db.Create(&tag).Error
 	return err
 }
 
-func UpdateMaterialCategory(materialCategory *MaterialCategory, uuid string) (err error) {
-	err = Db.Model(&materialCategory).Where("uuid = ?", uuid).Updates(
-		MaterialCategory{Name: materialCategory.Name},
+func UpdateTag(tag *Tag, uuid string) (err error) {
+	err = Db.Model(&tag).Where("uuid = ?", uuid).Updates(
+		Tag{Name: tag.Name},
 	).Error
 	return err
 }
 
-func (materialCategory *MaterialCategory) DeleteMaterialCategory() (err error) {
-	err = Db.Delete(&materialCategory).Error
+func (tag *Tag) DeleteTag() (err error) {
+	err = Db.Delete(&tag).Error
 	return err
 }

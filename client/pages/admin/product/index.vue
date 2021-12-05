@@ -1,19 +1,13 @@
 <template>
     <v-main class="grey lighten-4">
-        <c-product-list
-            :items="products"
-            :accessory-categories="accessoryCategories"
-            :material-categories="materialCategories"
-            :sales-sites="salesSites"
-            @c-change="loadingProduct"
-        />
+        <c-product-list :items="products" :categories="categories" :tags="tags" :sales-sites="salesSites" @c-change="loadingProduct" />
     </v-main>
 </template>
 
 <script lang="ts">
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
-import { ICategory, IProduct, ISite } from '~/types'
+import { IClassification, IProduct, ISite } from '~/types'
 @Component({
     head: {
         title: '商品一覧',
@@ -22,8 +16,8 @@ import { ICategory, IProduct, ISite } from '~/types'
 export default class PageAdminProductIndex extends Vue {
     products: Array<IProduct> = []
 
-    accessoryCategories: Array<ICategory> = []
-    materialCategories: Array<ICategory> = []
+    categories: Array<IClassification> = []
+    tags: Array<IClassification> = []
     salesSites: Array<ISite> = []
 
     // 新規作成ダイアログの表示
@@ -31,12 +25,12 @@ export default class PageAdminProductIndex extends Vue {
     async asyncData({ app }: Context) {
         try {
             const products = await app.$axios.$get(`/product`)
-            const accessoryCategories = await app.$axios.$get(`/accessory_category`)
-            const materialCategories = await app.$axios.$get(`/material_category`)
+            const categories = await app.$axios.$get(`/category`)
+            const tags = await app.$axios.$get(`/tag`)
             const salesSites = await app.$axios.$get(`/sales_site`)
-            return { products, accessoryCategories, materialCategories, salesSites }
+            return { products, categories, tags, salesSites }
         } catch (e) {
-            return { products: [], accessoryCategories: [], materialCategories: [], salesSites: [] }
+            return { products: [], categories: [], tags: [], salesSites: [] }
         }
     }
 

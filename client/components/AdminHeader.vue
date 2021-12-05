@@ -50,7 +50,7 @@ export default class AdminHeader extends Vue {
     tables: Array<ITable> = [
         { name: '製作者', link: 'creator', icon: 'mdi-account' },
         { name: '商品', link: 'product', icon: 'mdi-cart-variant' },
-        { name: 'カテゴリー', link: 'category', icon: 'mdi-tag-outline' },
+        { name: '分類', link: 'classification', icon: 'mdi-tag-outline' },
         { name: 'サイト', link: 'site', icon: 'mdi-application-outline' },
     ]
 

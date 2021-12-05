@@ -51,16 +51,16 @@ func StartMainServer() error {
 	r.HandleFunc("/api/product_image/{product_image_uuid}/blob", getProductImageBlobHandler).Methods("GET")
 	r.HandleFunc("/api/product/{product_uuid}/product_image", createProductImageHandler).Methods("POST")
 	r.HandleFunc("/api/product/{product_uuid}/product_image/{product_image_uuid}", deleteProductImageHandler).Methods("DELETE")
-	// アクセサリーカテゴリー
-	r.HandleFunc("/api/accessory_category", getAllAccessoryCategoriesHandler).Methods("GET")
-	r.HandleFunc("/api/accessory_category", createAccessoryCategoryHandler).Methods("POST")
-	r.HandleFunc("/api/accessory_category/{accessory_category_uuid}", updateAccessoryCategoryHandler).Methods("PUT")
-	r.HandleFunc("/api/accessory_category/{accessory_category_uuid}", deleteAccessoryCategoryHandler).Methods("DELETE")
-	// 材料カテゴリー
-	r.HandleFunc("/api/material_category", getAllMaterialCategoriesHandler).Methods("GET")
-	r.HandleFunc("/api/material_category", createMaterialCategoryHandler).Methods("POST")
-	r.HandleFunc("/api/material_category/{material_category_uuid}", updateMaterialCategoryHandler).Methods("PUT")
-	r.HandleFunc("/api/material_category/{material_category_uuid}", deleteMaterialCategoryHandler).Methods("DELETE")
+	// カテゴリー
+	r.HandleFunc("/api/category", getAllCategoriesHandler).Methods("GET")
+	r.HandleFunc("/api/category", createCategoryHandler).Methods("POST")
+	r.HandleFunc("/api/category/{category_uuid}", updateCategoryHandler).Methods("PUT")
+	r.HandleFunc("/api/category/{category_uuid}", deleteCategoryHandler).Methods("DELETE")
+	// タグ
+	r.HandleFunc("/api/tag", getAllTagsHandler).Methods("GET")
+	r.HandleFunc("/api/tag", createTagHandler).Methods("POST")
+	r.HandleFunc("/api/tag/{tag_uuid}", updateTagHandler).Methods("PUT")
+	r.HandleFunc("/api/tag/{tag_uuid}", deleteTagHandler).Methods("DELETE")
 	// 販売サイト
 	r.HandleFunc("/api/sales_site", getAllSalesSitesHandler).Methods("GET")
 	r.HandleFunc("/api/sales_site", createSalesSiteHandler).Methods("POST")

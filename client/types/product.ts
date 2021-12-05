@@ -1,4 +1,4 @@
-import { ICategory, ISite } from 'types'
+import { IClassification, ISite } from 'types'
 
 export interface IProductImage {
     uuid: string
@@ -9,8 +9,8 @@ export interface IProduct {
     uuid: string
     name: string
     description: string
-    accessoryCategory: ICategory | null
-    materialCategories: Array<ICategory>
+    category: IClassification | null
+    tags: Array<IClassification>
     productImages: Array<IProductImage>
     salesSites: Array<ISite>
 }
