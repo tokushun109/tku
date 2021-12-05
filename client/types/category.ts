@@ -9,5 +9,5 @@ export interface ICategoryType {
 
 export const CategoryType: ICategoryType = {
     Accessory: { name: 'accessory', value: 'アクセサリーカテゴリー' },
-    Material: { name: 'material', value: '材料カテゴリー' },
+    Material: { name: 'material', value: 'タグ' },
 } as const

@@ -83,7 +83,7 @@
                         return-object
                         chips
                         multiple
-                        label="材料カテゴリー"
+                        label="タグ"
                         outlined
                     />
                     <v-select

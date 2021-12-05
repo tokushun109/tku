@@ -116,7 +116,7 @@ func deleteAccessoryCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(responseBody)
 }
 
-// 材料カテゴリー一覧を取得
+// タグ一覧を取得
 func getAllMaterialCategoriesHandler(w http.ResponseWriter, r *http.Request) {
 	materialCategories := models.GetAllMaterialCategories()
 	w.Header().Set("Content-Type", "application/json")
@@ -127,7 +127,7 @@ func getAllMaterialCategoriesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// 材料カテゴリーの新規作成
+// タグの新規作成
 func createMaterialCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -163,7 +163,7 @@ func createMaterialCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(responseBody)
 }
 
-// 材料カテゴリーの更新
+// タグの更新
 func updateMaterialCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	uuid := vars["material_category_uuid"]
@@ -202,7 +202,7 @@ func updateMaterialCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(responseBody)
 }
 
-// 材料カテゴリーの削除
+// タグの削除
 func deleteMaterialCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	uuid := vars["material_category_uuid"]

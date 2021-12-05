@@ -24,7 +24,7 @@ export default class PageAdminCategoryIndex extends Vue {
     // アクセサリーカテゴリー一覧
     accessoryCategories: Array<ICategory> = []
 
-    // 材料カテゴリー一覧
+    // タグ一覧
     materialCategories: Array<ICategory> = []
 
     async asyncData({ app }: Context) {

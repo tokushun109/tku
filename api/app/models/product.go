@@ -99,7 +99,7 @@ func InsertProduct(product *Product) (err error) {
 	}
 
 	var productToMaterialCategories []ProductToMaterialCategory
-	// 商品と材料カテゴリーを紐付け
+	// 商品とタグを紐付け
 	for _, materialCategory := range product.MaterialCategories {
 		productToMaterialCategories = append(
 			productToMaterialCategories,
@@ -179,7 +179,7 @@ func UpdateProduct(product *Product, uuid string) (err error) {
 		return err
 	}
 
-	// 商品と材料カテゴリーを紐付け
+	// 商品とタグを紐付け
 	var productToMaterialCategories []ProductToMaterialCategory
 	for _, materialCategory := range product.MaterialCategories {
 		productToMaterialCategories = append(
