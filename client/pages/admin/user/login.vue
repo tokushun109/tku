@@ -6,7 +6,7 @@
                 <h3 class="title mb-4 green--text text--darken-3">ログイン</h3>
                 <v-form ref="form" v-model="valid" lazy-validation>
                     <v-text-field v-model="form.email" :rules="rules" label="email(必須)" outlined />
-                    <v-text-field v-model="form.password" :rules="rules" label="パスワード(必須)" outlined />
+                    <v-text-field v-model="form.password" type="password" :rules="rules" label="パスワード(必須)" outlined />
                     <v-btn color="primary" :disabled="!valid" @click="onSubmit">確定</v-btn>
                 </v-form>
             </v-sheet>
