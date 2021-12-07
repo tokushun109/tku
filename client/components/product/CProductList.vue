@@ -47,7 +47,7 @@
                                             </v-carousel-item>
                                         </v-carousel>
                                         <div class="text-right">
-                                            <p>{{ listItem.price | priceFormat }}円</p>
+                                            <p>{{ listItem.price | priceFormat }}円(税込)</p>
                                         </div>
                                     </v-card-text>
                                 </v-card>
