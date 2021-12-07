@@ -20,7 +20,7 @@ export function nonSpace(value: string) {
 
 // 金額
 export function price(value: number) {
-    return value.toString().match(/^([1-9]\d*|0)(\.\d+)?$/) || `金額を入力してください`
+    return !!value.toString().match(/^([1-9]\d*|0)(\.\d+)?$/) || `金額を入力してください`
 }
 
 // 最大金額
