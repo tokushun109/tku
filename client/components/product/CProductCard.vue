@@ -8,7 +8,7 @@
                         <v-chip v-if="!listItem.isActive" x-small :color="ColorType.Grey" :text-color="ColorType.White">展示</v-chip>
                     </div>
                     <v-spacer />
-                    <div>
+                    <div v-if="admin">
                         <c-icon :type="IconType.Edit.name" @c-click="$emit('c-open', ExecutionType.Edit, listItem)" />
                         <c-icon :type="IconType.Delete.name" @c-click="$emit('c-open', ExecutionType.Delete, listItem)" />
                     </div>
@@ -34,11 +34,12 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'nuxt-property-decorator'
-import _ from 'lodash'
 import { ColorType, ExecutionType, IconType, IProduct, TExecutionType } from '~/types'
 @Component({})
 export default class CProductCard extends Vue {
     @Prop({ type: Object }) listItem!: IProduct
+    @Prop({ type: Boolean, default: false }) admin!: boolean
+
     ColorType: typeof ColorType = ColorType
     IconType: typeof IconType = IconType
     ExecutionType: typeof ExecutionType = ExecutionType

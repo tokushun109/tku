@@ -13,7 +13,7 @@
                     <v-row>
                         <v-col v-for="listItem in listItems" :key="listItem.uuid" cols="12" sm="6" md="4">
                             <v-list-item>
-                                <c-product-card :list-item="listItem" @c-open="openHandler" />
+                                <c-product-card :list-item="listItem" admin @c-open="openHandler" />
                             </v-list-item>
                         </v-col>
                     </v-row>
