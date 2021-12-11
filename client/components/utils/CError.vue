@@ -1,6 +1,6 @@
 <template>
-    <v-container>
-        <c-message v-if="errors && errors.length > 0" color="error">
+    <v-container v-if="errors && errors.length > 0">
+        <c-message color="error">
             <ul class="errors">
                 <li v-for="(error, index) in errors" :key="index" class="error">
                     <span v-dompurify-html="error.data.replace(/\n/g, '<br />')"></span>
