@@ -1,5 +1,5 @@
 <template>
-    <v-card width="100%" :color="Color" hover @click.native="$emit('c-open', ExecutionType.Detail, listItem)">
+    <v-card width="100%" :color="Color" hover @click.native="$emit('c-click', ExecutionType.Detail, listItem)">
         <v-card-text>
             <div class="my-4">
                 <div>
@@ -13,8 +13,8 @@
             <c-product-image :product="listItem" />
             <div class="text-right mt-2">
                 <div v-if="admin" class="d-flex">
-                    <c-icon :type="IconType.Edit.name" @c-click="$emit('c-open', ExecutionType.Edit, listItem)" />
-                    <c-icon :type="IconType.Delete.name" @c-click="$emit('c-open', ExecutionType.Delete, listItem)" />
+                    <c-icon :type="IconType.Edit.name" @c-click="$emit('c-click', ExecutionType.Edit, listItem)" />
+                    <c-icon :type="IconType.Delete.name" @c-click="$emit('c-click', ExecutionType.Delete, listItem)" />
                     <v-spacer />
                     <div class="text-h6">￥{{ listItem.price | priceFormat }}<span class="text-caption">税込</span></div>
                 </div>

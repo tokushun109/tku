@@ -6,7 +6,7 @@
                     <div class="close-icon">
                         <img src="/icon/close.png" alt="close" @click="toggle" />
                     </div>
-                    <c-open-menu @close-menu="toggle" />
+                    <c-click-menu @close-menu="toggle" />
                 </div>
                 <div v-else class="open-icon">
                     <img src="/icon/menu.png" alt="open" @click="toggle" />

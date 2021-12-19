@@ -1,7 +1,7 @@
 <template>
     <v-main class="grey lighten-4">
         <v-container>
-            <v-sheet class="pa-4 lighten-4 text-center">
+            <v-sheet class="pa-4 lighten-4 mx-auto text-center" max-width="800px">
                 <c-error :errors.sync="errors" />
                 <h3 class="title mb-4 green--text text--darken-3">ログイン</h3>
                 <v-form ref="form" v-model="valid" lazy-validation>
