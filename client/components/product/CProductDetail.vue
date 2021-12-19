@@ -18,10 +18,19 @@
             </v-sheet>
         </v-container>
         <div class="purchase-button">
-            <v-btn :color="ColorType.Orange" x-large fab>
-                <c-icon :type="IconType.Cart.name" :color="ColorType.White" />
+            <v-btn :color="ColorType.Orange" :disabled="product.salesSites.length === 0" x-large fab @click="dialogVisible = true">
+                <c-icon :type="IconType.Cart.name" :color="ColorType.White" @c-click="dialogVisible = true" />
             </v-btn>
         </div>
+        <c-dialog :visible.sync="dialogVisible" title="ご購入はこちらから" :is-button="false">
+            <template #content>
+                <div v-for="site in product.salesSites" :key="site.uuid">
+                    <v-btn :color="ColorType.LightGreen" :href="site.url" class="my-4 white--text" block>
+                        {{ site.name }}
+                    </v-btn>
+                </div>
+            </template>
+        </c-dialog>
     </v-main>
 </template>
 
@@ -33,6 +42,9 @@ export default class CProductDetail extends Vue {
     @Prop({ type: Object }) product!: IProduct
     ColorType: typeof ColorType = ColorType
     IconType: typeof IconType = IconType
+
+    // ダイアログの表示
+    dialogVisible: boolean = false
 }
 </script>
 
