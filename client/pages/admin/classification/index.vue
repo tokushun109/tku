@@ -1,10 +1,10 @@
 <template>
     <v-main class="grey lighten-4">
         <v-row>
-            <v-col cols="12" sm="12" md="6">
+            <v-col cols="12" md="6">
                 <c-classification-list :type="CategoryType.Category.name" :items="categories" @c-change="loadingCategory" />
             </v-col>
-            <v-col cols="12" sm="12" md="6">
+            <v-col cols="12" md="6">
                 <c-classification-list :type="CategoryType.Tag.name" :items="tags" @c-change="loadingCategory" />
             </v-col>
         </v-row>

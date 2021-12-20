@@ -3,18 +3,36 @@
         <v-container>
             <v-sheet class="pa-4 lighten-4">
                 <p class="title-weight green--text text--darken-3">{{ product.name }}</p>
-                <c-product-image class="mb-4" category :product="product" />
-                <p class="title-weight grey--text text--light-1 text-h6">
-                    ￥{{ product.price | priceFormat }}
-                    <span class="text-body-2">(税込)</span>
-                </p>
-                <pre style="white-space: pre-wrap" class="mb-4 text-body-2">{{ product.description }}</pre>
-                <p v-if="product.tags.length > 0" class="title-weight">関連タグ<v-divider /></p>
-                <div class="d-flex">
-                    <div v-for="tag in product.tags" :key="tag.uuid">
-                        <v-chip small :color="ColorType.Lime" :text-color="ColorType.White" class="mx-1">{{ tag.name }}</v-chip>
-                    </div>
-                </div>
+                <v-row>
+                    <v-col md="7">
+                        <c-product-image class="mb-4" category :product="product" />
+                    </v-col>
+                    <v-col md="5">
+                        <p class="title-weight grey--text text--light-1 text-h6">
+                            ￥{{ product.price | priceFormat }}
+                            <span class="text-body-2">(税込)</span>
+                        </p>
+                        <pre style="white-space: pre-wrap" class="mb-4 text-body-2">{{ product.description }}</pre>
+                        <p v-if="product.tags.length > 0" class="title-weight">関連タグ<v-divider /></p>
+                        <div class="d-flex">
+                            <div v-for="tag in product.tags" :key="tag.uuid">
+                                <v-chip small :color="ColorType.Lime" :text-color="ColorType.White" class="mx-1">{{ tag.name }}</v-chip>
+                            </div>
+                        </div>
+                        <div class="site-buttons-area">
+                            <div class="text-body-1 mt-4">
+                                <p class="title-weight">販売サイト<v-divider /></p>
+                            </div>
+                            <v-row>
+                                <v-col v-for="site in product.salesSites" :key="site.uuid" md="6" sm="12">
+                                    <v-btn :color="ColorType.LightGreen" :href="site.url" class="white--text text-h6" block>
+                                        {{ site.name }}
+                                    </v-btn>
+                                </v-col>
+                            </v-row>
+                        </div>
+                    </v-col>
+                </v-row>
             </v-sheet>
         </v-container>
         <div class="purchase-button">
@@ -22,13 +40,20 @@
                 <c-icon :type="IconType.Cart.name" :color="ColorType.White" @c-click="dialogVisible = true" />
             </v-btn>
         </div>
-        <c-dialog :visible.sync="dialogVisible" title="ご購入はこちらから" :is-button="false">
+        <c-dialog :visible.sync="dialogVisible" :is-button="false">
             <template #content>
-                <div v-for="site in product.salesSites" :key="site.uuid">
-                    <v-btn :color="ColorType.LightGreen" :href="site.url" class="my-4 white--text" block>
-                        {{ site.name }}
-                    </v-btn>
+                <div class="text-body-1">
+                    <p class="title-weight">以下のサイトで販売中です！<v-divider /></p>
                 </div>
+                <c-container>
+                    <v-row>
+                        <v-col v-for="site in product.salesSites" :key="site.uuid" cols="12" md="6">
+                            <v-btn :color="ColorType.LightGreen" :href="site.url" class="white--text text-h6 site-modal" block>
+                                {{ site.name }}
+                            </v-btn>
+                        </v-col>
+                    </v-row>
+                </c-container>
             </template>
         </c-dialog>
     </v-main>
@@ -51,8 +76,14 @@ export default class CProductDetail extends Vue {
 <style lang="stylus" scoped>
 .c-product-detail-page
     position relative
+    .site-buttons-area
+        +md()
+            display none
     .purchase-button
-        position absolute
+        position fixed
         right 20px
-        bottom 20px
+        bottom 50px
+        display none
+        +md()
+            display block
 </style>

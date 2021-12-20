@@ -23,7 +23,7 @@ export default class CPage extends Vue {
     padding $page-padding
     min-height calc(100vh - 103px - 140px)
     max-width $wide-width
-    +sp()
+    +sm()
         padding $page-sp-padding
     .page-title
         position relative

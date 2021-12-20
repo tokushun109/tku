@@ -1,7 +1,7 @@
 <template>
     <v-dialog v-model="dialogVisible" :width="width">
         <v-card>
-            <v-card-title class="text-h5 justify-center green white--text">{{ title }}</v-card-title>
+            <v-card-title v-if="title" class="text-h5 justify-center green white--text">{{ title }}</v-card-title>
             <v-card-text class="pt-5">
                 <div class="title text-center"><slot name="content" /></div>
                 <div v-if="isButton" class="text-center">

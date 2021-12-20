@@ -11,7 +11,7 @@
                 <v-list>
                     <c-message v-if="listItems.length === 0" class="mt-4"> 登録されていません </c-message>
                     <v-row>
-                        <v-col v-for="listItem in listItems" :key="listItem.uuid" cols="12" sm="6" md="4">
+                        <v-col v-for="listItem in listItems" :key="listItem.uuid" sm="12" md="6">
                             <v-list-item>
                                 <c-product-card :list-item="listItem" admin @c-click="clickHandler" />
                             </v-list-item>

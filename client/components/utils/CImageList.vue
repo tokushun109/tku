@@ -1,7 +1,7 @@
 <template>
     <v-container v-if="registeredList.length > 0 || previewList.length > 0" class="c-image-list mb-4">
         <v-row>
-            <v-col v-for="(registeredPath, index) in registeredList" :key="registeredPath" class="registered-item" cols="12" sm="3" md="3">
+            <v-col v-for="(registeredPath, index) in registeredList" :key="registeredPath" class="registered-item" cols="6" sm="4" md="3">
                 <div class="image-wrapper">
                     <c-icon
                         class="close-icon"
@@ -12,7 +12,7 @@
                     <v-img :src="registeredPath" :alt="`registered${index}`" class="registered-item-image" />
                 </div>
             </v-col>
-            <v-col v-for="(previewPath, index) in previewList" :key="previewPath" class="preview-item yellow lighten-3" cols="12" sm="3" md="3">
+            <v-col v-for="(previewPath, index) in previewList" :key="previewPath" class="preview-item yellow lighten-3" cols="6" sm="4" md="3">
                 <div class="image-wrapper">
                     <c-icon
                         class="close-icon"
