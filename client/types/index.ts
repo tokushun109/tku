@@ -26,6 +26,7 @@ export const IconType: IIconType = {
     Edit: { name: 'edit', icon: 'mdi-pencil' },
     Delete: { name: 'delete', icon: 'mdi-delete' },
     Close: { name: 'close', icon: 'mdi-close' },
+    Cart: { name: 'cart', icon: 'mdi-cart' },
 } as const
 
 export const ColorType = {
@@ -33,7 +34,10 @@ export const ColorType = {
     Orange: 'orange',
     Yellow: 'yellow',
     Green: 'green',
+    LightGreen: 'light-green',
     Blue: 'blue',
+    Cyan: 'cyan',
+    Lime: 'lime',
     Purple: 'purple',
     Black: 'black',
     Grey: 'grey',

@@ -1,13 +1,13 @@
 <template>
     <v-dialog v-model="dialogVisible" :width="width">
         <v-card>
-            <v-card-title class="text-h5 justify-center green white--text">{{ title }}</v-card-title>
+            <v-card-title v-if="title" class="text-h5 justify-center green white--text">{{ title }}</v-card-title>
             <v-card-text class="pt-5">
                 <div class="title text-center"><slot name="content" /></div>
                 <div v-if="isButton" class="text-center">
-                    <v-btn color="primary" :disabled="confirmButtonDisabled" @click="confirmButton">{{ confirmButtonTitle }}</v-btn>
                     <v-btn color="primary" outlined @click="cancelButton">キャンセル</v-btn>
                     <v-btn v-if="subConfirmButtonTitle" color="secondary" @click="subConfirmButton">{{ subConfirmButtonTitle }}</v-btn>
+                    <v-btn color="primary" :disabled="confirmButtonDisabled" @click="confirmButton">{{ confirmButtonTitle }}</v-btn>
                 </div>
             </v-card-text>
         </v-card>

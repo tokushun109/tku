@@ -13,7 +13,7 @@ export function newProduct(): IProduct {
         name: '',
         description: '',
         price: 1,
-        category: null,
+        category: newClassification(),
         tags: [],
         productImages: [],
         salesSites: [],

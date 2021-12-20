@@ -1,5 +1,5 @@
 <template>
-    <v-icon :color="color" @click="$emit('c-click')">{{ getIcon }}</v-icon>
+    <v-icon :color="color" @click.stop="$emit('c-click')">{{ getIcon }}</v-icon>
 </template>
 
 <script lang="ts">

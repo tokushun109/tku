@@ -5,15 +5,15 @@
                 <div class="d-flex">
                     <h3 class="title green--text text--darken-3">商品</h3>
                     <v-spacer />
-                    <c-icon :type="IconType.New.name" @c-click="openHandler(ExecutionType.Create)" />
+                    <c-icon :type="IconType.New.name" @c-click="clickHandler(ExecutionType.Create)" />
                 </div>
                 <v-divider />
                 <v-list>
                     <c-message v-if="listItems.length === 0" class="mt-4"> 登録されていません </c-message>
                     <v-row>
-                        <v-col v-for="listItem in listItems" :key="listItem.uuid" cols="12" sm="6" md="4">
+                        <v-col v-for="listItem in listItems" :key="listItem.uuid" sm="12" md="6">
                             <v-list-item>
-                                <c-product-card :list-item="listItem" admin @c-open="openHandler" />
+                                <c-product-card :list-item="listItem" admin @c-click="clickHandler" />
                             </v-list-item>
                         </v-col>
                     </v-row>
@@ -184,10 +184,12 @@ export default class CProductList extends Vue {
         }
     }
 
-    openHandler(executionType: TExecutionType, item: IProduct | null = null) {
+    clickHandler(executionType: TExecutionType, item: IProduct | null = null) {
         this.errors = []
         if (executionType === ExecutionType.Create) {
             this.setInit()
+        } else if (item && executionType === ExecutionType.Detail) {
+            this.$router.push(`/admin/product/${item.uuid}`)
         } else {
             this.setItem(item!)
         }
