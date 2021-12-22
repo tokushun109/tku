@@ -1,7 +1,7 @@
 export interface ISite {
     uuid: string
     name: string
-    url: string
+    url?: string
 }
 
 export interface ISiteType {

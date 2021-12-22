@@ -32,7 +32,13 @@
                     lazy-validation
                 >
                     <v-text-field v-model="modalItem.name" :rules="nameRules" label="サイト名(必須)" outlined counter="20" />
-                    <v-text-field v-model="modalItem.url" :rules="urlRules" label="URL" outlined />
+                    <v-text-field
+                        v-if="!(siteTypeValue === SiteType.SalesSite.value)"
+                        v-model="modalItem.url"
+                        :rules="urlRules"
+                        label="URL"
+                        outlined
+                    />
                 </v-form>
                 <p v-else-if="executionType === ExecutionType.Delete">削除してもよろしいですか？</p>
             </template>
@@ -54,6 +60,7 @@ export default class CSiteList extends Vue {
     IconType: typeof IconType = IconType
     ExecutionType: typeof ExecutionType = ExecutionType
     executionType: TExecutionType = ExecutionType.Create
+    SiteType: typeof SiteType = SiteType
 
     // ダイアログの表示
     dialogVisible: boolean = false
