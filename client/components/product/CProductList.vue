@@ -54,18 +54,74 @@
                         :preview-list="previewList"
                         @c-delete-image-handler="deleteImageHandler"
                     />
-                    <v-select v-model="modalItem.category" :items="categories" item-text="name" return-object chips label="カテゴリー" outlined />
-                    <v-select v-model="modalItem.tags" :items="tags" item-text="name" return-object chips multiple label="タグ" outlined />
                     <v-select
-                        v-model="modalItem.salesSites"
-                        :items="salesSites"
+                        v-model="modalItem.category"
+                        :items="categories"
+                        item-text="name"
+                        return-object
+                        height="56"
+                        chips
+                        label="カテゴリー"
+                        outlined
+                    />
+                    <v-select
+                        v-model="modalItem.tags"
+                        :items="tags"
                         item-text="name"
                         return-object
                         chips
+                        height="56"
                         multiple
-                        label="販売サイト"
+                        label="タグ"
                         outlined
                     />
+                    <v-row>
+                        <v-col cols="3">
+                            <v-select
+                                v-model="previewSiteDetail.salesSite"
+                                :items="salesSites"
+                                item-text="name"
+                                height="56"
+                                return-object
+                                chips
+                                label="販売サイト"
+                                outlined
+                            />
+                        </v-col>
+                        <v-col cols="8">
+                            <v-text-field
+                                v-model="previewSiteDetail.url"
+                                :items="salesSites"
+                                item-text="name"
+                                return-object
+                                chips
+                                label="URL"
+                                outlined
+                            />
+                        </v-col>
+                        <v-col cols="1">
+                            <c-icon
+                                class="mt-2"
+                                x-large
+                                :color="ColorType.Green"
+                                :type="IconType.Plus.name"
+                                :disabled="!(previewSiteDetail.salesSite && previewSiteDetail.url)"
+                                @c-click="AddSiteDetail"
+                            />
+                        </v-col>
+                    </v-row>
+                    <div v-if="modalItem.siteDetails.length > 0" class="site-detail-preview">
+                        <div v-for="(siteDetail, index) in modalItem.siteDetails" :key="index">
+                            <v-row align="center" class="my-1">
+                                <v-col cols="3"> {{ siteDetail.salesSite.name }} </v-col>
+                                <v-col cols="8"> {{ siteDetail.url }} </v-col>
+                                <v-col cols="1">
+                                    <c-icon :color="ColorType.Red" :type="IconType.Close.name" @c-click="deleteSiteDetail(index)" />
+                                </v-col>
+                            </v-row>
+                            <v-divider v-if="modalItem.siteDetails.length !== index + 1" />
+                        </div>
+                    </div>
                     <div class="d-flex justify-center outlined">
                         <v-checkbox v-model="modalItem.isActive" label="販売中" dense />
                     </div>
@@ -89,7 +145,9 @@ import {
     ImageType,
     IProduct,
     ISite,
+    ISiteDetail,
     newProduct,
+    newSiteDetail,
     TExecutionType,
     TImageType,
 } from '~/types'
@@ -118,6 +176,8 @@ export default class CProductList extends Vue {
     notificationVisible: boolean = false
     // 確認ダイアログの表示
     confirmVisible: boolean = true
+
+    previewSiteDetail: ISiteDetail = newSiteDetail()
 
     valid: boolean = true
 
@@ -162,6 +222,21 @@ export default class CProductList extends Vue {
         return message
     }
 
+    @Watch('dialogVisible')
+    resetValidation() {
+        if (!this.dialogVisible && this.executionType !== ExecutionType.Delete) {
+            const refs: any = this.$refs.form
+            refs.resetValidation()
+        }
+    }
+
+    AddSiteDetail() {
+        if (this.previewSiteDetail.salesSite && this.previewSiteDetail.url) {
+            this.modalItem.siteDetails.push(this.previewSiteDetail)
+            this.previewSiteDetail = newSiteDetail()
+        }
+    }
+
     getColor(listItem: IProduct): string {
         return listItem.isActive ? 'light-green lighten-5' : 'grey lighten-3'
     }
@@ -174,14 +249,6 @@ export default class CProductList extends Vue {
     setItem(item: IProduct) {
         this.modalItem = _.cloneDeep(item)
         this.uploadFiles = []
-    }
-
-    @Watch('dialogVisible')
-    resetValidation() {
-        if (!this.dialogVisible && this.executionType !== ExecutionType.Delete) {
-            const refs: any = this.$refs.form
-            refs.resetValidation()
-        }
     }
 
     clickHandler(executionType: TExecutionType, item: IProduct | null = null) {
@@ -264,10 +331,18 @@ export default class CProductList extends Vue {
             this.uploadFiles.splice(index, 1)
         }
     }
+
+    deleteSiteDetail(index: number) {
+        this.modalItem.siteDetails.splice(index, 1)
+    }
 }
 </script>
 
 <style lang="stylus">
 .v-image
     aspect-ratio 16 / 9
+
+.site-detail-preview
+    border 1px dashed $light-dark-color
+    border-radius 3px
 </style>

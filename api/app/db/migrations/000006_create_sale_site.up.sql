@@ -9,6 +9,8 @@ CREATE TABLE IF NOT EXISTS sales_site(
 
 CREATE TABLE IF NOT EXISTS site_detail(
     id INT PRIMARY KEY AUTO_INCREMENT,
+    uuid VARCHAR(36) NOT NULL UNIQUE,
+    url VARCHAR(255) NOT NULL,
     product_id INT NOT NULL,
     sales_site_id INT NOT NULL,
     created_at DATETIME,

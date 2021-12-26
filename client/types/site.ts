@@ -4,6 +4,12 @@ export interface ISite {
     url?: string
 }
 
+export interface ISiteDetail {
+    uuid: string
+    url: string
+    salesSite: ISite
+}
+
 export interface ISiteType {
     [key: string]: { name: string; value: string }
 }
