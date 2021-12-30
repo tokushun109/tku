@@ -16,7 +16,7 @@ type Product struct {
 	Category      Category        `json:"category" validate:"-"`
 	Tags          []Tag           `gorm:"many2many:product_to_tag" json:"tags"`
 	ProductImages []*ProductImage `gorm:"hasmany:product_image" json:"productImages"`
-	SalesSites    []SalesSite     `gorm:"many2many:product_to_sales_site" json:"salesSites"`
+	SiteDetails   []*SiteDetail   `gorm:"hasmany:site_detail" json:"siteDetails"`
 }
 
 type Products []Product
@@ -45,7 +45,7 @@ func GetAllProducts() (products Products) {
 	Db.Preload("Category").
 		Preload("ProductImages").
 		Preload("Tags").
-		Preload("SalesSites").
+		Preload("SiteDetails.SalesSite").
 		Find(&products)
 	for _, product := range products {
 		setProductImageApiPath(&product)
@@ -57,7 +57,7 @@ func GetProduct(uuid string) (product Product, err error) {
 	err = Db.Preload("Category").
 		Preload("ProductImages").
 		Preload("Tags").
-		Preload("SalesSites").
+		Preload("SiteDetails.SalesSite").
 		First(&product, "uuid = ?", uuid).Error
 
 	setProductImageApiPath(&product)
@@ -95,7 +95,7 @@ func InsertProduct(product *Product) (err error) {
 	// カテゴリーの設定
 	category := GetCategory(product.Category.Uuid)
 	product.CategoryId = category.ID
-	if err := tx.Omit("Category", "Tags", "ProductImages", "SalesSites").Create(&product).Error; err != nil {
+	if err := tx.Omit("Category", "Tags", "ProductImages", "SiteDetails").Create(&product).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -118,19 +118,26 @@ func InsertProduct(product *Product) (err error) {
 		}
 	}
 
-	var productToSalesSiteList []ProductToSalesSite
+	var siteDetailList []SiteDetail
 	// 商品と販売サイトを紐付け
-	for _, salesSite := range product.SalesSites {
-		productToSalesSiteList = append(
-			productToSalesSiteList,
-			ProductToSalesSite{
+	for _, siteDetail := range product.SiteDetails {
+		// uuidの設定
+		uuid, err := GenerateUuid()
+		if err != nil {
+			return err
+		}
+		siteDetailList = append(
+			siteDetailList,
+			SiteDetail{
+				Uuid:        uuid,
+				Url:         siteDetail.Url,
 				ProductId:   product.ID,
-				SalesSiteId: GetSalesSite(salesSite.Uuid).ID,
+				SalesSiteId: GetSalesSite(siteDetail.SalesSite.Uuid).ID,
 			},
 		)
 	}
-	if len(productToSalesSiteList) > 0 {
-		if err := tx.Create(&productToSalesSiteList).Error; err != nil {
+	if len(siteDetailList) > 0 {
+		if err := tx.Create(&siteDetailList).Error; err != nil {
 			tx.Rollback()
 			return err
 		}
@@ -151,7 +158,7 @@ func UpdateProduct(product *Product, uuid string) (err error) {
 	}
 
 	err = tx.Model(&product).
-		Omit("Category", "Tags", "ProductImages", "SalesSites").
+		Omit("Category", "Tags", "ProductImages", "SiteDetails").
 		Where("uuid = ?", uuid).
 		Updates(
 			Product{
@@ -205,26 +212,33 @@ func UpdateProduct(product *Product, uuid string) (err error) {
 	// 登録されている中間テーブルを全て物理削除する
 	if err = tx.Where("product_id = ?", registeredProduct.ID).
 		Unscoped().
-		Delete(&ProductToSalesSite{}).
+		Delete(&SiteDetail{}).
 		Error; err != nil {
 		tx.Rollback()
 		return err
 	}
 
+	var siteDetailList []SiteDetail
 	// 商品と販売サイトを紐付け
-	var productToSalesSiteList []ProductToSalesSite
-	for _, salesSite := range product.SalesSites {
-		productToSalesSiteList = append(
-			productToSalesSiteList,
-			ProductToSalesSite{
+	for _, siteDetail := range product.SiteDetails {
+		// uuidの設定
+		uuid, err := GenerateUuid()
+		if err != nil {
+			return err
+		}
+		siteDetailList = append(
+			siteDetailList,
+			SiteDetail{
+				Uuid:        uuid,
+				Url:         siteDetail.Url,
 				ProductId:   registeredProduct.ID,
-				SalesSiteId: GetSalesSite(salesSite.Uuid).ID,
+				SalesSiteId: GetSalesSite(siteDetail.SalesSite.Uuid).ID,
 			},
 		)
 	}
 
-	if len(productToSalesSiteList) > 0 {
-		if err := tx.Create(&productToSalesSiteList).Error; err != nil {
+	if len(siteDetailList) > 0 {
+		if err := tx.Create(&siteDetailList).Error; err != nil {
 			tx.Rollback()
 			return err
 		}
@@ -300,7 +314,7 @@ func (product *Product) DeleteProduct() (err error) {
 	}
 
 	// 商品を削除する
-	if err = tx.Select("Tags", "SalesSites", "ProductImages").Delete(&product).Error; err != nil {
+	if err = tx.Select("Tags", "SiteDetails", "ProductImages").Delete(&product).Error; err != nil {
 		tx.Rollback()
 		return err
 	}

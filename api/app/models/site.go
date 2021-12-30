@@ -8,7 +8,15 @@ type SalesSite struct {
 	DefaultModel
 	Uuid string `json:"uuid"`
 	Name string `json:"name" validate:"min=1,max=20"`
-	Url  string `json:"url" validate:"url"`
+}
+
+type SiteDetail struct {
+	DefaultModel
+	Uuid        string    `json:"uuid"`
+	Url         string    `json:"url" validate:"url"`
+	ProductId   *uint     `json:"-"`
+	SalesSiteId *uint     `json:"-"`
+	SalesSite   SalesSite `json:"salesSite" validate:"-"`
 }
 
 type SalesSites []SalesSite

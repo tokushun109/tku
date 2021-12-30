@@ -1,5 +1,7 @@
 <template>
-    <v-icon :color="color" @click.stop="$emit('c-click')">{{ getIcon }}</v-icon>
+    <v-icon :color="color" :large="large" :small="small" :x-large="xLarge" :x-small="xSmall" :disabled="disabled" @click.stop="$emit('c-click')">
+        {{ getIcon }}
+    </v-icon>
 </template>
 
 <script lang="ts">
@@ -12,6 +14,13 @@ export default class CIcon extends Vue {
     @Prop({ type: String, default: IconType.New.name }) type!: string
     // 色の種類
     @Prop({ type: String }) color?: TColorType
+    // サイズの種類
+    @Prop({ type: Boolean, default: false }) large!: boolean
+    @Prop({ type: Boolean, default: false }) small!: boolean
+    @Prop({ type: Boolean, default: false }) xLarge!: boolean
+    @Prop({ type: Boolean, default: false }) xSmall!: boolean
+    // 非活性な状態か
+    @Prop({ type: Boolean, default: false }) disabled!: boolean
     // アイコンの取得
     get getIcon(): string {
         let icon = ''

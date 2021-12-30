@@ -1,3 +1,4 @@
+import { ISiteDetail } from './site'
 import { IProduct, IClassification, ISite, ICreator } from '~/types'
 export function newCreator(): ICreator {
     return {
@@ -16,7 +17,7 @@ export function newProduct(): IProduct {
         category: newClassification(),
         tags: [],
         productImages: [],
-        salesSites: [],
+        siteDetails: [],
         isActive: true,
     }
 }
@@ -33,5 +34,19 @@ export function newSite(): ISite {
         uuid: '',
         name: '',
         url: '',
+    }
+}
+
+export function newSalesSite(): ISite {
+    return {
+        uuid: '',
+        name: '',
+    }
+}
+export function newSiteDetail(): ISiteDetail {
+    return {
+        uuid: '',
+        url: '',
+        salesSite: newSalesSite(),
     }
 }

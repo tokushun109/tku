@@ -27,6 +27,7 @@ export const IconType: IIconType = {
     Delete: { name: 'delete', icon: 'mdi-delete' },
     Close: { name: 'close', icon: 'mdi-close' },
     Cart: { name: 'cart', icon: 'mdi-cart' },
+    Plus: { name: 'plus', icon: 'mdi-plus' },
 } as const
 
 export const ColorType = {
