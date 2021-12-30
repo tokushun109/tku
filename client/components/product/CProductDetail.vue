@@ -25,7 +25,14 @@
                             </div>
                             <v-row>
                                 <v-col v-for="siteDetail in product.siteDetails" :key="siteDetail.uuid" md="6" sm="12">
-                                    <v-btn :color="ColorType.LightGreen" :href="siteDetail.url" class="white--text text-h6" block>
+                                    <v-btn
+                                        :color="ColorType.LightGreen"
+                                        :href="siteDetail.url"
+                                        class="white--text text-h6"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        block
+                                    >
                                         {{ siteDetail.salesSite.name }}
                                     </v-btn>
                                 </v-col>
@@ -48,7 +55,14 @@
                 <c-container>
                     <v-row>
                         <v-col v-for="siteDetail in product.siteDetails" :key="siteDetail.uuid" cols="12" md="6">
-                            <v-btn :color="ColorType.LightGreen" :href="siteDetail.url" class="white--text text-h6 site-modal" block>
+                            <v-btn
+                                :color="ColorType.LightGreen"
+                                :href="siteDetail.url"
+                                class="white--text text-h6 site-modal"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                block
+                            >
                                 {{ siteDetail.salesSite.name }}
                             </v-btn>
                         </v-col>
