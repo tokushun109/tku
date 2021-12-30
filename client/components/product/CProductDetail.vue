@@ -4,10 +4,10 @@
             <v-sheet class="pa-4 lighten-4">
                 <p class="title-weight green--text text--darken-3">{{ product.name }}</p>
                 <v-row>
-                    <v-col md="7">
+                    <v-col cols="12" md="7">
                         <c-product-image class="mb-4" category :product="product" />
                     </v-col>
-                    <v-col md="5">
+                    <v-col cols="12" md="5">
                         <p class="title-weight grey--text text--light-1 text-h6">
                             ￥{{ product.price | priceFormat }}
                             <span class="text-body-2">(税込)</span>
@@ -24,9 +24,9 @@
                                 <p class="title-weight">販売サイト<v-divider /></p>
                             </div>
                             <v-row>
-                                <v-col v-for="site in product.salesSites" :key="site.uuid" md="6" sm="12">
-                                    <v-btn :color="ColorType.LightGreen" :href="site.url" class="white--text text-h6" block>
-                                        {{ site.name }}
+                                <v-col v-for="siteDetail in product.siteDetails" :key="siteDetail.uuid" md="6" sm="12">
+                                    <v-btn :color="ColorType.LightGreen" :href="siteDetail.url" class="white--text text-h6" block>
+                                        {{ siteDetail.salesSite.name }}
                                     </v-btn>
                                 </v-col>
                             </v-row>
@@ -36,7 +36,7 @@
             </v-sheet>
         </v-container>
         <div class="purchase-button">
-            <v-btn :color="ColorType.Orange" :disabled="product.salesSites.length === 0" x-large fab @click="dialogVisible = true">
+            <v-btn :color="ColorType.Orange" :disabled="product.siteDetails.length === 0" x-large fab @click="dialogVisible = true">
                 <c-icon :type="IconType.Cart.name" :color="ColorType.White" @c-click="dialogVisible = true" />
             </v-btn>
         </div>
@@ -47,9 +47,9 @@
                 </div>
                 <c-container>
                     <v-row>
-                        <v-col v-for="site in product.salesSites" :key="site.uuid" cols="12" md="6">
-                            <v-btn :color="ColorType.LightGreen" :href="site.url" class="white--text text-h6 site-modal" block>
-                                {{ site.name }}
+                        <v-col v-for="siteDetail in product.siteDetails" :key="siteDetail.uuid" cols="12" md="6">
+                            <v-btn :color="ColorType.LightGreen" :href="siteDetail.url" class="white--text text-h6 site-modal" block>
+                                {{ siteDetail.salesSite.name }}
                             </v-btn>
                         </v-col>
                     </v-row>

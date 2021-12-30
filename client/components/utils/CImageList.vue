@@ -12,7 +12,7 @@
                     <v-img :src="registeredPath" :alt="`registered${index}`" class="registered-item-image" />
                 </div>
             </v-col>
-            <v-col v-for="(previewPath, index) in previewList" :key="previewPath" class="preview-item yellow lighten-3" cols="6" sm="4" md="3">
+            <v-col v-for="(previewPath, index) in previewList" :key="previewPath" class="preview-item lighten-3" cols="6" sm="4" md="3">
                 <div class="image-wrapper">
                     <c-icon
                         class="close-icon"

@@ -16,7 +16,7 @@ type Product struct {
 	Category      Category        `json:"category" validate:"-"`
 	Tags          []Tag           `gorm:"many2many:product_to_tag" json:"tags"`
 	ProductImages []*ProductImage `gorm:"hasmany:product_image" json:"productImages"`
-	SiteDetails   []*SiteDetail    `gorm:"hasmany:site_detail" json:"siteDetails"`
+	SiteDetails   []*SiteDetail   `gorm:"hasmany:site_detail" json:"siteDetails"`
 }
 
 type Products []Product
@@ -45,7 +45,7 @@ func GetAllProducts() (products Products) {
 	Db.Preload("Category").
 		Preload("ProductImages").
 		Preload("Tags").
-		Preload("SiteDetails").
+		Preload("SiteDetails.SalesSite").
 		Find(&products)
 	for _, product := range products {
 		setProductImageApiPath(&product)
@@ -57,7 +57,7 @@ func GetProduct(uuid string) (product Product, err error) {
 	err = Db.Preload("Category").
 		Preload("ProductImages").
 		Preload("Tags").
-		Preload("SiteDetails").
+		Preload("SiteDetails.SalesSite").
 		First(&product, "uuid = ?", uuid).Error
 
 	setProductImageApiPath(&product)
@@ -218,14 +218,21 @@ func UpdateProduct(product *Product, uuid string) (err error) {
 		return err
 	}
 
-	// 商品と販売サイトを紐付け
 	var siteDetailList []SiteDetail
-	for _, salesSite := range product.SiteDetails {
+	// 商品と販売サイトを紐付け
+	for _, siteDetail := range product.SiteDetails {
+		// uuidの設定
+		uuid, err := GenerateUuid()
+		if err != nil {
+			return err
+		}
 		siteDetailList = append(
 			siteDetailList,
 			SiteDetail{
+				Uuid:        uuid,
+				Url:         siteDetail.Url,
 				ProductId:   registeredProduct.ID,
-				SalesSiteId: GetSalesSite(salesSite.Uuid).ID,
+				SalesSiteId: GetSalesSite(siteDetail.SalesSite.Uuid).ID,
 			},
 		)
 	}

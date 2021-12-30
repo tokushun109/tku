@@ -32,7 +32,7 @@
                     <v-text-field v-model="modalItem.name" :rules="nameRules" label="商品名(必須)" outlined counter="20" />
                     <v-textarea v-model="modalItem.description" label="商品説明" outlined />
                     <v-row>
-                        <v-col cols="7">
+                        <v-col cols="6">
                             <v-text-field
                                 v-model.number="modalItem.price"
                                 :rules="priceRules"
@@ -43,7 +43,7 @@
                                 type="number"
                             />
                         </v-col>
-                        <v-col class="text-right" cols="5">
+                        <v-col class="text-right" cols="6">
                             <p class="pt-3">{{ modalItem.price | priceFormat }}円</p>
                         </v-col>
                     </v-row>
@@ -75,52 +75,46 @@
                         label="タグ"
                         outlined
                     />
-                    <v-row>
-                        <v-col cols="3">
+                    <v-row dense>
+                        <v-col cols="12" sm="6">
                             <v-select
                                 v-model="previewSiteDetail.salesSite"
                                 :items="salesSites"
+                                height="54"
                                 item-text="name"
-                                height="56"
                                 return-object
                                 chips
                                 label="販売サイト"
                                 outlined
+                                hint="選択後にURLを入力してください"
                             />
                         </v-col>
-                        <v-col cols="8">
+                        <v-col cols="12" sm="6">
                             <v-text-field
                                 v-model="previewSiteDetail.url"
-                                :items="salesSites"
-                                item-text="name"
-                                return-object
-                                chips
+                                :append-icon="IconType.Plus.icon"
                                 label="URL"
-                                outlined
-                            />
-                        </v-col>
-                        <v-col cols="1">
-                            <c-icon
-                                class="mt-2"
-                                x-large
-                                :color="ColorType.Green"
-                                :type="IconType.Plus.name"
-                                :disabled="!(previewSiteDetail.salesSite && previewSiteDetail.url)"
-                                @c-click="AddSiteDetail"
+                                :disabled="!previewSiteDetail.salesSite.name"
+                                hint="Enterで販売サイトを追加"
+                                @keydown.enter="AddSiteDetail"
                             />
                         </v-col>
                     </v-row>
-                    <div v-if="modalItem.siteDetails.length > 0" class="site-detail-preview">
-                        <div v-for="(siteDetail, index) in modalItem.siteDetails" :key="index">
-                            <v-row align="center" class="my-1">
-                                <v-col cols="3"> {{ siteDetail.salesSite.name }} </v-col>
-                                <v-col cols="8"> {{ siteDetail.url }} </v-col>
-                                <v-col cols="1">
-                                    <c-icon :color="ColorType.Red" :type="IconType.Close.name" @c-click="deleteSiteDetail(index)" />
-                                </v-col>
-                            </v-row>
-                            <v-divider v-if="modalItem.siteDetails.length !== index + 1" />
-                        </div>
+                    <div v-if="modalItem.siteDetails.length > 0" class="site-detail-preview text-left">
+                        <v-chip
+                            v-for="(siteDetail, index) in modalItem.siteDetails"
+                            :key="index"
+                            class="ma-1"
+                            close
+                            :color="ColorType.Grey"
+                            :text-color="ColorType.White"
+                            :href="siteDetail.url"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            @click:close="deleteSiteDetail(index)"
+                        >
+                            {{ siteDetail.salesSite.name }}
+                        </v-chip>
                     </div>
                     <div class="d-flex justify-center outlined">
                         <v-checkbox v-model="modalItem.isActive" label="販売中" dense />
