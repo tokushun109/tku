@@ -2,6 +2,8 @@ package models
 
 import (
 	"errors"
+
+	"gorm.io/gorm"
 )
 
 type Category struct {
@@ -59,8 +61,28 @@ func UpdateCategory(category *Category, uuid string) (err error) {
 }
 
 func (category *Category) DeleteCategory() (err error) {
+	tx := Db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := tx.Error; err != nil {
+		return err
+	}
+
+	// 商品の外部キーをnullにする
+	if err = tx.Model(&Product{}).
+		Where("category_id = ?", GetCategory(category.Uuid).ID).
+		Update("category_id", gorm.Expr("NULL")).
+		Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
 	err = Db.Delete(&category).Error
-	return err
+	return tx.Commit().Error
 }
 
 func GetAllTags() (tags Tags) {
@@ -102,6 +124,26 @@ func UpdateTag(tag *Tag, uuid string) (err error) {
 }
 
 func (tag *Tag) DeleteTag() (err error) {
-	err = Db.Delete(&tag).Error
-	return err
+	tx := Db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := tx.Error; err != nil {
+		return err
+	}
+
+	// 登録されている中間テーブルを全て物理削除する
+	if err = tx.Where("tag_id = ?", GetTag(tag.Uuid).ID).
+		Unscoped().
+		Delete(&ProductToTag{}).
+		Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	err = tx.Delete(&tag).Error
+	return tx.Commit().Error
 }
