@@ -79,8 +79,28 @@ func UpdateSalesSite(sales_site *SalesSite, uuid string) (err error) {
 }
 
 func (salesSite *SalesSite) DeleteSalesSite() (err error) {
+	tx := Db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := tx.Error; err != nil {
+		return err
+	}
+
+	// 登録されている中間テーブルを全て物理削除する
+	if err = tx.Where("sales_site_id = ?", GetSalesSite(salesSite.Uuid).ID).
+		Unscoped().
+		Delete(&SiteDetail{}).
+		Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
 	err = Db.Delete(&salesSite).Error
-	return err
+	return tx.Commit().Error
 }
 
 func GetAllSkillMarkets() (skillMarkets SkillMarkets) {
