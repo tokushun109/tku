@@ -1,9 +1,5 @@
 <template>
-    <c-page>
-        <div>
-            <p>{{ creator }}</p>
-        </div>
-    </c-page>
+    <v-main class="light-green lighten-4"> </v-main>
 </template>
 
 <script lang="ts">

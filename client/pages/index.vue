@@ -1,7 +1,5 @@
 <template>
-    <c-page>
-        <c-top-main :creator="creator" />
-    </c-page>
+    <v-main class="light-green lighten-4"> </v-main>
 </template>
 
 <script lang="ts">
