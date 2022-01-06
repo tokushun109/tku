@@ -28,6 +28,7 @@ export const IconType: IIconType = {
     Close: { name: 'close', icon: 'mdi-close' },
     Cart: { name: 'cart', icon: 'mdi-cart' },
     Plus: { name: 'plus', icon: 'mdi-plus' },
+    Menu: { name: 'menu', icon: 'mdi-menu' },
 } as const
 
 export const ColorType = {

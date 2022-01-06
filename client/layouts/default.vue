@@ -2,8 +2,8 @@
     <div>
         <v-app>
             <template v-if="!isAdmin">
+                <site-menu />
                 <Nuxt />
-                <site-menu-footer />
             </template>
             <template v-else>
                 <admin-header />
