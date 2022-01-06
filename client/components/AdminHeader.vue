@@ -1,7 +1,7 @@
 <template>
     <div class="admin-header">
         <v-app-bar app color="primary" dark clipped-left>
-            <v-app-bar-nav-icon v-if="!$store.getters['user/isGuest']" @click="sidebarVisible = !sidebarVisible"></v-app-bar-nav-icon>
+            <v-app-bar-nav-icon v-if="!$store.getters['user/isGuest']" @click="sidebarVisible = !sidebarVisible" />
             <v-app-bar-title>tku</v-app-bar-title>
             <v-spacer />
             <v-dialog v-if="!$store.getters['user/isGuest']" v-model="dialogVisible" width="400">
@@ -28,7 +28,7 @@
                 </v-list-item>
                 <v-divider />
                 <v-list dense nav>
-                    <v-list-item v-for="(table, index) in tables" :key="index" :to="`/admin/${table.link}`">
+                    <v-list-item v-for="(table, index) in tables" :key="index" nuxt :to="`/admin/${table.link}`">
                         <v-list-item-icon>
                             <v-icon>{{ table.icon }}</v-icon>
                         </v-list-item-icon>

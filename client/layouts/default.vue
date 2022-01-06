@@ -1,15 +1,16 @@
 <template>
     <div>
-        <template v-if="!isAdmin">
-            <site-header />
-            <Nuxt />
-        </template>
-        <v-app v-else>
-            <admin-header />
-            <Nuxt />
-            <admin-footer />
+        <v-app>
+            <template v-if="!isAdmin">
+                <site-menu />
+                <Nuxt />
+            </template>
+            <template v-else>
+                <admin-header />
+                <Nuxt />
+                <admin-footer />
+            </template>
         </v-app>
-        <c-confirm />
     </div>
 </template>
 

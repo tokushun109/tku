@@ -3,9 +3,6 @@
         <div class="c-top-main-contents">
             <img v-if="creator" class="creator-logo top-logo" :src="creator.logo" alt="creatorLogo" />
             <img v-else class="home-logo top-logo" src="/icon/home.png" alt="homeLogo" />
-            <div class="c-top-main-message">
-                <h1>ここにメッセージが入ります</h1>
-            </div>
         </div>
     </div>
 </template>

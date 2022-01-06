@@ -1,13 +1,13 @@
 import { Context } from '@nuxt/types'
 
 export default async function ({ app, route, store, redirect }: Context) {
-    // SSRの時は処理を認証処理を行わない
+    // SSRの時は認証処理を行わない
     if (!process.server) {
         return
     }
 
     // ログイン画面の時は認証処理を行わない
-    if (route.path === '/admin/user/login') {
+    if (!route.path.includes('/admin') || route.path === '/admin/user/login') {
         return
     }
     // sessionのcookieを取得
