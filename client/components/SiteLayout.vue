@@ -120,5 +120,5 @@ export default class SiteLayout extends Vue {
             transform translateY(-50%) translateX(-50%)
     .menu-item
         position relative
-        top 20%
+        top 10%
 </style>
