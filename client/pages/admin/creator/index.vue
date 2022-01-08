@@ -1,5 +1,5 @@
 <template>
-    <v-main class="grey lighten-4">
+    <v-sheet class="grey lighten-4">
         <v-container>
             <v-sheet class="pa-4 lighten-4">
                 <h3 class="title green--text text--darken-3">サイトロゴ</h3>
@@ -36,7 +36,7 @@
             </template>
         </c-dialog>
         <c-notification :visible.sync="notificationVisible">製作者を更新しました</c-notification>
-    </v-main>
+    </v-sheet>
 </template>
 
 <script lang="ts">

@@ -4,16 +4,18 @@
         <v-btn fab x-large class="toggle-button" @click="toggleMenu">
             <c-icon :type="IconType.Menu.name" x-large @c-click="toggleMenu" />
         </v-btn>
-        <v-sheet height="190" color="transparent" class="site-title-area">
-            <v-card flat color="transparent" class="site-title mx-auto text-h1 grey--text text--darken-1" to="/">tku</v-card>
+        <v-sheet color="transparent" class="site-title-area">
+            <v-card flat width="200" color="transparent" class="site-title mx-auto text-h1 grey--text text--darken-1" to="/"> tku </v-card>
         </v-sheet>
         <v-dialog v-model="menuVisible" fullscreen hide-overlay transition="dialog-top-transition" scrollable>
             <v-sheet :color="ColorType.Grey" class="menu-area">
                 <v-btn fab x-large class="toggle-button" @click="toggleMenu">
                     <c-icon :type="IconType.Close.name" x-large @c-click="toggleMenu" />
                 </v-btn>
-                <v-sheet height="190" color="transparent" class="site-title-area">
-                    <v-card color="transparent" class="site-title mx-auto text-h1 white--text" to="/" flat nuxt @click="toggleMenu">tku</v-card>
+                <v-sheet color="transparent" class="site-title-area">
+                    <v-card color="transparent" width="200" class="site-title mx-auto text-h1 white--text" to="/" flat nuxt @click="toggleMenu">
+                        tku
+                    </v-card>
                 </v-sheet>
                 <v-container class="menu-item">
                     <v-row>
@@ -76,21 +78,18 @@ export default class SiteLayout extends Vue {
     position relative
     .toggle-button
         position absolute
-        top 60px
+        top 12px
         right 60px
         z-index 5
         +sm()
             display none
     .site-title-area
         position relative
+        text-align center
         +sm()
             display none
         .site-title
-            position absolute
-            top 50%
-            left 50%
             font-family 'Lobster' !important
-            transform translateY(-50%) translateX(-50%)
     .sm
         display none
         +sm()
@@ -101,23 +100,21 @@ export default class SiteLayout extends Vue {
 .menu-area
     position relative
     z-index 5
+    padding-top 65px
     +sm()
         display none
     .toggle-button
         position absolute
-        top 60px
+        top 77px
         right 60px
         z-index 6
     .site-title-area
         position relative
+        text-align center
         +sm()
             display none
         .site-title
-            position absolute
-            top 50%
-            left 50%
             font-family 'Lobster' !important
-            transform translateY(-50%) translateX(-50%)
     .menu-item
         position relative
         top 10%

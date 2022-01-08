@@ -1,5 +1,5 @@
 <template>
-    <v-main class="light-green lighten-4"> </v-main>
+    <v-sheet></v-sheet>
 </template>
 
 <script lang="ts">

@@ -2,13 +2,17 @@
     <div>
         <v-app>
             <template v-if="!isAdmin">
-                <site-layout />
-                <Nuxt />
+                <v-main class="light-green lighten-4">
+                    <site-layout />
+                    <Nuxt />
+                </v-main>
             </template>
             <template v-else>
-                <admin-header />
-                <Nuxt />
-                <admin-footer />
+                <v-main class="grey lighten-4">
+                    <admin-header />
+                    <Nuxt />
+                    <admin-footer />
+                </v-main>
             </template>
         </v-app>
     </div>

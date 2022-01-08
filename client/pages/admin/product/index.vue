@@ -1,7 +1,5 @@
 <template>
-    <v-main class="grey lighten-4">
-        <c-product-list :items="products" :categories="categories" :tags="tags" :sales-sites="salesSites" @c-change="loadingProduct" />
-    </v-main>
+    <c-product-list :items="products" :categories="categories" :tags="tags" :sales-sites="salesSites" @c-change="loadingProduct" />
 </template>
 
 <script lang="ts">

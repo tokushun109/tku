@@ -1,17 +1,15 @@
 <template>
-    <v-main class="grey lighten-4">
-        <v-row>
-            <v-col cols="12" md="4">
-                <c-site-list :type="SiteType.Sns.name" :items="snsList" @c-change="loadingSite" />
-            </v-col>
-            <v-col cols="12" md="4">
-                <c-site-list :type="SiteType.SalesSite.name" :items="salesSites" @c-change="loadingSite" />
-            </v-col>
-            <v-col cols="12" md="4">
-                <c-site-list :type="SiteType.SkillMarket.name" :items="skillMarkets" @c-change="loadingSite" />
-            </v-col>
-        </v-row>
-    </v-main>
+    <v-row>
+        <v-col cols="12" md="4">
+            <c-site-list :type="SiteType.Sns.name" :items="snsList" @c-change="loadingSite" />
+        </v-col>
+        <v-col cols="12" md="4">
+            <c-site-list :type="SiteType.SalesSite.name" :items="salesSites" @c-change="loadingSite" />
+        </v-col>
+        <v-col cols="12" md="4">
+            <c-site-list :type="SiteType.SkillMarket.name" :items="skillMarkets" @c-change="loadingSite" />
+        </v-col>
+    </v-row>
 </template>
 
 <script lang="ts">
