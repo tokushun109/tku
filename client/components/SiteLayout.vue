@@ -38,7 +38,7 @@
         <!-- sm幅以下 -->
         <div class="sm text-center">
             <v-app-bar app>
-                <div class="site-title mx-auto text-h4 grey--text text--darken-1">tku</div>
+                <v-card color="transparent" class="site-title mx-auto text-h4 grey--text text--darken-1" to="/" flat nuxt>tku</v-card>
             </v-app-bar>
             <v-bottom-navigation color="primary" grow app>
                 <v-btn v-for="(item, index) in menuItems" :key="index" nuxt :to="`/${item.link}`">
@@ -120,5 +120,5 @@ export default class SiteLayout extends Vue {
             transform translateY(-50%) translateX(-50%)
     .menu-item
         position relative
-        top 20%
+        top 10%
 </style>
