@@ -1,17 +1,15 @@
 <template>
-    <v-main class="grey lighten-4">
-        <v-container>
-            <v-sheet class="pa-4 lighten-4 mx-auto text-center" max-width="800px">
-                <c-error :errors.sync="errors" />
-                <h3 class="title mb-4 green--text text--darken-3">ログイン</h3>
-                <v-form ref="form" v-model="valid" lazy-validation>
-                    <v-text-field v-model="form.email" :rules="rules" label="email(必須)" outlined />
-                    <v-text-field v-model="form.password" type="password" :rules="rules" label="パスワード(必須)" outlined />
-                    <v-btn color="primary" :disabled="!valid" @click="onSubmit">確定</v-btn>
-                </v-form>
-            </v-sheet>
-        </v-container>
-    </v-main>
+    <v-container>
+        <v-sheet class="pa-4 lighten-4 mx-auto text-center" max-width="800px">
+            <c-error :errors.sync="errors" />
+            <h3 class="title mb-4 green--text text--darken-3">ログイン</h3>
+            <v-form ref="form" v-model="valid" lazy-validation>
+                <v-text-field v-model="form.email" :rules="rules" label="email(必須)" outlined />
+                <v-text-field v-model="form.password" type="password" :rules="rules" label="パスワード(必須)" outlined />
+                <v-btn color="primary" :disabled="!valid" @click="onSubmit">確定</v-btn>
+            </v-form>
+        </v-sheet>
+    </v-container>
 </template>
 
 <script lang="ts">

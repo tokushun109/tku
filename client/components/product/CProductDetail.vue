@@ -1,6 +1,6 @@
 <template>
-    <v-main class="c-product-detail-page grey lighten-4">
-        <v-container>
+    <v-sheet class="c-product-detail-page grey lighten-4">
+        <v-container class="c-product-detail-page grey lighten-4">
             <v-sheet class="pa-4 lighten-4">
                 <p class="title-weight green--text text--darken-3">{{ product.name }}</p>
                 <v-row>
@@ -70,7 +70,7 @@
                 </c-container>
             </template>
         </c-dialog>
-    </v-main>
+    </v-sheet>
 </template>
 
 <script lang="ts">
