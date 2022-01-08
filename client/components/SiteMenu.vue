@@ -9,16 +9,21 @@
                     <c-icon :type="IconType.Close.name" x-large @c-click="toggleMenu" />
                 </v-btn>
                 <v-container class="menu-item">
-                    <v-list nav>
-                        <v-list-item v-for="(item, index) in menuItems" :key="index" nuxt :to="`/${item.link}`" @click="toggleMenu">
-                            <v-list-item-icon>
-                                <v-icon x-large>{{ item.icon }}</v-icon>
-                            </v-list-item-icon>
-                            <v-list-item-content>
-                                <v-list-item-title> {{ item.name }} </v-list-item-title>
-                            </v-list-item-content>
-                        </v-list-item>
-                    </v-list>
+                    <v-row>
+                        <v-col v-for="(item, index) in menuItems" :key="index" cols="6">
+                            <v-card height="500" elevation="20" :to="item.link" nuxt class="text-center" @click="toggleMenu">
+                                <v-card-title class="justify-center">
+                                    <v-avatar size="300">
+                                        <v-icon size="300">{{ item.icon }}</v-icon>
+                                    </v-avatar>
+                                </v-card-title>
+                                <v-card-text>
+                                    <div class="text-h1">{{ item.name }}</div>
+                                </v-card-text>
+                            </v-card>
+                        </v-col>
+                        <v-spacer />
+                    </v-row>
                 </v-container>
             </v-sheet>
         </v-dialog>
@@ -77,6 +82,6 @@ export default class SiteMenu extends Vue {
         top 60px
         right 60px
     .menu-item
-        position absolute
-        top 30%
+        position relative
+        top 20%
 </style>
