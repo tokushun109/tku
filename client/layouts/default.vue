@@ -2,7 +2,7 @@
     <div>
         <v-app>
             <template v-if="!isAdmin">
-                <site-menu />
+                <site-layout />
                 <Nuxt />
             </template>
             <template v-else>

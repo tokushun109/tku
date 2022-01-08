@@ -58,7 +58,13 @@ export default {
         '@nuxtjs/axios',
         '@nuxtjs/style-resources',
         ['cookie-universal-nuxt', { parseJSON: false }],
+        'nuxt-webfontloader',
     ],
+    webfontloader: {
+        google: {
+            families: ['Lobster:400,700'],
+        },
+    },
 
     // Axios module configuration: https://go.nuxtjs.dev/config-axios
     axios: {
