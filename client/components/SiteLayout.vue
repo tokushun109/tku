@@ -61,7 +61,7 @@ export default class SiteLayout extends Vue {
     IconType: typeof IconType = IconType
 
     menuItems: Array<ITable> = [
-        { name: 'About', link: 'creator', icon: 'mdi-lead-pencil' },
+        { name: 'About', link: 'creator', icon: 'mdi-information-variant' },
         { name: 'Items', link: 'product', icon: 'mdi-view-module' },
     ]
 
