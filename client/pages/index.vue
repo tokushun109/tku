@@ -5,7 +5,7 @@
                 コットンレースのマクラメアクセサリー
             </v-chip>
             <v-sheet class="light-green lighten-4">
-                <c-top-image class="mb-4" category :carousel-items="carouselItems" />
+                <c-top-image class="mb-4" title category :carousel-items="carouselItems" />
             </v-sheet>
             <div class="more text-right">
                 <v-btn rounded outlined x-large :color="ColorType.Grey" nuxt to="/product">
