@@ -44,6 +44,7 @@ export const ColorType = {
     Black: 'black',
     Grey: 'grey',
     White: 'white',
+    Transparent: 'transparent',
 } as const
 
 export type TColorType = typeof ColorType[keyof typeof ColorType]

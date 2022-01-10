@@ -48,6 +48,7 @@ func StartMainServer() error {
 	r.HandleFunc("/api/product/{product_uuid}", updateProductHandler).Methods("PUT")
 	r.HandleFunc("/api/product/{product_uuid}", deleteProductHandler).Methods("DELETE")
 	// 商品画像
+	r.HandleFunc("/api/carousel_image", getCarouselImageHandler).Methods("GET")
 	r.HandleFunc("/api/product_image/{product_image_uuid}/blob", getProductImageBlobHandler).Methods("GET")
 	r.HandleFunc("/api/product/{product_uuid}/product_image", createProductImageHandler).Methods("POST")
 	r.HandleFunc("/api/product/{product_uuid}/product_image/{product_image_uuid}", deleteProductImageHandler).Methods("DELETE")

@@ -20,7 +20,7 @@
                 <v-container class="menu-item">
                     <v-row>
                         <v-col v-for="(item, index) in menuItems" :key="index" cols="6">
-                            <v-card height="500" elevation="20" :to="item.link" nuxt rounded class="text-center rounded-xl" @click="toggleMenu">
+                            <v-card height="500" elevation="20" :to="item.link" nuxt class="text-center rounded-xl" @click="toggleMenu">
                                 <v-card-title class="justify-center">
                                     <v-avatar size="300">
                                         <v-icon size="300">{{ item.icon }}</v-icon>

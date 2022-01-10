@@ -53,6 +53,20 @@ func GetAllProducts() (products Products) {
 	return products
 }
 
+func GetNewProducts(limit int) (products Products) {
+	Db.Preload("Category").
+		Preload("ProductImages").
+		Preload("Tags").
+		Preload("SiteDetails.SalesSite").
+		Order("id desc").
+		Limit(limit).
+		Find(&products)
+	for _, product := range products {
+		setProductImageApiPath(&product)
+	}
+	return products
+}
+
 func GetProduct(uuid string) (product Product, err error) {
 	err = Db.Preload("Category").
 		Preload("ProductImages").
