@@ -17,6 +17,9 @@
                         :text-color="ColorType.White"
                         >{{ displayProduct(index).category.name }}</v-chip
                     >
+                    <v-chip v-if="title" class="title-label" small :color="ColorType.Orange" :text-color="ColorType.White">
+                        {{ displayProduct(index).name }}
+                    </v-chip>
                     <v-img :src="image" :alt="`image-${index}`" />
                 </v-carousel-item>
             </v-carousel>
@@ -59,10 +62,16 @@ export default class CTopImage extends Vue {
 .carousel-wrapper
     .carousel-item-wrapper
         position relative
+        .title-label
+            position absolute
+            top 5px
+            left 5px
+            z-index 5
+            opacity 0.8
         .category-label
             position absolute
-            top 10px
             right 5px
+            bottom 5px
             z-index 5
             opacity 0.8
         .v-image
