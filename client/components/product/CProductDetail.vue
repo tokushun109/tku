@@ -4,10 +4,10 @@
             <v-sheet class="pa-4 lighten-4">
                 <p class="title-weight green--text text--darken-3">{{ product.name }}</p>
                 <v-row>
-                    <v-col cols="12" md="7">
+                    <v-col cols="12" sm="6">
                         <c-product-image class="mb-4" category :product="product" />
                     </v-col>
-                    <v-col cols="12" md="5">
+                    <v-col cols="12" sm="6">
                         <p class="title-weight grey--text text--light-1 text-h6">
                             ￥{{ product.price | priceFormat }}
                             <span class="text-body-2">(税込)</span>
@@ -91,13 +91,13 @@ export default class CProductDetail extends Vue {
 .c-product-detail-page
     position relative
     .site-buttons-area
-        +md()
+        +sm()
             display none
     .purchase-button
         position fixed
         right 20px
         bottom 50px
         display none
-        +md()
+        +sm()
             display block
 </style>
