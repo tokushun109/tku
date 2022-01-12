@@ -20,12 +20,12 @@
                     <v-chip v-if="title" class="title-label" small :color="ColorType.Orange" :text-color="ColorType.White">
                         {{ displayProduct(index).name }}
                     </v-chip>
-                    <v-img :src="image" :alt="`image-${index}`" />
+                    <v-img :src="image" :alt="`image-${index}`" class="carousel-image" />
                 </v-carousel-item>
             </v-carousel>
             <v-carousel v-else :show-arrows="false" height="auto" hide-delimiters>
-                <v-carousel-item>
-                    <v-img src="/img/product/no-image.png" />
+                <v-carousel-item class="carousel-item-wrapper">
+                    <v-img src="/img/product/no-image.png" alt="no-image" class="carousel-image" />
                 </v-carousel-item>
             </v-carousel>
         </v-container>
@@ -40,7 +40,7 @@ import { ColorType, ICarouselItem, IProduct } from '~/types'
 export default class CTopImage extends Vue {
     ColorType: typeof ColorType = ColorType
     // 商品のリスト
-    @Prop({ type: Object }) carouselItems!: Array<ICarouselItem>
+    @Prop({ type: Array }) carouselItems!: Array<ICarouselItem>
     // 商品名を画像上に表示する
     @Prop({ type: Boolean, default: false }) title!: boolean
     // カテゴリーを画像上に表示する
@@ -58,7 +58,7 @@ export default class CTopImage extends Vue {
 }
 </script>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
 .carousel-wrapper
     .carousel-item-wrapper
         position relative
@@ -74,6 +74,8 @@ export default class CTopImage extends Vue {
             bottom 5px
             z-index 5
             opacity 0.8
-        .v-image
-            aspect-ratio 16 / 9
+        .carousel-image
+            width 100%
+            aspect-ratio 1 / 1
+            object-fit cover
 </style>

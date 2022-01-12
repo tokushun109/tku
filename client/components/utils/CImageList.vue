@@ -48,6 +48,11 @@ export default class CImageList extends Vue {
     border-radius 3px
     .image-wrapper
         position relative
+        .registered-item-image
+        .preview-item-image
+            width 100%
+            aspect-ratio 1 / 1
+            object-fit cover
         .close-icon
             position absolute
             top 5px
