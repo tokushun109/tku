@@ -1,12 +1,10 @@
 <template>
-    <v-container class="page-top text-center">
-        <v-sheet :color="ColorType.Transparent" max-width="900" class="mx-auto">
-            <v-chip :color="ColorType.White" class="font-weight-bold text-subtitle-2 text-sm-h6 grey--text lighten-1 mt-4 mb-10">
-                コットンレースのマクラメアクセサリー
-            </v-chip>
-            <v-sheet class="light-green lighten-4">
-                <c-top-image class="mb-4" title category :carousel-items="carouselItems" />
-            </v-sheet>
+    <v-sheet :color="ColorType.Transparent" class="mx-auto page-top text-center">
+        <v-chip :color="ColorType.White" class="font-weight-bold text-subtitle-2 text-sm-h6 grey--text lighten-1 my-8">
+            コットンレースのマクラメアクセサリー
+        </v-chip>
+        <v-sheet class="light-green lighten-4 mx-4">
+            <c-top-image class="mb-4" title category :carousel-items="carouselItems" />
             <div class="more text-right">
                 <v-btn rounded outlined x-large :color="ColorType.Grey" nuxt to="/product">
                     <div class="text-h6">MORE</div>
@@ -14,7 +12,7 @@
                 </v-btn>
             </div>
         </v-sheet>
-    </v-container>
+    </v-sheet>
 </template>
 
 <script lang="ts">
