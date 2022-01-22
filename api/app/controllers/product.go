@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"api/app/models"
-	"api/config"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -157,17 +156,16 @@ func deleteProductHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getCarouselImageHandler(w http.ResponseWriter, r *http.Request) {
+
 	products := models.GetNewProducts(5)
 	type NewProductImage struct {
 		Product         models.Product `json:"product"`
 		NewImageApiPath string         `json:"apiPath"`
 	}
 	var newProductImages []NewProductImage
-	base := config.Config.ApiBaseUrl
 	for _, product := range products {
 		if len(product.ProductImages) > 0 {
-			newImageApiPath := base + "/product_image/" + product.ProductImages[0].Uuid + "/blob"
-			newProductImages = append(newProductImages, NewProductImage{Product: product, NewImageApiPath: newImageApiPath})
+			newProductImages = append(newProductImages, NewProductImage{Product: product, NewImageApiPath: product.ProductImages[0].ApiPath})
 		}
 	}
 	w.Header().Set("Content-Type", "application/json")

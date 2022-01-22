@@ -54,11 +54,12 @@ func GetAllProducts() (products Products) {
 }
 
 func GetNewProducts(limit int) (products Products) {
-	Db.Preload("Category").
+	Db.Joins("join product_image on product_image.product_id = product.id").
+		Where("product_image.deleted_at is null").
+		Preload("Category").
 		Preload("ProductImages").
-		Preload("Tags").
-		Preload("SiteDetails.SalesSite").
 		Order("id desc").
+		Group("product.id").
 		Limit(limit).
 		Find(&products)
 	for _, product := range products {
