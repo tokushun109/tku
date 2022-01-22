@@ -4,12 +4,34 @@
         <v-sheet class="default grey lighten-4">
             <div class="carousel-wrapper d-flex">
                 <div v-for="(image, index) in displayImages" :key="index" class="slide-show pa-5">
-                    <v-card elevation="20" nuxt :to="`/product/${displayProduct(index).uuid}`">
+                    <v-card class="carousel-item-wrapper" elevation="20" nuxt :to="`/product/${displayProduct(index).uuid}`">
+                        <v-chip
+                            v-if="category && displayProduct(index).category.uuid"
+                            class="category-label"
+                            small
+                            :color="ColorType.LightGreen"
+                            :text-color="ColorType.White"
+                            >{{ displayProduct(index).category.name }}</v-chip
+                        >
+                        <v-chip v-if="title" class="title-label" small :color="ColorType.Orange" :text-color="ColorType.White">
+                            {{ displayProduct(index).name }}
+                        </v-chip>
                         <v-img eager :src="image" :alt="`image-${index}`" width="530" class="carousel-image" />
                     </v-card>
                 </div>
                 <div v-for="(image, index) in displayImages" :key="index" class="slide-show pa-5">
-                    <v-card elevation="20" nuxt :to="`/product/${displayProduct(index).uuid}`">
+                    <v-card class="carousel-item-wrapper" elevation="20" nuxt :to="`/product/${displayProduct(index).uuid}`">
+                        <v-chip
+                            v-if="category && displayProduct(index).category.uuid"
+                            class="category-label"
+                            small
+                            :color="ColorType.LightGreen"
+                            :text-color="ColorType.White"
+                            >{{ displayProduct(index).category.name }}</v-chip
+                        >
+                        <v-chip v-if="title" class="title-label" small :color="ColorType.Orange" :text-color="ColorType.White">
+                            {{ displayProduct(index).name }}
+                        </v-chip>
                         <v-img eager :src="image" :alt="`image-${index}`" width="530" class="carousel-image" />
                     </v-card>
                 </div>
@@ -89,15 +111,34 @@ export default class CTopImage extends Vue {
             .slide-show
                 display flex
                 animation loop-slide 40s infinite linear 1s both
-            .carousel-image
-                width 100%
-                aspect-ratio 1 / 1
-                object-fit cover
-                &.sm
+                .carousel-item-wrapper
+                    position relative
+                    transition all 0.2s
+                    &:hover
+                        opacity 0.8
+                        cursor pointer
+                        transform translateY(-10px)
+                    .title-label
+                        position absolute
+                        top 5px
+                        left 5px
+                        z-index 5
+                        opacity 0.8
+                    .category-label
+                        position absolute
+                        right 5px
+                        bottom 5px
+                        z-index 5
+                        opacity 0.8
+                    .carousel-image
+                        width 100%
+                        aspect-ratio 1 / 1
+                        object-fit cover
+                        &.sm
+                            +sm()
+                                display none
                     +sm()
                         display none
-            +sm()
-                display none
     .sm
         display none
         +sm()

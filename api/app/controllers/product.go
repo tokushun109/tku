@@ -156,7 +156,6 @@ func deleteProductHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getCarouselImageHandler(w http.ResponseWriter, r *http.Request) {
-
 	products := models.GetNewProducts(5)
 	type NewProductImage struct {
 		Product         models.Product `json:"product"`
