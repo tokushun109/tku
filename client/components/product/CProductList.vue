@@ -129,21 +129,20 @@
 import { Component, Prop, PropSync, Vue, Watch } from 'nuxt-property-decorator'
 import _ from 'lodash'
 import {
-    ColorType,
-    ExecutionType,
     IClassification,
-    IconType,
     IError,
-    ImageType,
     IProduct,
     ISite,
     ISiteDetail,
-    newProduct,
-    newSiteDetail,
+    ColorType,
+    ExecutionType,
+    IconType,
+    ImageType,
     TExecutionType,
     TImageType,
 } from '~/types'
-import { maxPrice, min20, price, required } from '~/methods'
+import { maxPrice, min20, newProduct, newSiteDetail, price, required } from '~/methods'
+
 @Component({})
 export default class CProductList extends Vue {
     @PropSync('items') listItems!: Array<IProduct>

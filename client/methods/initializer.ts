@@ -1,4 +1,4 @@
-import { ISiteDetail } from './site'
+import { ISiteDetail } from '../types/site'
 import { IProduct, IClassification, ISite, ICreator } from '~/types'
 export function newCreator(): ICreator {
     return {

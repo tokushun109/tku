@@ -43,8 +43,8 @@
 <script lang="ts">
 import { Component, Prop, PropSync, Vue, Watch } from 'nuxt-property-decorator'
 import _ from 'lodash'
-import { CategoryType, ExecutionType, IClassification, IconType, IError, newClassification, TExecutionType } from '~/types'
-import { min20, required } from '~/methods'
+import { IClassification, IError, CategoryType, ExecutionType, IconType, TExecutionType } from '~/types'
+import { min20, newClassification, required } from '~/methods'
 @Component({})
 export default class CClassificationList extends Vue {
     @PropSync('items') listItems!: Array<IClassification>

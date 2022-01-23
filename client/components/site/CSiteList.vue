@@ -50,8 +50,8 @@
 <script lang="ts">
 import { Component, Prop, PropSync, Vue, Watch } from 'nuxt-property-decorator'
 import _ from 'lodash'
-import { ExecutionType, IconType, IError, ISite, newSite, SiteType, TExecutionType } from '~/types'
-import { min20, nonDoubleByte, nonSpace, required } from '~/methods'
+import { IError, ISite, ExecutionType, IconType, SiteType, TExecutionType } from '~/types'
+import { min20, newSite, nonDoubleByte, nonSpace, required } from '~/methods'
 @Component({})
 export default class CSiteList extends Vue {
     @PropSync('items') listItems!: Array<ISite>

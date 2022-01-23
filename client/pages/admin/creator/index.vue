@@ -43,7 +43,8 @@
 import { Context } from '@nuxt/types'
 import { Component, Vue, Watch } from 'nuxt-property-decorator'
 import _ from 'lodash'
-import { IconType, ICreator, IError, ISite, newCreator } from '~/types'
+import { ICreator, IError, ISite, IconType } from '~/types'
+import { newCreator } from '~/methods'
 @Component({
     head: {
         title: '製作者紹介',
