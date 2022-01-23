@@ -5,7 +5,8 @@
 <script lang="ts">
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
-import { ColorType, IProduct, newProduct } from '~/types'
+import { newProduct } from '~/methods'
+import { IProduct, ColorType } from '~/types'
 @Component({
     head: {
         title: '商品詳細',

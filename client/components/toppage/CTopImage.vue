@@ -76,7 +76,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'nuxt-property-decorator'
-import { ColorType, ICarouselItem, IProduct } from '~/types'
+import { ICarouselItem, IProduct, ColorType } from '~/types'
 
 @Component({})
 export default class CTopImage extends Vue {
