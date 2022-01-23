@@ -10,6 +10,10 @@
 		"lint:js": "eslint --ext \".js,.vue\" --ignore-path .gitignore .",
 		"lint": "yarn lint:js"
 	},
+	"browserslist": [
+		"defaults",
+		"IE 11"
+	],
 	"dependencies": {
 		"@nuxt/typescript-runtime": "^2.0.1",
 		"@nuxtjs/axios": "^5.12.5",
