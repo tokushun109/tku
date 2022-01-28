@@ -5,7 +5,7 @@
 <script lang="ts">
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
-import { IClassification, IProduct, ISite } from '~/types'
+import { IClassification, IGetProductsParams, IProduct, ISite } from '~/types'
 @Component({
     head: {
         title: '商品一覧',
@@ -22,7 +22,10 @@ export default class PageAdminProductIndex extends Vue {
     createDialogVisible: boolean = false
     async asyncData({ app }: Context) {
         try {
-            const products = await app.$axios.$get(`/product`)
+            const params: IGetProductsParams = {
+                mode: 'all',
+            }
+            const products = await app.$axios.$get(`/product`, { params })
             const categories = await app.$axios.$get(`/category`)
             const tags = await app.$axios.$get(`/tag`)
             const salesSites = await app.$axios.$get(`/sales_site`)

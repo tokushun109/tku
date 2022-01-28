@@ -5,7 +5,8 @@
             <c-icon :type="IconType.Menu.name" x-large @c-click="toggleMenu" />
         </v-btn>
         <v-sheet color="transparent" class="site-title-area">
-            <v-card flat width="200" color="transparent" class="site-title mx-auto text-h1 grey--text text--darken-1" to="/"> tku </v-card>
+            <v-card flat width="200" color="transparent" class="site-title mx-auto text-h1 grey--text text--darken-2" to="/"> tku </v-card>
+            <div class="site-sub-title text-h5 grey--text text--darken-1 mb-10">Cotton lace × Macrame</div>
         </v-sheet>
         <v-dialog v-model="menuVisible" fullscreen hide-overlay transition="dialog-top-transition" scrollable>
             <v-sheet :color="ColorType.Grey" class="menu-area">
@@ -20,7 +21,7 @@
                 <v-container class="menu-item">
                     <v-row>
                         <v-col v-for="(item, index) in menuItems" :key="index" cols="6">
-                            <v-card height="500" elevation="20" :to="item.link" nuxt class="text-center rounded-xl" @click="toggleMenu">
+                            <v-card height="500" elevation="20" :to="item.link" nuxt class="menu-card text-center rounded-xl" @click="toggleMenu">
                                 <v-card-title class="justify-center">
                                     <v-avatar size="300">
                                         <v-icon size="300">{{ item.icon }}</v-icon>
@@ -77,8 +78,8 @@ export default class SiteLayout extends Vue {
 .site-menu
     position relative
     .toggle-button
-        position absolute
-        top 12px
+        position fixed
+        top 77px
         right 60px
         z-index 5
         +sm()
@@ -89,6 +90,8 @@ export default class SiteLayout extends Vue {
         +sm()
             display none
         .site-title
+            font-family 'Lobster' !important
+        .site-sub-title
             font-family 'Lobster' !important
     .sm
         display none
@@ -105,7 +108,7 @@ export default class SiteLayout extends Vue {
         display none
     .toggle-button
         position absolute
-        top 77px
+        top 85px
         right 60px
         z-index 6
     .site-title-area
@@ -118,4 +121,10 @@ export default class SiteLayout extends Vue {
     .menu-item
         position relative
         top 10%
+        .menu-card
+            transition all 0.2s
+            &:hover
+                background-color #DCEDC8
+                cursor pointer
+                transform translateY(-10px)
 </style>

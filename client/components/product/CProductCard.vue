@@ -12,9 +12,11 @@
             </div>
             <c-product-image :product="listItem" />
             <div class="text-right mt-2">
-                <div v-if="admin" class="d-flex">
-                    <c-icon :type="IconType.Edit.name" @c-click="$emit('c-click', ExecutionType.Edit, listItem)" />
-                    <c-icon :type="IconType.Delete.name" @c-click="$emit('c-click', ExecutionType.Delete, listItem)" />
+                <div class="d-flex">
+                    <template v-if="admin">
+                        <c-icon :type="IconType.Edit.name" @c-click="$emit('c-click', ExecutionType.Edit, listItem)" />
+                        <c-icon :type="IconType.Delete.name" @c-click="$emit('c-click', ExecutionType.Delete, listItem)" />
+                    </template>
                     <v-spacer />
                     <div class="text-h6">￥{{ listItem.price | priceFormat }}<span class="text-caption">税込</span></div>
                 </div>

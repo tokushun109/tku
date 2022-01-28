@@ -23,7 +23,13 @@ var typeToExtention = map[string]string{
 
 // 商品一覧を取得
 func getAllProductsHandler(w http.ResponseWriter, r *http.Request) {
-	products := models.GetAllProducts()
+	mode := r.URL.Query().Get("mode")
+	products, err := models.GetAllProducts(mode)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(products); err != nil {
 		log.Println(err)

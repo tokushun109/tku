@@ -16,6 +16,11 @@ export interface IProduct {
     siteDetails: Array<ISiteDetail>
     isActive: boolean
 }
+
+export interface IGetProductsParams {
+    mode: 'all' | 'active'
+}
+
 export interface ICarouselItem {
     product: IProduct
     apiPath: string

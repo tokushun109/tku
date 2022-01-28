@@ -1,14 +1,20 @@
 <template>
-    <v-sheet class="carousel-wrapper">
+    <v-sheet class="carousel-wrapper rounded-xl">
         <v-chip v-if="category && product.category.uuid" class="category-label" small :color="ColorType.LightGreen" :text-color="ColorType.White">{{
             product.category.name
         }}</v-chip>
-        <v-carousel v-if="product.productImages.length > 0" :show-arrows="product.productImages.length > 1" height="auto" hide-delimiters>
+        <v-carousel
+            v-if="product.productImages.length > 0"
+            :show-arrows="product.productImages.length > 1"
+            height="auto"
+            hide-delimiters
+            class="rounded-xl"
+        >
             <v-carousel-item v-for="image in product.productImages" :key="image.uuid">
                 <v-img :src="image.apiPath" :alt="image.uuid" class="carousel-image" />
             </v-carousel-item>
         </v-carousel>
-        <v-carousel v-else :show-arrows="false" height="auto" hide-delimiters>
+        <v-carousel v-else :show-arrows="false" height="auto" hide-delimiters class="rounded-xl">
             <v-carousel-item>
                 <v-img src="/img/product/no-image.png" alt="no-image" class="carousel-image" />
             </v-carousel-item>
