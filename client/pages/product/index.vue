@@ -1,9 +1,9 @@
 <template>
     <v-container>
-        <div class="text-h4 mb-5 grey--text text--darken-1">
-            Items
+        <v-container>
+            <h2 class="text-h3 mb-5 grey--text text--darken-1">ITEMS</h2>
             <v-divider />
-        </div>
+        </v-container>
         <v-sheet class="grey lighten-4">
             <v-container>
                 <c-message v-if="products.length === 0" class="mt-4"> 登録されていません </c-message>
