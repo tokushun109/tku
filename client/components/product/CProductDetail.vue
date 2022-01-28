@@ -1,6 +1,6 @@
 <template>
-    <v-sheet class="c-product-detail-page grey lighten-4">
-        <v-container class="c-product-detail-page grey lighten-4">
+    <v-sheet class="c-product-detail-page" :color="ColorType.Transparent">
+        <v-container class="c-product-detail-page">
             <v-sheet class="pa-4 lighten-4">
                 <p class="title-weight green--text text--darken-3">{{ product.name }}</p>
                 <v-row>
@@ -96,7 +96,7 @@ export default class CProductDetail extends Vue {
     .purchase-button
         position fixed
         right 20px
-        bottom 50px
+        bottom 70px
         display none
         +sm()
             display block
