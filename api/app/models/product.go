@@ -41,20 +41,33 @@ func setProductImageApiPath(product *Product) {
 	}
 }
 
-func GetAllProducts() (products Products) {
-	Db.Preload("Category").
-		Preload("ProductImages").
-		Preload("Tags").
-		Preload("SiteDetails.SalesSite").
-		Find(&products)
+func GetAllProducts(mode string) (products Products, err error) {
+	if mode == "all" {
+		Db.Preload("Category").
+			Preload("ProductImages").
+			Preload("Tags").
+			Preload("SiteDetails.SalesSite").
+			Find(&products)
+	} else if mode == "active" {
+		Db.Where("is_active = ?", 1).
+			Preload("Category").
+			Preload("ProductImages").
+			Preload("Tags").
+			Preload("SiteDetails.SalesSite").
+			Find(&products)
+	} else {
+		err = errors.New("invalid params")
+		return products, err
+	}
 	for _, product := range products {
 		setProductImageApiPath(&product)
 	}
-	return products
+	return products, err
 }
 
 func GetNewProducts(limit int) (products Products) {
 	Db.Joins("join product_image on product_image.product_id = product.id").
+		Where("product.is_active = ?", 1).
 		Where("product_image.deleted_at is null").
 		Preload("Category").
 		Preload("ProductImages").
