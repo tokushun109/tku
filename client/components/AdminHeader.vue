@@ -1,6 +1,6 @@
 <template>
     <div class="admin-header">
-        <v-app-bar app color="primary" dark clipped-left>
+        <v-app-bar app :color="ColorType.Green" dark clipped-left>
             <v-app-bar-nav-icon v-if="!$store.getters['user/isGuest']" @click="sidebarVisible = !sidebarVisible" />
             <v-app-bar-title>tku</v-app-bar-title>
             <v-spacer />
@@ -8,22 +8,22 @@
                 <template #activator="{ on, attrs }">
                     <v-btn outlined v-bind="attrs" v-on="on">ログアウト</v-btn>
                 </template>
-                <v-card>
-                    <v-card-title class="text-h5 justify-center"></v-card-title>
-                    <v-card-text class="d-flex justify-center">ログアウトします。よろしいですか？</v-card-text>
+                <v-card class="sigh-out-area">
+                    <v-card-title />
+                    <v-card-text class="sigh-out-text">ログアウトします。よろしいですか？</v-card-text>
                     <v-divider />
-                    <v-card-actions class="d-flex justify-center">
+                    <v-card-actions class="sigh-out-actions">
+                        <v-btn color="primary" outlined @click="dialogVisible = false">いいえ</v-btn>
                         <v-btn color="primary" @click="logoutHandler">はい</v-btn>
-                        <v-btn @click="dialogVisible = false">いいえ</v-btn>
                     </v-card-actions>
                 </v-card>
             </v-dialog>
         </v-app-bar>
-        <v-navigation-drawer v-if="!$store.getters['user/isGuest']" v-model="sidebarVisible" clipped app>
+        <v-navigation-drawer v-if="!$store.getters['user/isGuest']" v-model="sidebarVisible" class="admin-navigation" clipped app>
             <v-container>
-                <v-list-item>
-                    <v-list-item-content>
-                        <v-list-item-title class="title green--text text--darken-3"> 設定 </v-list-item-title>
+                <v-list-item class="navigation-list">
+                    <v-list-item-content class="navigation-list-item">
+                        <v-list-item-title class="title navigation-title"> 設定 </v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
                 <v-divider />
@@ -44,9 +44,10 @@
 
 <script lang="ts">
 import { Component, Vue } from 'nuxt-property-decorator'
-import { ITable } from '~/types'
+import { ColorType, ITable } from '~/types'
 @Component({})
 export default class AdminHeader extends Vue {
+    ColorType: typeof ColorType = ColorType
     tables: Array<ITable> = [
         { name: '製作者', link: 'creator', icon: 'mdi-account' },
         { name: '商品', link: 'product', icon: 'mdi-cart-variant' },
@@ -64,4 +65,18 @@ export default class AdminHeader extends Vue {
 }
 </script>
 
-<style lang="stylus"></style>
+<style lang="stylus" scoped>
+.sigh-out-area
+    .sigh-out-text
+        text-align center
+        font-size $font-medium
+    .sigh-out-actions
+        display flex
+        justify-content center
+
+.admin-navigation
+    .navigation-list
+        .navigation-list-item
+            .navigation-title
+                color $title-text-color
+</style>

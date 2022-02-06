@@ -45,7 +45,7 @@ export default class CImageList extends Vue {
 <style lang="stylus" scoped>
 .c-image-list
     border 1px dashed $light-dark-color
-    border-radius 3px
+    border-radius $image-border-radius
     .image-wrapper
         position relative
         .registered-item-image

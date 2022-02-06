@@ -1,5 +1,5 @@
 <template>
-    <div class="site-menu light-green lighten-4">
+    <div class="site-menu">
         <v-btn fab x-large class="toggle-button" @click="toggleMenu">
             <c-icon :type="IconType.Menu.name" x-large @c-click="toggleMenu" />
         </v-btn>
@@ -11,8 +11,8 @@
                 <v-container class="menu-item">
                     <v-row>
                         <v-col v-for="(item, index) in menuItems" :key="index" cols="6">
-                            <v-card height="500" elevation="20" :to="item.link" nuxt class="text-center rounded-xl" @click="toggleMenu">
-                                <v-card-title class="justify-center">
+                            <v-card height="500" elevation="20" :to="`/${item.link}`" nuxt class="menu-item-card" @click="toggleMenu">
+                                <v-card-title class="menu-item-card-title">
                                     <v-avatar size="300">
                                         <v-icon size="300">{{ item.icon }}</v-icon>
                                     </v-avatar>
@@ -84,4 +84,9 @@ export default class SiteMenu extends Vue {
     .menu-item
         position relative
         top 20%
+        .menu-item-card
+            border-radius $image-border-radius
+            text-align center
+            .menu-item-card-title
+                text-align center
 </style>

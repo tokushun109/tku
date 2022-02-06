@@ -1,10 +1,10 @@
 <template>
     <v-container>
         <v-container>
-            <h2 class="text-h3 mb-5 grey--text text--darken-1">ITEMS</h2>
+            <h2 class="page-title text-h3">ITEMS</h2>
             <v-divider />
         </v-container>
-        <v-sheet class="grey lighten-4">
+        <v-sheet>
             <v-container>
                 <c-message v-if="products.length === 0" class="mt-4"> 登録されていません </c-message>
                 <v-row>
@@ -50,4 +50,8 @@ export default class PageProductIndex extends Vue {
 }
 </script>
 
-<style lang="stylus"></style>
+<style lang="stylus">
+.page-title
+    margin-bottom 20px
+    color $title-text-color
+</style>

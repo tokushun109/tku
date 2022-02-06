@@ -1,17 +1,17 @@
 <template>
-    <v-container>
-        <v-sheet class="pa-4 lighten-4">
-            <div class="d-flex">
-                <h3 class="title green--text text--darken-3">{{ siteTypeValue }}</h3>
+    <v-container class="c-site-list">
+        <v-sheet class="list-header-wrapper">
+            <div class="list-header">
+                <h3 class="title list-title">{{ siteTypeValue }}</h3>
                 <v-spacer />
                 <c-icon :type="IconType.New.name" @c-click="openHandler(ExecutionType.Create)" />
             </div>
             <v-divider />
-            <v-list dense>
-                <c-message v-if="listItems.length === 0" class="mt-4"> 登録されていません </c-message>
-                <v-list-item v-for="listItem in listItems" v-else :key="listItem.uuid">
+            <v-list class="list-content-wrapper" dense>
+                <c-message v-if="listItems.length === 0" class="no-record-message"> 登録されていません </c-message>
+                <v-list-item v-for="listItem in listItems" v-else :key="listItem.uuid" class="list-content">
                     <v-list-item-content>
-                        <v-list-item-title class="d-flex">
+                        <v-list-item-title class="list-content-title">
                             <div>{{ listItem.name }}</div>
                             <v-spacer />
                             <c-icon :type="IconType.Edit.name" @c-click="openHandler(ExecutionType.Edit, listItem)" />
@@ -197,4 +197,18 @@ export default class CSiteList extends Vue {
 }
 </script>
 
-<style lang="stylus"></style>
+<style lang="stylus" scoped>
+.c-site-list
+    .list-header-wrapper
+        padding 16px
+        .list-header
+            display flex
+            .list-title
+                color $title-text-color
+    .list-content-wrapper
+        .no-record-message
+            margin-top 16px
+        .list-content
+            .list-content-title
+                display flex
+</style>

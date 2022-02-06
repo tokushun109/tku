@@ -1,18 +1,22 @@
 <template>
-    <v-card width="100%" :color="Color" hover @click.native="$emit('c-click', ExecutionType.Detail, listItem)">
-        <v-card-text>
-            <div class="my-4">
-                <div>
-                    <div class="green--text text--darken-3">
-                        {{ listItem.name }}
-                        <v-chip v-if="!listItem.isActive" x-small :color="ColorType.Grey" :text-color="ColorType.White">展示</v-chip>
-                    </div>
+    <v-card
+        width="100%"
+        :class="{ 'is-active': listItem.isActive }"
+        hover
+        class="c-product-card"
+        @click.native="$emit('c-click', ExecutionType.Detail, listItem)"
+    >
+        <v-card-text class="product-card-wrapper">
+            <div class="product-card-header">
+                <div class="product-name">
+                    {{ listItem.name }}
+                    <v-chip v-if="!listItem.isActive" x-small :color="ColorType.Grey" :text-color="ColorType.White">展示</v-chip>
                 </div>
                 <v-divider />
             </div>
             <c-product-image :product="listItem" />
-            <div class="text-right mt-2">
-                <div class="d-flex">
+            <div class="product-card-footer">
+                <div class="product-card-footer-content">
                     <template v-if="admin">
                         <c-icon :type="IconType.Edit.name" @c-click="$emit('c-click', ExecutionType.Edit, listItem)" />
                         <c-icon :type="IconType.Delete.name" @c-click="$emit('c-click', ExecutionType.Delete, listItem)" />
@@ -37,11 +41,22 @@ export default class CProductCard extends Vue {
     IconType: typeof IconType = IconType
     ExecutionType: typeof ExecutionType = ExecutionType
     executionType: TExecutionType = ExecutionType.Create
-
-    get Color(): string {
-        return this.listItem.isActive ? 'light-green lighten-5' : 'grey lighten-3'
-    }
 }
 </script>
 
-<style lang="stylus" scoped></style>
+<style lang="stylus" scoped>
+.c-product-card
+    background-color $secondary-bg-color
+    &.is-active
+        background-color $light-bg-color
+    .product-card-wrapper
+        .product-card-header
+            margin 16px 0
+            .product-name
+                color $title-text-color
+        .product-card-footer
+            margin-top 15px
+            text-align right
+            .product-card-footer-content
+                display flex
+</style>

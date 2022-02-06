@@ -1,34 +1,40 @@
 <template>
     <v-sheet class="c-product-detail-page" :color="ColorType.Transparent">
-        <v-container class="c-product-detail-page">
-            <v-sheet class="pa-4 lighten-4">
-                <p class="title-weight green--text text--darken-3">{{ product.name }}</p>
-                <v-row>
+        <v-container class="c-product-detail-page-wrapper">
+            <v-sheet class="c-product-detail-page-area">
+                <p class="product-name">{{ product.name }}</p>
+                <v-row class="detail-area">
                     <v-col cols="12" sm="6">
                         <c-product-image class="mb-4" category :product="product" />
                     </v-col>
                     <v-col cols="12" sm="6">
-                        <p class="title-weight grey--text text--light-1 text-h6">
-                            ￥{{ product.price | priceFormat }}
-                            <span class="text-body-2">(税込)</span>
-                        </p>
-                        <pre style="white-space: pre-wrap" class="mb-4 text-body-2">{{ product.description }}</pre>
-                        <p v-if="product.tags.length > 0" class="title-weight">関連タグ<v-divider /></p>
-                        <div class="d-flex">
-                            <div v-for="tag in product.tags" :key="tag.uuid">
-                                <v-chip small :color="ColorType.Lime" :text-color="ColorType.White" class="mx-1">{{ tag.name }}</v-chip>
+                        <div class="price-area">
+                            <p class="price text-h6">
+                                ￥{{ product.price | priceFormat }}
+                                <span class="text-body-2">(税込)</span>
+                            </p>
+                        </div>
+                        <div class="description-area">
+                            <pre class="description text-body-2">{{ product.description }}</pre>
+                        </div>
+                        <div class="tag-area">
+                            <p v-if="product.tags.length > 0" class="tag">関連タグ<v-divider /></p>
+                            <div class="tag-content">
+                                <div v-for="tag in product.tags" :key="tag.uuid">
+                                    <v-chip small :color="ColorType.Lime" :text-color="ColorType.White" class="mx-1">{{ tag.name }}</v-chip>
+                                </div>
                             </div>
                         </div>
-                        <div class="site-buttons-area">
-                            <div class="text-body-1 mt-4">
-                                <p class="title-weight">販売サイト<v-divider /></p>
+                        <div class="sales-site-area">
+                            <div class="sales-site text-body-1">
+                                <p>販売サイト<v-divider /></p>
                             </div>
                             <v-row>
                                 <v-col v-for="siteDetail in product.siteDetails" :key="siteDetail.uuid" md="6" sm="12">
                                     <v-btn
                                         :color="ColorType.LightGreen"
                                         :href="siteDetail.url"
-                                        class="white--text text-h6"
+                                        class="site-buttons"
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         block
@@ -47,10 +53,10 @@
                 <c-icon :type="IconType.Cart.name" :color="ColorType.White" @c-click="dialogVisible = true" />
             </v-btn>
         </div>
-        <c-dialog :visible.sync="dialogVisible" :is-button="false">
+        <c-dialog class="sales-site-dialog" :visible.sync="dialogVisible" :is-button="false">
             <template #content>
-                <div class="text-body-1">
-                    <p class="title-weight">以下のサイトで販売中です！<v-divider /></p>
+                <div class="message-area">
+                    <p class="message">以下のサイトで販売中です！<v-divider /></p>
                 </div>
                 <c-container>
                     <v-row>
@@ -90,9 +96,35 @@ export default class CProductDetail extends Vue {
 <style lang="stylus" scoped>
 .c-product-detail-page
     position relative
-    .site-buttons-area
-        +sm()
-            display none
+    .c-product-detail-page-wrapper
+        .c-product-detail-page-area
+            padding 16px
+            .product-name
+                color $title-text-color
+                font-weight $title-font-weight
+            .detail-area
+                .price-area
+                    .price
+                        color $text-color
+                        font-weight $title-font-weight
+                .description-area
+                    .description
+                        margin-bottom 16px
+                        white-space pre-wrap
+                .tag-area
+                    .tag
+                        font-weight $title-font-weight
+                    .tag-content
+                        display flex
+                .sales-site-area
+                    +sm()
+                        display none
+                    .sales-site
+                        margin-top 16px
+                        font-weight $title-font-weight
+                    .site-buttons
+                        color $white-color
+                        font-size $font-large
     .purchase-button
         position fixed
         right 20px
@@ -100,4 +132,9 @@ export default class CProductDetail extends Vue {
         display none
         +sm()
             display block
+
+.v-dialog
+    .message-area
+        .message
+            font-weight $title-font-weight
 </style>

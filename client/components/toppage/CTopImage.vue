@@ -1,9 +1,9 @@
 <template>
     <div class="c-top-image">
         <!-- md幅以上での表示 -->
-        <v-sheet class="default grey lighten-4">
-            <div class="carousel-wrapper d-flex">
-                <div v-for="(image, index) in displayImages" :key="index" class="slide-show pa-5">
+        <v-sheet class="default">
+            <div class="carousel-wrapper">
+                <div v-for="(image, index) in displayImages" :key="index" class="slide-show">
                     <v-card class="carousel-item-wrapper" elevation="20" nuxt :to="`/product/${displayProduct(index).uuid}`">
                         <v-chip
                             v-if="category && displayProduct(index).category.uuid"
@@ -19,7 +19,7 @@
                         <v-img eager :src="image" :alt="`image-${index}`" width="530" class="carousel-image" />
                     </v-card>
                 </div>
-                <div v-for="(image, index) in displayImages" :key="index" class="slide-show pa-5">
+                <div v-for="(image, index) in displayImages" :key="index" class="slide-show">
                     <v-card class="carousel-item-wrapper" elevation="20" nuxt :to="`/product/${displayProduct(index).uuid}`">
                         <v-chip
                             v-if="category && displayProduct(index).category.uuid"
@@ -38,7 +38,7 @@
             </div>
         </v-sheet>
         <!-- sm幅以下での表示 -->
-        <v-sheet class="sm light-green lighten-4 mx-4">
+        <v-sheet class="sm">
             <v-card rounded elevation="20">
                 <v-container class="carousel-wrapper">
                     <v-carousel v-if="displayImages.length > 0" :show-arrows="carouselItems.length > 1" cycle hide-delimiters height="auto">
@@ -106,10 +106,13 @@ export default class CTopImage extends Vue {
         +sm()
             display none
         .carousel-wrapper
+            display flex
             align-items center
             overflow hidden
+            background-color $secondary-bg-color
             .slide-show
                 display flex
+                padding 20px
                 animation loop-slide 40s infinite linear 1s both
                 .carousel-item-wrapper
                     position relative
@@ -141,6 +144,7 @@ export default class CTopImage extends Vue {
                         display none
     .sm
         display none
+        margin 0 16px
         +sm()
             display block
             .carousel-wrapper
