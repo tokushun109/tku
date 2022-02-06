@@ -1,15 +1,15 @@
 <template>
-    <v-container>
-        <v-sheet class="pa-4 lighten-4">
+    <v-container class="c-product-list">
+        <v-sheet class="product-list-area">
             <v-container>
-                <div class="d-flex">
-                    <h3 class="title green--text text--darken-3">商品</h3>
+                <div class="product-list-header">
+                    <h3 class="title product-list-title">商品</h3>
                     <v-spacer />
                     <c-icon :type="IconType.New.name" @c-click="clickHandler(ExecutionType.Create)" />
                 </div>
                 <v-divider />
-                <v-list>
-                    <c-message v-if="listItems.length === 0" class="mt-4"> 登録されていません </c-message>
+                <v-list class="product-list-content">
+                    <c-message v-if="listItems.length === 0" class="message"> 登録されていません </c-message>
                     <v-row>
                         <v-col v-for="listItem in listItems" :key="listItem.uuid" cols="12" sm="6" md="4">
                             <c-product-card :list-item="listItem" admin @c-click="clickHandler" />
@@ -29,7 +29,7 @@
                 >
                     <v-text-field v-model="modalItem.name" :rules="nameRules" label="商品名(必須)" outlined counter="20" />
                     <v-textarea v-model="modalItem.description" label="商品説明" outlined />
-                    <v-row>
+                    <v-row class="price-input">
                         <v-col cols="6">
                             <v-text-field
                                 v-model.number="modalItem.price"
@@ -41,8 +41,8 @@
                                 type="number"
                             />
                         </v-col>
-                        <v-col class="text-right" cols="6">
-                            <p class="pt-3">{{ modalItem.price | priceFormat }}円</p>
+                        <v-col class="price-unit" cols="6">
+                            <p class="price-unit-content">{{ modalItem.price | priceFormat }}円</p>
                         </v-col>
                     </v-row>
                     <v-file-input v-model="uploadFiles" label="商品画像" prepend-icon="mdi-camera" multiple outlined />
@@ -98,11 +98,10 @@
                             />
                         </v-col>
                     </v-row>
-                    <div v-if="modalItem.siteDetails.length > 0" class="site-detail-preview text-left">
+                    <div v-if="modalItem.siteDetails.length > 0" class="site-detail-preview">
                         <v-chip
                             v-for="(siteDetail, index) in modalItem.siteDetails"
                             :key="index"
-                            class="ma-1"
                             close
                             :color="ColorType.Grey"
                             :text-color="ColorType.White"
@@ -114,7 +113,7 @@
                             {{ siteDetail.salesSite.name }}
                         </v-chip>
                     </div>
-                    <div class="d-flex justify-center outlined">
+                    <div class="active-check-box">
                         <v-checkbox v-model="modalItem.isActive" label="販売中" dense />
                     </div>
                 </v-form>
@@ -228,10 +227,6 @@ export default class CProductList extends Vue {
         }
     }
 
-    getColor(listItem: IProduct): string {
-        return listItem.isActive ? 'light-green lighten-5' : 'grey lighten-3'
-    }
-
     setInit() {
         this.modalItem = newProduct()
         this.uploadFiles = []
@@ -246,13 +241,15 @@ export default class CProductList extends Vue {
         this.errors = []
         if (executionType === ExecutionType.Create) {
             this.setInit()
+            this.executionType = executionType
+            this.dialogVisible = true
         } else if (item && executionType === ExecutionType.Detail) {
             this.$router.push(`/admin/product/${item.uuid}`)
         } else {
             this.setItem(item!)
+            this.executionType = executionType
+            this.dialogVisible = true
         }
-        this.executionType = executionType
-        this.dialogVisible = true
     }
 
     closeHandler() {
@@ -330,7 +327,31 @@ export default class CProductList extends Vue {
 </script>
 
 <style lang="stylus" scoped>
+.c-product-list
+    .product-list-area
+        padding 16px
+        .product-list-header
+            display flex
+            .product-list-title
+                color $title-text-color
+        .product-list-content
+            .message
+                margin-top 16px
+
+.price-input
+    .price-unit
+        text-align right
+        .price-unit-content
+            padding-top 12px
+
 .site-detail-preview
     border 1px dashed $light-dark-color
     border-radius 3px
+    text-align left
+    .site-detail-chip
+        margin 4px
+
+.active-check-box
+    display flex
+    justify-content center
 </style>

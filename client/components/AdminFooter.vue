@@ -1,5 +1,5 @@
 <template>
-    <v-footer color="primary" dark app class="d-flex justify-center">tku</v-footer>
+    <v-footer class="admin-footer" color="primary" dark app>tku</v-footer>
 </template>
 
 <script lang="ts">
@@ -8,4 +8,8 @@ import { Component, Vue } from 'nuxt-property-decorator'
 export default class AdminFooter extends Vue {}
 </script>
 
-<style lang="stylus"></style>
+<style lang="stylus" scoped>
+.admin-footer
+    display flex
+    justify-content center
+</style>

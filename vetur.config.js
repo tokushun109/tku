@@ -38,5 +38,6 @@ module.exports = {
                 './client/src/components/**/*.vue'
             ]
         }
-    ]
+    ],
+    transpileDependencies: ['vuetify']
 }

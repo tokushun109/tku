@@ -1,20 +1,20 @@
 <template>
-    <v-sheet class="grey lighten-4">
+    <v-sheet class="page-admin-creator">
         <v-container>
-            <v-sheet class="pa-4 lighten-4">
-                <h3 class="title green--text text--darken-3">サイトロゴ</h3>
+            <v-sheet class="creator-wrapper">
+                <h3 class="logo-title">サイトロゴ</h3>
                 <v-divider />
-                <v-container class="text-center">
-                    <v-avatar color="grey darken-1" class="my-4" size="240">
+                <v-container class="logo-content">
+                    <v-avatar :color="ColorType.Grey" class="logo-avatar" size="240">
                         <img v-if="creator.apiPath" :src="creator.apiPath" style="object-fit: cover" alt="ロゴ画像" />
                     </v-avatar>
                 </v-container>
-                <h3 class="title green--text text--darken-3">紹介文</h3>
+                <h3 class="description-title">紹介文</h3>
                 <v-divider />
-                <v-container>
-                    <pre style="white-space: pre-wrap; word-break: break-all">{{ creator.introduction }}</pre>
+                <v-container class="description-content">
+                    <pre class="description-text">{{ creator.introduction }}</pre>
                 </v-container>
-                <div class="text-center">
+                <div class="edit-button">
                     <v-btn color="primary" @click="openHandler"><c-icon :type="IconType.Edit.name" />編集</v-btn>
                 </div>
             </v-sheet>
@@ -43,7 +43,7 @@
 import { Context } from '@nuxt/types'
 import { Component, Vue, Watch } from 'nuxt-property-decorator'
 import _ from 'lodash'
-import { ICreator, IError, ISite, IconType } from '~/types'
+import { ICreator, IError, ISite, IconType, ColorType } from '~/types'
 import { newCreator } from '~/methods'
 @Component({
     head: {
@@ -52,7 +52,7 @@ import { newCreator } from '~/methods'
 })
 export default class PageAdminCreatorIndex extends Vue {
     IconType: typeof IconType = IconType
-
+    ColorType: typeof ColorType = ColorType
     // 製作者
     creator: ICreator = newCreator()
 
@@ -145,4 +145,22 @@ export default class PageAdminCreatorIndex extends Vue {
 }
 </script>
 
-<style lang="stylus"></style>
+<style lang="stylus" scoped>
+.page-admin-creator
+    .creator-wrapper
+        padding 16px
+        .logo-title
+            color $title-text-color
+        .logo-content
+            text-align center
+            .logo-avatar
+                margin 16px 0
+        .description-title
+            color $title-text-color
+        .description-content
+            .description-text
+                white-space pre-wrap
+                word-break break-all
+        .edit-button
+            text-align center
+</style>

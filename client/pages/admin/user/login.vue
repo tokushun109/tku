@@ -1,8 +1,8 @@
 <template>
-    <v-container>
-        <v-sheet class="pa-4 lighten-4 mx-auto text-center" max-width="800px">
+    <v-container class="page-admin-login">
+        <v-sheet class="admin-login-area" max-width="800">
             <c-error :errors.sync="errors" />
-            <h3 class="title mb-4 green--text text--darken-3">ログイン</h3>
+            <h3 class="login-title">ログイン</h3>
             <v-form ref="form" v-model="valid" lazy-validation>
                 <v-text-field v-model="form.email" :rules="rules" label="email(必須)" outlined />
                 <v-text-field v-model="form.password" type="password" :rules="rules" label="パスワード(必須)" outlined />
@@ -46,4 +46,13 @@ export default class PageAdminUserLogin extends Vue {
 }
 </script>
 
-<style lang="stylus"></style>
+<style lang="stylus" scoped>
+.page-admin-login
+    .admin-login-area
+        margin 0 auto
+        padding 16px
+        text-align center
+        .login-title
+            margin-bottom 16px
+            color $title-text-color
+</style>

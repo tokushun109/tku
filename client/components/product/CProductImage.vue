@@ -1,5 +1,5 @@
 <template>
-    <v-sheet class="carousel-wrapper rounded-xl">
+    <v-sheet class="carousel-wrapper">
         <v-chip v-if="category && product.category.uuid" class="category-label" small :color="ColorType.LightGreen" :text-color="ColorType.White">{{
             product.category.name
         }}</v-chip>
@@ -8,13 +8,13 @@
             :show-arrows="product.productImages.length > 1"
             height="auto"
             hide-delimiters
-            class="rounded-xl"
+            class="carousel-area"
         >
             <v-carousel-item v-for="image in product.productImages" :key="image.uuid">
                 <v-img :src="image.apiPath" :alt="image.uuid" class="carousel-image" />
             </v-carousel-item>
         </v-carousel>
-        <v-carousel v-else :show-arrows="false" height="auto" hide-delimiters class="rounded-xl">
+        <v-carousel v-else :show-arrows="false" height="auto" hide-delimiters class="carousel-area">
             <v-carousel-item>
                 <v-img src="/img/product/no-image.png" alt="no-image" class="carousel-image" />
             </v-carousel-item>
@@ -41,12 +41,15 @@ export default class CProductImage extends Vue {
 <style lang="stylus" scoped>
 .carousel-wrapper
     position relative
+    border-radius $image-border-radius
     .category-label
         position absolute
         top 10px
         right 5px
         z-index 5
         opacity 0.8
+    .carousel-area
+        border-radius $image-border-radius
     .carousel-image
         width 100%
         aspect-ratio 1 / 1

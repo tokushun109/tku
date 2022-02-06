@@ -76,7 +76,6 @@ export default {
         middleware: 'auth',
     },
     vuetify: {
-        customVariables: ['~/assets/variables.scss'],
         theme: {
             themes: {
                 light: {

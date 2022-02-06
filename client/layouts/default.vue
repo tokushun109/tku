@@ -1,14 +1,14 @@
 <template>
     <div>
-        <v-app>
+        <v-app class="default-bg">
             <template v-if="!isAdmin">
-                <v-main class="light-green lighten-4">
+                <v-main>
                     <site-layout />
                     <Nuxt />
                 </v-main>
             </template>
             <template v-else>
-                <v-main class="grey lighten-4">
+                <v-main>
                     <admin-header />
                     <Nuxt />
                     <admin-footer />
@@ -30,4 +30,9 @@ export default class LayoutDefault extends Vue {
 }
 </script>
 
-<style lang="stylus"></style>
+<style lang="stylus" scoped>
+* :not(.v-icon)
+    font-family $font-face !important
+    .default-bg
+        background-color $primary-bg-color
+</style>

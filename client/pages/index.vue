@@ -1,8 +1,8 @@
 <template>
-    <v-sheet :color="ColorType.Transparent" class="mx-auto page-top text-center">
-        <div class="sm site-sub-title text-h5 grey--text text--darken-1 py-10">Cotton lace × Macrame</div>
-        <c-top-image class="mb-4" title category :carousel-items="carouselItems" />
-        <div class="more text-right mr-4">
+    <v-sheet :color="ColorType.Transparent" class="page-top">
+        <div class="sm site-sub-title text-h5">Cotton lace × Macrame</div>
+        <c-top-image class="top-image" title category :carousel-items="carouselItems" />
+        <div class="more">
             <v-btn rounded outlined x-large :color="ColorType.Grey" nuxt to="/product">
                 <div class="text-h6">MORE</div>
                 <v-icon large>mdi-arrow-right-thick</v-icon>
@@ -36,10 +36,19 @@ export default class PageTop extends Vue {
 </script>
 
 <style lang="stylus" scoped>
-.site-sub-title
-    display none
-    &.sm
-        +sm()
-            display block
-            font-family 'Lobster' !important
+.page-top
+    margin 0 auto
+    text-align center
+    .site-sub-title
+        display none
+        padding 0 40px
+        color $text-color
+        &.sm
+            +sm()
+                display block
+    .top-image
+        margin-bottom 16px
+    .more
+        margin-right 16px
+        text-align right
 </style>
