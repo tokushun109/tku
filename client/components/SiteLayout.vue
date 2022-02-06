@@ -6,7 +6,7 @@
         </v-btn>
         <v-sheet color="transparent" class="site-title-area">
             <v-card flat width="200" color="transparent" class="site-title text-h1" to="/"> tku </v-card>
-            <div class="site-sub-title">Cotton lace × Macrame</div>
+            <div class="site-sub-title text-h5">Cotton lace × Macrame</div>
         </v-sheet>
         <v-dialog v-model="menuVisible" fullscreen hide-overlay transition="dialog-top-transition" scrollable>
             <v-sheet :color="ColorType.Grey" class="menu-area">
