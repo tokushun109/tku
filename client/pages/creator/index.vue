@@ -1,5 +1,15 @@
 <template>
-    <v-sheet> </v-sheet>
+    <v-container class="page-creator">
+        <v-container>
+            <h2 class="page-title text-h3">ABOUT</h2>
+            <v-divider />
+        </v-container>
+        <v-sheet>
+            <v-container>
+                <c-creator-edit :item.sync="creator" />
+            </v-container>
+        </v-sheet>
+    </v-container>
 </template>
 
 <script lang="ts">
