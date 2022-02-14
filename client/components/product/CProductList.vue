@@ -89,7 +89,7 @@
                         </v-col>
                         <v-col cols="12" sm="6">
                             <v-text-field
-                                v-model="previewSiteDetail.url"
+                                v-model="previewSiteDetail.detailUrl"
                                 :append-icon="IconType.Plus.icon"
                                 label="URL"
                                 :disabled="!previewSiteDetail.salesSite.name"
@@ -105,7 +105,7 @@
                             close
                             :color="ColorType.Grey"
                             :text-color="ColorType.White"
-                            :href="siteDetail.url"
+                            :href="siteDetail.detailUrl"
                             target="_blank"
                             rel="noopener noreferrer"
                             @click:close="deleteSiteDetail(index)"
@@ -221,7 +221,7 @@ export default class CProductList extends Vue {
     }
 
     AddSiteDetail() {
-        if (this.previewSiteDetail.salesSite && this.previewSiteDetail.url) {
+        if (this.previewSiteDetail.salesSite && this.previewSiteDetail.detailUrl) {
             this.modalItem.siteDetails.push(this.previewSiteDetail)
             this.previewSiteDetail = newSiteDetail()
         }

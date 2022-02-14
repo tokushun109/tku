@@ -4,7 +4,7 @@
         <v-btn fab x-large class="toggle-button" @click="toggleMenu">
             <c-icon :type="IconType.Menu.name" x-large @c-click="toggleMenu" />
         </v-btn>
-        <v-sheet color="transparent" class="site-title-area">
+        <v-sheet v-if="isRoot" color="transparent" class="site-title-area">
             <v-card flat width="200" color="transparent" class="site-title text-h1" to="/"> tku </v-card>
             <div class="site-sub-title text-h5">Cotton lace × Macrame</div>
         </v-sheet>
@@ -66,6 +66,10 @@ export default class SiteLayout extends Vue {
 
     menuVisible: boolean = false
 
+    get isRoot(): boolean {
+        return this.$route.path === '/'
+    }
+
     toggleMenu() {
         this.menuVisible = !this.menuVisible
     }
@@ -77,8 +81,8 @@ export default class SiteLayout extends Vue {
     position relative
     .toggle-button
         position fixed
-        top 77px
-        right 60px
+        top 40px
+        right 40px
         z-index 5
         +sm()
             display none
@@ -113,8 +117,8 @@ export default class SiteLayout extends Vue {
         display none
     .toggle-button
         position absolute
-        top 85px
-        right 60px
+        top 40px
+        right 40px
         z-index 6
     .site-title-area
         position relative

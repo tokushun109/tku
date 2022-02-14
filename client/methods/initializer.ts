@@ -41,12 +41,13 @@ export function newSalesSite(): ISite {
     return {
         uuid: '',
         name: '',
+        url: '',
     }
 }
 export function newSiteDetail(): ISiteDetail {
     return {
         uuid: '',
-        url: '',
+        detailUrl: '',
         salesSite: newSalesSite(),
     }
 }

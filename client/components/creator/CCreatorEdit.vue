@@ -2,17 +2,22 @@
     <v-sheet class="c-creator-edit">
         <v-container>
             <v-sheet class="creator-wrapper">
-                <h3 class="logo-title">製作者</h3>
+                <h3 class="description-title">PROFILE</h3>
                 <v-divider />
                 <v-container class="logo-content">
-                    <v-avatar :color="ColorType.Grey" class="logo-avatar" size="240">
-                        <img v-if="creator.apiPath" :src="creator.apiPath" style="object-fit: cover" alt="ロゴ画像" />
+                    <v-avatar :color="ColorType.Grey" size="400" class="logo-avatar">
+                        <img v-if="creator.apiPath" :src="creator.apiPath" class="logo-image" alt="ロゴ画像" />
                     </v-avatar>
                 </v-container>
-                <h3 class="description-title">紹介</h3>
-                <v-divider />
                 <v-container class="description-content">
                     <pre class="description-text">{{ creator.introduction }}</pre>
+                </v-container>
+                <v-container class="sns-content">
+                    <v-row>
+                        <v-col v-for="sns in snsList" :key="sns.uuid">
+                            <v-avatar :color="ColorType.Grey" class="logo-avatar"> </v-avatar>
+                        </v-col>
+                    </v-row>
                 </v-container>
                 <div v-if="admin" class="edit-button">
                     <v-btn color="primary" @click="openHandler"><c-icon :type="IconType.Edit.name" @c-click="openHandler" />編集</v-btn>
@@ -54,6 +59,8 @@ export default class CCreatorEdit extends Vue {
     ColorType: typeof ColorType = ColorType
     // 製作者
     @PropSync('item') creator!: ICreator
+    // SNSのリスト
+    @Prop({ type: Array }) snsList!: Array<ISite>
     // 管理画面での使用
     @Prop({ type: Boolean, default: false }) admin!: boolean
 
@@ -62,9 +69,6 @@ export default class CCreatorEdit extends Vue {
 
     // アップロードするロゴファイル
     uploadFile: File | null = null
-
-    // SNSのリスト
-    snsList: Array<ISite> | null = []
 
     // 販売サイトのリスト
     salesSites: Array<ISite> | null = []
@@ -137,18 +141,22 @@ export default class CCreatorEdit extends Vue {
 .c-creator-edit
     .creator-wrapper
         padding 16px
-        .logo-title
-            color $title-text-color
         .logo-content
             text-align center
             .logo-avatar
                 margin 16px 0
+                .logo-image
+                    object-fit cover
         .description-title
             color $title-text-color
         .description-content
             .description-text
                 white-space pre-wrap
                 word-break break-all
+        .sns-title
+            color $title-text-color
+        .sales-site-title
+            color $title-text-color
         .edit-button
             text-align center
 </style>

@@ -36,14 +36,17 @@ export default class PageAdminProductIndex extends Vue {
     }
 
     async loadingProduct() {
-        this.products = await this.$axios.$get(`/product`)
+        const params: IGetProductsParams = {
+            mode: 'all',
+        }
+        this.products = await this.$axios.$get(`/product`, { params })
     }
 
     // 商品の削除
     async productDeleteHandler(product: IProduct) {
         if (confirm(`${product.name}を削除します。よろしいですか？`)) {
             await this.$axios.$delete(`/product/${product.uuid}`)
-            this.loadingProduct()
+            await this.loadingProduct()
         }
     }
 }

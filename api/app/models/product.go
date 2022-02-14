@@ -158,7 +158,7 @@ func InsertProduct(product *Product) (err error) {
 			siteDetailList,
 			SiteDetail{
 				Uuid:        uuid,
-				Url:         siteDetail.Url,
+				DetailUrl:   siteDetail.DetailUrl,
 				ProductId:   product.ID,
 				SalesSiteId: GetSalesSite(siteDetail.SalesSite.Uuid).ID,
 			},
@@ -258,7 +258,7 @@ func UpdateProduct(product *Product, uuid string) (err error) {
 			siteDetailList,
 			SiteDetail{
 				Uuid:        uuid,
-				Url:         siteDetail.Url,
+				DetailUrl:   siteDetail.DetailUrl,
 				ProductId:   registeredProduct.ID,
 				SalesSiteId: GetSalesSite(siteDetail.SalesSite.Uuid).ID,
 			},
