@@ -2,22 +2,18 @@
     <v-sheet class="c-creator-edit">
         <v-container>
             <v-sheet class="creator-wrapper">
-                <h3 class="description-title">PROFILE</h3>
-                <v-divider />
                 <v-container class="logo-content">
-                    <v-avatar :color="ColorType.Grey" size="400" class="logo-avatar">
-                        <img v-if="creator.apiPath" :src="creator.apiPath" class="logo-image" alt="ロゴ画像" />
-                    </v-avatar>
+                    <v-img v-if="creator.apiPath" :src="creator.apiPath" max-width="400" aspect-ratio="1" class="logo-image" alt="ロゴ画像" />
                 </v-container>
                 <v-container class="description-content">
                     <pre class="description-text">{{ creator.introduction }}</pre>
                 </v-container>
-                <v-container class="sns-content">
-                    <v-row>
-                        <v-col v-for="sns in snsList" :key="sns.uuid">
-                            <v-avatar :color="ColorType.Grey" class="logo-avatar"> </v-avatar>
-                        </v-col>
-                    </v-row>
+                <v-container v-if="!admin" class="sns-content">
+                    <div v-for="sns in snsList" :key="sns.uuid" class="sns-item">
+                        <v-btn fab :color="ColorType.Orange" :href="sns.url" x-large>
+                            <v-icon :color="ColorType.White">{{ sns.icon }}</v-icon>
+                        </v-btn>
+                    </div>
                 </v-container>
                 <div v-if="admin" class="edit-button">
                     <v-btn color="primary" @click="openHandler"><c-icon :type="IconType.Edit.name" @c-click="openHandler" />編集</v-btn>
@@ -142,21 +138,22 @@ export default class CCreatorEdit extends Vue {
     .creator-wrapper
         padding 16px
         .logo-content
-            text-align center
-            .logo-avatar
-                margin 16px 0
-                .logo-image
-                    object-fit cover
+            .logo-image
+                margin 0 auto
+                border-radius 50%
+                object-fit cover
         .description-title
             color $title-text-color
         .description-content
+            text-align center
             .description-text
                 white-space pre-wrap
                 word-break break-all
-        .sns-title
-            color $title-text-color
-        .sales-site-title
-            color $title-text-color
+        .sns-content
+            display flex
+            justify-content center
+            .sns-item
+                margin 0 10px
         .edit-button
             text-align center
 </style>

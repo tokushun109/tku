@@ -41,7 +41,7 @@ export default class PageTop extends Vue {
     text-align center
     .site-sub-title
         display none
-        padding 0 40px
+        padding 30px 40px
         color $text-color
         &.sm
             +sm()

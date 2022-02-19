@@ -33,7 +33,7 @@
                                 <v-col v-for="siteDetail in product.siteDetails" :key="siteDetail.uuid" md="6" sm="12">
                                     <v-btn
                                         :color="ColorType.LightGreen"
-                                        :href="siteDetail.url"
+                                        :href="siteDetail.detailUrl"
                                         class="site-buttons"
                                         target="_blank"
                                         rel="noopener noreferrer"
@@ -63,7 +63,7 @@
                         <v-col v-for="siteDetail in product.siteDetails" :key="siteDetail.uuid" cols="12" md="6">
                             <v-btn
                                 :color="ColorType.LightGreen"
-                                :href="siteDetail.url"
+                                :href="siteDetail.detailUrl"
                                 class="white--text text-h6 site-modal"
                                 target="_blank"
                                 rel="noopener noreferrer"

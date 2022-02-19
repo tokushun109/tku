@@ -2,6 +2,7 @@ export interface ISite {
     uuid: string
     name: string
     url: string
+    icon: string
 }
 
 export interface ISiteDetail {

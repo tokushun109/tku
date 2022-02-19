@@ -9,6 +9,7 @@ type SalesSite struct {
 	Uuid string `json:"uuid"`
 	Name string `json:"name" validate:"min=1,max=20"`
 	Url  string `json:"url" validate:"url"`
+	Icon string `json:"icon"`
 }
 
 type SiteDetail struct {
@@ -27,6 +28,7 @@ type SkillMarket struct {
 	Uuid string `json:"uuid"`
 	Name string `json:"name" validate:"min=1,max=20"`
 	Url  string `json:"url" validate:"url"`
+	Icon string `json:"icon"`
 }
 
 type SkillMarkets []SkillMarket
@@ -36,6 +38,7 @@ type Sns struct {
 	Uuid string `json:"uuid"`
 	Name string `json:"name" validate:"min=1,max=20"`
 	Url  string `json:"url" validate:"url"`
+	Icon string `json:"icon"`
 }
 
 type SnsList []Sns
@@ -74,7 +77,7 @@ func InsertSalesSite(salesSite *SalesSite) (err error) {
 
 func UpdateSalesSite(sales_site *SalesSite, uuid string) (err error) {
 	err = Db.Model(&sales_site).Where("uuid = ?", uuid).Updates(
-		SalesSite{Name: sales_site.Name},
+		SalesSite{Name: sales_site.Name, Url: sales_site.Url, Icon: sales_site.Icon},
 	).Error
 	return err
 }
@@ -138,7 +141,7 @@ func InsertSkillMarket(skillMarket *SkillMarket) (err error) {
 
 func UpdateSkillMarket(skill_market *SkillMarket, uuid string) (err error) {
 	err = Db.Model(&skill_market).Where("uuid = ?", uuid).Updates(
-		SkillMarket{Name: skill_market.Name},
+		SkillMarket{Name: skill_market.Name, Url: skill_market.Url, Icon: skill_market.Icon},
 	).Error
 	return err
 }
@@ -182,7 +185,7 @@ func InsertSns(sns *Sns) (err error) {
 
 func UpdateSns(sns *Sns, uuid string) (err error) {
 	err = Db.Model(&sns).Where("uuid = ?", uuid).Updates(
-		Sns{Name: sns.Name},
+		Sns{Name: sns.Name, Url: sns.Url, Icon: sns.Icon},
 	).Error
 	return err
 }
