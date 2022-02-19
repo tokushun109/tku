@@ -32,13 +32,14 @@
                     lazy-validation
                 >
                     <v-text-field v-model="modalItem.name" :rules="nameRules" label="サイト名(必須)" outlined counter="20" />
-                    <v-text-field
-                        v-if="!(siteTypeValue === SiteType.SalesSite.value)"
-                        v-model="modalItem.url"
-                        :rules="urlRules"
-                        label="URL"
-                        outlined
-                    />
+                    <v-text-field v-model="modalItem.url" :rules="urlRules" label="URL" outlined />
+                    <v-text-field v-model="modalItem.icon" label="アイコン" outlined />
+                    <v-container v-if="modalItem.icon" class="icon-preview">
+                        <p>アイコンプレビュー</p>
+                        <v-btn fab :color="ColorType.Orange" :href="modalItem.url" x-large>
+                            <v-icon :color="ColorType.White">{{ modalItem.icon }}</v-icon>
+                        </v-btn>
+                    </v-container>
                 </v-form>
                 <p v-else-if="executionType === ExecutionType.Delete">削除してもよろしいですか？</p>
             </template>
@@ -50,7 +51,7 @@
 <script lang="ts">
 import { Component, Prop, PropSync, Vue, Watch } from 'nuxt-property-decorator'
 import _ from 'lodash'
-import { IError, ISite, ExecutionType, IconType, SiteType, TExecutionType } from '~/types'
+import { IError, ISite, ExecutionType, IconType, SiteType, TExecutionType, ColorType } from '~/types'
 import { min20, newSite, nonDoubleByte, nonSpace, required } from '~/methods'
 @Component({})
 export default class CSiteList extends Vue {
@@ -61,6 +62,7 @@ export default class CSiteList extends Vue {
     ExecutionType: typeof ExecutionType = ExecutionType
     executionType: TExecutionType = ExecutionType.Create
     SiteType: typeof SiteType = SiteType
+    ColorType: typeof ColorType = ColorType
 
     // ダイアログの表示
     dialogVisible: boolean = false
@@ -211,4 +213,7 @@ export default class CSiteList extends Vue {
         .list-content
             .list-content-title
                 display flex
+
+.icon-preview
+    margin-bottom 32px
 </style>

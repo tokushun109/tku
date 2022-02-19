@@ -1,5 +1,14 @@
 <template>
-    <v-sheet> </v-sheet>
+    <v-container class="page-creator">
+        <v-container>
+            <h2 class="page-title text-sm-h3 text-h4">ABOUT</h2>
+        </v-container>
+        <v-sheet>
+            <v-container>
+                <c-creator-edit :item.sync="creator" :sns-list="snsList" />
+            </v-container>
+        </v-sheet>
+    </v-container>
 </template>
 
 <script lang="ts">
@@ -13,17 +22,24 @@ import { ICreator, ISite } from '~/types'
 })
 export default class PageCreatorIndex extends Vue {
     creator: ICreator | null = null
-    sns: Array<ISite> | null = []
+    snsList: Array<ISite> | null = []
     async asyncData({ app }: Context) {
         try {
             const creator = await app.$axios.$get(`/creator`)
-            const sns = await app.$axios.$get(`/sns`)
-            return { creator, sns }
+            const snsList = await app.$axios.$get(`/sns`)
+            return { creator, snsList }
         } catch (e) {
-            return { creator: null, sns: [] }
+            return { creator: null, snsList: [] }
         }
     }
 }
 </script>
 
-<style lang="stylus"></style>
+<style lang="stylus" scoped>
+.page-title
+    margin-bottom 20px
+    color $site-title-text-color
+    text-align center
+    +sm()
+        margin-bottom auto
+</style>

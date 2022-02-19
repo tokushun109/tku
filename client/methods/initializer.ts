@@ -34,19 +34,14 @@ export function newSite(): ISite {
         uuid: '',
         name: '',
         url: '',
+        icon: '',
     }
 }
 
-export function newSalesSite(): ISite {
-    return {
-        uuid: '',
-        name: '',
-    }
-}
 export function newSiteDetail(): ISiteDetail {
     return {
         uuid: '',
-        url: '',
-        salesSite: newSalesSite(),
+        detailUrl: '',
+        salesSite: newSite(),
     }
 }

@@ -1,8 +1,7 @@
 <template>
-    <v-container>
+    <v-container class="page-product">
         <v-container>
-            <h2 class="page-title text-h3">ITEMS</h2>
-            <v-divider />
+            <h2 class="page-title text-sm-h3 text-h4">ITEMS</h2>
         </v-container>
         <v-sheet>
             <v-container>
@@ -50,8 +49,11 @@ export default class PageProductIndex extends Vue {
 }
 </script>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
 .page-title
     margin-bottom 20px
-    color $title-text-color
+    color $site-title-text-color
+    text-align center
+    +sm()
+        margin-bottom auto
 </style>
