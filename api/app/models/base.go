@@ -35,7 +35,7 @@ func gormConnect() *gorm.DB {
 	DBPass := config.Config.DBPass
 	Protocol := config.Config.Protocol
 	DBName := config.Config.DBName
-	SQL_CONNECT := DBUser + ":" + DBPass + "@" + Protocol + "/" + "?charset=utf8&parseTime=True&loc=Local"
+	SQL_CONNECT := DBUser + ":" + DBPass + "@" + Protocol + "/" + "?charset=utf8mb4&parseTime=True&loc=Local"
 
 	// SQLに接続
 	DbConnection, err := gorm.Open(mysql.Open(SQL_CONNECT), &gorm.Config{NamingStrategy: schema.NamingStrategy{
@@ -70,7 +70,6 @@ func removeFile(path string) (err error) {
 
 func init() {
 	Db = gormConnect()
-
 	creator := GetCreator()
 	if creator.ID == nil {
 		// 製作者の初期データが未作成の場合のみ作成する

@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+  # MySQL
+  db:
+    image: mysql:latest
+    container_name: mysql
+    env_file: ./docker/.docker.env
+    volumes:
+      - ./app/db/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./app/db/initdb.d:/docker-entrypoint-initdb.d
+    ports:
+      - 3306:3306
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 -u${DB_USER} -p${DB_PASS}
+
+  # DB migratie
+  migrate:
+    build:
+      context: .
+      dockerfile: ./docker/migrations/Dockerfile
+    container_name: migrate
+    env_file: ./docker/.docker.env
+    depends_on:
+      db:
+        condition: service_healthy
+    command: [ "up" ]
+    volumes:
+      - ./app/db/migrations:/migrations
+
+  # API
+  api:
+    build:
+      context: .
+      dockerfile: ./docker/api/Dockerfile
+    container_name: api
+    env_file: ./docker/.docker.env
+    depends_on:
+      - migrate
+    command: go run main.go
+    ports:
+      - 8080:8080
