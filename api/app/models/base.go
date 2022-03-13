@@ -35,7 +35,7 @@ func gormConnect() *gorm.DB {
 	DBPass := config.Config.DBPass
 	Protocol := config.Config.Protocol
 	DBName := config.Config.DBName
-	SQL_CONNECT := DBUser + ":" + DBPass + "@" + Protocol + "/" + "?charset=utf8mb4&parseTime=True&loc=Local"
+	SQL_CONNECT := DBUser + ":" + DBPass + "@" + Protocol + "/" + "?charset=utf8mb4&parseTime=True&loc=Asia%2FTokyo"
 
 	// SQLに接続
 	DbConnection, err := gorm.Open(mysql.Open(SQL_CONNECT), &gorm.Config{NamingStrategy: schema.NamingStrategy{
@@ -49,7 +49,7 @@ func gormConnect() *gorm.DB {
 	DbConnection.Exec(cmdCreateDB)
 
 	// DBに接続
-	DB_CONNECT := DBUser + ":" + DBPass + "@" + Protocol + "/" + DBName + "?charset=utf8&parseTime=True&loc=Local"
+	DB_CONNECT := DBUser + ":" + DBPass + "@" + Protocol + "/" + DBName + "?charset=utf8&parseTime=True&loc=Asia%2FTokyo"
 	Db, err := gorm.Open(mysql.Open(DB_CONNECT), &gorm.Config{NamingStrategy: schema.NamingStrategy{
 		SingularTable: true,
 	}})
