@@ -27,8 +27,8 @@ var Config ConfigList
 func init() {
 	LoadConfig()
 	if Config.Env == "local" {
-		if _, err := os.Stat("tmp/webapp.log"); err != nil {
-			os.Create("tmp/webapp.log")
+		if _, err := os.Stat(Config.LogFile); err != nil {
+			os.Create(Config.LogFile)
 		}
 		utils.LoggingSettings(Config.LogFile)
 	}

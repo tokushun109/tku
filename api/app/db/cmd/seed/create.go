@@ -1,4 +1,4 @@
-package main
+package db
 
 // go run app/db/cmd/seed/create.go
 func main() {
