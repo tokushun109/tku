@@ -1,7 +1,7 @@
 <template>
     <v-container class="page-creator">
         <v-container>
-            <h2 class="page-title text-sm-h3 text-h4">ABOUT</h2>
+            <h2 class="page-title text-sm-h3 text-h4">CREATOR</h2>
         </v-container>
         <v-sheet>
             <v-container>

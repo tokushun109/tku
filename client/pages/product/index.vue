@@ -1,7 +1,7 @@
 <template>
     <v-container class="page-product">
         <v-container>
-            <h2 class="page-title text-sm-h3 text-h4">ITEMS</h2>
+            <h2 class="page-title text-sm-h3 text-h4">PRODUCTS</h2>
         </v-container>
         <v-sheet>
             <v-container>

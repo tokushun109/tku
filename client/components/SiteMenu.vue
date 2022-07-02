@@ -45,8 +45,8 @@ export default class SiteMenu extends Vue {
     IconType: typeof IconType = IconType
 
     menuItems: Array<ITable> = [
-        { name: 'ABOUT', link: 'creator', icon: 'mdi-lead-pencil' },
-        { name: 'ITEMS', link: 'product', icon: 'mdi-view-module' },
+        { name: 'CREATOR', link: 'creator', icon: 'mdi-lead-pencil' },
+        { name: 'PRODUCTS', link: 'product', icon: 'mdi-view-module' },
     ]
 
     menuVisible: boolean = false
