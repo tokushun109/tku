@@ -5,7 +5,7 @@
             <c-icon :type="IconType.Menu.name" x-large @c-click="toggleMenu" />
         </v-btn>
         <v-sheet v-if="isRoot" color="transparent" class="site-title-area">
-            <v-card flat width="200" color="transparent" class="site-title text-h1" to="/"> tku </v-card>
+            <v-card flat width="300" color="transparent" class="site-title text-h1" to="/"> tocoriri </v-card>
             <div class="site-sub-title text-h5">Cotton lace × Macrame</div>
         </v-sheet>
         <v-dialog v-model="menuVisible" fullscreen hide-overlay transition="dialog-top-transition" scrollable>
@@ -14,7 +14,7 @@
                     <c-icon :type="IconType.Close.name" x-large @c-click="toggleMenu" />
                 </v-btn>
                 <v-sheet color="transparent" class="site-title-area">
-                    <v-card color="transparent" width="200" class="site-title text-h1" to="/" flat nuxt @click="toggleMenu"> tku </v-card>
+                    <v-card color="transparent" width="300" class="site-title text-h1" to="/" flat nuxt @click="toggleMenu"> tocoriri </v-card>
                 </v-sheet>
                 <v-container class="menu-item">
                     <v-row>
@@ -39,7 +39,7 @@
         <!-- sm幅以下 -->
         <div class="sm">
             <v-app-bar app>
-                <v-card color="transparent" class="site-title text-h4" to="/" flat nuxt>tku</v-card>
+                <v-card color="transparent" class="site-title text-h4" to="/" flat nuxt>tocoriri</v-card>
             </v-app-bar>
             <v-bottom-navigation color="primary" grow app>
                 <v-btn v-for="(item, index) in menuItems" :key="index" nuxt :to="`/${item.link}`">
@@ -143,5 +143,7 @@ export default class SiteLayout extends Vue {
             .menu-card-icon
                 justify-content center
             .menu-card-name
-                font-size 80px
+                font-size 45px
+                +md()
+                    font-size 5vw
 </style>
