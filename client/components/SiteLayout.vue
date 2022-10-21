@@ -26,7 +26,7 @@
                                     </v-avatar>
                                 </v-card-title>
                                 <v-card-text class="menu-card-name">
-                                    <div>{{ item.name }}</div>
+                                    {{ item.name }}
                                 </v-card-text>
                             </v-card>
                         </v-col>
@@ -61,7 +61,7 @@ export default class SiteLayout extends Vue {
 
     menuItems: Array<ITable> = [
         { name: 'CREATOR', link: 'creator', icon: 'mdi-human-greeting-variant' },
-        { name: 'PRODUCTS', link: 'product', icon: 'mdi-view-module' },
+        { name: 'PRODUCTS', link: 'product', icon: 'mdi-diamond' },
     ]
 
     menuVisible: boolean = false
@@ -136,6 +136,7 @@ export default class SiteLayout extends Vue {
             border-radius $image-border-radius
             text-align center
             transition all 0.2s
+            padding-top 20px
             &:hover
                 background-color #DCEDC8
                 cursor pointer
@@ -143,6 +144,7 @@ export default class SiteLayout extends Vue {
             .menu-card-icon
                 justify-content center
             .menu-card-name
+                margin-top 20px
                 font-size 45px
                 +md()
                     font-size 5vw
