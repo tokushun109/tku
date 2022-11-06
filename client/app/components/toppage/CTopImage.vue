@@ -19,7 +19,7 @@
                         <v-img eager :src="image" :alt="`image-${index}`" width="530" class="carousel-image" />
                     </v-card>
                 </div>
-                <div v-for="(image, index) in displayImages" :key="index" class="slide-show">
+                <div v-for="(image, index) in displayImages" :key="`${index}-sm`" class="slide-show">
                     <v-card class="carousel-item-wrapper" elevation="20" nuxt :to="`/product/${displayProduct(index).uuid}`">
                         <v-chip
                             v-if="category && displayProduct(index).category.uuid"
