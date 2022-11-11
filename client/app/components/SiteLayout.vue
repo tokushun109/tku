@@ -2,7 +2,9 @@
     <div class="site-layout">
         <!-- md幅以上 -->
         <v-btn fab x-large class="toggle-button" @click="toggleMenu">
-            <c-icon :type="IconType.Menu.name" x-large @c-click="toggleMenu" />
+            <client-only>
+                <c-icon :type="IconType.Menu.name" x-large @c-click="toggleMenu" />
+            </client-only>
         </v-btn>
         <v-sheet v-if="isRoot" color="transparent" class="site-title-area">
             <v-card flat width="300" color="transparent" class="site-title text-h1" to="/"> tocoriri </v-card>

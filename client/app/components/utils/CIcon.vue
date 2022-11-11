@@ -27,6 +27,7 @@ export default class CIcon extends Vue {
         for (const type in IconType) {
             if (this.type === IconType[type].name) {
                 icon = IconType[type].icon
+                break
             }
         }
         return icon
