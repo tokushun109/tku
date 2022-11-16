@@ -1,8 +1,9 @@
-export default {
+module.exports = {
+    ssr: 'true',
     srcDir: 'app/',
     // Global page headers: https://go.nuxtjs.dev/config-head
     head: {
-        title: 'client',
+        title: 'tocoriri',
         htmlAttrs: {
             lang: 'ja',
         },
@@ -17,7 +18,7 @@ export default {
             {
                 hid: 'description',
                 name: 'description',
-                content: '',
+                content: 'tocoriri web site',
             },
         ],
         link: [
@@ -77,10 +78,18 @@ export default {
         baseURL: 'http://localhost:8080/api',
     },
     // Build Configuration: https://go.nuxtjs.dev/config-build
-    build: {},
+    build: {
+        vendor: ['axios'],
+        publicPath: '/production/_nuxt/'
+    },
     router: {
+        base: `/`,
         middleware: 'auth',
     },
+    performance: {
+        gzip: false
+    },
+    dev: false,
     vuetify: {
         theme: {
             themes: {
