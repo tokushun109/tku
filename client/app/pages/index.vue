@@ -17,7 +17,7 @@ import { Component, Vue } from 'nuxt-property-decorator'
 import { ColorType, ICarouselItem } from '~/types'
 @Component({
     head: {
-        title: 'tku',
+        title: 'tocoriri',
     },
 })
 export default class PageTop extends Vue {
