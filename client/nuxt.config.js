@@ -20,6 +20,11 @@ module.exports = {
                 name: 'description',
                 content: 'tocoriri web site',
             },
+            // 本番稼働させたら記述を変更する
+            {
+                name: 'robots',
+                content: 'noindex'
+            }
         ],
         link: [
             {
