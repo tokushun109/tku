@@ -1,0 +1,27 @@
+service: tku-client
+app: tku
+org: tokushun109
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  stage: prod
+  profile: tku
+  region: ap-northeast-1
+
+functions:
+  nuxt:
+    handler: ./deploy_config/index.nuxt
+    events:
+      - http: ANY /
+      - http: ANY /{proxy+}
+
+plugins:
+  - serverless-offline
+  - serverless-apigw-binary
+
+custom:
+  apigwBinary:
+    types:
+      - '*/*'
