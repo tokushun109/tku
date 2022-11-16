@@ -16,9 +16,10 @@ functions:
     events:
       - http: ANY /
       - http: ANY /{proxy+}
+    # 本番稼働できるようになったら、コメントアウトを外す
+    # provisionedConcurrency: 1
 
 plugins:
-  - serverless-offline
   - serverless-apigw-binary
 
 custom:
