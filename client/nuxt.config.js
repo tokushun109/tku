@@ -79,7 +79,6 @@ module.exports = {
     },
     // Build Configuration: https://go.nuxtjs.dev/config-build
     build: {
-        vendor: ['axios'],
         publicPath: '/production/_nuxt/'
     },
     router: {
