@@ -2,6 +2,7 @@ package config
 
 import (
 	"api/utils"
+	"fmt"
 	"log"
 	"os"
 
@@ -48,6 +49,7 @@ func LoadConfig() {
 		}
 	}
 
+	protocol := fmt.Sprintf("tcp(%s)", os.Getenv("MYSQL_HOST"))
 	Config = ConfigList{
 		Port:        cfg.Section("web").Key("port").MustString("8000"),
 		LogFile:     cfg.Section("web").Key("logfile").String(),
@@ -56,7 +58,7 @@ func LoadConfig() {
 		DBUser:      os.Getenv("DB_USER"),
 		DBName:      os.Getenv("DB_NAME"),
 		DBPass:      os.Getenv("DB_PASS"),
-		Protocol:    os.Getenv("PROTOCOL"),
+		Protocol:    protocol,
 		ApiBaseUrl:  os.Getenv("API_BASE_URL"),
 		CreatorName: os.Getenv("CREATOR_NAME"),
 	}
