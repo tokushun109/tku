@@ -2,7 +2,7 @@ name: tku-ci
 on: 
   push:
     # テスト用のブランチ
-      branches: main
+      branches: 'feature/#385'
 jobs:
   ecr:
     runs-on: ubuntu-latest
