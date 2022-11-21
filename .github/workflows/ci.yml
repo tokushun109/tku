@@ -1,8 +1,10 @@
 name: tku-ci
-on: push
-  branches: 'feature/#385'
+on: 
+  push:
+    # テスト用のブランチ
+      branches: 'feature/#385'
 jobs:
-  push for ECR:
+  ecr:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
