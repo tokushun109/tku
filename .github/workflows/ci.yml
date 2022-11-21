@@ -1,8 +1,8 @@
 name: tku-ci
-run-name: ci for ${{ github.ref }} 
-on: [push]
+on: push
+  branches: 'feature/#385'
 jobs:
-  check-bats-version:
+  push for ECR:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
