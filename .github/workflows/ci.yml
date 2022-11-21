@@ -1,10 +1,9 @@
 name: tku-ci
 on: 
   push:
-    # テスト用のブランチ
-      branches: 'feature/#385'
+      branches: main
 jobs:
-  ecr:
+  ECR:
     runs-on: ubuntu-latest
     timeout-minutes: 300
 
