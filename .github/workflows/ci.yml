@@ -1,5 +1,5 @@
-name: learn-github-actions
-run-name: ${{ github.actor }} is learning GitHub Actions
+name: tku-ci
+run-name: ci for ${{ github.ref }} 
 on: [push]
 jobs:
   check-bats-version:
