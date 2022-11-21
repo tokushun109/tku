@@ -6,7 +6,7 @@ services:
     image: mysql:latest
     container_name: mysql
     platform: linux/amd64
-    env_file: ./docker/.docker.env
+    env_file: .env
     volumes:
       - ./app/db/my.cnf:/etc/mysql/conf.d/my.cnf
       - ./app/db/initdb.d:/docker-entrypoint-initdb.d
@@ -21,7 +21,9 @@ services:
       context: .
       dockerfile: ./docker/migrations/Dockerfile
     container_name: migrate
-    env_file: ./docker/.docker.env
+    env_file: .env
+    environment:
+      MYSQL_HOST: mysql
     depends_on:
       db:
         condition: service_healthy
@@ -35,7 +37,9 @@ services:
       context: .
       dockerfile: ./docker/api/Dockerfile
     container_name: api
-    env_file: ./docker/.docker.env
+    env_file: .env
+    environment:
+      MYSQL_HOST: mysql
     depends_on:
       - migrate
     command: go run main.go
