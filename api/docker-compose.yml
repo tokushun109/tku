@@ -42,7 +42,7 @@ services:
       MYSQL_HOST: mysql
     depends_on:
       - migrate
-    command: go run main.go
+    command: air
     ports:
       - 8080:8080
     volumes:

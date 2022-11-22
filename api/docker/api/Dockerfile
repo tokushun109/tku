@@ -4,5 +4,6 @@ ENV ROOT=/api
 WORKDIR ${ROOT}
 COPY ./ ${ROOT}
 
-RUN apk update && apk add git
-RUN go mod download
+RUN apk update && apk add git && \
+    go install github.com/cosmtrek/air@latest && \
+    go mod download
