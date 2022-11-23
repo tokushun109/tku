@@ -42,7 +42,7 @@ services:
       MYSQL_HOST: mysql
     depends_on:
       - migrate
-    command: air
+    command: sh ./docker/api/script/local/command.sh
     ports:
       - 8080:8080
     volumes:
