@@ -42,7 +42,7 @@ func LoadConfig() {
 		log.Fatalln(err)
 	}
 	// ENVがない(localの場合).envから設定読み込み
-	if os.Getenv("ENV") != "" {
+	if os.Getenv("ENV") == "" {
 		err = godotenv.Load(".env")
 		if err != nil {
 			log.Fatalln(err)
