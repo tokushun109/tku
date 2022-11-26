@@ -76,6 +76,7 @@ dist
 
 # Serverless directories
 .serverless
+deploy_config/secrets.json
 
 # IDE / Editor
 .idea
