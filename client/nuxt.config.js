@@ -79,9 +79,18 @@ module.exports = {
     },
 
     // Axios module configuration: https://go.nuxtjs.dev/config-axios
+    publicRuntimeConfig: {
     axios: {
-        baseURL: process.env.API_URL || 'http://localhost:8080/api',
+        browserBaseURL:
+            process.env.BROWSER_BASE_URL || 'http://localhost:8080/api'
+        }
     },
+    privateRuntimeConfig: {
+    axios: {
+        baseURL:
+            process.env.API_BASE_URL || 'http://localhost:8080/api'
+        }
+    },    
     // Build Configuration: https://go.nuxtjs.dev/config-build
     build: {
         publicPath: '/production/_nuxt/'
