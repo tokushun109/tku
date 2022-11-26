@@ -41,6 +41,8 @@ func StartMainServer() error {
 	// gorilla/muxを使ったルーティング
 	r := mux.NewRouter().StrictSlash(true)
 	port := fmt.Sprintf(":%s", config.Config.Port)
+	// ヘルスチェック
+	r.HandleFunc("/api/health_check", getHealthCheckHandler).Methods("GET")
 	// 商品
 	r.HandleFunc("/api/product", getAllProductsHandler).Methods("GET")
 	r.HandleFunc("/api/product/{product_uuid}", getProductHandler).Methods("GET")
