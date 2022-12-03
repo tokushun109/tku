@@ -41,5 +41,5 @@ export default class PageCreatorIndex extends Vue {
     color $site-title-text-color
     text-align center
     +sm()
-        margin-bottom auto
+        display none
 </style>
