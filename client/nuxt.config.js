@@ -93,7 +93,7 @@ module.exports = {
     },    
     // Build Configuration: https://go.nuxtjs.dev/config-build
     build: {
-        publicPath: '/production/_nuxt/'
+        publicPath: '_nuxt/'
     },
     router: {
         base: `/`,

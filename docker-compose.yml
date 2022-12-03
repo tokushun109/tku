@@ -1,0 +1,72 @@
+version: '3'
+
+services:
+  # MySQL
+  db:
+    image: mysql:latest
+    container_name: mysql
+    platform: linux/amd64
+    volumes:
+      - ./api/app/db/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./api/app/db/initdb.d:/docker-entrypoint-initdb.d
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - DB_USER=root
+      - DB_PASS=root
+      - DB_NAME=tku
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 -uroot -prppt
+    # healthcheck:
+    #   test: mysqladmin ping -h 127.0.0.1 -u${DB_USER} -p${DB_PASS}
+    ports:
+      - 3306:3306
+
+  # DB migratie
+  migrate:
+    build:
+      context: ./api
+      dockerfile: ./docker/migrations/Dockerfile
+    container_name: migrate
+    env_file: ./api/.env
+    environment:
+      MYSQL_HOST: mysql
+    depends_on:
+      db:
+        condition: service_healthy
+    command: [ "up" ]
+    volumes:
+      - ./api/app/db/migrations:/migrations
+
+  # API
+  api:
+    build:
+      context: ./api
+      dockerfile: ./docker/api/Dockerfile
+    container_name: api
+    env_file: ./api/.env
+    environment:
+      MYSQL_HOST: mysql
+    depends_on:
+      - migrate
+    command: sh ./docker/api/script/local/command.sh
+    ports:
+      - 8080:8080
+    volumes:
+      - ./api:/api
+
+  # CLIENT
+  client:
+    build:
+      context: ./client
+      dockerfile: ./docker/Dockerfile
+    container_name: client
+    environment:
+      BROWSER_BASE_URL: http://localhost:8080/api
+      API_BASE_URL: http://host.docker.internal:8080/api
+    depends_on:
+      - api
+    command: sh ./docker/script/local/command.sh
+    ports:
+      - 3000:3000
+    volumes:
+      - ./client:/client
