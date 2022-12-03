@@ -16,8 +16,10 @@
 		"IE 11"
 	],
 	"dependencies": {
+		"@nuxt/typescript-build": "^2.0.4",
 		"@nuxtjs/axios": "^5.12.5",
 		"@nuxtjs/style-resources": "^1.0.0",
+		"@nuxtjs/vuetify": "^1.12.1",
 		"@types/lodash": "^4.14.171",
 		"cookie-universal-nuxt": "^2.1.5",
 		"core-js": "^3.8.2",
@@ -29,11 +31,10 @@
 		"ress": "^3.0.0",
 		"serverless-apigw-binary": "^0.4.4",
 		"serverless-http": "^3.1.0",
+		"serverless-s3-sync": "^3.1.0",
 		"stylus": "^0.54.8",
 		"stylus-loader": "^3.0.2",
-		"vue-dompurify-html": "^2.3.0",
-		"@nuxt/typescript-build": "^2.0.4",
-		"@nuxtjs/vuetify": "^1.12.1"
+		"vue-dompurify-html": "^2.3.0"
 	},
 	"devDependencies": {
 		"@nuxt/types": "^2.14.12",

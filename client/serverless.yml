@@ -9,6 +9,7 @@ provider:
   stage: prod
   profile: tku
   region: ap-northeast-1
+  architecture: arm64
   environment: 
     BROWSER_BASE_URL: ${self:custom.secrets.BROWSER_BASE_URL}
     API_BASE_URL: ${self:custom.secrets.API_BASE_URL}
@@ -17,16 +18,157 @@ functions:
   nuxt:
     handler: ./deploy_config/index.nuxt
     events:
-      - http: ANY /
-      - http: ANY /{proxy+}
-    # 本番稼働できるようになったら、コメントアウトを外す
-    # provisionedConcurrency: 1
+      - http:
+          path: /
+          method: any
+      - http:
+          path: /{proxy+}
+          method: any
+      - http: 
+          path: /_nuxt/{proxy+}
+          method: any
+          integration: http-proxy
+          request:
+            uri: https://${self:custom.buckets.ASSETS_BUCKET_NAME}.s3.${self:provider.region}.amazonaws.com/{proxy}
+            parameters:
+              paths:
+                proxy: true
+      - http: 
+          path: /static/{proxy+}
+          method: any
+          integration: http-proxy
+          request:
+            uri: https://${self:custom.buckets.STATIC_BUCKET_NAME}.s3.${self:provider.region}.amazonaws.com/{proxy}
+            parameters:
+              paths:
+                proxy: true
+    timeout: 30
+
+resources:
+  Resources:
+    ClientAssetsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.buckets.ASSETS_BUCKET_NAME}
+        CorsConfiguration:
+          CorsRules:
+            -
+              AllowedOrigins:
+                - '*'
+              AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - GET
+                - HEAD
+                - PUT
+                - POST
+                - DELETE
+              MaxAge: 3000
+              ExposedHeaders:
+                - x-amz-server-side-encryption
+                - x-amz-request-id
+                - x-amz-id-2
+    ClientAssetsBucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket:
+          Ref: ClientAssetsBucket
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement: [
+            {
+              Action: ['s3:GetObject'],
+              Effect: 'Allow',
+              Resource: {
+                Fn::Join: ['', ['arn:aws:s3:::', { Ref: 'ClientAssetsBucket' }, '/*']],
+              },
+              Principal: '*'
+            },
+          ]
+    ClientStaticBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.buckets.STATIC_BUCKET_NAME}
+        CorsConfiguration:
+          CorsRules:
+            -
+              AllowedOrigins:
+                - '*'
+              AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - GET
+                - HEAD
+                - PUT
+                - POST
+                - DELETE
+              MaxAge: 3000
+              ExposedHeaders:
+                - x-amz-server-side-encryption
+                - x-amz-request-id
+                - x-amz-id-2
+    ClientStaticBucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket:
+          Ref: ClientStaticBucket
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement: [
+            {
+              Action: ['s3:GetObject'],
+              Effect: 'Allow',
+              Resource: {
+                Fn::Join: ['', ['arn:aws:s3:::', { Ref: 'ClientStaticBucket' }, '/*']],
+              },
+              Principal: '*'
+            },
+          ]
+
+package:
+  excludeDevDependencies: true
+  exclude:
+    - .**
+    - .**/*
+    - app/**
+    - test/**
+    - jest.config.js
+    - Dockerfile
+    - ./*.sh
+    - README.md
+    - package.json
+    - tsconfig.json
+    - yarn.lock
+    - node_modules/**typescript**/**
+    - node_modules/@types/**
+    - node_modules/ts-loader/**
+    - node_modules/ts-node/**
+    - node_modules/ts-config/**
+    - node_modules/@babel**/**
+    - node_modules/babel**/**
+    - node_modules/@vue**/**
+    - node_modules/**eslint**/**
+    - node_modules/**prettier**/**
+    - node_modules/**jest**/**
+  include:
+    - deploy_config/**
+    - nuxt.config.js
 
 plugins:
   - serverless-apigw-binary
+  - serverless-s3-sync
 
 custom:
   secrets: ${file(./deploy_config/secrets.json)}
+  stackId: ck57lb
   apigwBinary:
     types:
       - '*/*'
+  buckets:
+    ASSETS_BUCKET_NAME: ${self:service}-${self:custom.stackId}-${self:provider.stage}-assets
+    STATIC_BUCKET_NAME: ${self:service}-${self:custom.stackId}-${self:provider.stage}-static
+  s3Sync:
+    - bucketName: ${self:custom.buckets.ASSETS_BUCKET_NAME}
+      localDir: .nuxt/dist/client
+    - bucketName: ${self:custom.buckets.STATIC_BUCKET_NAME}
+      localDir: app/static
