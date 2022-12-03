@@ -52,4 +52,6 @@ export default class PageTop extends Vue {
     .more
         margin-right 16px
         text-align right
+        +sm()
+            display none
 </style>
