@@ -8,6 +8,4 @@ EXPOSE 3000
 ENV HOST 0.0.0.0
 
 RUN apk update && \
-    apk add git && \
-    yarn install --production=true && \
-    yarn build
+    apk add git

@@ -17,6 +17,7 @@ provider:
 functions:
   nuxt:
     handler: ./deploy_config/index.nuxt
+    timeout: 30
     events:
       - http:
           path: /
@@ -34,15 +35,32 @@ functions:
               paths:
                 proxy: true
       - http: 
-          path: /static/{proxy+}
+          path: /icon/{proxy+}
           method: any
           integration: http-proxy
           request:
-            uri: https://${self:custom.buckets.STATIC_BUCKET_NAME}.s3.${self:provider.region}.amazonaws.com/{proxy}
+            uri: https://${self:custom.buckets.STATIC_BUCKET_NAME}.s3.${self:provider.region}.amazonaws.com/icon/{proxy}
             parameters:
               paths:
                 proxy: true
-    timeout: 30
+      - http: 
+          path: /img/{proxy+}
+          method: any
+          integration: http-proxy
+          request:
+            uri: https://${self:custom.buckets.STATIC_BUCKET_NAME}.s3.${self:provider.region}.amazonaws.com/img/{proxy}
+            parameters:
+              paths:
+                proxy: true
+      - http: 
+          path: /favicon/{proxy+}
+          method: any
+          integration: http-proxy
+          request:
+            uri: https://${self:custom.buckets.STATIC_BUCKET_NAME}.s3.${self:provider.region}.amazonaws.com/favicon/{proxy}
+            parameters:
+              paths:
+                proxy: true
 
 resources:
   Resources:
