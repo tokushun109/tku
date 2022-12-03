@@ -1,6 +1,5 @@
 <template>
     <v-sheet :color="ColorType.Transparent" class="page-top">
-        <div class="sm site-sub-title text-h5">Cotton lace × Macrame</div>
         <c-top-image class="top-image" title category :carousel-items="carouselItems" />
         <div class="more">
             <v-btn rounded outlined x-large :color="ColorType.Grey" nuxt to="/product">
@@ -39,6 +38,8 @@ export default class PageTop extends Vue {
 .page-top
     margin 0 auto
     text-align center
+    +sm()
+        padding-top 35px
     .site-sub-title
         display none
         padding 30px 40px

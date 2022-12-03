@@ -44,7 +44,7 @@
                 <v-card color="transparent" class="site-title text-h4" to="/" flat nuxt>tocoriri</v-card>
             </v-app-bar>
             <v-bottom-navigation color="primary" grow app>
-                <v-btn v-for="(item, index) in menuItems" :key="index" nuxt :to="`/${item.link}`">
+                <v-btn v-for="(item, index) in menuItems" :key="index" :color="ColorType.White" nuxt :to="`/${item.link}`">
                     <span>{{ item.name }}</span>
                     <v-icon>{{ item.icon }}</v-icon>
                 </v-btn>
@@ -106,6 +106,9 @@ export default class SiteLayout extends Vue {
         text-align center
         +sm()
             display block
+            .v-item-group.v-bottom-navigation .v-btn
+                width 50% !important
+                height 100% !important
         .site-title
             margin 0 auto
             color $text-color
@@ -135,10 +138,10 @@ export default class SiteLayout extends Vue {
         position relative
         top 10%
         .menu-card
+            padding-top 20px
             border-radius $image-border-radius
             text-align center
             transition all 0.2s
-            padding-top 20px
             &:hover
                 background-color #DCEDC8
                 cursor pointer
