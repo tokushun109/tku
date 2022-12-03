@@ -20,6 +20,7 @@ services:
     #   test: mysqladmin ping -h 127.0.0.1 -u${DB_USER} -p${DB_PASS}
     ports:
       - 3306:3306
+    command: mysqld --innodb_use_native_aio=0
 
   # DB migratie
   migrate:
