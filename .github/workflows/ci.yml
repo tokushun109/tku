@@ -1,10 +1,10 @@
 name: tku-ci
 on: 
   push:
-      branches: 'feature/#430-2'
+      branches: main
 jobs:
   SLS:
-    name: Auto Deploy
+    name: SLS Auto Deploy
     runs-on: ubuntu-latest
     timeout-minutes: 300
     steps:
@@ -33,6 +33,7 @@ jobs:
         working-directory: ./client
 
   ECR:
+    name: ECR Auto Push
     runs-on: ubuntu-latest
     timeout-minutes: 300
 

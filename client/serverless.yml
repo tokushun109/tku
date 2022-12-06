@@ -10,6 +10,7 @@ provider:
   region: ap-northeast-1
   architecture: arm64
   environment: 
+    ## localの時に使用
     # BROWSER_BASE_URL: ${self:custom.secrets.BROWSER_BASE_URL}
     # API_BASE_URL: ${self:custom.secrets.API_BASE_URL}
     BROWSER_BASE_URL: ${env:BROWSER_BASE_URL}
@@ -178,6 +179,7 @@ plugins:
   - serverless-s3-sync
 
 custom:
+  ## localの時に使用
   # secrets: ${file(./deploy_config/secrets.json)}
   stackId: ck57lb
   apigwBinary:
