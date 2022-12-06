@@ -11,16 +11,17 @@ import (
 )
 
 type ConfigList struct {
-	Port        string
-	Sql         string
-	LogFile     string
-	Env         string
-	DBUser      string
-	DBName      string
-	DBPass      string
-	Protocol    string
-	ApiBaseUrl  string
-	CreatorName string
+	Port          string
+	Sql           string
+	LogFile       string
+	Env           string
+	DBUser        string
+	DBName        string
+	DBPass        string
+	Protocol      string
+	ApiBaseUrl    string
+	CreatorName   string
+	ApiBucketName string
 }
 
 var Config ConfigList
@@ -51,15 +52,16 @@ func LoadConfig() {
 
 	protocol := fmt.Sprintf("tcp(%s)", os.Getenv("MYSQL_HOST"))
 	Config = ConfigList{
-		Port:        cfg.Section("web").Key("port").MustString("8000"),
-		LogFile:     cfg.Section("web").Key("logfile").String(),
-		Sql:         cfg.Section("db").Key("sql").String(),
-		Env:         os.Getenv("ENV"),
-		DBUser:      os.Getenv("DB_USER"),
-		DBName:      os.Getenv("DB_NAME"),
-		DBPass:      os.Getenv("DB_PASS"),
-		Protocol:    protocol,
-		ApiBaseUrl:  os.Getenv("API_BASE_URL"),
-		CreatorName: os.Getenv("CREATOR_NAME"),
+		Port:          cfg.Section("web").Key("port").MustString("8000"),
+		LogFile:       cfg.Section("web").Key("logfile").String(),
+		Sql:           cfg.Section("db").Key("sql").String(),
+		Env:           os.Getenv("ENV"),
+		DBUser:        os.Getenv("DB_USER"),
+		DBName:        os.Getenv("DB_NAME"),
+		DBPass:        os.Getenv("DB_PASS"),
+		Protocol:      protocol,
+		ApiBaseUrl:    os.Getenv("API_BASE_URL"),
+		CreatorName:   os.Getenv("CREATOR_NAME"),
+		ApiBucketName: os.Getenv("API_BUCKET_NAME"),
 	}
 }

@@ -2,7 +2,6 @@ package models
 
 import (
 	"api/config"
-	"strings"
 )
 
 type Creator struct {
@@ -16,19 +15,8 @@ type Creator struct {
 	ApiPath string `gorm:"-" json:"apiPath"`
 }
 
-// 商品に紐づく商品画像に画像取得用のapiをつける
-func setCreatorLogoApiPath(creator *Creator) {
-	base := config.Config.ApiBaseUrl
-	creator.ApiPath = ""
-	if creator.Logo != "" {
-		fileName := strings.Split(creator.Logo, "/")[4]
-		creator.ApiPath = base + "/creator/logo/" + fileName + "/blob"
-	}
-}
-
 func GetCreator() (creator Creator) {
 	Db.Limit(1).Find(&creator)
-	setCreatorLogoApiPath(&creator)
 	return creator
 }
 

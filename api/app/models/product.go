@@ -1,7 +1,6 @@
 package models
 
 import (
-	"api/config"
 	"errors"
 )
 
@@ -33,14 +32,6 @@ type ProductImage struct {
 	ApiPath string `gorm:"-" json:"apiPath"`
 }
 
-// 商品に紐づく商品画像に画像取得用のapiをつける
-func setProductImageApiPath(product *Product) {
-	base := config.Config.ApiBaseUrl
-	for _, productImage := range product.ProductImages {
-		productImage.ApiPath = base + "/product_image/" + productImage.Uuid + "/blob"
-	}
-}
-
 func GetAllProducts(mode string) (products Products, err error) {
 	if mode == "all" {
 		Db.Preload("Category").
@@ -59,9 +50,6 @@ func GetAllProducts(mode string) (products Products, err error) {
 		err = errors.New("invalid params")
 		return products, err
 	}
-	for _, product := range products {
-		setProductImageApiPath(&product)
-	}
 	return products, err
 }
 
@@ -75,9 +63,6 @@ func GetNewProducts(limit int) (products Products) {
 		Group("product.id").
 		Limit(limit).
 		Find(&products)
-	for _, product := range products {
-		setProductImageApiPath(&product)
-	}
 	return products
 }
 
@@ -87,8 +72,6 @@ func GetProduct(uuid string) (product Product, err error) {
 		Preload("Tags").
 		Preload("SiteDetails.SalesSite").
 		First(&product, "uuid = ?", uuid).Error
-
-	setProductImageApiPath(&product)
 	return product, err
 }
 

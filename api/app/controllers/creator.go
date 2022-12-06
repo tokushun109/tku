@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"api/app/models"
+	"api/config"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -16,9 +17,35 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
+// 商品に紐づく商品画像に画像取得用のapiをつける
+func setCreatorLogoApiPath(creator *models.Creator) error {
+	if config.Config.Env == "" {
+		// localの場合はプロジェクト内のディレクトリから取得
+		base := config.Config.ApiBaseUrl
+		creator.ApiPath = ""
+		if creator.Logo != "" {
+			fileName := strings.Split(creator.Logo, "/")[4]
+			creator.ApiPath = base + "/creator/logo/" + fileName + "/blob"
+		}
+	} else {
+		// 本番の場合はS3から取得
+		var err error
+		creator.ApiPath, err = GetS3Content(&creator.Logo)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // 製作者詳細を取得
 func getCreatorHandler(w http.ResponseWriter, r *http.Request) {
 	creator := models.GetCreator()
+	if err := setCreatorLogoApiPath(&creator); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(creator); err != nil {
 		log.Println(err)
@@ -111,24 +138,34 @@ func updateCreatorLogoHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
-	savedirectory := fmt.Sprintf("img/logo/%s/%s", uuid[0:1], uuid[1:2])
+	saveDirectory := fmt.Sprintf("img/logo/%s/%s", uuid[0:1], uuid[1:2])
 	// 保存用のディレクトリがない場合は作成する
-	if err := os.MkdirAll(savedirectory, 0777); err != nil {
+	if err := os.MkdirAll(saveDirectory, 0777); err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
 	// fileのMIMETypeを取得
 	mimeType := handler.Header["Content-Type"][0]
-	savePath := savedirectory + "/" + uuid + typeToExtention[mimeType]
-	f, err := os.OpenFile(savePath, os.O_WRONLY|os.O_CREATE, 0666)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-		return
+	savePath := saveDirectory + "/" + uuid + typeToExtension[mimeType]
+	if config.Config.Env == "" {
+		// localの場合はプロジェクト内のディレクトリに保存
+		f, err := os.OpenFile(savePath, os.O_WRONLY|os.O_CREATE, 0666)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+			return
+		}
+		defer f.Close()
+		io.Copy(f, file)
+	} else {
+		// 本番の場合はS3にアップロード
+		if err := UploadS3(&savePath, file); err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+			return
+		}
 	}
-	defer f.Close()
-	io.Copy(f, file)
 
 	// ファイルの情報をsqlに保存する
 	var creator models.Creator
