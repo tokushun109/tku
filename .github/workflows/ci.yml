@@ -3,15 +3,15 @@ on:
   push:
       branches: main
 jobs:
-  SLS:
-    name: SLS Auto Deploy
+  Client:
+    name: Client Auto Deploy
     runs-on: ubuntu-latest
     timeout-minutes: 300
     steps:
       - uses: actions/checkout@v3
 
       - name: Setup Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: '16.x'
 
@@ -32,8 +32,8 @@ jobs:
           SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
         working-directory: ./client
 
-  ECR:
-    name: ECR Auto Push
+  Api:
+    name: Api Auto Deploy
     runs-on: ubuntu-latest
     timeout-minutes: 300
 
@@ -41,7 +41,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -60,3 +60,16 @@ jobs:
           TAG=$ECR_REGISTRY/$ECR_REPOSITORY:latest
           docker tag $ECR_REPOSITORY:latest $TAG
           docker push $TAG
+      - name: Render Amazon ECS task definition
+        id: render-api-container
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ./infra/tasks/api.json
+          container-name: api
+          image: ${{ steps.login-ecr.outputs.registry }}/tku_api:latest
+      - name: Deploy to Amazon ECS service
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.render-api-container.outputs.task-definition }}
+          service: ${{ secrets.API_SERVICE }}
+          cluster: ${{ secrets.API_CLUSTER }}
