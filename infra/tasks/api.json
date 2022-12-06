@@ -61,7 +61,7 @@
                 }
             ],
             "dockerSecurityOptions": null,
-            "memory": 800,
+            "memory": 512,
             "memoryReservation": null,
             "volumesFrom": [],
             "stopTimeout": null,
@@ -87,38 +87,7 @@
     "placementConstraints": [],
     "memory": null,
     "taskRoleArn": "arn:aws:iam::418549683327:role/tku-task-role",
-    "compatibilities": [
-        "EXTERNAL",
-        "EC2"
-    ],
-    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-1:418549683327:task-definition/api-prod:21",
     "family": "api-prod",
-    "requiresAttributes": [
-        {
-            "targetId": null,
-            "targetType": null,
-            "value": null,
-            "name": "com.amazonaws.ecs.capability.ecr-auth"
-        },
-        {
-            "targetId": null,
-            "targetType": null,
-            "value": null,
-            "name": "ecs.capability.secrets.asm.environment-variables"
-        },
-        {
-            "targetId": null,
-            "targetType": null,
-            "value": null,
-            "name": "com.amazonaws.ecs.capability.task-iam-role"
-        },
-        {
-            "targetId": null,
-            "targetType": null,
-            "value": null,
-            "name": "ecs.capability.execution-role-ecr-pull"
-        }
-    ],
     "pidMode": null,
     "requiresCompatibilities": [
         "EC2"
@@ -126,7 +95,6 @@
     "networkMode": null,
     "runtimePlatform": null,
     "cpu": null,
-    "status": "ACTIVE",
     "inferenceAccelerators": null,
     "proxyConfiguration": null,
     "volumes": []
