@@ -1,0 +1,132 @@
+{
+    "ipcMode": null,
+    "executionRoleArn": "arn:aws:iam::418549683327:role/tku-task-role",
+    "containerDefinitions": [
+        {
+            "dnsSearchDomains": null,
+            "environmentFiles": null,
+            "logConfiguration": null,
+            "entryPoint": [],
+            "portMappings": [
+                {
+                    "hostPort": 0,
+                    "protocol": "tcp",
+                    "containerPort": 8080
+                }
+            ],
+            "command": [
+                "sh",
+                "./docker/api/script/prod/command.sh"
+            ],
+            "linuxParameters": null,
+            "cpu": 0,
+            "environment": [],
+            "resourceRequirements": null,
+            "ulimits": null,
+            "dnsServers": null,
+            "mountPoints": [],
+            "workingDirectory": null,
+            "secrets": [
+                {
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:API_BASE_URL::",
+                    "name": "API_BASE_URL"
+                },
+                {
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:CREATOR_NAME::",
+                    "name": "CREATOR_NAME"
+                },
+                {
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:DB_NAME::",
+                    "name": "DB_NAME"
+                },
+                {
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:DB_PASS::",
+                    "name": "DB_PASS"
+                },
+                {
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:DB_USER::",
+                    "name": "DB_USER"
+                },
+                {
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:ENV::",
+                    "name": "ENV"
+                },
+                {
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:MYSQL_HOST::",
+                    "name": "MYSQL_HOST"
+                },
+                {
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:MYSQL_ROOT_PASSWORD::",
+                    "name": "MYSQL_ROOT_PASSWORD\t"
+                }
+            ],
+            "dockerSecurityOptions": null,
+            "memory": 800,
+            "memoryReservation": null,
+            "volumesFrom": [],
+            "stopTimeout": null,
+            "startTimeout": null,
+            "firelensConfiguration": null,
+            "dependsOn": null,
+            "disableNetworking": null,
+            "interactive": null,
+            "healthCheck": null,
+            "essential": true,
+            "links": null,
+            "hostname": null,
+            "extraHosts": null,
+            "pseudoTerminal": null,
+            "user": null,
+            "readonlyRootFilesystem": null,
+            "dockerLabels": null,
+            "systemControls": null,
+            "privileged": null
+        }
+    ],
+    "placementConstraints": [],
+    "memory": null,
+    "taskRoleArn": "arn:aws:iam::418549683327:role/tku-task-role",
+    "compatibilities": [
+        "EXTERNAL",
+        "EC2"
+    ],
+    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-1:418549683327:task-definition/api-prod:21",
+    "family": "api-prod",
+    "requiresAttributes": [
+        {
+            "targetId": null,
+            "targetType": null,
+            "value": null,
+            "name": "com.amazonaws.ecs.capability.ecr-auth"
+        },
+        {
+            "targetId": null,
+            "targetType": null,
+            "value": null,
+            "name": "ecs.capability.secrets.asm.environment-variables"
+        },
+        {
+            "targetId": null,
+            "targetType": null,
+            "value": null,
+            "name": "com.amazonaws.ecs.capability.task-iam-role"
+        },
+        {
+            "targetId": null,
+            "targetType": null,
+            "value": null,
+            "name": "ecs.capability.execution-role-ecr-pull"
+        }
+    ],
+    "pidMode": null,
+    "requiresCompatibilities": [
+        "EC2"
+    ],
+    "networkMode": null,
+    "runtimePlatform": null,
+    "cpu": null,
+    "status": "ACTIVE",
+    "inferenceAccelerators": null,
+    "proxyConfiguration": null,
+    "volumes": []
+}

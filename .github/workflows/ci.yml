@@ -1,10 +1,10 @@
 name: tku-ci
 on: 
   push:
-      branches: main
+      branches: 'feature/#433'
 jobs:
-  SLS:
-    name: SLS Auto Deploy
+  Client:
+    name: Client Auto Deploy
     runs-on: ubuntu-latest
     timeout-minutes: 300
     steps:
@@ -32,8 +32,8 @@ jobs:
           SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
         working-directory: ./client
 
-  ECR:
-    name: ECR Auto Push
+  Api:
+    name: Api Auto Deploy
     runs-on: ubuntu-latest
     timeout-minutes: 300
 
@@ -52,6 +52,7 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Build and push image to Amazon ECR
+        id: push-ecr
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: tku_api
@@ -60,3 +61,16 @@ jobs:
           TAG=$ECR_REGISTRY/$ECR_REPOSITORY:latest
           docker tag $ECR_REPOSITORY:latest $TAG
           docker push $TAG
+      - name: Render Amazon ECS task definition
+        id: render-api-container
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ./infra/tasks/api.json
+          container-name: api
+          image: ${{ steps.push-ecr.env.ECR_REGISTRY }}:latest
+      - name: Deploy to Amazon ECS service
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.render-api-container.outputs.task-definition }}
+          service: ${{ secrets.API_SERVICE }}
+          cluster: ${{ secrets.API_CLUSTER }}
