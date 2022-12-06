@@ -19,7 +19,8 @@ jobs:
         run: |
           npm install -g serverless
           npm install -g yarn                              
-          yarn install --production=true                                                   
+          yarn install --production=true
+        working-directory: ./client
 
       - name: Deploy to Lambda
         run: yarn deploy
@@ -28,6 +29,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           API_BASE_URL: ${{ secrets.API_BASE_URL }}
           BROWSER_BASE_URL: ${{ secrets.BROWSER_BASE_URL }}
+        working-directory: ./client
 
   ECR:
     runs-on: ubuntu-latest
