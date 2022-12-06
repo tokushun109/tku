@@ -177,6 +177,8 @@ package:
 plugins:
   - serverless-apigw-binary
   - serverless-s3-sync
+  - serverless-api-compression
+
 
 custom:
   ## localの時に使用
@@ -185,6 +187,7 @@ custom:
   apigwBinary:
     types:
       - '*/*'
+  contentCompression: 0
   buckets:
     ASSETS_BUCKET_NAME: ${self:service}-${self:custom.stackId}-${self:provider.stage}-assets
     STATIC_BUCKET_NAME: ${self:service}-${self:custom.stackId}-${self:provider.stage}-static
