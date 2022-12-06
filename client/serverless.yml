@@ -10,9 +10,9 @@ provider:
   profile: tku
   region: ap-northeast-1
   architecture: arm64
-  environment: 
-    BROWSER_BASE_URL: ${self:custom.secrets.BROWSER_BASE_URL}
-    API_BASE_URL: ${self:custom.secrets.API_BASE_URL}
+  # environment: 
+  #   BROWSER_BASE_URL: ${self:custom.secrets.BROWSER_BASE_URL}
+  #   API_BASE_URL: ${self:custom.secrets.API_BASE_URL}
 
 functions:
   nuxt:
@@ -177,7 +177,7 @@ plugins:
   - serverless-s3-sync
 
 custom:
-  secrets: ${file(./deploy_config/secrets.json)}
+  # secrets: ${file(./deploy_config/secrets.json)}
   stackId: ck57lb
   apigwBinary:
     types:
