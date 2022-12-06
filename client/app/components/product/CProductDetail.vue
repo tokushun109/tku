@@ -18,7 +18,10 @@
                             <pre class="description text-body-2">{{ product.description }}</pre>
                         </div>
                         <div class="tag-area">
-                            <p v-if="product.tags.length > 0" class="tag">関連タグ<v-divider /></p>
+                            <p v-if="product.tags.length > 0" class="tag">
+                                関連タグ<client-only><v-divider /></client-only>
+                            </p>
+
                             <div class="tag-content">
                                 <div v-for="tag in product.tags" :key="tag.uuid">
                                     <v-chip small :color="ColorType.Lime" :text-color="ColorType.White" class="mx-1">{{ tag.name }}</v-chip>
@@ -27,7 +30,9 @@
                         </div>
                         <div class="sales-site-area">
                             <div class="sales-site text-body-1">
-                                <p>販売サイト<v-divider /></p>
+                                <p>
+                                    販売サイト<client-only><v-divider /></client-only>
+                                </p>
                             </div>
                             <v-row>
                                 <v-col v-for="siteDetail in product.siteDetails" :key="siteDetail.uuid" md="6" sm="12">

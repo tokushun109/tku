@@ -40,7 +40,7 @@
 
         <!-- sm幅以下 -->
         <div class="sm">
-            <v-app-bar app>
+            <v-app-bar app class="site-header">
                 <v-card color="transparent" class="site-title text-h4" to="/" flat nuxt>tocoriri</v-card>
             </v-app-bar>
             <v-bottom-navigation color="primary" grow app>
@@ -109,10 +109,12 @@ export default class SiteLayout extends Vue {
             .v-item-group.v-bottom-navigation .v-btn
                 width 50% !important
                 height 100% !important
-        .site-title
-            margin 0 auto
-            color $text-color
-            font-family $title-font-face !important
+            .site-header
+                z-index 10 !important
+                .site-title
+                    margin 0 auto
+                    color $text-color
+                    font-family $title-font-face !important
 
 .menu-area
     position relative
