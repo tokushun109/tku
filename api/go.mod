@@ -3,6 +3,7 @@ module api
 go 1.16
 
 require (
+	github.com/aws/aws-sdk-go v1.44.153
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/google/uuid v1.2.0
 	github.com/gorilla/mux v1.8.0

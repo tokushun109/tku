@@ -57,7 +57,23 @@
                 },
                 {
                     "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:MYSQL_ROOT_PASSWORD::",
-                    "name": "MYSQL_ROOT_PASSWORD\t"
+                    "name": "MYSQL_ROOT_PASSWORD"
+                },
+                {
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:AWS_SECRET_ACCESS_KEY::",
+                    "name": "AWS_SECRET_ACCESS_KEY"
+                },
+                {
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:AWS_ACCESS_KEY_ID::",
+                    "name": "AWS_ACCESS_KEY_ID"
+                },
+                {
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:AWS_REGION::",
+                    "name": "AWS_REGION"
+                },
+                {
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:API_BUCKET_NAME::",
+                    "name": "API_BUCKET_NAME"
                 }
             ],
             "dockerSecurityOptions": null,

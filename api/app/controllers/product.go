@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"api/app/models"
+	"api/config"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -15,10 +16,32 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
-var typeToExtention = map[string]string{
+var typeToExtension = map[string]string{
 	"image/jpeg": ".jpg",
 	"image/png":  ".png",
 	"image/gif":  ".gif",
+	"image/webp": ".webp",
+}
+
+// 商品に紐づく商品画像に画像取得用のapiをつける
+func setProductImageApiPath(product *models.Product) error {
+	if config.Config.Env == "" {
+		// localの場合はプロジェクト内のディレクトリから取得
+		base := config.Config.ApiBaseUrl
+		for _, productImage := range product.ProductImages {
+			productImage.ApiPath = base + "/product_image/" + productImage.Uuid + "/blob"
+		}
+	} else {
+		// 本番の場合はS3から取得
+		var err error
+		for _, productImage := range product.ProductImages {
+			productImage.ApiPath, err = GetS3Content(&productImage.Path)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 // 商品一覧を取得
@@ -29,6 +52,13 @@ func getAllProductsHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
+	}
+	for _, product := range products {
+		if err := setProductImageApiPath(&product); err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+			return
+		}
 	}
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(products); err != nil {
@@ -43,6 +73,11 @@ func getProductHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	uuid := vars["product_uuid"]
 	product, err := models.GetProduct(uuid)
+	if err := setProductImageApiPath(&product); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
 	if err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
@@ -163,6 +198,13 @@ func deleteProductHandler(w http.ResponseWriter, r *http.Request) {
 
 func getCarouselImageHandler(w http.ResponseWriter, r *http.Request) {
 	products := models.GetNewProducts(5)
+	for _, product := range products {
+		if err := setProductImageApiPath(&product); err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+			return
+		}
+	}
 	type NewProductImage struct {
 		Product         models.Product `json:"product"`
 		NewImageApiPath string         `json:"apiPath"`
@@ -244,24 +286,34 @@ func createProductImageHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 			return
 		}
-		savedirectory := fmt.Sprintf("img/%s/%s", uuid[0:1], uuid[1:2])
+		saveDirectory := fmt.Sprintf("img/%s/%s", uuid[0:1], uuid[1:2])
 		// 保存用のディレクトリがない場合は作成する
-		if err := os.MkdirAll(savedirectory, 0777); err != nil {
+		if err := os.MkdirAll(saveDirectory, 0777); err != nil {
 			log.Println(err)
 			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 			return
 		}
 		// fileのMIMETypeを取得
 		mimeType := handler.Header["Content-Type"][0]
-		savePath := savedirectory + "/" + uuid + typeToExtention[mimeType]
-		f, err := os.OpenFile(savePath, os.O_WRONLY|os.O_CREATE, 0666)
-		if err != nil {
-			log.Println(err)
-			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-			return
+		savePath := saveDirectory + "/" + uuid + typeToExtension[mimeType]
+		if config.Config.Env == "" {
+			// localの場合はプロジェクト内のディレクトリに保存
+			f, err := os.OpenFile(savePath, os.O_WRONLY|os.O_CREATE, 0666)
+			if err != nil {
+				log.Println(err)
+				http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+				return
+			}
+			defer f.Close()
+			io.Copy(f, file)
+		} else {
+			// 本番の場合はS3にアップロード
+			if err := UploadS3(&savePath, file); err != nil {
+				log.Println(err)
+				http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+				return
+			}
 		}
-		defer f.Close()
-		io.Copy(f, file)
 
 		// ファイルの情報をsqlに保存する
 		var productImage models.ProductImage
