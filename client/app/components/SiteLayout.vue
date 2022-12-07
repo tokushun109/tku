@@ -43,12 +43,6 @@
             <v-app-bar app class="site-header">
                 <v-card color="transparent" class="site-title text-h4" to="/" flat nuxt>tocoriri</v-card>
             </v-app-bar>
-            <v-bottom-navigation color="primary" grow app>
-                <v-btn v-for="(item, index) in menuItems" :key="index" :color="ColorType.White" nuxt :to="`/${item.link}`">
-                    <span>{{ item.name }}</span>
-                    <v-icon>{{ item.icon }}</v-icon>
-                </v-btn>
-            </v-bottom-navigation>
         </div>
     </div>
 </template>

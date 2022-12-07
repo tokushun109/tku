@@ -5,6 +5,7 @@
                 <v-main>
                     <site-layout />
                     <Nuxt />
+                    <site-footer />
                 </v-main>
             </template>
             <template v-else>
