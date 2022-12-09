@@ -117,5 +117,6 @@ module.exports = {
                 },
             },
         },
+        defaultAssets: false
     },
 }

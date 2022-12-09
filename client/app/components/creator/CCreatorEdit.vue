@@ -31,7 +31,7 @@
             <template #content>
                 <c-error :errors.sync="errors" />
                 <v-form ref="form" v-model="valid" lazy-validation>
-                    <v-file-input v-model="uploadFile" label="ロゴ画像" prepend-icon="mdi-camera" outlined />
+                    <v-file-input v-model="uploadFile" label="ロゴ画像" :prepend-icon="mdiCamera" outlined />
                     <v-textarea v-model="creator.introduction" label="紹介文" outlined />
                 </v-form>
             </template>
@@ -41,6 +41,7 @@
 </template>
 
 <script lang="ts">
+import { mdiCamera } from '@mdi/js'
 import { Component, Vue, Watch, Prop, PropSync } from 'nuxt-property-decorator'
 import _ from 'lodash'
 import { ICreator, IError, ISite, IconType, ColorType } from '~/types'
@@ -51,6 +52,7 @@ import { newCreator } from '~/methods'
     },
 })
 export default class CCreatorEdit extends Vue {
+    mdiCamera = mdiCamera
     IconType: typeof IconType = IconType
     ColorType: typeof ColorType = ColorType
     // 製作者

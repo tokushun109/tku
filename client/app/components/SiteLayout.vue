@@ -48,6 +48,7 @@
 </template>
 
 <script lang="ts">
+import { mdiDiamond, mdiHumanGreetingVariant } from '@mdi/js'
 import { Component, Vue } from 'nuxt-property-decorator'
 import { IconType, ITable, ColorType } from '~/types'
 @Component({})
@@ -56,8 +57,8 @@ export default class SiteLayout extends Vue {
     IconType: typeof IconType = IconType
 
     menuItems: Array<ITable> = [
-        { name: 'CREATOR', link: 'creator', icon: 'mdi-human-greeting-variant' },
-        { name: 'PRODUCTS', link: 'product', icon: 'mdi-diamond' },
+        { name: 'CREATOR', link: 'creator', icon: mdiDiamond },
+        { name: 'PRODUCTS', link: 'product', icon: mdiHumanGreetingVariant },
     ]
 
     menuVisible: boolean = false

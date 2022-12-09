@@ -43,16 +43,17 @@
 </template>
 
 <script lang="ts">
+import { mdiAccount, mdiApplicationOutline, mdiCartVariant, mdiTagOutline } from '@mdi/js'
 import { Component, Vue } from 'nuxt-property-decorator'
 import { ColorType, ITable } from '~/types'
 @Component({})
 export default class AdminHeader extends Vue {
     ColorType: typeof ColorType = ColorType
     tables: Array<ITable> = [
-        { name: '製作者', link: 'creator', icon: 'mdi-account' },
-        { name: '商品', link: 'product', icon: 'mdi-cart-variant' },
-        { name: '分類', link: 'classification', icon: 'mdi-tag-outline' },
-        { name: 'サイト', link: 'site', icon: 'mdi-application-outline' },
+        { name: '製作者', link: 'creator', icon: mdiAccount },
+        { name: '商品', link: 'product', icon: mdiCartVariant },
+        { name: '分類', link: 'classification', icon: mdiTagOutline },
+        { name: 'サイト', link: 'site', icon: mdiApplicationOutline },
     ]
 
     sidebarVisible: boolean = false

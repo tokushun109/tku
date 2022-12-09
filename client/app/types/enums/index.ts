@@ -1,3 +1,4 @@
+import { mdiCart, mdiClose, mdiDelete, mdiMenu, mdiNotePlus, mdiPencil, mdiPlus } from '@mdi/js'
 export * from '~/types/enums/classification'
 export * from '~/types/enums/site'
 
@@ -17,13 +18,13 @@ export interface IIconType {
     [key: string]: { name: string; icon: string }
 }
 export const IconType: IIconType = {
-    New: { name: 'new', icon: 'mdi-note-plus' },
-    Edit: { name: 'edit', icon: 'mdi-pencil' },
-    Delete: { name: 'delete', icon: 'mdi-delete' },
-    Close: { name: 'close', icon: 'mdi-close' },
-    Cart: { name: 'cart', icon: 'mdi-cart' },
-    Plus: { name: 'plus', icon: 'mdi-plus' },
-    Menu: { name: 'menu', icon: 'mdi-menu' },
+    New: { name: 'new', icon: mdiNotePlus },
+    Edit: { name: 'edit', icon: mdiPencil },
+    Delete: { name: 'delete', icon: mdiDelete },
+    Close: { name: 'close', icon: mdiClose },
+    Cart: { name: 'cart', icon: mdiCart },
+    Plus: { name: 'plus', icon: mdiPlus },
+    Menu: { name: 'menu', icon: mdiMenu },
 } as const
 export const ColorType = {
     Red: 'red',
