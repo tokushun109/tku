@@ -4,13 +4,14 @@
         <div class="more">
             <v-btn rounded outlined x-large :color="ColorType.Grey" nuxt to="/product">
                 <div class="text-h6">MORE</div>
-                <v-icon large>mdi-arrow-right-thick</v-icon>
+                <v-icon large>{{ mdiArrowRightThick }}</v-icon>
             </v-btn>
         </div>
     </v-sheet>
 </template>
 
 <script lang="ts">
+import { mdiArrowRightThick } from '@mdi/js'
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
 import { ColorType, ICarouselItem } from '~/types'
@@ -20,6 +21,7 @@ import { ColorType, ICarouselItem } from '~/types'
     },
 })
 export default class PageTop extends Vue {
+    mdiArrowRightThick = mdiArrowRightThick
     ColorType: typeof ColorType = ColorType
 
     carouselItems: Array<ICarouselItem> = []

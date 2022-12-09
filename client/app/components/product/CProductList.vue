@@ -45,7 +45,7 @@
                             <p class="price-unit-content">{{ modalItem.price | priceFormat }}円</p>
                         </v-col>
                     </v-row>
-                    <v-file-input v-model="uploadFiles" label="商品画像" prepend-icon="mdi-camera" multiple outlined />
+                    <v-file-input v-model="uploadFiles" label="商品画像" :prepend-icon="mdiCamera" multiple outlined />
                     <c-image-list
                         title="現在の登録"
                         :registered-list="registeredList"
@@ -127,6 +127,7 @@
 <script lang="ts">
 import { Component, Prop, PropSync, Vue, Watch } from 'nuxt-property-decorator'
 import _ from 'lodash'
+import { mdiCamera } from '@mdi/js'
 import {
     IClassification,
     IError,
@@ -150,6 +151,7 @@ export default class CProductList extends Vue {
     @Prop({ type: Array, default: [] }) salesSites!: Array<ISite>
     @Prop({ type: String, default: '' }) type!: string
 
+    mdiCamera = mdiCamera
     ColorType: typeof ColorType = ColorType
     IconType: typeof IconType = IconType
     ExecutionType: typeof ExecutionType = ExecutionType
