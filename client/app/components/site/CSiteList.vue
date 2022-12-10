@@ -33,7 +33,6 @@
                 >
                     <v-text-field v-model="modalItem.name" :rules="nameRules" label="サイト名(必須)" outlined counter="20" />
                     <v-text-field v-model="modalItem.url" :rules="urlRules" label="URL" outlined />
-                    <v-text-field v-model="modalItem.icon" label="アイコン" outlined />
                     <v-container v-if="modalItem.icon" class="icon-preview">
                         <p>アイコンプレビュー</p>
                         <v-btn fab :color="ColorType.Orange" :href="modalItem.url" x-large>

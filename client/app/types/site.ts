@@ -1,8 +1,8 @@
 export interface ISite {
-    uuid: string
     name: string
     url: string
     icon: string
+    uuid?: string
 }
 
 export interface ISiteDetail {

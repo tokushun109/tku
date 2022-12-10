@@ -57,8 +57,8 @@ export default class SiteLayout extends Vue {
     IconType: typeof IconType = IconType
 
     menuItems: Array<ITable> = [
-        { name: 'CREATOR', link: 'creator', icon: mdiDiamond },
-        { name: 'PRODUCTS', link: 'product', icon: mdiHumanGreetingVariant },
+        { name: 'CREATOR', link: 'creator', icon: mdiHumanGreetingVariant },
+        { name: 'PRODUCTS', link: 'product', icon: mdiDiamond },
     ]
 
     menuVisible: boolean = false
