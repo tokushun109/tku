@@ -9,9 +9,9 @@
                     <pre class="description-text">{{ creator.introduction }}</pre>
                 </v-container>
                 <v-container v-if="!admin" class="sns-content">
-                    <div v-for="sns in snsList" :key="sns.uuid" class="sns-item">
+                    <div v-for="sns in snsList" :key="sns.name" class="sns-item">
                         <v-btn fab :color="ColorType.Orange" :href="sns.url" x-large>
-                            <v-icon :color="ColorType.White">{{ sns.icon }}</v-icon>
+                            <v-icon large :color="ColorType.White">{{ sns.icon }}</v-icon>
                         </v-btn>
                     </div>
                 </v-container>
@@ -41,7 +41,7 @@
 </template>
 
 <script lang="ts">
-import { mdiCamera } from '@mdi/js'
+import { mdiCamera, mdiInstagram } from '@mdi/js'
 import { Component, Vue, Watch, Prop, PropSync } from 'nuxt-property-decorator'
 import _ from 'lodash'
 import { ICreator, IError, ISite, IconType, ColorType } from '~/types'
@@ -55,10 +55,16 @@ export default class CCreatorEdit extends Vue {
     mdiCamera = mdiCamera
     IconType: typeof IconType = IconType
     ColorType: typeof ColorType = ColorType
+    snsList: Array<ISite> = [
+        {
+            name: 'instagram',
+            url: 'https://instagram.com/tku_accessory?igshid=YmMyMTA2M2Y=',
+            icon: mdiInstagram,
+        },
+    ]
+
     // 製作者
     @PropSync('item') creator!: ICreator
-    // SNSのリスト
-    @Prop({ type: Array }) snsList!: Array<ISite>
     // 管理画面での使用
     @Prop({ type: Boolean, default: false }) admin!: boolean
 

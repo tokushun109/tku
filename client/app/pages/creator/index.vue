@@ -5,7 +5,7 @@
         </v-container>
         <v-sheet>
             <v-container>
-                <c-creator-edit :item.sync="creator" :sns-list="snsList" />
+                <c-creator-edit :item.sync="creator" />
             </v-container>
         </v-sheet>
     </v-container>

@@ -1,7 +1,11 @@
 <template>
     <div class="admin-header">
         <v-app-bar app :color="ColorType.Green" dark clipped-left>
-            <v-app-bar-nav-icon v-if="!$store.getters['user/isGuest']" @click="sidebarVisible = !sidebarVisible" />
+            <v-app-bar-nav-icon v-if="!$store.getters['user/isGuest']" @click="sidebarVisible = !sidebarVisible">
+                <client-only>
+                    <c-icon :type="IconType.Menu.name" @click.native="sidebarVisible = !sidebarVisible" />
+                </client-only>
+            </v-app-bar-nav-icon>
             <v-app-bar-title>tku</v-app-bar-title>
             <v-spacer />
             <v-dialog v-if="!$store.getters['user/isGuest']" v-model="dialogVisible" width="400">
@@ -43,12 +47,14 @@
 </template>
 
 <script lang="ts">
-import { mdiAccount, mdiApplicationOutline, mdiCartVariant, mdiTagOutline } from '@mdi/js'
+import { mdiAccount, mdiApplicationOutline, mdiCartVariant, mdiTagOutline, mdiMenu } from '@mdi/js'
 import { Component, Vue } from 'nuxt-property-decorator'
-import { ColorType, ITable } from '~/types'
+import { ColorType, IconType, ITable } from '~/types'
 @Component({})
 export default class AdminHeader extends Vue {
     ColorType: typeof ColorType = ColorType
+    IconType: typeof IconType = IconType
+
     tables: Array<ITable> = [
         { name: '製作者', link: 'creator', icon: mdiAccount },
         { name: '商品', link: 'product', icon: mdiCartVariant },
