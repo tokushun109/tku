@@ -1,7 +1,7 @@
 name: tku-ci
 on: 
   push:
-      branches: 'main'
+      branches: 'feature/#448'
 jobs:
   Client:
     name: Client Auto Deploy

@@ -64,6 +64,7 @@ module.exports = {
         '@nuxt/typescript-build',
         '@nuxtjs/vuetify',
     ],
+
     // Modules: https://go.nuxtjs.dev/config-modules
     modules: [
         // https://go.nuxtjs.dev/axios
@@ -71,11 +72,29 @@ module.exports = {
         '@nuxtjs/style-resources',
         ['cookie-universal-nuxt', { parseJSON: false }],
         'nuxt-webfontloader',
+        '@nuxtjs/sitemap',
     ],
+
     webfontloader: {
         google: {
             families: ['Lobster:400,700'],
         },
+    },
+
+    sitemap: {
+        hostname: 'https://tocoriri.com',
+        exclude: [
+            '/admin',
+            '/admin/**',
+            '/order',
+        ],
+        routes: async () => {
+            const axios = require('axios')
+            // 商品詳細ページ
+            const baseURL = process.env.API_BASE_URL || 'http://localhost:8080/api'
+            const { data } = await axios.get(`${baseURL}/product?mode=active`)
+            return data.map((product) => `/product/${product.uuid}`)
+        }
     },
 
     // Axios module configuration: https://go.nuxtjs.dev/config-axios
