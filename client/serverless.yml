@@ -20,6 +20,9 @@ functions:
   nuxt:
     handler: ./deploy_config/index.nuxt
     timeout: 30
+    warmup:
+      default:
+        enabled: true
     events:
       - http:
           path: /
@@ -178,6 +181,7 @@ plugins:
   - serverless-apigw-binary
   - serverless-s3-sync
   - serverless-api-compression
+  - serverless-plugin-warmup
 
 
 custom:
@@ -196,3 +200,6 @@ custom:
       localDir: .nuxt/dist/client
     - bucketName: ${self:custom.buckets.STATIC_BUCKET_NAME}
       localDir: app/static
+  warmup:
+    default: 
+      prewarm: true
