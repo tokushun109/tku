@@ -10,6 +10,12 @@
             hide-delimiters
             class="carousel-area"
         >
+            <template v-if="product.productImages.length > 1" #prev="{ on, attrs }">
+                <v-icon large v-bind="attrs" v-on="on">{{ mdiChevronLeft }}</v-icon>
+            </template>
+            <template v-if="product.productImages.length > 1" #next="{ on, attrs }">
+                <v-icon large v-bind="attrs" v-on="on">{{ mdiChevronRight }}</v-icon>
+            </template>
             <v-carousel-item v-for="image in product.productImages" :key="image.uuid">
                 <v-img :src="image.apiPath" :alt="image.uuid" class="carousel-image" />
             </v-carousel-item>
@@ -23,11 +29,14 @@
 </template>
 
 <script lang="ts">
+import { mdiChevronLeft, mdiChevronRight } from '@mdi/js'
 import { Component, Vue, Prop } from 'nuxt-property-decorator'
 import { ColorType, IProduct } from '~/types'
 
 @Component({})
 export default class CProductImage extends Vue {
+    mdiChevronLeft = mdiChevronLeft
+    mdiChevronRight = mdiChevronRight
     ColorType: typeof ColorType = ColorType
     // 商品画像のリスト
     @Prop({ type: Object }) product!: IProduct

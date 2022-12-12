@@ -43,10 +43,10 @@
                 <v-container class="carousel-wrapper">
                     <v-carousel v-if="displayImages && displayImages.length > 0" cycle hide-delimiters height="auto">
                         <template v-if="carouselItems.length > 1" #prev="{ on, attrs }">
-                            <v-icon large v-bind="attrs" v-on="on">{{ mdiArrowLeftThick }}</v-icon>
+                            <v-icon large v-bind="attrs" v-on="on">{{ mdiChevronLeft }}</v-icon>
                         </template>
                         <template v-if="carouselItems.length > 1" #next="{ on, attrs }">
-                            <v-icon large v-bind="attrs" v-on="on">{{ mdiArrowRightThick }}</v-icon>
+                            <v-icon large v-bind="attrs" v-on="on">{{ mdiChevronRight }}</v-icon>
                         </template>
                         <v-carousel-item
                             v-for="(image, index) in displayImages"
@@ -81,14 +81,14 @@
 </template>
 
 <script lang="ts">
-import { mdiArrowLeftThick, mdiArrowRightThick } from '@mdi/js'
+import { mdiChevronLeft, mdiChevronRight } from '@mdi/js'
 import { Component, Vue, Prop } from 'nuxt-property-decorator'
 import { ICarouselItem, IProduct, ColorType } from '~/types'
 
 @Component({})
 export default class CTopImage extends Vue {
-    mdiArrowLeftThick = mdiArrowLeftThick
-    mdiArrowRightThick = mdiArrowRightThick
+    mdiChevronLeft = mdiChevronLeft
+    mdiChevronRight = mdiChevronRight
 
     ColorType: typeof ColorType = ColorType
 
