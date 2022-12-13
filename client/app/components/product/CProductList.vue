@@ -45,13 +45,16 @@
                             <p class="price-unit-content">{{ modalItem.price | priceFormat }}円</p>
                         </v-col>
                     </v-row>
-                    <v-file-input v-model="uploadFiles" label="商品画像" :prepend-icon="mdiCamera" multiple outlined />
+                    <v-file-input v-model="uploadFiles" label="商品画像" :prepend-icon="mdiCamera" multiple outlined @change="orderInit" />
                     <c-image-list
                         title="現在の登録"
                         :registered-list="registeredList"
                         :preview-list="previewList"
+                        :max-order="maxOrder"
                         @c-delete-image-handler="deleteImageHandler"
+                        @c-order-image-handler="orderImageHandler"
                     />
+                    <v-btn v-if="isChangedOrder" class="order-reset" @click="orderInit">表示順リセット</v-btn>
                     <v-select
                         v-model="modalItem.category"
                         :items="categories"
@@ -140,8 +143,13 @@ import {
     ImageType,
     TExecutionType,
     TImageType,
+    IImagePathOrder,
 } from '~/types'
 import { maxPrice, min20, newProduct, newSiteDetail, price, required } from '~/methods'
+
+interface IIndexOrder {
+    [key: number]: number
+}
 
 @Component({})
 export default class CProductList extends Vue {
@@ -180,17 +188,23 @@ export default class CProductList extends Vue {
     priceRules = [required, price, maxPrice]
 
     // 既存登録リスト
-    get registeredList(): Array<string> {
-        return this.modalItem.productImages.map((i) => i.apiPath)
+    get registeredList(): Array<IImagePathOrder> {
+        const registeredList: Array<IImagePathOrder> = []
+        this.modalItem.productImages.forEach((productImage, index) => {
+            const imageOrder: number | null = this.registeredFileOrder[index] ? this.registeredFileOrder[index] : null
+            registeredList[index] = { path: productImage.apiPath, order: imageOrder, type: ImageType.Registered }
+        })
+        return registeredList
     }
 
     // プレビューリスト
-    get previewList(): Array<string> {
-        const previewList = []
-        for (const file of this.uploadFiles) {
+    get previewList(): Array<IImagePathOrder> {
+        const previewList: Array<IImagePathOrder> = []
+        this.uploadFiles.forEach((file, index) => {
+            const imageOrder: number | null = this.uploadFileOrder[index] ? this.uploadFileOrder[index] : null
             const url = URL.createObjectURL(file)
-            previewList.push(url)
-        }
+            previewList[index] = { path: url, order: imageOrder, type: ImageType.Preview }
+        })
         return previewList
     }
 
@@ -212,6 +226,10 @@ export default class CProductList extends Vue {
             }
         }
         return message
+    }
+
+    get isChangedOrder() {
+        return this.order !== this.maxOrder
     }
 
     @Watch('dialogVisible')
@@ -260,6 +278,7 @@ export default class CProductList extends Vue {
 
     async confirmHandler() {
         this.errors = []
+        // ここで優先度を反映させる処理を追加
         if (this.executionType === ExecutionType.Create) {
             try {
                 const createProduct = await this.$axios.$post(`/product`, this.modalItem)
@@ -317,9 +336,58 @@ export default class CProductList extends Vue {
     deleteImageHandler(index: number, imageType: TImageType) {
         if (imageType === ImageType.Registered) {
             this.modalItem.productImages.splice(index, 1)
+            this.$delete(this.registeredFileOrder, index)
         } else {
             this.uploadFiles.splice(index, 1)
+            this.$delete(this.uploadFileOrder, index)
         }
+        this.orderInit()
+    }
+
+    order: number = 100
+    maxOrder: 100 = 100
+    registeredFileOrder: IIndexOrder = {}
+    uploadFileOrder: IIndexOrder = {}
+    orderImageHandler(index: number, imageType: TImageType) {
+        if (imageType === ImageType.Registered) {
+            if (this.registeredFileOrder[index]) {
+                this.addOrder(this.registeredFileOrder[index])
+                this.$delete(this.registeredFileOrder, index)
+                this.order += 1
+            } else {
+                this.$set(this.registeredFileOrder, index, this.order)
+                this.order -= 1
+            }
+        } else if (imageType === ImageType.Preview) {
+            // 新しい優先度がまだついていない
+            if (this.uploadFileOrder[index]) {
+                this.addOrder(this.uploadFileOrder[index])
+                this.$delete(this.uploadFileOrder, index)
+                this.order += 1
+            } else {
+                this.$set(this.uploadFileOrder, index, this.order)
+                this.order -= 1
+            }
+        }
+    }
+
+    addOrder(baseOrder: number) {
+        for (const index in this.registeredFileOrder) {
+            if (this.registeredFileOrder[index] <= baseOrder) {
+                this.registeredFileOrder[index] += 1
+            }
+        }
+        for (const index in this.uploadFileOrder) {
+            if (this.uploadFileOrder[index] <= baseOrder) {
+                this.uploadFileOrder[index] += 1
+            }
+        }
+    }
+
+    orderInit() {
+        this.order = 100
+        this.registeredFileOrder = {}
+        this.uploadFileOrder = {}
     }
 
     deleteSiteDetail(index: number) {
@@ -345,6 +413,9 @@ export default class CProductList extends Vue {
         text-align right
         .price-unit-content
             padding-top 12px
+
+.order-reset
+    margin-bottom 16px
 
 .site-detail-preview
     border 1px dashed $light-dark-color
