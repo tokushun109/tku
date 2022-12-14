@@ -151,6 +151,11 @@ interface IIndexOrder {
     [key: number]: number
 }
 
+interface IProductImageParams {
+    isChanged: boolean
+    order: IIndexOrder
+}
+
 @Component({})
 export default class CProductList extends Vue {
     @PropSync('items') listItems!: Array<IProduct>
@@ -306,6 +311,11 @@ export default class CProductList extends Vue {
                 // 画像を選択していたら、アップロードを行う
                 if (this.uploadFiles.length > 0) {
                     const params = new FormData()
+                    const orderParams: IProductImageParams = {
+                        isChanged: this.isChangedOrder,
+                        order: this.uploadFileOrder,
+                    }
+                    params.append('order', JSON.stringify(orderParams))
                     this.uploadFiles.forEach((file, index) => {
                         params.append(`file${index}`, file)
                     })

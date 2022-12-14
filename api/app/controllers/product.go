@@ -23,6 +23,11 @@ var typeToExtension = map[string]string{
 	"image/webp": ".webp",
 }
 
+type OrderParams struct {
+	IsChanged bool
+	Order     map[int]int
+}
+
 // 商品に紐づく商品画像に画像取得用のapiをつける
 func setProductImageApiPath(product *models.Product) error {
 	if config.Config.Env == "" {
@@ -265,6 +270,17 @@ func createProductImageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	productId := product.ID
+
+	// order用のパラメータを受け取る処理を作成
+
+	orderJson := r.FormValue("order")
+	order := OrderParams{}
+	if err := json.Unmarshal([]byte(orderJson), &order); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
 	i := 0
 	for {
 		// ファイルをapiディレクトリ内に保存する
