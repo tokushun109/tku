@@ -1,5 +1,5 @@
 <template>
-    <c-product-list :items="products" :categories="categories" :tags="tags" :sales-sites="salesSites" @c-change="loadingProduct" />
+    <c-product-list :key="updateCount" :items="products" :categories="categories" :tags="tags" :sales-sites="salesSites" @c-change="loadingProduct" />
 </template>
 
 <script lang="ts">
@@ -35,11 +35,13 @@ export default class PageAdminProductIndex extends Vue {
         }
     }
 
+    updateCount: number = 0
     async loadingProduct() {
         const params: IGetProductsParams = {
             mode: 'all',
         }
         this.products = await this.$axios.$get(`/product`, { params })
+        this.updateCount += 1
     }
 
     // 商品の削除

@@ -271,11 +271,9 @@ func createProductImageHandler(w http.ResponseWriter, r *http.Request) {
 
 	productId := product.ID
 
-	// order用のパラメータを受け取る処理を作成
-
 	orderJson := r.FormValue("order")
-	order := OrderParams{}
-	if err := json.Unmarshal([]byte(orderJson), &order); err != nil {
+	orderMap := OrderParams{}
+	if err := json.Unmarshal([]byte(orderJson), &orderMap); err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
@@ -338,6 +336,11 @@ func createProductImageHandler(w http.ResponseWriter, r *http.Request) {
 		productImage.MimeType = mimeType
 		productImage.Path = savePath
 		productImage.ProductId = productId
+		productImage.Order = 0
+		if orderMap.IsChanged {
+			productImage.Order = orderMap.Order[i]
+		}
+
 		// sqlにデータを作成する
 		err = models.InsertProductImage(&productImage)
 		if err != nil {

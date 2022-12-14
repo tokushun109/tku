@@ -144,6 +144,7 @@ import {
     TExecutionType,
     TImageType,
     IImagePathOrder,
+    BadRequest,
 } from '~/types'
 import { maxPrice, min20, newProduct, newSiteDetail, price, required } from '~/methods'
 
@@ -283,13 +284,28 @@ export default class CProductList extends Vue {
 
     async confirmHandler() {
         this.errors = []
-        // ここで優先度を反映させる処理を追加
+        const selectedLength = this.maxOrder - this.order
+        const totalImageLength = this.modalItem.productImages.length + this.uploadFiles.length
+        if (this.isChangedOrder && selectedLength < totalImageLength) {
+            this.errors.push(new BadRequest('全ての画像の並び替えが選択されていません'))
+            return
+        }
+        if (this.isChangedOrder) {
+            this.modalItem.productImages.forEach((image, index) => {
+                image.order = this.registeredFileOrder[index]
+            })
+        }
         if (this.executionType === ExecutionType.Create) {
             try {
                 const createProduct = await this.$axios.$post(`/product`, this.modalItem)
                 // 画像を選択していたら、アップロードを行う
                 if (this.uploadFiles.length > 0) {
                     const params = new FormData()
+                    const orderParams: IProductImageParams = {
+                        isChanged: this.isChangedOrder,
+                        order: this.uploadFileOrder,
+                    }
+                    params.append('order', JSON.stringify(orderParams))
                     this.uploadFiles.forEach((file, index) => {
                         params.append(`file${index}`, file)
                     })
@@ -341,6 +357,7 @@ export default class CProductList extends Vue {
                 this.errors.push(e)
             }
         }
+        this.orderInit()
     }
 
     deleteImageHandler(index: number, imageType: TImageType) {
@@ -369,7 +386,6 @@ export default class CProductList extends Vue {
                 this.order -= 1
             }
         } else if (imageType === ImageType.Preview) {
-            // 新しい優先度がまだついていない
             if (this.uploadFileOrder[index]) {
                 this.addOrder(this.uploadFileOrder[index])
                 this.$delete(this.uploadFileOrder, index)

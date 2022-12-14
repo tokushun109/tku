@@ -5,7 +5,6 @@ export interface IProductImage {
     name: string
     apiPath: string
     order: number
-    newOrder?: null | number
 }
 
 export interface IImagePathOrder {

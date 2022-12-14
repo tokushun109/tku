@@ -2,6 +2,8 @@ package models
 
 import (
 	"errors"
+
+	"gorm.io/gorm"
 )
 
 type Product struct {
@@ -36,14 +38,18 @@ type ProductImage struct {
 func GetAllProducts(mode string) (products Products, err error) {
 	if mode == "all" {
 		Db.Preload("Category").
-			Preload("ProductImages").
+			Preload("ProductImages", func(db *gorm.DB) *gorm.DB {
+				return db.Order("product_image.order Desc")
+			}).
 			Preload("Tags").
 			Preload("SiteDetails.SalesSite").
 			Find(&products)
 	} else if mode == "active" {
 		Db.Where("is_active = ?", 1).
 			Preload("Category").
-			Preload("ProductImages").
+			Preload("ProductImages", func(db *gorm.DB) *gorm.DB {
+				return db.Order("product_image.order Desc")
+			}).
 			Preload("Tags").
 			Preload("SiteDetails.SalesSite").
 			Find(&products)
@@ -69,7 +75,9 @@ func GetNewProducts(limit int) (products Products) {
 
 func GetProduct(uuid string) (product Product, err error) {
 	err = Db.Preload("Category").
-		Preload("ProductImages").
+		Preload("ProductImages", func(db *gorm.DB) *gorm.DB {
+			return db.Order("product_image.order Desc")
+		}).
 		Preload("Tags").
 		Preload("SiteDetails.SalesSite").
 		First(&product, "uuid = ?", uuid).Error
@@ -256,9 +264,18 @@ func UpdateProduct(product *Product, uuid string) (err error) {
 		}
 	}
 
-	// 残しておく商品画像のuuidリストを作成
 	var leaveProductImageUuids []string
 	for _, productImage := range product.ProductImages {
+
+		// 商品画像の優先順位を更新
+		err = tx.Model(&productImage).Where("uuid = ?", productImage.Uuid).Updates(
+			ProductImage{Order: productImage.Order},
+		).Error
+		if err != nil {
+			return err
+		}
+
+		// 残しておく商品画像のuuidリストを作成
 		leaveProductImageUuids = append(
 			leaveProductImageUuids, productImage.Uuid,
 		)
