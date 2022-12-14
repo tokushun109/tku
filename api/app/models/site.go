@@ -75,9 +75,9 @@ func InsertSalesSite(salesSite *SalesSite) (err error) {
 	return err
 }
 
-func UpdateSalesSite(sales_site *SalesSite, uuid string) (err error) {
-	err = Db.Model(&sales_site).Where("uuid = ?", uuid).Updates(
-		SalesSite{Name: sales_site.Name, Url: sales_site.Url, Icon: sales_site.Icon},
+func UpdateSalesSite(salesSite *SalesSite, uuid string) (err error) {
+	err = Db.Model(&salesSite).Where("uuid = ?", uuid).Updates(
+		SalesSite{Name: salesSite.Name, Url: salesSite.Url, Icon: salesSite.Icon},
 	).Error
 	return err
 }

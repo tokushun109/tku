@@ -1,10 +1,18 @@
-import { IClassification, ISiteDetail } from '~/types'
+import { IClassification, ISiteDetail, TImageType } from '~/types'
 
 export interface IProductImage {
     uuid: string
     name: string
     apiPath: string
+    order: number
 }
+
+export interface IImagePathOrder {
+    path: string
+    order: number | null
+    type: TImageType
+}
+
 export interface IProduct {
     uuid: string
     name: string
