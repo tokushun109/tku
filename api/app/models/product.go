@@ -65,7 +65,9 @@ func GetNewProducts(limit int) (products Products) {
 		Where("product.is_active = ?", 1).
 		Where("product_image.deleted_at is null").
 		Preload("Category").
-		Preload("ProductImages").
+		Preload("ProductImages", func(db *gorm.DB) *gorm.DB {
+			return db.Order("product_image.order Desc")
+		}).
 		Order("id desc").
 		Group("product.id").
 		Limit(limit).
