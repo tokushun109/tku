@@ -72,7 +72,7 @@ functions:
     timeout: 30
     memorySize: 512
     events:
-      - schedule: cron(0/15 * * * ? *)
+      - schedule: cron(0/10 * * * ? *)
 
 resources:
   Resources:
