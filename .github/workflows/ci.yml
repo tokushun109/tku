@@ -1,7 +1,7 @@
 name: tku-ci
 on: 
   push:
-      branches: main
+    branches: feature/#449
 jobs:
   Client:
     name: Client Auto Deploy
@@ -27,6 +27,8 @@ jobs:
         env:
           API_BASE_URL: ${{ secrets.API_BASE_URL }}
           BROWSER_BASE_URL: ${{ secrets.BROWSER_BASE_URL }}
+          DOMAIN_URL: ${{ secrets.DOMAIN_URL }}
+          LINE_TOKEN: ${{ secrets.LINE_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
