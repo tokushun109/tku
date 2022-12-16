@@ -43,7 +43,7 @@ export default class PageProductIndex extends Vue {
         if (!this.products) {
             return
         }
-        const title = 'tocoriri | 商品一覧'
+        const title = '商品一覧 | tocoriri'
         const description = 'tocoriri(とこりり)の商品一覧ページです。'
         const image = this.products[0].productImages[0].apiPath
         return {

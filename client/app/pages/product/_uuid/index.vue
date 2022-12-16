@@ -23,7 +23,7 @@ export default class PageProductDetail extends Vue {
         if (!this.product) {
             return
         }
-        const title = `tocoriri | ${this.product.name}`
+        const title = `${this.product.name} | tocoriri`
         const description = this.product.description.replace(/\r?\n/g, '')
         const image = this.product.productImages[0].apiPath
         return {

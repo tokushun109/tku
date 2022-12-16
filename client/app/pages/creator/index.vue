@@ -33,7 +33,7 @@ export default class PageCreatorIndex extends Vue {
         if (!this.creator) {
             return
         }
-        const title = 'tocoriri | 製作者紹介'
+        const title = '製作者紹介 | tocoriri'
         const description = this.creator.introduction.replace(/\r?\n/g, '')
         const image = this.creator.apiPath
         return {
