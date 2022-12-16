@@ -13,6 +13,9 @@
                         <v-btn fab :color="ColorType.Orange" :href="sns.url" x-large>
                             <v-icon large :color="ColorType.White">{{ sns.icon }}</v-icon>
                         </v-btn>
+                        <div class="sns-name">
+                            <strong>{{ sns.name }}</strong>
+                        </div>
                     </div>
                 </v-container>
                 <div v-if="admin" class="edit-button">
@@ -157,11 +160,15 @@ export default class CCreatorEdit extends Vue {
             .description-text
                 white-space pre-wrap
                 word-break break-all
+                +sm()
+                    font-size 3vw
         .sns-content
             display flex
             justify-content center
             .sns-item
                 margin 0 10px
+        .sns-name
+            margin-top 10px
         .edit-button
             text-align center
 </style>
