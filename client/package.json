@@ -19,6 +19,7 @@
 		"@mdi/js": "^7.0.96",
 		"@nuxt/typescript-build": "^2.0.4",
 		"@nuxtjs/axios": "^5.12.5",
+		"@nuxtjs/robots": "^3.0.0",
 		"@nuxtjs/sitemap": "^2.4.0",
 		"@nuxtjs/style-resources": "^1.0.0",
 		"@nuxtjs/vuetify": "^1.12.1",

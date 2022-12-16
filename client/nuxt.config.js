@@ -25,10 +25,6 @@ module.exports = {
                 name: 'format-detection',
                 content: 'telephone=no',
             },
-            {
-                name: 'robots',
-                content: 'noindex',
-            },
 
             // SEO設定
             {
@@ -96,7 +92,14 @@ module.exports = {
         ['cookie-universal-nuxt', { parseJSON: false }],
         'nuxt-webfontloader',
         '@nuxtjs/sitemap',
+        '@nuxtjs/robots',
     ],
+
+    robots: {
+        UserAgent: '*',
+        Disallow: '/admin',
+        Sitemap: 'https://tocoriri.com/sitemap.xml',
+    },
 
     webfontloader: {
         google: {
