@@ -167,8 +167,9 @@ export default class CCreatorEdit extends Vue {
             justify-content center
             .sns-item
                 margin 0 10px
-        .sns-name
-            margin-top 10px
+                text-align center
+            .sns-name
+                margin-top 10px
         .edit-button
             text-align center
 </style>
