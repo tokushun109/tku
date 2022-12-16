@@ -30,13 +30,19 @@ export default class LayoutDefault extends Vue {
     }
 
     head() {
-        const url = process.env.DOMAIN_URL || 'https://tocoriri.com' + this.$route.path
+        const url = (process.env.DOMAIN_URL || 'https://tocoriri.com') + this.$route.path
         return {
             meta: [
                 {
                     hid: 'og:url',
                     property: 'og:url',
                     content: url,
+                },
+            ],
+            link: [
+                {
+                    rel: 'canonical',
+                    href: url,
                 },
             ],
         }
