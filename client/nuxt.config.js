@@ -82,7 +82,13 @@ module.exports = {
         // https://go.nuxtjs.dev/typescript
         '@nuxt/typescript-build',
         '@nuxtjs/vuetify',
+        '@nuxtjs/google-gtag',
     ],
+
+    'google-gtag': {
+        id: process.env.GOOGLE_TAG,
+        debug: false,
+    },
 
     // Modules: https://go.nuxtjs.dev/config-modules
     modules: [

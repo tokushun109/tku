@@ -15,10 +15,12 @@ provider:
     # API_BASE_URL: ${self:custom.secrets.API_BASE_URL}
     # DOMAIN_URL: ${self:custom.secrets.DOMAIN_URL}
     # LINE_TOKEN: ${self:custom.secrets.LINE_TOKEN}
+    # GOOGLE_TAG: ${self:custom.secrets.GOOGLE_TAG}
     BROWSER_BASE_URL: ${env:BROWSER_BASE_URL}
     API_BASE_URL: ${env:API_BASE_URL}
     DOMAIN_URL: ${env:DOMAIN_URL}
     LINE_TOKEN: ${env:LINE_TOKEN}
+    GOOGLE_TAG: ${env:GOOGLE_TAG}
 
 functions:
   nuxt:
