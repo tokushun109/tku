@@ -1,3 +1,0 @@
-UserAgent: *
-Disallow: /admin
-Sitemap: https://tocoriri.com/sitemap.xml

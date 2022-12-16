@@ -31,12 +31,18 @@ export default class LayoutDefault extends Vue {
 
     head() {
         const url = (process.env.DOMAIN_URL || 'https://tocoriri.com') + this.$route.path
+        const robots = this.isAdmin ? 'noindex' : ''
         return {
             meta: [
                 {
                     hid: 'og:url',
                     property: 'og:url',
                     content: url,
+                },
+                {
+                    hid: 'robots',
+                    name: 'robots',
+                    content: robots,
                 },
             ],
             link: [

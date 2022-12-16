@@ -25,10 +25,6 @@ module.exports = {
                 name: 'format-detection',
                 content: 'telephone=no',
             },
-            {
-                name: 'robots',
-                content: 'noindex',
-            },
 
             // SEO設定
             {
@@ -86,7 +82,13 @@ module.exports = {
         // https://go.nuxtjs.dev/typescript
         '@nuxt/typescript-build',
         '@nuxtjs/vuetify',
+        '@nuxtjs/google-gtag',
     ],
+
+    'google-gtag': {
+        id: process.env.GOOGLE_TAG,
+        debug: false,
+    },
 
     // Modules: https://go.nuxtjs.dev/config-modules
     modules: [
@@ -96,7 +98,14 @@ module.exports = {
         ['cookie-universal-nuxt', { parseJSON: false }],
         'nuxt-webfontloader',
         '@nuxtjs/sitemap',
+        '@nuxtjs/robots',
     ],
+
+    robots: {
+        UserAgent: '*',
+        Disallow: '/admin',
+        Sitemap: 'https://tocoriri.com/sitemap.xml',
+    },
 
     webfontloader: {
         google: {
