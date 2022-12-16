@@ -21,11 +21,7 @@ import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
 import { newProduct } from '~/methods'
 import { IGetProductsParams, IProduct } from '~/types'
-@Component({
-    head: {
-        title: '商品一覧',
-    },
-})
+@Component({})
 export default class PageProductIndex extends Vue {
     products: Array<IProduct> = []
     // form用のproductModel
@@ -36,10 +32,50 @@ export default class PageProductIndex extends Vue {
             const params: IGetProductsParams = {
                 mode: 'active',
             }
-            const products = await app.$axios.$get(`/product`, { params })
+            const products: Array<IProduct> = await app.$axios.$get(`/product`, { params })
             return { products }
         } catch (e) {
             return { products: [] }
+        }
+    }
+
+    head() {
+        if (!this.products) {
+            return
+        }
+        const title = 'tocoriri | 商品一覧'
+        const description = 'tocoriri(とこりり)の商品一覧ページです。'
+        const image = this.products[0].productImages[0].apiPath
+        return {
+            title,
+            meta: [
+                {
+                    hid: 'description',
+                    name: 'description',
+                    content: description,
+                },
+                {
+                    hid: 'og:title',
+                    property: 'og:title',
+                    content: title,
+                },
+                {
+                    hid: 'og:description',
+                    property: 'og:description',
+                    content: description,
+                },
+
+                {
+                    hid: 'og:type',
+                    property: 'og:type',
+                    content: 'article',
+                },
+                {
+                    hid: 'og:image',
+                    property: 'og:image',
+                    content: image,
+                },
+            ],
         }
     }
 

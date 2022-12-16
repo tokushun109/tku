@@ -1,13 +1,15 @@
+const axios = require('axios')
+
 module.exports = {
     ssr: 'true',
     srcDir: 'app/',
     // Global page headers: https://go.nuxtjs.dev/config-head
     head: {
-        title: 'tocoriri',
         htmlAttrs: {
             lang: 'ja',
         },
         meta: [
+            // 基本設定
             {
                 charset: 'utf-8',
             },
@@ -16,21 +18,46 @@ module.exports = {
                 content: 'width=device-width, initial-scale=1',
             },
             {
-                hid: 'description',
-                name: 'description',
-                content: 'tocoriri web site',
+                'http-equiv': 'X-UA-Compatible',
+                content: 'IE=edge',
             },
-            // 本番稼働させたら記述を変更する
+            {
+                name: 'format-detection',
+                content: 'telephone=no',
+            },
             {
                 name: 'robots',
-                content: 'noindex'
-            }
+                content: 'noindex',
+            },
+
+            // SEO設定
+            {
+                name: 'twitter:card',
+                content: 'summary',
+            },
+
+            // OGP設定
+            {
+                hid: 'og:site_name',
+                property: 'og:site_name',
+                content: 'tocoriri',
+            },
         ],
+
         link: [
             {
                 rel: 'icon',
                 type: 'image/x-icon',
                 href: '/favicon/favicon.ico',
+            },
+            {
+                rel: 'canonical',
+                href: process.env.DOMAIN_URL || 'https://tocoriri.com',
+            },
+            {
+                rel: 'apple-touch-icon',
+                sizes: '180x180',
+                href: '/apple-touch-icon/apple-touch-icon.png',
             },
         ],
     },
@@ -53,9 +80,9 @@ module.exports = {
     // Auto import components: https://go.nuxtjs.dev/config-components
     components: [
         {
-        path: '@/components/',
-        pathPrefix: false
-        }
+            path: '@/components/',
+            pathPrefix: false,
+        },
     ],
 
     // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
@@ -83,43 +110,36 @@ module.exports = {
 
     sitemap: {
         hostname: 'https://tocoriri.com',
-        exclude: [
-            '/admin',
-            '/admin/**',
-            '/order',
-        ],
+        exclude: ['/admin', '/admin/**', '/order'],
         routes: async () => {
-            const axios = require('axios')
             // 商品詳細ページ
             const baseURL = process.env.API_BASE_URL || 'http://localhost:8080/api'
             const { data } = await axios.get(`${baseURL}/product?mode=active`)
             return data.map((product) => `/product/${product.uuid}`)
-        }
+        },
     },
 
     // Axios module configuration: https://go.nuxtjs.dev/config-axios
     publicRuntimeConfig: {
-    axios: {
-        browserBaseURL:
-            process.env.BROWSER_BASE_URL || 'http://localhost:8080/api'
-        }
+        axios: {
+            browserBaseURL: process.env.BROWSER_BASE_URL || 'http://localhost:8080/api',
+        },
     },
     privateRuntimeConfig: {
-    axios: {
-        baseURL:
-            process.env.API_BASE_URL || 'http://localhost:8080/api'
-        }
-    },    
+        axios: {
+            baseURL: process.env.API_BASE_URL || 'http://localhost:8080/api',
+        },
+    },
     // Build Configuration: https://go.nuxtjs.dev/config-build
     build: {
-        publicPath: '_nuxt/'
+        publicPath: '_nuxt/',
     },
     router: {
         base: `/`,
         middleware: 'auth',
     },
     performance: {
-        gzip: false
+        gzip: false,
     },
     dev: false,
     vuetify: {
@@ -136,6 +156,6 @@ module.exports = {
                 },
             },
         },
-        defaultAssets: false
+        defaultAssets: false,
     },
 }

@@ -15,11 +15,7 @@ import { mdiArrowRightThick } from '@mdi/js'
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
 import { ColorType, ICarouselItem } from '~/types'
-@Component({
-    head: {
-        title: 'tocoriri',
-    },
-})
+@Component({})
 export default class PageTop extends Vue {
     mdiArrowRightThick = mdiArrowRightThick
     ColorType: typeof ColorType = ColorType
@@ -27,10 +23,48 @@ export default class PageTop extends Vue {
     carouselItems: Array<ICarouselItem> = []
     async asyncData({ app }: Context) {
         try {
-            const carouselItems = await app.$axios.$get(`/carousel_image`)
+            const carouselItems: Array<ICarouselItem> = await app.$axios.$get(`/carousel_image`)
+
             return { carouselItems }
         } catch (e) {
             return { carouselItems: [] }
+        }
+    }
+
+    head() {
+        const title = 'tocoriri | トップページ'
+        const description = 'マクラメ編みのアクセサリーショップtocoriri(とこりり)の紹介サイトです。'
+        const image = this.carouselItems[0].apiPath
+        return {
+            title,
+            meta: [
+                {
+                    hid: 'description',
+                    name: 'description',
+                    content: description,
+                },
+                {
+                    hid: 'og:title',
+                    property: 'og:title',
+                    content: title,
+                },
+                {
+                    hid: 'og:description',
+                    property: 'og:description',
+                    content: description,
+                },
+
+                {
+                    hid: 'og:type',
+                    property: 'og:type',
+                    content: 'website',
+                },
+                {
+                    hid: 'og:image',
+                    property: 'og:image',
+                    content: image,
+                },
+            ],
         }
     }
 }

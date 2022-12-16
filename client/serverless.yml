@@ -67,6 +67,16 @@ functions:
             parameters:
               paths:
                 proxy: true
+      - http: 
+          path: /apple-touch-icon/{proxy+}
+          method: any
+          integration: http-proxy
+          request:
+            uri: https://${self:custom.buckets.STATIC_BUCKET_NAME}.s3.${self:provider.region}.amazonaws.com/apple-touch-icon/{proxy}
+            parameters:
+              paths:
+                proxy: true
+
   warmup:
     handler: ./deploy_config/index.warmup
     timeout: 30

@@ -28,6 +28,19 @@ export default class LayoutDefault extends Vue {
     get isAdmin() {
         return this.$route.path.includes('admin')
     }
+
+    head() {
+        const url = process.env.DOMAIN_URL || 'https://tocoriri.com' + this.$route.path
+        return {
+            meta: [
+                {
+                    hid: 'og:url',
+                    property: 'og:url',
+                    content: url,
+                },
+            ],
+        }
+    }
 }
 </script>
 

@@ -15,21 +15,57 @@
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
 import { ICreator, ISite } from '~/types'
-@Component({
-    head: {
-        title: '製作者紹介',
-    },
-})
+@Component({})
 export default class PageCreatorIndex extends Vue {
     creator: ICreator | null = null
     snsList: Array<ISite> | null = []
     async asyncData({ app }: Context) {
         try {
-            const creator = await app.$axios.$get(`/creator`)
-            const snsList = await app.$axios.$get(`/sns`)
+            const creator: ICreator = await app.$axios.$get(`/creator`)
+            const snsList: Array<ISite> = await app.$axios.$get(`/sns`)
             return { creator, snsList }
         } catch (e) {
             return { creator: null, snsList: [] }
+        }
+    }
+
+    head() {
+        if (!this.creator) {
+            return
+        }
+        const title = 'tocoriri | 製作者紹介'
+        const description = this.creator.introduction.replace(/\r?\n/g, '')
+        const image = this.creator.apiPath
+        return {
+            title,
+            meta: [
+                {
+                    hid: 'description',
+                    name: 'description',
+                    content: description,
+                },
+                {
+                    hid: 'og:title',
+                    property: 'og:title',
+                    content: title,
+                },
+                {
+                    hid: 'og:description',
+                    property: 'og:description',
+                    content: description,
+                },
+
+                {
+                    hid: 'og:type',
+                    property: 'og:type',
+                    content: 'article',
+                },
+                {
+                    hid: 'og:image',
+                    property: 'og:image',
+                    content: image,
+                },
+            ],
         }
     }
 }
