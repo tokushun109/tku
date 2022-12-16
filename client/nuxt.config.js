@@ -51,10 +51,6 @@ module.exports = {
                 href: '/favicon/favicon.ico',
             },
             {
-                rel: 'canonical',
-                href: process.env.DOMAIN_URL || 'https://tocoriri.com',
-            },
-            {
                 rel: 'apple-touch-icon',
                 sizes: '180x180',
                 href: '/apple-touch-icon/apple-touch-icon.png',
