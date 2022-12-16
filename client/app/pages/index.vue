@@ -32,6 +32,9 @@ export default class PageTop extends Vue {
     }
 
     head() {
+        if (!this.carouselItems) {
+            return
+        }
         const title = 'トップページ | tocoriri'
         const description = 'マクラメ編みのアクセサリーショップtocoriri(とこりり)の紹介サイトです。'
         const image = this.carouselItems[0].apiPath
@@ -53,7 +56,6 @@ export default class PageTop extends Vue {
                     property: 'og:description',
                     content: description,
                 },
-
                 {
                     hid: 'og:type',
                     property: 'og:type',

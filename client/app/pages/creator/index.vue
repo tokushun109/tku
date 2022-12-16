@@ -54,7 +54,6 @@ export default class PageCreatorIndex extends Vue {
                     property: 'og:description',
                     content: description,
                 },
-
                 {
                     hid: 'og:type',
                     property: 'og:type',

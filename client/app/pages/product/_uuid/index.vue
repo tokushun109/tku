@@ -44,7 +44,6 @@ export default class PageProductDetail extends Vue {
                     property: 'og:description',
                     content: description,
                 },
-
                 {
                     hid: 'og:type',
                     property: 'og:type',
