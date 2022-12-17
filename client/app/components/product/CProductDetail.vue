@@ -66,7 +66,7 @@
         </v-container>
         <client-only>
             <div class="purchase-button">
-                <v-btn :color="ColorType.Orange" :disabled="product.siteDetails.length === 0" x-large fab @click="dialogVisible = true">
+                <v-btn :color="ColorType.Orange" :disabled="product.siteDetails.length === 0" small fab :elevation="3" @click="dialogVisible = true">
                     <c-icon :type="IconType.Cart.name" :color="ColorType.White" @c-click="dialogVisible = true" />
                 </v-btn>
             </div>
@@ -114,14 +114,13 @@ export default class CProductDetail extends Vue {
 <style lang="stylus" scoped>
 .c-product-detail-page
     position relative
-    +sm()
-        padding-bottom 40px
     .c-product-detail-page-wrapper
         .c-product-detail-page-area
             padding 16px
             .product-name
                 color $title-text-color
                 font-weight $title-font-weight
+                font-size 20px
             .detail-area
                 .price-area
                     .price
@@ -153,8 +152,9 @@ export default class CProductDetail extends Vue {
                         font-size $font-large
     .purchase-button
         position fixed
-        right 20px
-        bottom 70px
+        top 9px
+        right 25px
+        z-index 20
         display none
         +sm()
             display block

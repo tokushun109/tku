@@ -53,7 +53,10 @@ export default class CProductCard extends Vue {
         .product-card-header
             margin 16px 0
             .product-name
+                padding-bottom 10px
                 color $title-text-color
+                font-weight $title-font-weight
+                font-size 16px
         .product-card-footer
             margin-top 15px
             text-align right
