@@ -120,6 +120,7 @@ export default class CProductDetail extends Vue {
             .product-name
                 color $title-text-color
                 font-weight $title-font-weight
+                font-size 20px
             .detail-area
                 .price-area
                     .price
