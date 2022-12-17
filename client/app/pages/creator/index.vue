@@ -1,6 +1,6 @@
 <template>
     <v-container class="page-creator">
-        <v-container>
+        <v-container class="page-title-container">
             <h2 class="page-title text-sm-h3 text-h4">CREATOR</h2>
         </v-container>
         <v-sheet>
@@ -71,10 +71,11 @@ export default class PageCreatorIndex extends Vue {
 </script>
 
 <style lang="stylus" scoped>
-.page-title
-    margin-bottom 20px
-    color $site-title-text-color
-    text-align center
+.page-title-container
     +sm()
         display none
+    .page-title
+        margin-bottom 20px
+        color $site-title-text-color
+        text-align center
 </style>

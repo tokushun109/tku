@@ -41,13 +41,14 @@
         <v-sheet class="sm">
             <v-card rounded elevation="20">
                 <v-container class="carousel-wrapper">
-                    <v-carousel v-if="displayImages && displayImages.length > 0" cycle hide-delimiters height="auto">
-                        <template v-if="carouselItems.length > 1" #prev="{ on, attrs }">
-                            <v-icon large v-bind="attrs" v-on="on">{{ mdiChevronLeft }}</v-icon>
-                        </template>
-                        <template v-if="carouselItems.length > 1" #next="{ on, attrs }">
-                            <v-icon large v-bind="attrs" v-on="on">{{ mdiChevronRight }}</v-icon>
-                        </template>
+                    <v-carousel
+                        v-if="displayImages && displayImages.length > 0"
+                        :show-arrows="false"
+                        cycle
+                        :interval="3000"
+                        hide-delimiters
+                        height="auto"
+                    >
                         <v-carousel-item
                             v-for="(image, index) in displayImages"
                             :key="index"
