@@ -20,11 +20,11 @@
                 </v-sheet>
                 <v-container class="menu-item">
                     <v-row>
-                        <v-col v-for="(item, index) in menuItems" :key="index" cols="6">
-                            <v-card height="350" elevation="20" :to="`/${item.link}`" nuxt class="menu-card" @click="toggleMenu">
+                        <v-col v-for="(item, index) in menuItems" :key="index" cols="4">
+                            <v-card height="100%" elevation="20" :href="`${item.link}`" nuxt class="menu-card" @click="toggleMenu">
                                 <v-card-title class="menu-card-icon">
-                                    <v-avatar size="200">
-                                        <v-icon size="200">{{ item.icon }}</v-icon>
+                                    <v-avatar size="90%">
+                                        <v-icon size="90%">{{ item.icon }}</v-icon>
                                     </v-avatar>
                                 </v-card-title>
                                 <v-card-text class="menu-card-name">
@@ -48,7 +48,7 @@
 </template>
 
 <script lang="ts">
-import { mdiDiamond, mdiHumanGreetingVariant } from '@mdi/js'
+import { mdiDiamond, mdiEmail, mdiHumanGreetingVariant } from '@mdi/js'
 import { Component, Vue } from 'nuxt-property-decorator'
 import { IconType, ITable, ColorType } from '~/types'
 @Component({})
@@ -59,6 +59,7 @@ export default class SiteLayout extends Vue {
     menuItems: Array<ITable> = [
         { name: 'CREATOR', link: 'creator', icon: mdiHumanGreetingVariant },
         { name: 'PRODUCTS', link: 'product', icon: mdiDiamond },
+        { name: 'CONTACT', link: 'contact', icon: mdiEmail },
     ]
 
     menuVisible: boolean = false
@@ -135,7 +136,7 @@ export default class SiteLayout extends Vue {
         position relative
         top 10%
         .menu-card
-            padding-top 20px
+            padding 0 0 20px
             border-radius $image-border-radius
             text-align center
             transition all 0.2s
@@ -146,8 +147,7 @@ export default class SiteLayout extends Vue {
             .menu-card-icon
                 justify-content center
             .menu-card-name
-                margin-top 20px
-                font-size 45px
+                font-size 35px
                 +md()
-                    font-size 5vw
+                    font-size 3.5vw
 </style>
