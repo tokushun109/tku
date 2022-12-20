@@ -38,7 +38,7 @@ export function validPhoneNumber(value: string) {
     if (!value) {
         return true
     }
-    return value.match(/^0[0-9]{9,10}$/) || `入力内容を確認してください`
+    return !!value.match(/^0[0-9]{9,10}$/) || `入力内容を確認してください`
 }
 
 // メールアドレス
@@ -46,5 +46,5 @@ export function validMailAddress(value: string) {
     if (!value) {
         return true
     }
-    return value.match(/^[a-zA-Z0-9_.+-]+@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/) || `入力内容を確認してください`
+    return !!value.match(/^[a-zA-Z0-9_.+-]+@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/) || `入力内容を確認してください`
 }
