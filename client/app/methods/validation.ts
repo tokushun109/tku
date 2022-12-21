@@ -42,7 +42,7 @@ export function validPhoneNumber(value: string) {
 }
 
 // メールアドレス
-export function validMailAddress(value: string) {
+export function validEmail(value: string) {
     if (!value) {
         return true
     }

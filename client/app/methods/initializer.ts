@@ -51,7 +51,7 @@ export function newContact(): IContact {
         name: '',
         company: '',
         phoneNumber: '',
-        mailAddress: '',
+        email: '',
         content: '',
     }
 }

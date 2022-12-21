@@ -22,13 +22,7 @@
                                     validate-on-blur
                                     outlined
                                 />
-                                <v-text-field
-                                    v-model="contact.mailAddress"
-                                    :rules="mailAddressRules"
-                                    label="メールアドレス(必須)"
-                                    outlined
-                                    validate-on-blur
-                                />
+                                <v-text-field v-model="contact.email" :rules="emailRules" label="メールアドレス(必須)" outlined validate-on-blur />
                                 <v-textarea v-model="contact.content" :rules="contentRules" label="お問い合わせ内容(必須)" outlined />
                                 <div class="text-center">
                                     <v-btn color="primary" :disabled="!valid" @click="confirmHandler">送信する</v-btn>
@@ -47,7 +41,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'nuxt-property-decorator'
-import { min20, min50, newContact, required, validMailAddress, validPhoneNumber } from '~/methods'
+import { min20, min50, newContact, required, validEmail, validPhoneNumber } from '~/methods'
 import { IContact, IError } from '~/types'
 @Component({
     head: {
@@ -75,7 +69,7 @@ export default class PageContactIndex extends Vue {
 
     phoneRules = [validPhoneNumber]
 
-    mailAddressRules = [required, min50, validMailAddress]
+    emailRules = [required, min50, validEmail]
 
     contentRules = [required]
 

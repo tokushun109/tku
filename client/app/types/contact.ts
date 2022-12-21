@@ -2,6 +2,6 @@ export interface IContact {
     name: string
     company: string
     phoneNumber: string
-    mailAddress: string
+    email: string
     content: string
 }

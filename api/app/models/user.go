@@ -17,7 +17,6 @@ type User struct {
 
 type Users []User
 
-// TODO emailのfieldをなくす
 type Session struct {
 	ID        *uint     `gorm:"primary_key" json:"-"`
 	Uuid      string    `json:"uuid"`

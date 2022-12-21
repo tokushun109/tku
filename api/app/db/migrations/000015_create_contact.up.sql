@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS contact(
     name VARCHAR(30) NOT NULL,
     company VARCHAR(30),
     phone_number VARCHAR(30),
-    mail_address VARCHAR(50) NOT NULL,
+    email VARCHAR(50) NOT NULL,
     content TEXT(1000) NOT NULL,
     is_read BOOLEAN NOT NULL DEFAULT 0,
     created_at DATETIME,
