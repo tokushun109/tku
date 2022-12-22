@@ -1,0 +1,8 @@
+下記のお問い合わせが届きました。\n\n
+
+お名前: {{.Name}}\n
+会社名: {{.Company}}\n
+電話番号: {{.PhoneNumber}}\n
+メールアドレス: {{.Email}}\n
+お問い合せ内容:\n
+{{.Content}}\n\n

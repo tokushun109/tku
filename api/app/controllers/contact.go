@@ -7,10 +7,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"html/template"
+	html_tmpl "html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
+	text_tmpl "text/template"
 
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
@@ -74,7 +75,8 @@ func createContactHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var buffer *bytes.Buffer
-	var tpl *template.Template
+	var text *text_tmpl.Template
+	var html *html_tmpl.Template
 
 	// お問い合わせ元への通知
 	p := mail.NewPersonalization()
@@ -94,13 +96,20 @@ func createContactHandler(w http.ResponseWriter, r *http.Request) {
 	message.Subject = replyMail.Title
 
 	// テキストパートを設定
-	c := mail.NewContent("text/plain", "テストのテキストメールです。")
-	message.AddContent(c)
-	// HTMLパートを設定
+	text = text_tmpl.Must(text_tmpl.ParseFiles(wd + "/app/controllers/mail/contact/auto_reply.txt"))
 	buffer = &bytes.Buffer{}
+	if err = text.Execute(buffer, replyMail); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+	}
 
-	tpl = template.Must(template.ParseFiles(wd + "/app/controllers/mail/contact/auto_reply.html"))
-	if err = tpl.Execute(buffer, replyMail); err != nil {
+	c := mail.NewContent("text/plain", buffer.String())
+	message.AddContent(c)
+
+	// HTMLパートを設定
+	html = html_tmpl.Must(html_tmpl.ParseFiles(wd + "/app/controllers/mail/contact/auto_reply.html"))
+	buffer = &bytes.Buffer{}
+	if err = html.Execute(buffer, replyMail); err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 	}
@@ -141,14 +150,22 @@ func createContactHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	message.Subject = adminMail.Title
-	// テキストパートを設定
-	ac := mail.NewContent("text/plain", "テストのテキストメールです。")
-	message.AddContent(ac)
-	// HTMLパートを設定
-	buffer = &bytes.Buffer{}
 
-	tpl = template.Must(template.ParseFiles(wd + "/app/controllers/mail/contact/admin.html"))
-	if err = tpl.Execute(buffer, adminMail); err != nil {
+	// テキストパートを設定
+	text = text_tmpl.Must(text_tmpl.ParseFiles(wd + "/app/controllers/mail/contact/admin.txt"))
+	buffer = &bytes.Buffer{}
+	if err = text.Execute(buffer, replyMail); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+	}
+
+	ac := mail.NewContent("text/plain", buffer.String())
+	message.AddContent(ac)
+
+	// HTMLパートを設定
+	html = html_tmpl.Must(html_tmpl.ParseFiles(wd + "/app/controllers/mail/contact/admin.html"))
+	buffer = &bytes.Buffer{}
+	if err = html.Execute(buffer, adminMail); err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 	}
