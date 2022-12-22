@@ -4,5 +4,5 @@
 会社名: {{.Company}}
 電話番号: {{.PhoneNumber}}
 メールアドレス: {{.Email}}
-お問い合せ内容:
+お問い合わせ内容:
 {{.Content}}

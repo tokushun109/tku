@@ -20,7 +20,7 @@ import (
 
 // 商品に紐づく商品画像に画像取得用のapiをつける
 func setCreatorLogoApiPath(creator *models.Creator) error {
-	if config.Config.Env == "" {
+	if config.Config.Env == "local" {
 		// localの場合はプロジェクト内のディレクトリから取得
 		base := config.Config.ApiBaseUrl
 		creator.ApiPath = ""
@@ -149,7 +149,7 @@ func updateCreatorLogoHandler(w http.ResponseWriter, r *http.Request) {
 	// fileのMIMETypeを取得
 	mimeType := handler.Header["Content-Type"][0]
 	savePath := saveDirectory + "/" + uuid + typeToExtension[mimeType]
-	if config.Config.Env == "" {
+	if config.Config.Env == "local" {
 		// localの場合はプロジェクト内のディレクトリに保存
 		f, err := os.OpenFile(savePath, os.O_WRONLY|os.O_CREATE, 0666)
 		if err != nil {
