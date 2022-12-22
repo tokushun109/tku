@@ -11,6 +11,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
+	"strings"
 	text_tmpl "text/template"
 
 	"github.com/sendgrid/sendgrid-go"
@@ -158,9 +160,37 @@ func createContactHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 	}
+	msg := buffer.String()
 
-	ac := mail.NewContent("text/plain", buffer.String())
+	ac := mail.NewContent("text/plain", msg)
 	message.AddContent(ac)
+
+	// lineに通知する
+	u, err := url.ParseRequestURI("https://notify-api.line.me/api/notify")
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+	}
+
+	form := url.Values{}
+	form.Add("message", msg)
+
+	body := strings.NewReader(form.Encode())
+	req, err := http.NewRequest("POST", u.String(), body)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+	}
+
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("Authorization", "Bearer "+config.Config.LineContactToken)
+
+	lineClient := &http.Client{}
+	_, err = lineClient.Do(req)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+	}
 
 	// HTMLパートを設定
 	html = html_tmpl.Must(html_tmpl.ParseFiles(wd + "/app/controllers/mail/contact/admin.html"))
@@ -182,8 +212,6 @@ func createContactHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(response.Body)
 		fmt.Println(response.Headers)
 	}
-
-	// lineに通知する
 
 	// responseBodyで処理の成功を返す
 	responseBody := getSuccessResponse()
