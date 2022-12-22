@@ -13,7 +13,10 @@
                         <v-container>
                             <c-error :errors.sync="errors" />
                             <v-form ref="form" v-model="valid" lazy-validation>
-                                <v-text-field v-model="contact.name" :rules="nameRules" label="お名前(必須)" outlined counter="20" />
+                                <div class="require-form">
+                                    <v-chip v-if="!contact.name" class="require-chip">必須</v-chip>
+                                    <v-text-field v-model="contact.name" :rules="nameRules" label="お名前" outlined counter="20" />
+                                </div>
                                 <v-text-field v-model="contact.company" :rules="companyRules" label="会社名" outlined counter="20" />
                                 <v-text-field
                                     v-model="contact.phoneNumber"
@@ -22,8 +25,14 @@
                                     validate-on-blur
                                     outlined
                                 />
-                                <v-text-field v-model="contact.email" :rules="emailRules" label="メールアドレス(必須)" outlined validate-on-blur />
-                                <v-textarea v-model="contact.content" :rules="contentRules" label="お問い合わせ内容(必須)" outlined />
+                                <div class="require-form">
+                                    <v-chip v-if="!contact.email" class="require-chip">必須</v-chip>
+                                    <v-text-field v-model="contact.email" :rules="emailRules" label="メールアドレス" outlined validate-on-blur />
+                                </div>
+                                <div class="require-form">
+                                    <v-chip v-if="!contact.content" class="require-chip">必須</v-chip>
+                                    <v-textarea v-model="contact.content" :rules="contentRules" label="お問い合わせ内容" outlined />
+                                </div>
                                 <div class="text-center">
                                     <v-btn color="primary" :disabled="!valid" @click="confirmHandler">送信する</v-btn>
                                 </div>
@@ -111,6 +120,14 @@ export default class PageContactIndex extends Vue {
             display block
 
 .content-form-wrapper
+    .require-form
+        position relative
+        .require-chip
+            position absolute
+            top 13px
+            right 20px
+            background-color $danger-bg-color
+            color $danger-color
     .content-message-wrapper
         text-align center
 </style>

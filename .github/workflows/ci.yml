@@ -4,8 +4,7 @@ on:
   push:
     branches: 
       - main
-      # - feature/#
-
+      - feature/#494
 jobs:
   Client:
     name: Client Auto Deploy

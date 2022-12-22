@@ -11,7 +11,7 @@ require (
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/rs/cors v1.7.0
 	github.com/sendgrid/rest v2.6.9+incompatible // indirect
-	github.com/sendgrid/sendgrid-go v3.12.0+incompatible // indirect
+	github.com/sendgrid/sendgrid-go v3.12.0+incompatible
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	gopkg.in/go-ini/ini.v1 v1.62.0
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect

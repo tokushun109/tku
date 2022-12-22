@@ -62,166 +62,169 @@ func createContactHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
-	wd, err := utils.GetWorkingDir()
-	if err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-		return
-	}
 
-	// メール通知
-	var message *mail.SGMailV3
+	if config.Config.Env != "local" {
+		// 通知処理
+		var message *mail.SGMailV3
 
-	message = mail.NewV3Mail()
-	from := mail.NewEmail("tocoriri", "no-reply@tocoriri.com")
-	message.SetFrom(from)
+		wd, err := utils.GetWorkingDir()
+		if err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+			return
+		}
 
-	type MailTemplate struct {
-		Title         string
-		TopMessage    string
-		Name          string
-		Company       string
-		PhoneNumber   string
-		Email         string
-		Content       string
-		BottomMessage string
-	}
+		message = mail.NewV3Mail()
+		from := mail.NewEmail("tocoriri", "no-reply@tocoriri.com")
+		message.SetFrom(from)
 
-	var buffer *bytes.Buffer
-	var text *text_tmpl.Template
-	var html *html_tmpl.Template
+		type MailTemplate struct {
+			Title         string
+			TopMessage    string
+			Name          string
+			Company       string
+			PhoneNumber   string
+			Email         string
+			Content       string
+			BottomMessage string
+		}
 
-	// お問い合わせ元への通知
-	p := mail.NewPersonalization()
-	to := mail.NewEmail(contact.Name, contact.Email)
-	p.AddTos(to)
-	message.AddPersonalizations(p)
+		var buffer *bytes.Buffer
+		var text *text_tmpl.Template
+		var html *html_tmpl.Template
 
-	replyMail := MailTemplate{
-		Title:       "【tocoriri】お問い合わせを受け付けました",
-		Name:        contact.Name,
-		Company:     *contact.Company,
-		PhoneNumber: *contact.PhoneNumber,
-		Email:       contact.Email,
-		Content:     contact.Content,
-	}
+		// お問い合わせ元への通知
+		p := mail.NewPersonalization()
+		to := mail.NewEmail(contact.Name, contact.Email)
+		p.AddTos(to)
+		message.AddPersonalizations(p)
 
-	message.Subject = replyMail.Title
+		replyMail := MailTemplate{
+			Title:       "【tocoriri】お問い合わせを受け付けました",
+			Name:        contact.Name,
+			Company:     *contact.Company,
+			PhoneNumber: *contact.PhoneNumber,
+			Email:       contact.Email,
+			Content:     contact.Content,
+		}
 
-	// テキストパートを設定
-	text = text_tmpl.Must(text_tmpl.ParseFiles(wd + "/app/controllers/mail/contact/auto_reply.txt"))
-	buffer = &bytes.Buffer{}
-	if err = text.Execute(buffer, replyMail); err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-	}
+		message.Subject = replyMail.Title
 
-	c := mail.NewContent("text/plain", buffer.String())
-	message.AddContent(c)
+		// テキストパートを設定
+		text = text_tmpl.Must(text_tmpl.ParseFiles(wd + "/app/controllers/mail/contact/auto_reply.txt"))
+		buffer = &bytes.Buffer{}
+		if err = text.Execute(buffer, replyMail); err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		}
 
-	// HTMLパートを設定
-	html = html_tmpl.Must(html_tmpl.ParseFiles(wd + "/app/controllers/mail/contact/auto_reply.html"))
-	buffer = &bytes.Buffer{}
-	if err = html.Execute(buffer, replyMail); err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-	}
+		c := mail.NewContent("text/plain", buffer.String())
+		message.AddContent(c)
 
-	c = mail.NewContent("text/html", buffer.String())
-	message.AddContent(c)
+		// HTMLパートを設定
+		html = html_tmpl.Must(html_tmpl.ParseFiles(wd + "/app/controllers/mail/contact/auto_reply.html"))
+		buffer = &bytes.Buffer{}
+		if err = html.Execute(buffer, replyMail); err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		}
 
-	client := sendgrid.NewSendClient(config.Config.SendGridApiKey)
-	response, err := client.Send(message)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-	} else {
-		fmt.Println(response.StatusCode)
-		fmt.Println(response.Body)
-		fmt.Println(response.Headers)
-	}
+		c = mail.NewContent("text/html", buffer.String())
+		message.AddContent(c)
 
-	// 管理者への通知
-	message = mail.NewV3Mail()
-	message.SetFrom(from)
+		client := sendgrid.NewSendClient(config.Config.SendGridApiKey)
+		response, err := client.Send(message)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		} else {
+			fmt.Println(response.StatusCode)
+			fmt.Println(response.Body)
+			fmt.Println(response.Headers)
+		}
 
-	adminUsers := models.GetAllUsers()
-	for _, u := range adminUsers {
-		ap := mail.NewPersonalization()
-		to := mail.NewEmail(u.Name, u.Email)
-		ap.AddTos(to)
-		message.AddPersonalizations(ap)
-	}
+		// 管理者への通知
+		message = mail.NewV3Mail()
+		message.SetFrom(from)
 
-	adminMail := MailTemplate{
-		Title:       "【tocoriri】お問い合わせが届きました",
-		Name:        contact.Name,
-		Company:     *contact.Company,
-		PhoneNumber: *contact.PhoneNumber,
-		Email:       contact.Email,
-		Content:     contact.Content,
-	}
+		adminUsers := models.GetAllUsers()
+		for _, u := range adminUsers {
+			ap := mail.NewPersonalization()
+			to := mail.NewEmail(u.Name, u.Email)
+			ap.AddTos(to)
+			message.AddPersonalizations(ap)
+		}
 
-	message.Subject = adminMail.Title
+		adminMail := MailTemplate{
+			Title:       "【tocoriri】お問い合わせが届きました",
+			Name:        contact.Name,
+			Company:     *contact.Company,
+			PhoneNumber: *contact.PhoneNumber,
+			Email:       contact.Email,
+			Content:     contact.Content,
+		}
 
-	// テキストパートを設定
-	text = text_tmpl.Must(text_tmpl.ParseFiles(wd + "/app/controllers/mail/contact/admin.txt"))
-	buffer = &bytes.Buffer{}
-	if err = text.Execute(buffer, replyMail); err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-	}
-	msg := buffer.String()
+		message.Subject = adminMail.Title
 
-	ac := mail.NewContent("text/plain", msg)
-	message.AddContent(ac)
+		// テキストパートを設定
+		text = text_tmpl.Must(text_tmpl.ParseFiles(wd + "/app/controllers/mail/contact/admin.txt"))
+		buffer = &bytes.Buffer{}
+		if err = text.Execute(buffer, replyMail); err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		}
+		msg := buffer.String()
 
-	// lineに通知する
-	u, err := url.ParseRequestURI("https://notify-api.line.me/api/notify")
-	if err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-	}
+		ac := mail.NewContent("text/plain", msg)
+		message.AddContent(ac)
 
-	form := url.Values{}
-	form.Add("message", msg)
+		// lineに通知する
+		u, err := url.ParseRequestURI("https://notify-api.line.me/api/notify")
+		if err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		}
 
-	body := strings.NewReader(form.Encode())
-	req, err := http.NewRequest("POST", u.String(), body)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-	}
+		form := url.Values{}
+		form.Add("message", msg)
 
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Set("Authorization", "Bearer "+config.Config.LineContactToken)
+		body := strings.NewReader(form.Encode())
+		req, err := http.NewRequest("POST", u.String(), body)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		}
 
-	lineClient := &http.Client{}
-	_, err = lineClient.Do(req)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-	}
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		req.Header.Set("Authorization", "Bearer "+config.Config.LineContactToken)
 
-	// HTMLパートを設定
-	html = html_tmpl.Must(html_tmpl.ParseFiles(wd + "/app/controllers/mail/contact/admin.html"))
-	buffer = &bytes.Buffer{}
-	if err = html.Execute(buffer, adminMail); err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-	}
+		lineClient := &http.Client{}
+		_, err = lineClient.Do(req)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		}
 
-	ac = mail.NewContent("text/html", buffer.String())
-	message.AddContent(ac)
+		// HTMLパートを設定
+		html = html_tmpl.Must(html_tmpl.ParseFiles(wd + "/app/controllers/mail/contact/admin.html"))
+		buffer = &bytes.Buffer{}
+		if err = html.Execute(buffer, adminMail); err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		}
 
-	response, err = client.Send(message)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-	} else {
-		fmt.Println(response.StatusCode)
-		fmt.Println(response.Body)
-		fmt.Println(response.Headers)
+		ac = mail.NewContent("text/html", buffer.String())
+		message.AddContent(ac)
+
+		response, err = client.Send(message)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		} else {
+			fmt.Println(response.StatusCode)
+			fmt.Println(response.Body)
+			fmt.Println(response.Headers)
+		}
 	}
 
 	// responseBodyで処理の成功を返す
