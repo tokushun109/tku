@@ -19,7 +19,7 @@ export default class CContactList extends Vue {
         { text: '電話番号', value: 'phoneNumber' },
         { text: 'メールアドレス', value: 'email' },
         { text: '内容', value: 'content' },
-        { text: 'お問合わせ日時', value: 'createdAt' },
+        { text: 'お問合わせ日時', value: 'formatCreatedAt' },
     ]
 
     // ダイアログの表示

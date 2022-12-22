@@ -5,5 +5,6 @@ export interface IContact {
     phoneNumber: string
     email: string
     content: string
-    createdAt?: Date
+    createdAt?: string
+    formatCreatedAt?: string
 }

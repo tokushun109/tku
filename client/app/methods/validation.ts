@@ -10,7 +10,7 @@ export function min20(value: string) {
 
 // 50文字以内
 export function min50(value: string) {
-    return value.length <= 50 || `0文字以内で入力してください`
+    return value.length <= 50 || `50文字以内で入力してください`
 }
 
 // 全角文字を含まない
