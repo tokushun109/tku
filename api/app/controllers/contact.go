@@ -20,6 +20,17 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
+// お問い合わせ一覧を取得
+func getAllContactListHandler(w http.ResponseWriter, r *http.Request) {
+	contactList := models.GetAllContactList()
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(contactList); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+}
+
 // お問い合わせの新規作成
 func createContactHandler(w http.ResponseWriter, r *http.Request) {
 	reqBody, err := ioutil.ReadAll(r.Body)

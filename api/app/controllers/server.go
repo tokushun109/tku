@@ -85,6 +85,7 @@ func StartMainServer() error {
 	r.HandleFunc("/api/creator/logo", updateCreatorLogoHandler).Methods("PUT")
 	r.HandleFunc("/api/creator/logo/{logo_file}/blob", getCreatorLogoBlobHandler).Methods("GET")
 	// お問い合わせ
+	r.HandleFunc("/api/contact", getAllContactListHandler).Methods("GET")
 	r.HandleFunc("/api/contact", createContactHandler).Methods("POST")
 	// // ユーザー
 	// r.HandleFunc("/api/user", getAllUsersHandler).Methods("GET")
