@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta name="format-detection" content="telephone=no,address=no,email=no,date=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}}</title>
+</head>
+
+<body>
+    <div class="mail-wrapper" style="margin: 20px">
+        <div class="mail-top">
+            ハンドメイド販売サイトtocoririです。<br />
+            この度はお問い合わせいただき、ありがとうございます。<br /><br />
+            下記の内容でお問い合せを受け付けました。
+        </div>
+        <div class="mail-detail" style="margin: 20px 0; padding: 20px; background-color:aliceblue; font-size: 16px;">
+            <p><strong>お名前: </strong>{{.Name}}</p>
+            <p><strong>会社名: </strong>{{.Company}}</p>
+            <p><strong>電話番号: </strong>{{.PhoneNumber}}</p>
+            <p><strong>メールアドレス: </strong>{{.Email}}</p>
+            <p><strong>お問い合せ内容: </strong></p>
+            <pre>{{.Content}}</pre>
+        </div>
+        <p class="mail-bottom">後ほど、tocoriri管理者からご連絡させていただきます。</p>
+        <div class="mail-signature" style="font-size: 12px">
+            <p>======================================</p>
+            このメールアドレスには返信できません。<br />
+            ご不明な点等がございましたら、下記までお問い合わせください。<br /><br />
+            tocoriri管理者<br />
+            t.akane614@gmail.com
+            <p>======================================</p>
+        </div>
+    </div>
+</body>
+
+</html>

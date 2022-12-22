@@ -1,5 +1,5 @@
 import { ISiteDetail } from '../types/site'
-import { IProduct, IClassification, ISite, ICreator } from '~/types'
+import { IProduct, IClassification, ISite, ICreator, IContact } from '~/types'
 export function newCreator(): ICreator {
     return {
         name: '',
@@ -43,5 +43,15 @@ export function newSiteDetail(): ISiteDetail {
         uuid: '',
         detailUrl: '',
         salesSite: newSite(),
+    }
+}
+
+export function newContact(): IContact {
+    return {
+        name: '',
+        company: '',
+        phoneNumber: '',
+        email: '',
+        content: '',
     }
 }

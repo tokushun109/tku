@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"api/app/controllers/utils"
 	"api/app/models"
 	"api/config"
 	"encoding/json"
@@ -30,7 +31,7 @@ func setCreatorLogoApiPath(creator *models.Creator) error {
 	} else {
 		// 本番の場合はS3から取得
 		var err error
-		creator.ApiPath, err = GetS3Content(&creator.Logo)
+		creator.ApiPath, err = utils.GetS3Content(&creator.Logo)
 		if err != nil {
 			return err
 		}
@@ -160,7 +161,7 @@ func updateCreatorLogoHandler(w http.ResponseWriter, r *http.Request) {
 		io.Copy(f, file)
 	} else {
 		// 本番の場合はS3にアップロード
-		if err := UploadS3(&savePath, file); err != nil {
+		if err := utils.UploadS3(&savePath, file); err != nil {
 			log.Println(err)
 			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 			return

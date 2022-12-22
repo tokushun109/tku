@@ -1,7 +1,8 @@
 export interface IError {
     name: string
     status: number
-    data: string
+    data?: string
+    message?: string
 }
 class Error {
     public name: string = 'Error'

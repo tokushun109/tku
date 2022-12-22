@@ -74,6 +74,14 @@
                 {
                     "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:API_BUCKET_NAME::",
                     "name": "API_BUCKET_NAME"
+                },
+                {
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:SEND_GRID_API_KEY::",
+                    "name": "SEND_GRID_API_KEY"
+                },
+                {
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:LINE_CONTACT_TOKEN::",
+                    "name": "LINE_CONTACT_TOKEN"
                 }
             ],
             "dockerSecurityOptions": null,

@@ -18,7 +18,7 @@
 </template>
 
 <script lang="ts">
-import { mdiDiamond, mdiHumanGreetingVariant } from '@mdi/js'
+import { mdiDiamond, mdiEmail, mdiHumanGreetingVariant } from '@mdi/js'
 import { Component, Vue } from 'nuxt-property-decorator'
 import { ITable, ColorType } from '~/types'
 
@@ -29,6 +29,7 @@ export default class SiteFooter extends Vue {
     menuItems: Array<ITable> = [
         { name: 'CREATOR', link: 'creator', icon: mdiHumanGreetingVariant },
         { name: 'PRODUCTS', link: 'product', icon: mdiDiamond },
+        { name: 'CONTACT', link: 'contact', icon: mdiEmail },
     ]
 
     menuVisible: boolean = false

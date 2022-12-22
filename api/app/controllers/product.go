@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"api/app/controllers/utils"
 	"api/app/models"
 	"api/config"
 	"encoding/json"
@@ -40,7 +41,7 @@ func setProductImageApiPath(product *models.Product) error {
 		// 本番の場合はS3から取得
 		var err error
 		for _, productImage := range product.ProductImages {
-			productImage.ApiPath, err = GetS3Content(&productImage.Path)
+			productImage.ApiPath, err = utils.GetS3Content(&productImage.Path)
 			if err != nil {
 				return err
 			}
@@ -322,7 +323,7 @@ func createProductImageHandler(w http.ResponseWriter, r *http.Request) {
 			io.Copy(f, file)
 		} else {
 			// 本番の場合はS3にアップロード
-			if err := UploadS3(&savePath, file); err != nil {
+			if err := utils.UploadS3(&savePath, file); err != nil {
 				log.Println(err)
 				http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 				return

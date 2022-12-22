@@ -17,16 +17,16 @@ type loginForm struct {
 	Password string
 }
 
-// 商品一覧を取得
-func getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
-	users := models.GetAllUsers()
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(users); err != nil {
-		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-		return
-	}
-}
+// // ユーザー一覧を取得
+// func getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
+// 	users := models.GetAllUsers()
+// 	w.Header().Set("Content-Type", "application/json")
+// 	if err := json.NewEncoder(w).Encode(users); err != nil {
+// 		log.Println(err)
+// 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+// 		return
+// 	}
+// }
 
 // ログインしているユーザーを取得
 func getLoginUserHandler(w http.ResponseWriter, r *http.Request) {

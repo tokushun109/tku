@@ -20,7 +20,7 @@ type DefaultModel struct {
 	ID        *uint          `gorm:"primary_key" json:"-"`
 	CreatedAt time.Time      `json:"-"`
 	UpdatedAt time.Time      `json:"-"`
-	DeletedAt gorm.DeletedAt `gorm:"index"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
 func GenerateUuid() (uuidString string, err error) {
