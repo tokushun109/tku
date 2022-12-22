@@ -40,7 +40,7 @@
                         </v-container>
                     </template>
                     <v-container v-else class="content-message-wrapper">
-                        <strong>お問い合せを送信しました</strong>
+                        <strong>お問い合わせを送信しました</strong>
                     </v-container>
                 </v-sheet>
             </v-container>
