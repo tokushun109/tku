@@ -212,7 +212,7 @@ export default class CCreatorEdit extends Vue {
                 margin-top 10px
                 color $white-color
                 font-weight $title-font-weight
-                font-size 8px
+                font-size 12px
                 transform translateX(-50%)
         .sales-site-content
             text-align center

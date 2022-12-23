@@ -4,7 +4,7 @@ on:
   push:
     branches: 
       - main
-      - feature/#498
+      # - feature/#
 
 jobs:
   Client:
