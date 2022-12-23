@@ -21,7 +21,7 @@
                 <v-container class="menu-item">
                     <v-row>
                         <v-col v-for="(item, index) in menuItems" :key="index" cols="4">
-                            <v-card height="100%" elevation="20" :to="`${item.link}`" nuxt class="menu-card" @click="toggleMenu">
+                            <v-card height="100%" elevation="20" :to="`/${item.link}`" nuxt class="menu-card" @click="toggleMenu">
                                 <v-card-title class="menu-card-icon">
                                     <v-avatar size="90%">
                                         <v-icon size="90%">{{ item.icon }}</v-icon>
