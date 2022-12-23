@@ -5,7 +5,7 @@
         </v-container>
         <v-sheet>
             <v-container>
-                <c-creator-edit :item.sync="creator" />
+                <c-creator-edit :item.sync="creator" :sales-site-list="salesSiteList" />
             </v-container>
         </v-sheet>
     </v-container>
@@ -19,13 +19,15 @@ import { ICreator, ISite } from '~/types'
 export default class PageCreatorIndex extends Vue {
     creator: ICreator | null = null
     snsList: Array<ISite> | null = []
+    salesSiteList: Array<ISite> | null = []
     async asyncData({ app }: Context) {
         try {
             const creator: ICreator = await app.$axios.$get(`/creator`)
             const snsList: Array<ISite> = await app.$axios.$get(`/sns`)
-            return { creator, snsList }
+            const salesSiteList: Array<ISite> = await app.$axios.$get(`/sales_site`)
+            return { creator, snsList, salesSiteList }
         } catch (e) {
-            return { creator: null, snsList: [] }
+            return { creator: null, snsList: [], salesSiteList: [] }
         }
     }
 

@@ -8,18 +8,42 @@
                 <v-container class="description-content">
                     <pre class="description-text">{{ creator.introduction }}</pre>
                 </v-container>
-                <v-container v-if="!admin" class="sns-content">
-                    <div v-for="sns in snsList" :key="sns.name" class="sns-item">
-                        <v-btn fab :color="ColorType.Orange" :href="sns.url" x-large>
-                            <v-icon large :color="ColorType.White">{{ sns.icon }}</v-icon>
-                        </v-btn>
-                        <div class="sns-name">
-                            <strong>{{ sns.name }}</strong>
-                        </div>
+                <div>
+                    <div class="sns-head-title head-title">
+                        <div class="head-title-content">SNS</div>
                     </div>
-                </v-container>
-                <div v-if="admin" class="edit-button">
-                    <v-btn color="primary" @click="openHandler"><c-icon :type="IconType.Edit.name" @c-click="openHandler" />編集</v-btn>
+                    <v-container v-if="!admin" class="sns-content">
+                        <div v-for="sns in snsList" :key="sns.name" class="sns-item">
+                            <v-btn fab :color="ColorType.Orange" :href="sns.url" target="_blank" rel="noopener noreferrer" x-large>
+                                <v-icon :color="ColorType.White" class="sns-icon">{{ sns.icon }}</v-icon>
+                            </v-btn>
+                            <a class="sns-name" :href="sns.url" target="_blank" rel="noopener noreferrer">
+                                <small>{{ sns.name }}</small>
+                            </a>
+                        </div>
+                    </v-container>
+                </div>
+                <div>
+                    <div class="sales-site-head-title head-title">
+                        <div class="head-title-content">販売サイト</div>
+                    </div>
+                    <v-container v-if="!admin" class="sales-site-content">
+                        <div v-for="site in salesSiteList" :key="site.name" class="sales-site-item">
+                            <v-btn
+                                :color="ColorType.Orange"
+                                :href="site.url"
+                                class="sales-site-buttons"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                x-large
+                            >
+                                {{ site.name }}
+                            </v-btn>
+                        </div>
+                    </v-container>
+                    <div v-if="admin" class="edit-button">
+                        <v-btn color="primary" @click="openHandler"><c-icon :type="IconType.Edit.name" @c-click="openHandler" />編集</v-btn>
+                    </div>
                 </div>
             </v-sheet>
         </v-container>
@@ -68,6 +92,8 @@ export default class CCreatorEdit extends Vue {
 
     // 製作者
     @PropSync('item') creator!: ICreator
+    // 販売サイト一覧
+    @Prop({ type: Array, default: () => {} }) salesSiteList!: Array<ISite>
     // 管理画面での使用
     @Prop({ type: Boolean, default: false }) admin!: boolean
 
@@ -162,14 +188,43 @@ export default class CCreatorEdit extends Vue {
                 word-break break-all
                 +sm()
                     font-size 3vw
+        .head-title
+            color $title-text-color
+            text-align center
+            font-weight $title-font-weight
+            font-size $font-xxlarge
+            .head-title-content
+                margin-top 20px
         .sns-content
+            position relative
             display flex
             justify-content center
             .sns-item
                 margin 0 10px
                 text-align center
+                .sns-icon
+                    position absolute
+                    top -23px
             .sns-name
+                position absolute
+                bottom 27px
+                left 50%
                 margin-top 10px
+                color $white-color
+                font-weight $title-font-weight
+                font-size 8px
+                transform translateX(-50%)
+        .sales-site-content
+            text-align center
+            .sales-site-buttons
+                margin 10px 0
+                width 450px
+                color $white-color
+                font-size $font-large
+                +md()
+                    width 45vw
+                +sm()
+                    width 80%
         .edit-button
             text-align center
 </style>
