@@ -46,7 +46,7 @@
                                 </p>
                             </div>
                             <v-row>
-                                <v-col v-for="siteDetail in product.siteDetails" :key="siteDetail.uuid" md="6" sm="12">
+                                <v-col v-for="siteDetail in product.siteDetails" :key="siteDetail.uuid" md="6" sm="12" cols="12">
                                     <v-btn
                                         :color="ColorType.Orange"
                                         :href="siteDetail.detailUrl"
@@ -64,36 +64,6 @@
                 </v-row>
             </v-sheet>
         </v-container>
-        <client-only>
-            <div class="purchase-button">
-                <v-btn :color="ColorType.Orange" :disabled="product.siteDetails.length === 0" small fab :elevation="3" @click="dialogVisible = true">
-                    <c-icon :type="IconType.Cart.name" :color="ColorType.White" @c-click="dialogVisible = true" />
-                </v-btn>
-            </div>
-        </client-only>
-        <c-dialog class="sales-site-dialog" :visible.sync="dialogVisible" :is-button="false">
-            <template #content>
-                <div class="message-area">
-                    <p class="message">以下のサイトで販売中です！<v-divider /></p>
-                </div>
-                <v-container>
-                    <v-row>
-                        <v-col v-for="siteDetail in product.siteDetails" :key="siteDetail.uuid" cols="12" md="6">
-                            <v-btn
-                                :color="ColorType.Orange"
-                                :href="siteDetail.detailUrl"
-                                class="white--text text-h6 site-modal"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                block
-                            >
-                                {{ siteDetail.salesSite.name }}
-                            </v-btn>
-                        </v-col>
-                    </v-row>
-                </v-container>
-            </template>
-        </c-dialog>
     </v-sheet>
 </template>
 
@@ -105,9 +75,6 @@ export default class CProductDetail extends Vue {
     @Prop({ type: Object }) product!: IProduct
     ColorType: typeof ColorType = ColorType
     IconType: typeof IconType = IconType
-
-    // ダイアログの表示
-    dialogVisible: boolean = false
 }
 </script>
 
@@ -142,25 +109,10 @@ export default class CProductDetail extends Vue {
                     .tag-content
                         display flex
                 .sales-site-area
-                    +sm()
-                        display none
                     .sales-site
                         margin-top 16px
                         font-weight $title-font-weight
                     .site-buttons
                         color $white-color
                         font-size $font-large
-    .purchase-button
-        position fixed
-        top 9px
-        right 25px
-        z-index 20
-        display none
-        +sm()
-            display block
-
-.v-dialog
-    .message-area
-        .message
-            font-weight $title-font-weight
 </style>
