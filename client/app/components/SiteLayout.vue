@@ -40,7 +40,7 @@
 
         <!-- sm幅以下 -->
         <div class="sm">
-            <v-app-bar app class="site-header">
+            <v-app-bar app dense class="site-header">
                 <v-card color="transparent" class="site-title text-h4" to="/" flat nuxt>tocoriri</v-card>
             </v-app-bar>
         </div>
