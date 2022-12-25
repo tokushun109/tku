@@ -51,4 +51,7 @@ export default class SiteFooter extends Vue {
         display none
         +sm()
             display block
+            .v-item-group.v-bottom-navigation .v-btn
+                width 50% !important
+                height 100% !important
 </style>

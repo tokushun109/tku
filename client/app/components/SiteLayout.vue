@@ -40,7 +40,7 @@
 
         <!-- sm幅以下 -->
         <div class="sm">
-            <v-app-bar app dense class="site-header">
+            <v-app-bar dense class="site-header">
                 <v-card color="transparent" class="site-title text-h4" to="/" flat nuxt>tocoriri</v-card>
             </v-app-bar>
         </div>
@@ -102,9 +102,6 @@ export default class SiteLayout extends Vue {
         text-align center
         +sm()
             display block
-            .v-item-group.v-bottom-navigation .v-btn
-                width 50% !important
-                height 100% !important
             .site-header
                 z-index 10 !important
                 .site-title
