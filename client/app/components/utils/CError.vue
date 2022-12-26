@@ -13,11 +13,15 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'nuxt-property-decorator'
-import { IError } from '~/types'
+
+interface ICError {
+    data?: string
+    message?: string
+}
 
 @Component
 export default class CError extends Vue {
-    @Prop({ type: Array, default: [] }) errors?: Array<IError>
+    @Prop({ type: Array, default: [] }) errors?: Array<ICError>
 }
 </script>
 
