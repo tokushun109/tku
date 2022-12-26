@@ -1,4 +1,4 @@
-import { GetterTree, ActionTree, MutationTree } from 'vuex'
+import { GetterTree, ActionTree, MutationTree } from 'vuex/types'
 import { IUser, ILoginForm, ISession, errorCustomize } from '~/types'
 
 interface RootState {}
@@ -41,7 +41,7 @@ export const actions: ActionTree<State, RootState> = {
             // store保存
             context.commit('setUser', user)
             return Promise.resolve(user)
-        } catch (e) {
+        } catch (e: any) {
             return Promise.reject(errorCustomize(e.response, 'メールアドレスかパスワードが間違っています'))
         }
     },
