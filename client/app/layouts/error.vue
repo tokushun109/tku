@@ -17,11 +17,11 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'nuxt-property-decorator'
-import { IResponseError } from '~/types'
+import { IDefaultError } from '~/types'
 
 @Component({})
 export default class Error extends Vue {
-    @Prop({ type: Object, default: () => {} }) error!: IResponseError
+    @Prop({ type: Object, default: () => {} }) error!: IDefaultError
 }
 </script>
 
@@ -41,6 +41,7 @@ export default class Error extends Vue {
         height 75vh
         .error-message
             padding 20vh 0
+            color $site-title-text-color
             font-size $font-xxlarge
             +sm()
                 font-size $font-xlarge

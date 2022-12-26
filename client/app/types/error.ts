@@ -4,11 +4,13 @@ export interface IAxiosError {
     data: string
 }
 
-export interface IResponseError {
+export interface IDefaultError {
     statusCode: number
     path: string
     message: string
 }
+
+export type IError = IAxiosError | IDefaultError
 
 class Error {
     public name: string = 'Error'
