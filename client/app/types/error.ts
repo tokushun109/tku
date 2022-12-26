@@ -1,9 +1,17 @@
-export interface IError {
+export interface IAxiosError {
     name: string
     status: number
-    data?: string
-    message?: string
+    data: string
 }
+
+export interface IDefaultError {
+    statusCode: number
+    path: string
+    message: string
+}
+
+export type IError = IAxiosError | IDefaultError
+
 class Error {
     public name: string = 'Error'
     public status: number = 0
@@ -45,7 +53,7 @@ interface IErrorResponse {
 
 // バックエンドから返ってきたエラーをカスタマイズする
 export function errorCustomize(errorResponse: IErrorResponse, data: string = errorResponse.data) {
-    let error: IError = new Error('')
+    let error: IAxiosError = new Error('')
     error = {
         name: errorResponse.statusText,
         status: errorResponse.status,
