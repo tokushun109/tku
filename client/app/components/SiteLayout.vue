@@ -77,6 +77,9 @@ export default class SiteLayout extends Vue {
 <style lang="stylus" scoped>
 .site-layout
     position relative
+    padding 48px 0 0
+    +sm()
+        padding 0
     .toggle-button
         position fixed
         top 40px
