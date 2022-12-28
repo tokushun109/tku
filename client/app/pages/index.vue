@@ -14,20 +14,22 @@
 import { mdiArrowRightThick } from '@mdi/js'
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
-import { ColorType, ICarouselItem } from '~/types'
+import { ColorType, ICarouselItem, ICreator } from '~/types'
 @Component({})
 export default class PageTop extends Vue {
     mdiArrowRightThick = mdiArrowRightThick
     ColorType: typeof ColorType = ColorType
 
     carouselItems: Array<ICarouselItem> = []
+    creator: ICreator | null = null
     async asyncData({ app }: Context) {
         try {
+            const creator: ICreator = await app.$axios.$get(`/creator`)
             const carouselItems: Array<ICarouselItem> = await app.$axios.$get(`/carousel_image`)
 
-            return { carouselItems }
+            return { creator, carouselItems }
         } catch (e) {
-            return { carouselItems: [] }
+            return { creator: null, carouselItems: [] }
         }
     }
 
@@ -37,7 +39,7 @@ export default class PageTop extends Vue {
         }
         const title = 'tocoriri'
         const description = 'マクラメ編みのアクセサリーショップtocoriri(とこりり)の紹介サイトです。'
-        const image = this.carouselItems[0].apiPath
+        const image = this.creator && this.creator.apiPath ? this.creator.apiPath : ''
         return {
             title,
             meta: [
