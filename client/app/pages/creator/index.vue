@@ -5,7 +5,7 @@
         </v-container>
         <v-sheet>
             <v-container>
-                <c-creator-edit :item.sync="creator" :sales-site-list="salesSiteList" />
+                <c-creator-edit v-if="creator" :item.sync="creator" :sales-site-list="salesSiteList" />
             </v-container>
         </v-sheet>
     </v-container>

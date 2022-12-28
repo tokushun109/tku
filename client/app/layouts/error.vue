@@ -17,11 +17,11 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'nuxt-property-decorator'
-import { IDefaultError } from '~/types'
+import { IClientError } from '~/types'
 
 @Component({})
 export default class Error extends Vue {
-    @Prop({ type: Object, default: () => {} }) error!: IDefaultError
+    @Prop({ type: Object, default: () => {} }) error!: IClientError
 }
 </script>
 

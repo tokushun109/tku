@@ -1,21 +1,29 @@
 <template>
-    <c-product-detail :product="product" />
+    <c-product-detail v-if="product" :product="product" />
 </template>
 
 <script lang="ts">
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
-import { IProduct } from '~/types'
+import { IClientError, IProduct, serverToClientError } from '~/types'
 
 @Component({})
 export default class PageProductDetail extends Vue {
     product: IProduct | null = null
+    error: IClientError | null = null
     async asyncData({ app, params }: Context) {
         try {
             const product = await app.$axios.$get(`/product/${params.uuid}`)
             return { product }
         } catch (e) {
-            return { product: null }
+            const error = serverToClientError(e.response)
+            return { product: null, error }
+        }
+    }
+
+    mounted() {
+        if (this.error) {
+            this.$nuxt.error(this.error)
         }
     }
 
