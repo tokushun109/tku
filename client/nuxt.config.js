@@ -103,7 +103,7 @@ module.exports = {
 
     robots: {
         UserAgent: '*',
-        Disallow: ['/admin', '/contact'],
+        Disallow: ['/admin'],
         Sitemap: 'https://tocoriri.com/sitemap.xml',
     },
 
@@ -115,7 +115,7 @@ module.exports = {
 
     sitemap: {
         hostname: 'https://tocoriri.com',
-        exclude: ['/admin', '/admin/**', '/order', '/contact'],
+        exclude: ['/admin', '/admin/**', '/order'],
         routes: async () => {
             // 商品詳細ページ
             const baseURL = process.env.API_BASE_URL || 'http://localhost:8080/api'
