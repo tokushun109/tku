@@ -1,16 +1,16 @@
-export interface IAxiosError {
+export interface IServerError {
     name: string
     status: number
     data: string
 }
 
-export interface IDefaultError {
+export interface IClientError {
     statusCode: number
-    path: string
+    path?: string
     message: string
 }
 
-export type IError = IAxiosError | IDefaultError
+export type IError = IServerError | IClientError
 
 class Error {
     public name: string = 'Error'
@@ -51,9 +51,18 @@ interface IErrorResponse {
     data: string
 }
 
+// サーバーからのエラーをクライアントエラーに変換する
+export function serverToClientError(errorResponse: IServerError): IClientError {
+    const error: IClientError = {
+        statusCode: errorResponse.status,
+        message: errorResponse.data,
+    }
+    return error
+}
+
 // バックエンドから返ってきたエラーをカスタマイズする
 export function errorCustomize(errorResponse: IErrorResponse, data: string = errorResponse.data) {
-    let error: IAxiosError = new Error('')
+    let error: IServerError = new Error('')
     error = {
         name: errorResponse.statusText,
         status: errorResponse.status,
