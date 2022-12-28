@@ -49,21 +49,14 @@
 </template>
 
 <script lang="ts">
+import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
 import { min20, min50, newContact, required, validEmail, validPhoneNumber } from '~/methods'
-import { IContact, IError } from '~/types'
-@Component({
-    head: {
-        meta: [
-            {
-                hid: 'robots',
-                name: 'robots',
-                content: 'noindex',
-            },
-        ],
-    },
-})
+import { IContact, ICreator, IError } from '~/types'
+@Component({})
 export default class PageContactIndex extends Vue {
+    creator: ICreator | null = null
+
     contact: IContact = newContact()
 
     isSent: boolean = false
@@ -81,6 +74,52 @@ export default class PageContactIndex extends Vue {
     emailRules = [required, min50, validEmail]
 
     contentRules = [required]
+
+    async asyncData({ app }: Context) {
+        try {
+            const creator: ICreator = await app.$axios.$get(`/creator`)
+
+            return { creator }
+        } catch (e) {
+            return { creator: null }
+        }
+    }
+
+    head() {
+        const title = 'お問い合わせ | tocoriri'
+        const description = 'マクラメ編みのアクセサリーショップtocoriri(とこりり)へのお問い合わせ・ご意見・ご相談はこちらから'
+        const image = this.creator && this.creator.apiPath ? this.creator.apiPath : ''
+        return {
+            title,
+            meta: [
+                {
+                    hid: 'description',
+                    name: 'description',
+                    content: description,
+                },
+                {
+                    hid: 'og:title',
+                    property: 'og:title',
+                    content: title,
+                },
+                {
+                    hid: 'og:description',
+                    property: 'og:description',
+                    content: description,
+                },
+                {
+                    hid: 'og:type',
+                    property: 'og:type',
+                    content: 'article',
+                },
+                {
+                    hid: 'og:image',
+                    property: 'og:image',
+                    content: image,
+                },
+            ],
+        }
+    }
 
     async confirmHandler() {
         this.errors = []
