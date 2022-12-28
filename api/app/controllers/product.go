@@ -79,12 +79,12 @@ func getProductHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	uuid := vars["product_uuid"]
 	product, err := models.GetProduct(uuid)
-	if err := setProductImageApiPath(&product); err != nil {
+	if err != nil {
 		log.Println(err)
-		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusNotFound)
 		return
 	}
-	if err != nil {
+	if err := setProductImageApiPath(&product); err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return

@@ -117,7 +117,13 @@
                         </v-chip>
                     </div>
                     <div class="active-check-box">
-                        <v-checkbox v-model="modalItem.isActive" label="販売中" dense />
+                        <v-checkbox
+                            v-model="modalItem.isActive"
+                            :off-icon="mdiCheckboxBlankOutline"
+                            :on-icon="mdiCheckboxMarked"
+                            label="販売中"
+                            dense
+                        />
                     </div>
                 </v-form>
                 <p v-else-if="executionType === ExecutionType.Delete">削除してもよろしいですか？</p>
@@ -130,7 +136,7 @@
 <script lang="ts">
 import { Component, Prop, PropSync, Vue, Watch } from 'nuxt-property-decorator'
 import _ from 'lodash'
-import { mdiCamera } from '@mdi/js'
+import { mdiCamera, mdiCheckboxMarked, mdiCheckboxBlankOutline } from '@mdi/js'
 import {
     IClassification,
     IError,
@@ -166,6 +172,8 @@ export default class CProductList extends Vue {
     @Prop({ type: String, default: '' }) type!: string
 
     mdiCamera = mdiCamera
+    mdiCheckboxMarked = mdiCheckboxMarked
+    mdiCheckboxBlankOutline = mdiCheckboxBlankOutline
     ColorType: typeof ColorType = ColorType
     IconType: typeof IconType = IconType
     ExecutionType: typeof ExecutionType = ExecutionType
