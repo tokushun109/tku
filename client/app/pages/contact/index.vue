@@ -45,6 +45,7 @@
                 </v-sheet>
             </v-container>
         </v-sheet>
+        <c-breadcrumbs :items="breadCrumbs" />
     </v-container>
 </template>
 
@@ -52,7 +53,7 @@
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
 import { min20, min50, newContact, required, validEmail, validPhoneNumber } from '~/methods'
-import { IContact, ICreator, IError } from '~/types'
+import { IBreadCrumb, IContact, ICreator, IError } from '~/types'
 @Component({})
 export default class PageContactIndex extends Vue {
     creator: ICreator | null = null
@@ -74,6 +75,11 @@ export default class PageContactIndex extends Vue {
     emailRules = [required, min50, validEmail]
 
     contentRules = [required]
+
+    breadCrumbs: Array<IBreadCrumb> = [
+        { text: 'トップページ', href: '/' },
+        { text: 'お問い合わせ', disabled: true },
+    ]
 
     async asyncData({ app }: Context) {
         try {

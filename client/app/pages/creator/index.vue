@@ -8,18 +8,25 @@
                 <c-creator-edit v-if="creator" :item.sync="creator" :sales-site-list="salesSiteList" />
             </v-container>
         </v-sheet>
+        <c-breadcrumbs :items="breadCrumbs" />
     </v-container>
 </template>
 
 <script lang="ts">
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
-import { ICreator, ISite } from '~/types'
+import { IBreadCrumb, ICreator, ISite } from '~/types'
 @Component({})
 export default class PageCreatorIndex extends Vue {
     creator: ICreator | null = null
     snsList: Array<ISite> | null = []
     salesSiteList: Array<ISite> | null = []
+
+    breadCrumbs: Array<IBreadCrumb> = [
+        { text: 'トップページ', href: '/' },
+        { text: '製作者紹介', disabled: true },
+    ]
+
     async asyncData({ app }: Context) {
         try {
             const creator: ICreator = await app.$axios.$get(`/creator`)
