@@ -13,6 +13,7 @@
                 </v-row>
             </v-container>
         </v-sheet>
+        <c-breadcrumbs :items="breadCrumbs" />
     </v-container>
 </template>
 
@@ -20,12 +21,17 @@
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
 import { newProduct } from '~/methods'
-import { IGetProductsParams, IProduct } from '~/types'
+import { IBreadCrumb, IGetProductsParams, IProduct } from '~/types'
 @Component({})
 export default class PageProductIndex extends Vue {
     products: Array<IProduct> = []
     // form用のproductModel
     productModel: IProduct = newProduct()
+
+    breadCrumbs: Array<IBreadCrumb> = [
+        { text: 'トップページ', href: '/' },
+        { text: '商品一覧', disabled: true },
+    ]
 
     async asyncData({ app }: Context) {
         try {

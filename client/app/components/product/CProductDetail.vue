@@ -64,17 +64,24 @@
                 </v-row>
             </v-sheet>
         </v-container>
+        <c-breadcrumbs :items="breadCrumbs" />
     </v-sheet>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'nuxt-property-decorator'
-import { ColorType, IconType, IProduct } from '~/types'
+import { ColorType, IBreadCrumb, IconType, IProduct } from '~/types'
 @Component({})
 export default class CProductDetail extends Vue {
     @Prop({ type: Object }) product!: IProduct
     ColorType: typeof ColorType = ColorType
     IconType: typeof IconType = IconType
+
+    breadCrumbs: Array<IBreadCrumb> = [
+        { text: 'トップページ', href: '/' },
+        { text: '商品一覧', href: '/product' },
+        { text: this.product.name, disabled: true },
+    ]
 }
 </script>
 
