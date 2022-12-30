@@ -48,7 +48,7 @@
 </template>
 
 <script lang="ts">
-import { mdiDiamond, mdiEmail, mdiHumanGreetingVariant } from '@mdi/js'
+import { mdiDiamond, mdiEmail, mdiFaceWoman } from '@mdi/js'
 import { Component, Vue } from 'nuxt-property-decorator'
 import { IconType, ITable, ColorType } from '~/types'
 @Component({})
@@ -57,7 +57,7 @@ export default class SiteLayout extends Vue {
     IconType: typeof IconType = IconType
 
     menuItems: Array<ITable> = [
-        { name: 'CREATOR', link: 'creator', icon: mdiHumanGreetingVariant },
+        { name: 'CREATOR', link: 'creator', icon: mdiFaceWoman },
         { name: 'PRODUCTS', link: 'product', icon: mdiDiamond },
         { name: 'CONTACT', link: 'contact', icon: mdiEmail },
     ]
