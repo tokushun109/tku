@@ -63,8 +63,8 @@
                     </v-col>
                 </v-row>
             </v-sheet>
+            <c-breadcrumbs :items="breadCrumbs" />
         </v-container>
-        <c-breadcrumbs :items="breadCrumbs" />
     </v-sheet>
 </template>
 
