@@ -97,7 +97,8 @@ func StartMainServer() error {
 
 	// corsの設定
 	customizeCors := cors.New(cors.Options{
-		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
+		AllowedMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
+		AllowedOrigins: []string{config.Config.ClientUrl},
 	})
 	c := customizeCors.Handler(r)
 	return http.ListenAndServe(port, c)
