@@ -105,7 +105,9 @@
                         <v-chip
                             v-for="(siteDetail, index) in modalItem.siteDetails"
                             :key="index"
+                            class="site-detail-chip"
                             close
+                            :close-icon="mdiCloseCircle"
                             :color="ColorType.Grey"
                             :text-color="ColorType.White"
                             :href="siteDetail.detailUrl"
@@ -136,7 +138,7 @@
 <script lang="ts">
 import { Component, Prop, PropSync, Vue, Watch } from 'nuxt-property-decorator'
 import _ from 'lodash'
-import { mdiCamera, mdiCheckboxMarked, mdiCheckboxBlankOutline } from '@mdi/js'
+import { mdiCamera, mdiCheckboxMarked, mdiCheckboxBlankOutline, mdiCloseCircle } from '@mdi/js'
 import {
     IClassification,
     IError,
@@ -174,6 +176,7 @@ export default class CProductList extends Vue {
     mdiCamera = mdiCamera
     mdiCheckboxMarked = mdiCheckboxMarked
     mdiCheckboxBlankOutline = mdiCheckboxBlankOutline
+    mdiCloseCircle = mdiCloseCircle
     ColorType: typeof ColorType = ColorType
     IconType: typeof IconType = IconType
     ExecutionType: typeof ExecutionType = ExecutionType
@@ -456,7 +459,7 @@ export default class CProductList extends Vue {
     border-radius 3px
     text-align left
     .site-detail-chip
-        margin 4px
+        margin 8px 0 8px 8px
 
 .active-check-box
     display flex
