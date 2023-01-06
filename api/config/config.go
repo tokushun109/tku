@@ -19,6 +19,7 @@ type ConfigList struct {
 	DBName           string
 	DBPass           string
 	Protocol         string
+	ClientUrl        string
 	ApiBaseUrl       string
 	CreatorName      string
 	ApiBucketName    string
@@ -62,6 +63,7 @@ func LoadConfig() {
 		DBName:           os.Getenv("DB_NAME"),
 		DBPass:           os.Getenv("DB_PASS"),
 		Protocol:         protocol,
+		ClientUrl:        os.Getenv("CLIENT_URL"),
 		ApiBaseUrl:       os.Getenv("API_BASE_URL"),
 		CreatorName:      os.Getenv("CREATOR_NAME"),
 		ApiBucketName:    os.Getenv("API_BUCKET_NAME"),

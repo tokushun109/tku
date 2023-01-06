@@ -28,6 +28,10 @@
             "workingDirectory": null,
             "secrets": [
                 {
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:CLIENT_URL::",
+                    "name": "CLIENT_URL"
+                },
+                {
                     "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:API_BASE_URL::",
                     "name": "API_BASE_URL"
                 },
