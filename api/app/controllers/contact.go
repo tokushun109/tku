@@ -100,7 +100,7 @@ func createContactHandler(w http.ResponseWriter, r *http.Request) {
 		message.AddPersonalizations(p)
 
 		replyMail := MailTemplate{
-			Title:       "【tocoriri】お問い合わせを受け付けました",
+			Title:       "【とこりり】お問い合わせを受け付けました",
 			Name:        contact.Name,
 			Company:     *contact.Company,
 			PhoneNumber: *contact.PhoneNumber,
@@ -156,7 +156,7 @@ func createContactHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		adminMail := MailTemplate{
-			Title:       "【tocoriri】お問い合わせが届きました",
+			Title:       "【とこりり】お問い合わせが届きました",
 			Name:        contact.Name,
 			Company:     *contact.Company,
 			PhoneNumber: *contact.PhoneNumber,

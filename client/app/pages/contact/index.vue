@@ -92,8 +92,8 @@ export default class PageContactIndex extends Vue {
     }
 
     head() {
-        const title = 'お問い合わせ | tocoriri'
-        const description = 'マクラメ編みのアクセサリーショップtocoriri(とこりり)へのお問い合わせ・ご意見・ご相談はこちらから'
+        const title = 'お問い合わせ | とこりり'
+        const description = 'マクラメ編みのアクセサリーショップ【とこりり】へのお問い合わせ・ご意見・ご相談はこちらから'
         const image = this.creator && this.creator.apiPath ? this.creator.apiPath : ''
         return {
             title,
