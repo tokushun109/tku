@@ -73,11 +73,7 @@ import { Component, Vue, Watch, Prop, PropSync } from 'nuxt-property-decorator'
 import _ from 'lodash'
 import { ICreator, IError, ISite, IconType, ColorType } from '~/types'
 import { newCreator } from '~/methods'
-@Component({
-    head: {
-        title: '製作者紹介',
-    },
-})
+@Component({})
 export default class CCreatorEdit extends Vue {
     mdiCamera = mdiCamera
     IconType: typeof IconType = IconType

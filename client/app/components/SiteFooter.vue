@@ -2,7 +2,7 @@
     <div class="site-footer">
         <v-container class="site-footer-content">
             <v-sheet color="transparent">
-                <div class="copy-right">©︎2022 tocoriri</div>
+                <div class="copy-right">©︎2022 とこりり</div>
             </v-sheet>
         </v-container>
         <!-- sm幅以下 -->

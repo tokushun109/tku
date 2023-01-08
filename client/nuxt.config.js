@@ -36,7 +36,7 @@ module.exports = {
             {
                 hid: 'og:site_name',
                 property: 'og:site_name',
-                content: 'tocoriri',
+                content: 'とこりり',
             },
         ],
 

@@ -37,8 +37,8 @@ export default class PageTop extends Vue {
         if (!this.carouselItems) {
             return
         }
-        const title = 'tocoriri'
-        const description = 'マクラメ編みのアクセサリーショップtocoriri(とこりり)の紹介サイトです。'
+        const title = 'アクセサリーショップ とこりり'
+        const description = 'マクラメ編みのアクセサリーショップ【とこりり】の紹介サイトです。'
         const image = this.creator && this.creator.apiPath ? this.creator.apiPath : ''
         return {
             title,
