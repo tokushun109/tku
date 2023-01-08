@@ -75,7 +75,7 @@ func createContactHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		message = mail.NewV3Mail()
-		from := mail.NewEmail("tocoriri", "no-reply@tocoriri.com")
+		from := mail.NewEmail("とこりり", "no-reply@tocoriri.com")
 		message.SetFrom(from)
 
 		type MailTemplate struct {
