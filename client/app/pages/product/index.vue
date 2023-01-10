@@ -1,5 +1,5 @@
 <template>
-    <v-container class="page-product">
+    <c-layout-container normal class="page-product">
         <v-container class="page-title-container">
             <h2 class="page-title text-sm-h3 text-h4">PRODUCTS</h2>
         </v-container>
@@ -14,7 +14,7 @@
             </v-container>
         </v-sheet>
         <c-breadcrumbs :items="breadCrumbs" />
-    </v-container>
+    </c-layout-container>
 </template>
 
 <script lang="ts">

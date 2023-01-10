@@ -1,5 +1,7 @@
 <template>
-    <c-product-detail :product="product" />
+    <c-layout-container normal class="c-product-detail-page-wrapper">
+        <c-product-detail :product="product" />
+    </c-layout-container>
 </template>
 
 <script lang="ts">

@@ -1,5 +1,5 @@
 <template>
-    <v-container class="page-contact">
+    <c-layout-container class="page-contact" narrow>
         <v-container class="page-title-container">
             <h2 class="page-title text-sm-h3 text-h4">CONTACT</h2>
         </v-container>
@@ -46,7 +46,7 @@
             </v-container>
         </v-sheet>
         <c-breadcrumbs :items="breadCrumbs" />
-    </v-container>
+    </c-layout-container>
 </template>
 
 <script lang="ts">

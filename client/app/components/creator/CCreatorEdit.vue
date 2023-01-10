@@ -9,10 +9,10 @@
                     <pre class="description-text">{{ creator.introduction }}</pre>
                 </v-container>
                 <div>
-                    <div class="sns-head-title head-title">
+                    <div v-if="snsList" class="sns-head-title head-title">
                         <div class="head-title-content">SNS</div>
                     </div>
-                    <v-container v-if="!admin" class="sns-content">
+                    <v-container class="sns-content">
                         <div v-for="sns in snsList" :key="sns.name" class="sns-item">
                             <v-btn fab :color="ColorType.Orange" :href="sns.url" target="_blank" rel="noopener noreferrer" x-large>
                                 <v-icon :color="ColorType.White" class="sns-icon">{{ sns.icon }}</v-icon>
@@ -24,10 +24,10 @@
                     </v-container>
                 </div>
                 <div>
-                    <div class="sales-site-head-title head-title">
+                    <div v-if="salesSiteList" class="sales-site-head-title head-title">
                         <div class="head-title-content">販売サイト</div>
                     </div>
-                    <v-container v-if="!admin" class="sales-site-content">
+                    <v-container class="sales-site-content">
                         <div v-for="site in salesSiteList" :key="site.name" class="sales-site-item">
                             <v-btn
                                 :color="ColorType.Orange"

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-app class="default-bg">
+        <v-app class="default">
             <template v-if="!isAdmin">
                 <v-main>
                     <site-layout />
@@ -57,8 +57,12 @@ export default class LayoutDefault extends Vue {
 </script>
 
 <style lang="stylus" scoped>
+.default
+    padding $page-padding
+    background-color $primary-bg-color
+    +sm()
+        padding $page-sp-padding
+
 * :not(.v-icon)
     font-family $font-face !important
-    .default-bg
-        background-color $primary-bg-color
 </style>

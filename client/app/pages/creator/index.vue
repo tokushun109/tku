@@ -1,5 +1,5 @@
 <template>
-    <v-container class="page-creator">
+    <c-layout-container normal class="page-creator">
         <v-container class="page-title-container">
             <h2 class="page-title text-sm-h3 text-h4">CREATOR</h2>
         </v-container>
@@ -9,7 +9,7 @@
             </v-container>
         </v-sheet>
         <c-breadcrumbs :items="breadCrumbs" />
-    </v-container>
+    </c-layout-container>
 </template>
 
 <script lang="ts">
