@@ -1,8 +1,8 @@
 <template>
     <c-layout-container normal class="page-product">
-        <v-container class="page-title-container">
-            <h2 class="page-title text-sm-h3 text-h4">Product</h2>
-        </v-container>
+        <div class="page-title-container">
+            <h1 class="page-title text-sm-h3 text-h4">Product</h1>
+        </div>
         <v-sheet>
             <v-container>
                 <c-message v-if="products.length === 0" class="mt-4"> 登録されていません </c-message>
@@ -94,9 +94,4 @@ export default class PageProductIndex extends Vue {
 .page-title-container
     +sm()
         display none
-    .page-title
-        margin-bottom 20px
-        color $site-title-text-color
-        text-align center
-        font-family $title-font-face !important
 </style>

@@ -1,10 +1,10 @@
 <template>
     <c-layout-container normal class="page-creator">
-        <v-container class="page-title-container">
-            <h2 class="page-title text-sm-h3 text-h4">About</h2>
-        </v-container>
+        <div class="page-title-container">
+            <h1 class="page-title text-h4">About</h1>
+        </div>
         <v-sheet>
-            <c-top-logo></c-top-logo>
+            <c-top-logo />
             <c-creator-edit v-if="creator" :item.sync="creator" :sales-site-list="salesSiteList" />
         </v-sheet>
         <c-breadcrumbs :items="breadCrumbs" />
@@ -82,8 +82,4 @@ export default class PageAboutIndex extends Vue {
 .page-title-container
     +sm()
         display none
-    .page-title
-        color $site-title-text-color
-        text-align center
-        font-family $title-font-face !important
 </style>

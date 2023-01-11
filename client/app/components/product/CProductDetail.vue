@@ -7,7 +7,7 @@
             </v-col>
             <v-col cols="12" sm="6">
                 <div class="price-area">
-                    <p class="price text-h6">
+                    <p class="price">
                         ￥{{ product.price | priceFormat }}
                         <span class="text-body-2">(税込)</span>
                     </p>
@@ -78,12 +78,13 @@ export default class CProductDetail extends Vue {
     .product-name
         color $title-text-color
         font-weight $title-font-weight
-        font-size 20px
+        font-size 30px
     .detail-area
         .price-area
             .price
                 color $text-color
                 font-weight $title-font-weight
+                font-size 45px
         .description-area
             .description
                 margin-bottom 16px

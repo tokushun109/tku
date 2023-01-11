@@ -1,6 +1,6 @@
-$font-face = 'Lato', 'Noto Sans JP', '游ゴシック Medium', '游ゴシック体', 'Yu Gothic Medium', 'YuGothic', 'ヒラギノ角ゴ ProN', 'Hiragino Kaku Gothic ProN', 'メイリオ', 'Meiryo', 'ＭＳ Ｐゴシック', 'MS PGothic', sans-serif
+$font-face = 'M PLUS Rounded 1c', sans-serif
 $title-font-face = 'Lobster'
-$title-font-weight = 600
+$title-font-weight = 700
 /**
  * media size
  */
@@ -50,6 +50,14 @@ $page-title-underline = true
 $page-title-underline-color = #45a8a1
 $page-title-underline-width = 100px
 $page-content-section-margin-bottom = 16px
+
+.page-title
+    margin-bottom 20px
+    color $site-title-text-color
+    text-align center
+    font-size 70px !important
+    font-family $title-font-face !important
+
 /**
  * image layout
  */
@@ -83,13 +91,3 @@ $c-label-required-content = '必須'
 $c-label-required-color = #ff5a5a
 $c-label-required-weight = bold
 $c-label-required-size = 13px
-
-// /**
-// * @extend 用のベーススタイル
-// */
-// margin: 0, padding: 0
-.zero-space
-    margin 0
-    padding 0     /**
-     * font
-     */

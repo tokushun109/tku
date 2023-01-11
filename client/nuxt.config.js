@@ -109,7 +109,7 @@ module.exports = {
 
     webfontloader: {
         google: {
-            families: ['Lobster:400,700'],
+            families: ['Lobster', 'M PLUS Rounded 1c'],
         },
     },
 

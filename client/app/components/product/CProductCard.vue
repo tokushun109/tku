@@ -22,7 +22,7 @@
                         <c-icon :type="IconType.Delete.name" @c-click="$emit('c-click', ExecutionType.Delete, listItem)" />
                     </template>
                     <v-spacer />
-                    <div class="text-h6">￥{{ listItem.price | priceFormat }}<span class="text-caption">税込</span></div>
+                    <div class="price">￥{{ listItem.price | priceFormat }}<span class="text-caption">税込</span></div>
                 </div>
             </div>
         </v-card-text>
@@ -59,14 +59,13 @@ export default class CProductCard extends Vue {
                 text-overflow ellipsis
                 white-space nowrap
                 font-weight $title-font-weight
-                font-size 16px
-                +sm()
-                    overflow inherit
-                    text-overflow inherit
-                    white-space inherit
+                font-size $font-xlarge
         .product-card-footer
             margin-top 15px
             text-align right
             .product-card-footer-content
                 display flex
+                .price
+                    font-weight 600
+                    font-size $font-xlarge
 </style>
