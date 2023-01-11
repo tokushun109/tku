@@ -1,7 +1,7 @@
 <template>
     <c-layout-container class="page-contact" narrow>
         <v-container class="page-title-container">
-            <h2 class="page-title text-sm-h3 text-h4">CONTACT</h2>
+            <h2 class="page-title text-sm-h3 text-h4">Contact</h2>
         </v-container>
         <div v-if="!isSent" class="contact-introduction">
             <p>お問い合わせ・<br class="sm" />ご意見・ご相談はこちらから</p>
@@ -156,6 +156,7 @@ export default class PageContactIndex extends Vue {
         margin-bottom 20px
         color $site-title-text-color
         text-align center
+        font-family $title-font-face !important
 
 .contact-introduction
     text-align center

@@ -1,52 +1,50 @@
 <template>
     <v-sheet class="c-creator-edit">
-        <v-container>
-            <v-sheet class="creator-wrapper">
-                <v-container class="logo-content">
-                    <v-img v-if="creator.apiPath" :src="creator.apiPath" max-width="400" aspect-ratio="1" class="logo-image" alt="ロゴ画像" />
-                </v-container>
-                <v-container class="description-content">
-                    <pre class="description-text">{{ creator.introduction }}</pre>
-                </v-container>
-                <div>
-                    <div v-if="snsList" class="sns-head-title head-title">
-                        <div class="head-title-content">SNS</div>
-                    </div>
-                    <v-container class="sns-content">
-                        <div v-for="sns in snsList" :key="sns.name" class="sns-item">
-                            <v-btn fab :color="ColorType.Orange" :href="sns.url" target="_blank" rel="noopener noreferrer" x-large>
-                                <v-icon :color="ColorType.White" class="sns-icon">{{ sns.icon }}</v-icon>
-                            </v-btn>
-                            <a class="sns-name" :href="sns.url" target="_blank" rel="noopener noreferrer">
-                                <small>{{ sns.name }}</small>
-                            </a>
-                        </div>
-                    </v-container>
+        <v-sheet class="creator-wrapper">
+            <v-container class="logo-content">
+                <v-img v-if="creator.apiPath" :src="creator.apiPath" max-width="400" aspect-ratio="1" class="logo-image" alt="ロゴ画像" />
+            </v-container>
+            <v-container class="description-content">
+                <pre class="description-text">{{ creator.introduction }}</pre>
+            </v-container>
+            <div>
+                <div v-if="snsList" class="sns-head-title head-title">
+                    <div class="head-title-content">SNS</div>
                 </div>
-                <div>
-                    <div v-if="salesSiteList" class="sales-site-head-title head-title">
-                        <div class="head-title-content">販売サイト</div>
+                <v-container class="sns-content">
+                    <div v-for="sns in snsList" :key="sns.name" class="sns-item">
+                        <v-btn fab :color="ColorType.Orange" :href="sns.url" target="_blank" rel="noopener noreferrer" x-large>
+                            <v-icon :color="ColorType.White" class="sns-icon">{{ sns.icon }}</v-icon>
+                        </v-btn>
+                        <a class="sns-name" :href="sns.url" target="_blank" rel="noopener noreferrer">
+                            <small>{{ sns.name }}</small>
+                        </a>
                     </div>
-                    <v-container class="sales-site-content">
-                        <div v-for="site in salesSiteList" :key="site.name" class="sales-site-item">
-                            <v-btn
-                                :color="ColorType.Orange"
-                                :href="site.url"
-                                class="sales-site-buttons"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                x-large
-                            >
-                                {{ site.name }}
-                            </v-btn>
-                        </div>
-                    </v-container>
-                    <div v-if="admin" class="edit-button">
-                        <v-btn color="primary" @click="openHandler"><c-icon :type="IconType.Edit.name" @c-click="openHandler" />編集</v-btn>
-                    </div>
+                </v-container>
+            </div>
+            <div>
+                <div v-if="salesSiteList" class="sales-site-head-title head-title">
+                    <div class="head-title-content">販売サイト</div>
                 </div>
-            </v-sheet>
-        </v-container>
+                <v-container class="sales-site-content">
+                    <div v-for="site in salesSiteList" :key="site.name" class="sales-site-item">
+                        <v-btn
+                            :color="ColorType.Orange"
+                            :href="site.url"
+                            class="sales-site-buttons"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            x-large
+                        >
+                            {{ site.name }}
+                        </v-btn>
+                    </div>
+                </v-container>
+                <div v-if="admin" class="edit-button">
+                    <v-btn color="primary" @click="openHandler"><c-icon :type="IconType.Edit.name" @c-click="openHandler" />編集</v-btn>
+                </div>
+            </div>
+        </v-sheet>
         <c-dialog
             :visible.sync="dialogVisible"
             title="製作者の編集"

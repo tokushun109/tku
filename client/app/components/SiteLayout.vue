@@ -6,18 +6,21 @@
                 <c-icon :type="IconType.Menu.name" x-large @c-click="toggleMenu" />
             </client-only>
         </v-btn>
-        <v-sheet v-if="isRoot" color="transparent" class="site-title-area">
-            <v-card flat width="300" color="transparent" class="site-title text-h1" to="/"> tocoriri </v-card>
-            <div class="site-sub-title text-h5">Cotton lace × Macrame</div>
-        </v-sheet>
+        <div v-if="isRoot" class="site-title-area">
+            <nuxt-link to="/">
+                <img class="site-title" src="/img/logo/tocoriri_logo.png" alt="アクセサリーショップ とこりり" />
+            </nuxt-link>
+        </div>
         <v-dialog v-model="menuVisible" fullscreen hide-overlay transition="dialog-top-transition" scrollable>
             <v-sheet :color="ColorType.Grey" class="menu-area">
                 <v-btn fab x-large class="toggle-button" @click="toggleMenu">
                     <c-icon :type="IconType.Close.name" x-large @c-click="toggleMenu" />
                 </v-btn>
-                <v-sheet color="transparent" class="site-title-area">
-                    <v-card color="transparent" width="300" class="site-title text-h1" to="/" flat nuxt @click="toggleMenu"> tocoriri </v-card>
-                </v-sheet>
+                <div class="site-title-area" @click="toggleMenu">
+                    <nuxt-link to="/">
+                        <img class="site-title" src="/img/logo/tocoriri_logo_white.png" alt="とこりり メニュー" />
+                    </nuxt-link>
+                </div>
                 <v-container class="menu-item">
                     <v-row>
                         <v-col v-for="(item, index) in menuItems" :key="index" cols="4">
@@ -57,9 +60,9 @@ export default class SiteLayout extends Vue {
     IconType: typeof IconType = IconType
 
     menuItems: Array<ITable> = [
-        { name: 'CREATOR', link: 'creator', icon: mdiFaceWoman },
-        { name: 'PRODUCTS', link: 'product', icon: mdiDiamond },
-        { name: 'CONTACT', link: 'contact', icon: mdiEmail },
+        { name: 'About', link: 'about', icon: mdiFaceWoman },
+        { name: 'Product', link: 'product', icon: mdiDiamond },
+        { name: 'Contact', link: 'contact', icon: mdiEmail },
     ]
 
     menuVisible: boolean = false
@@ -86,17 +89,15 @@ export default class SiteLayout extends Vue {
             display none
     .site-title-area
         position relative
+        padding-top 20px
         text-align center
         +sm()
             display none
         .site-title
             margin 0 auto
-            color $site-title-text-color
-            font-family $title-font-face !important
-        .site-sub-title
-            margin-bottom 40px
-            color $text-color
-            font-size $font-xxlarge
+            width 400px
+            height 200px
+            object-fit cover
     .sm
         display none
         text-align center
@@ -112,7 +113,7 @@ export default class SiteLayout extends Vue {
 .menu-area
     position relative
     z-index 5
-    padding-top 65px
+    padding-top 20px
     +sm()
         display none
     .toggle-button
@@ -127,11 +128,11 @@ export default class SiteLayout extends Vue {
             display none
         .site-title
             margin 0 auto
-            color $white-color
-            font-family $title-font-face !important
+            width 400px
+            height 200px
+            object-fit cover
     .menu-item
         position relative
-        top 10%
         .menu-card
             padding 0 0 20px
             border-radius $image-border-radius
@@ -145,6 +146,7 @@ export default class SiteLayout extends Vue {
                 justify-content center
             .menu-card-name
                 font-size 35px
+                font-family $title-font-face !important
                 +md()
                     font-size 3.5vw
 </style>

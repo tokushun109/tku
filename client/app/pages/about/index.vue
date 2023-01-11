@@ -1,12 +1,11 @@
 <template>
     <c-layout-container normal class="page-creator">
         <v-container class="page-title-container">
-            <h2 class="page-title text-sm-h3 text-h4">CREATOR</h2>
+            <h2 class="page-title text-sm-h3 text-h4">About</h2>
         </v-container>
         <v-sheet>
-            <v-container>
-                <c-creator-edit v-if="creator" :item.sync="creator" :sales-site-list="salesSiteList" />
-            </v-container>
+            <c-top-logo></c-top-logo>
+            <c-creator-edit v-if="creator" :item.sync="creator" :sales-site-list="salesSiteList" />
         </v-sheet>
         <c-breadcrumbs :items="breadCrumbs" />
     </c-layout-container>
@@ -17,7 +16,7 @@ import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
 import { IBreadCrumb, ICreator, ISite } from '~/types'
 @Component({})
-export default class PageCreatorIndex extends Vue {
+export default class PageAboutIndex extends Vue {
     creator: ICreator | null = null
     snsList: Array<ISite> | null = []
     salesSiteList: Array<ISite> | null = []
@@ -84,7 +83,7 @@ export default class PageCreatorIndex extends Vue {
     +sm()
         display none
     .page-title
-        margin-bottom 20px
         color $site-title-text-color
         text-align center
+        font-family $title-font-face !important
 </style>

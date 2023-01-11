@@ -1,7 +1,7 @@
 <template>
     <c-layout-container normal class="page-product">
         <v-container class="page-title-container">
-            <h2 class="page-title text-sm-h3 text-h4">PRODUCTS</h2>
+            <h2 class="page-title text-sm-h3 text-h4">Product</h2>
         </v-container>
         <v-sheet>
             <v-container>
@@ -98,4 +98,5 @@ export default class PageProductIndex extends Vue {
         margin-bottom 20px
         color $site-title-text-color
         text-align center
+        font-family $title-font-face !important
 </style>

@@ -9,7 +9,7 @@
         <div class="sm">
             <v-bottom-navigation color="primary" height="50px" mandatory grow app>
                 <v-btn v-for="(item, index) in menuItems" :key="index" :color="ColorType.White" nuxt :to="`/${item.link}`">
-                    <span>{{ item.name }}</span>
+                    <span class="menu-name">{{ item.name }}</span>
                     <v-icon>{{ item.icon }}</v-icon>
                 </v-btn>
             </v-bottom-navigation>
@@ -27,9 +27,9 @@ export default class SiteFooter extends Vue {
     ColorType: typeof ColorType = ColorType
 
     menuItems: Array<ITable> = [
-        { name: 'CREATOR', link: 'creator', icon: mdiFaceWoman },
-        { name: 'PRODUCTS', link: 'product', icon: mdiDiamond },
-        { name: 'CONTACT', link: 'contact', icon: mdiEmail },
+        { name: 'About', link: 'about', icon: mdiFaceWoman },
+        { name: 'Product', link: 'product', icon: mdiDiamond },
+        { name: 'Contact', link: 'contact', icon: mdiEmail },
     ]
 
     menuVisible: boolean = false
@@ -54,4 +54,6 @@ export default class SiteFooter extends Vue {
             .v-item-group.v-bottom-navigation .v-btn
                 width 50% !important
                 height 100% !important
+        .menu-name
+            font-family $title-font-face !important
 </style>

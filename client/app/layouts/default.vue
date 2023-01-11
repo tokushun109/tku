@@ -58,10 +58,7 @@ export default class LayoutDefault extends Vue {
 
 <style lang="stylus" scoped>
 .default
-    padding $page-padding
     background-color $primary-bg-color
-    +sm()
-        padding $page-sp-padding
 
 * :not(.v-icon)
     font-family $font-face !important

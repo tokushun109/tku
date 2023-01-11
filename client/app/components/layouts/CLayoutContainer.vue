@@ -24,8 +24,13 @@ export default class CLayoutContainer extends Vue {
 
 <style lang="stylus">
 .c-layout-container
-    &.normal
-        max-width 1200px
-    &.narrow
-        max-width 800px
+    padding $page-padding
+    +sm()
+        padding $page-sp-padding
+
+&.normal
+    max-width 1200px
+
+&.narrow
+    max-width 800px
 </style>
