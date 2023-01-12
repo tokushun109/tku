@@ -109,7 +109,7 @@ module.exports = {
 
     webfontloader: {
         google: {
-            families: ['Lobster', 'M PLUS Rounded 1c'],
+            families: ['Lobster', 'Sawarabi Mincho'],
         },
     },
 

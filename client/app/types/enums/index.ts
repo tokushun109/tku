@@ -41,7 +41,7 @@ export const ColorType = {
     Grey: 'grey',
     White: 'white',
     Transparent: 'transparent',
-    Primary: '#AD7C5E',
+    Primary: '#7b675b',
     Secondary: '#BCAAA4',
     Title: '#6D4C41',
     Accent: '#FFB74D',

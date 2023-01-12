@@ -12,9 +12,9 @@
             </nuxt-link>
         </div>
         <v-dialog v-model="menuVisible" fullscreen hide-overlay transition="dialog-top-transition" scrollable>
-            <v-sheet :color="ColorType.Title" class="menu-area">
+            <v-sheet :color="ColorType.Primary" class="menu-area">
                 <v-btn :color="ColorType.White" fab x-large class="toggle-button" @click="toggleMenu">
-                    <v-icon :color="ColorType.Title" x-large>{{ IconType.Menu.icon }}</v-icon>
+                    <v-icon :color="ColorType.Title" x-large>{{ IconType.Close.icon }}</v-icon>
                 </v-btn>
                 <div class="site-title-area" @click="toggleMenu">
                     <nuxt-link to="/">
@@ -43,7 +43,7 @@
 
         <!-- sm幅以下 -->
         <div class="sm">
-            <v-app-bar :color="ColorType.Title" dense class="site-header">
+            <v-app-bar :color="ColorType.Primary" dense class="site-header">
                 <div class="site-title-area">
                     <nuxt-link to="/">
                         <h1><img class="site-title" src="/img/logo/tocoriri_logo_white.png" alt="アクセサリーショップ とこりり" /></h1>
