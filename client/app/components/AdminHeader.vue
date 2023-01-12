@@ -1,6 +1,6 @@
 <template>
     <div class="admin-header">
-        <v-app-bar app :color="ColorType.Green" dark clipped-left>
+        <v-app-bar app :color="ColorType.Primary" dark clipped-left>
             <v-app-bar-nav-icon v-if="!$store.getters['user/isGuest']" @click="sidebarVisible = !sidebarVisible">
                 <client-only>
                     <c-icon :type="IconType.Menu.name" @click.native="sidebarVisible = !sidebarVisible" />

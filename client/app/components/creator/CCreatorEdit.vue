@@ -209,5 +209,6 @@ export default class CCreatorEdit extends Vue {
             +sm()
                 width 80%
     .edit-button
+        margin-bottom 32px
         text-align center
 </style>

@@ -2,7 +2,8 @@
     <v-sheet :color="ColorType.Transparent" class="page-top">
         <c-top-image class="top-image" title category :carousel-items="carouselItems" />
         <c-layout-container normal>
-            <div class="page-top-container">
+            <!-- aboutがページの修正が終わってから表示 -->
+            <div v-if="false" class="page-top-container">
                 <div class="about-section">
                     <h2 class="page-top-title">About</h2>
                     <v-container class="about-section__message default">
@@ -18,6 +19,7 @@
                         <p><span class="emphasis">オシャレなだけじゃない</span><br /><span class="emphasis">あったらちょっと嬉しい作品</span></p>
                         <p>を制作・販売しております。</p>
                     </v-container>
+                    <c-detail-button to="about" />
                 </div>
             </div>
         </c-layout-container>
@@ -113,17 +115,19 @@ export default class PageTop extends Vue {
         font-family $title-font-face !important
         +sm()
             font-size 40px !important
-    .about-section
-        &__message
-            color $text-color
-            font-weight 800
-            &.default
-                +sm()
+    .page-top-container
+        margin-bottom 64px
+        .about-section
+            &__message
+                color $text-color
+                font-weight 800
+                &.default
+                    +sm()
+                        display none
+                &.sm
                     display none
-            &.sm
-                display none
-                +sm()
-                    display block
-            .emphasis
-                color $accent
+                    +sm()
+                        display block
+                .emphasis
+                    color $accent
 </style>
