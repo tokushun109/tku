@@ -53,9 +53,11 @@
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
 import { min20, min50, newContact, required, validEmail, validPhoneNumber } from '~/methods'
-import { IBreadCrumb, IContact, ICreator, IError } from '~/types'
+import { ColorType, IBreadCrumb, IContact, ICreator, IError } from '~/types'
 @Component({})
 export default class PageContactIndex extends Vue {
+    ColorType: typeof ColorType = ColorType
+
     creator: ICreator | null = null
 
     contact: IContact = newContact()
@@ -155,6 +157,8 @@ export default class PageContactIndex extends Vue {
 
 .contact-introduction
     text-align center
+    +sm()
+        margin-top 25px
     .sm
         display none
         +sm()

@@ -205,7 +205,7 @@ export default class CSiteList extends Vue {
         .list-header
             display flex
             .list-title
-                color $title-text-color
+                color $title-primary-color
     .list-content-wrapper
         .no-record-message
             margin-top 16px

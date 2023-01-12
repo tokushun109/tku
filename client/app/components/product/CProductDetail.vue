@@ -21,7 +21,7 @@
                     </p>
 
                     <div class="category-content">
-                        <v-chip small :color="ColorType.LightGreen" :text-color="ColorType.White" class="mx-1">{{ product.category.name }}</v-chip>
+                        <v-chip small :color="ColorType.Secondary" :text-color="ColorType.White" class="mx-1">{{ product.category.name }}</v-chip>
                     </div>
                 </div>
                 <div v-if="product.tags.length > 0" class="tag-area">
@@ -31,7 +31,7 @@
 
                     <div class="tag-content">
                         <div v-for="tag in product.tags" :key="tag.uuid">
-                            <v-chip small :color="ColorType.LightGreen" :text-color="ColorType.White" class="mx-1">{{ tag.name }}</v-chip>
+                            <v-chip small :color="ColorType.Secondary" :text-color="ColorType.White" class="mx-1">{{ tag.name }}</v-chip>
                         </div>
                     </div>
                 </div>
@@ -44,7 +44,7 @@
                     <v-row>
                         <v-col v-for="siteDetail in product.siteDetails" :key="siteDetail.uuid" md="6" sm="12" cols="12">
                             <v-btn
-                                :color="ColorType.Orange"
+                                :color="ColorType.Accent"
                                 :href="siteDetail.detailUrl"
                                 class="site-buttons"
                                 target="_blank"
@@ -76,15 +76,21 @@ export default class CProductDetail extends Vue {
 .c-product-detail-page-area
     padding 16px
     .product-name
-        color $title-text-color
+        color $title-primary-color
         font-weight $title-font-weight
-        font-size 30px
+        font-size 35px
+        +sm()
+            font-size $font-xlarge
     .detail-area
         .price-area
+            text-align right
             .price
-                color $text-color
+                margin-right auto
+                color $title-primary-color
                 font-weight $title-font-weight
                 font-size 45px
+                +sm()
+                    font-size 30px
         .description-area
             .description
                 margin-bottom 16px

@@ -440,7 +440,7 @@ export default class CProductList extends Vue {
         .product-list-header
             display flex
             .product-list-title
-                color $title-text-color
+                color $title-primary-color
         .product-list-content
             .message
                 margin-top 16px

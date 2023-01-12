@@ -46,16 +46,16 @@ export default class CProductCard extends Vue {
 
 <style lang="stylus" scoped>
 .c-product-card
-    background-color $secondary-bg-color
+    background-color $light-dark-color
     &.is-active
-        background-color $light-bg-color
+        background-color $accent-light-color
     .product-card-wrapper
         .product-card-header
             margin 16px 0
             .product-name
                 overflow hidden
                 padding-bottom 10px
-                color $title-text-color
+                color $title-primary-color
                 text-overflow ellipsis
                 white-space nowrap
                 font-weight $title-font-weight

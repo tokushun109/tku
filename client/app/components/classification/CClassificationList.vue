@@ -185,7 +185,7 @@ export default class CClassificationList extends Vue {
         .list-header
             display flex
             .list-title
-                color $title-text-color
+                color $title-primary-color
     .list-content-wrapper
         .list-content
             .list-content-title

@@ -2,7 +2,7 @@
     <v-sheet :color="ColorType.Transparent" class="page-top">
         <c-top-image class="top-image" title category :carousel-items="carouselItems" />
         <div class="more">
-            <v-btn rounded outlined x-large :color="ColorType.Grey" nuxt to="/product">
+            <v-btn rounded outlined x-large :color="ColorType.Primary" nuxt to="/product">
                 <div class="text-h6">商品一覧へ</div>
                 <v-icon large>{{ mdiArrowRightThick }}</v-icon>
             </v-btn>

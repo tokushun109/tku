@@ -37,9 +37,15 @@ export const ColorType = {
     Lime: 'lime',
     Purple: 'purple',
     Black: 'black',
+    Brown: 'brown',
     Grey: 'grey',
     White: 'white',
     Transparent: 'transparent',
+    Primary: '#AD7C5E',
+    Secondary: '#BCAAA4',
+    Title: '#6D4C41',
+    Accent: '#FFB74D',
+    AccentLight: '#FFF8E1',
 } as const
 export type TColorType = typeof ColorType[keyof typeof ColorType]
 

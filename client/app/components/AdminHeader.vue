@@ -86,5 +86,5 @@ export default class AdminHeader extends Vue {
     .navigation-list
         .navigation-list-item
             .navigation-title
-                color $title-text-color
+                color $title-primary-color
 </style>

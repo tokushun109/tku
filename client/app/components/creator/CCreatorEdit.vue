@@ -12,7 +12,7 @@
             </div>
             <v-container class="sns-content">
                 <div v-for="sns in snsList" :key="sns.name" class="sns-item">
-                    <v-btn fab :color="ColorType.Orange" :href="sns.url" target="_blank" rel="noopener noreferrer" x-large>
+                    <v-btn fab :color="ColorType.Accent" :href="sns.url" target="_blank" rel="noopener noreferrer" x-large>
                         <v-icon :color="ColorType.White" class="sns-icon">{{ sns.icon }}</v-icon>
                     </v-btn>
                     <a class="sns-name" :href="sns.url" target="_blank" rel="noopener noreferrer">
@@ -27,7 +27,7 @@
             </div>
             <v-container class="sales-site-content">
                 <div v-for="site in salesSiteList" :key="site.name" class="sales-site-item">
-                    <v-btn :color="ColorType.Orange" :href="site.url" class="sales-site-buttons" target="_blank" rel="noopener noreferrer" x-large>
+                    <v-btn :color="ColorType.Accent" :href="site.url" class="sales-site-buttons" target="_blank" rel="noopener noreferrer" x-large>
                         {{ site.name }}
                     </v-btn>
                 </div>
@@ -163,7 +163,7 @@ export default class CCreatorEdit extends Vue {
             border-radius 50%
             object-fit cover
     .description-title
-        color $title-text-color
+        color $title-primary-color
     .description-content
         text-align center
         .description-text
@@ -172,7 +172,7 @@ export default class CCreatorEdit extends Vue {
             +sm()
                 font-size 3vw
     .head-title
-        color $title-text-color
+        color $title-primary-color
         text-align center
         font-weight $title-font-weight
         font-size $font-xxlarge

@@ -45,7 +45,7 @@ export default class Error extends Vue {
         height 75vh
         .error-message
             padding 20vh 0
-            color $site-title-text-color
+            color $title-primary-color
             font-size $font-xxlarge
             +sm()
                 font-size $font-xlarge

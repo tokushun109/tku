@@ -1,20 +1,20 @@
 <template>
     <div class="site-layout">
         <!-- md幅以上 -->
-        <v-btn fab x-large class="toggle-button" @click="toggleMenu">
-            <client-only>
-                <c-icon :type="IconType.Menu.name" x-large @c-click="toggleMenu" />
-            </client-only>
-        </v-btn>
+        <div @click="toggleMenu">
+            <v-btn :color="ColorType.Primary" fab x-large class="toggle-button">
+                <v-icon :color="ColorType.White" x-large>{{ IconType.Menu.icon }}</v-icon>
+            </v-btn>
+        </div>
         <div v-if="isRoot" class="site-title-area">
             <nuxt-link to="/">
                 <img class="site-title" src="/img/logo/tocoriri_logo.png" alt="アクセサリーショップ とこりり" />
             </nuxt-link>
         </div>
         <v-dialog v-model="menuVisible" fullscreen hide-overlay transition="dialog-top-transition" scrollable>
-            <v-sheet :color="ColorType.Grey" class="menu-area">
-                <v-btn fab x-large class="toggle-button" @click="toggleMenu">
-                    <c-icon :type="IconType.Close.name" x-large @c-click="toggleMenu" />
+            <v-sheet :color="ColorType.Title" class="menu-area">
+                <v-btn :color="ColorType.White" fab x-large class="toggle-button" @click="toggleMenu">
+                    <v-icon :color="ColorType.Title" x-large>{{ IconType.Menu.icon }}</v-icon>
                 </v-btn>
                 <div class="site-title-area" @click="toggleMenu">
                     <nuxt-link to="/">
@@ -27,7 +27,7 @@
                             <v-card height="100%" elevation="20" :to="`/${item.link}`" nuxt class="menu-card" @click="toggleMenu">
                                 <v-card-title class="menu-card-icon">
                                     <v-avatar size="90%">
-                                        <v-icon size="90%">{{ item.icon }}</v-icon>
+                                        <v-icon :color="ColorType.Primary" size="90%">{{ item.icon }}</v-icon>
                                     </v-avatar>
                                 </v-card-title>
                                 <v-card-text class="menu-card-name">
@@ -43,8 +43,12 @@
 
         <!-- sm幅以下 -->
         <div class="sm">
-            <v-app-bar dense class="site-header">
-                <v-card color="transparent" class="site-title text-h4" to="/" flat nuxt>tocoriri</v-card>
+            <v-app-bar :color="ColorType.Title" dense class="site-header">
+                <div class="site-title-area">
+                    <nuxt-link to="/">
+                        <img class="site-title" src="/img/logo/tocoriri_logo_white.png" alt="アクセサリーショップ とこりり" />
+                    </nuxt-link>
+                </div>
             </v-app-bar>
         </div>
     </div>
@@ -105,10 +109,15 @@ export default class SiteLayout extends Vue {
             display block
             .site-header
                 z-index 10 !important
-                .site-title
+                .site-title-area
+                    position relative
+                    display block
                     margin 0 auto
-                    color $text-color
-                    font-family $title-font-face !important
+                    padding-top 8px
+                    .site-title
+                        width 100px
+                        height 50px
+                        object-fit cover
 
 .menu-area
     position relative
@@ -145,6 +154,7 @@ export default class SiteLayout extends Vue {
             .menu-card-icon
                 justify-content center
             .menu-card-name
+                color $primary
                 font-size 35px
                 font-family $title-font-face !important
                 +md()
