@@ -174,5 +174,9 @@ export default class PageContactIndex extends Vue {
             background-color $danger-bg-color
             color $danger-color
     .content-message-wrapper
+        padding 30vh 0
+        height 65vh
+        color $title-primary-color
         text-align center
+        font-size $font-xlarge
 </style>

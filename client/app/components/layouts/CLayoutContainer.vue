@@ -27,10 +27,8 @@ export default class CLayoutContainer extends Vue {
     padding $page-padding
     +sm()
         padding $page-sp-padding
-
-&.normal
-    max-width 1200px
-
-&.narrow
-    max-width 800px
+    &.normalとい
+        max-width 1200px
+    &.narrow
+        max-width 800px
 </style>
