@@ -65,6 +65,7 @@ export default class CProductCard extends Vue {
             .product-card-footer-content
                 display flex
                 .price
+                    color $title-primary-color
                     font-weight 600
                     font-size $font-xlarge
 </style>

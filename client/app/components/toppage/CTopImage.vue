@@ -64,7 +64,7 @@
                                 :text-color="ColorType.White"
                                 >{{ displayProduct(index).category.name }}</v-chip
                             >
-                            <v-chip v-if="title" class="title-label" small :color="ColorType.Orange" :text-color="ColorType.White">
+                            <v-chip v-if="title" class="title-label" small :color="ColorType.Accent" :text-color="ColorType.White">
                                 {{ displayProduct(index).name }}
                             </v-chip>
                             <v-img :src="image" :alt="`image-${index}`" class="carousel-image" />
