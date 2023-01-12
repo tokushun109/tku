@@ -9,11 +9,11 @@
                             v-if="category && displayProduct(index).category.uuid"
                             class="category-label"
                             small
-                            :color="ColorType.LightGreen"
+                            :color="ColorType.Accent"
                             :text-color="ColorType.White"
                             >{{ displayProduct(index).category.name }}</v-chip
                         >
-                        <v-chip v-if="title" class="title-label" small :color="ColorType.Orange" :text-color="ColorType.White">
+                        <v-chip v-if="title" class="title-label" small :color="ColorType.Accent" :text-color="ColorType.White">
                             {{ displayProduct(index).name }}
                         </v-chip>
                         <v-img eager :src="image" :alt="`image-${index}`" width="530" class="carousel-image" />
@@ -25,11 +25,11 @@
                             v-if="category && displayProduct(index).category.uuid"
                             class="category-label"
                             small
-                            :color="ColorType.LightGreen"
+                            :color="ColorType.Accent"
                             :text-color="ColorType.White"
                             >{{ displayProduct(index).category.name }}</v-chip
                         >
-                        <v-chip v-if="title" class="title-label" small :color="ColorType.Orange" :text-color="ColorType.White">
+                        <v-chip v-if="title" class="title-label" small :color="ColorType.Accent" :text-color="ColorType.White">
                             {{ displayProduct(index).name }}
                         </v-chip>
                         <v-img eager :src="image" :alt="`image-${index}`" width="530" class="carousel-image" />
@@ -60,11 +60,11 @@
                                 v-if="category && displayProduct(index).category.uuid"
                                 class="category-label"
                                 small
-                                :color="ColorType.LightGreen"
+                                :color="ColorType.Accent"
                                 :text-color="ColorType.White"
                                 >{{ displayProduct(index).category.name }}</v-chip
                             >
-                            <v-chip v-if="title" class="title-label" small :color="ColorType.Orange" :text-color="ColorType.White">
+                            <v-chip v-if="title" class="title-label" small :color="ColorType.Accent" :text-color="ColorType.White">
                                 {{ displayProduct(index).name }}
                             </v-chip>
                             <v-img :src="image" :alt="`image-${index}`" class="carousel-image" />
@@ -121,7 +121,7 @@ export default class CTopImage extends Vue {
             display flex
             align-items center
             overflow hidden
-            background-color $secondary-bg-color
+            background-color $accent-light-color
             .slide-show
                 display flex
                 padding 20px

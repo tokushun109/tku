@@ -1,8 +1,10 @@
 <template>
     <div class="error-wrapper">
-        <v-sheet color="transparent" class="site-title-area">
-            <v-card flat width="300" color="transparent" class="site-title text-h1" to="/"> tocoriri </v-card>
-        </v-sheet>
+        <div class="site-title-area">
+            <nuxt-link to="/">
+                <img class="site-title" src="/img/logo/tocoriri_logo.png" alt="アクセサリーショップ とこりり" />
+            </nuxt-link>
+        </div>
         <v-container>
             <v-container class="error-content">
                 <div class="error-message">
@@ -30,18 +32,20 @@ export default class Error extends Vue {
     text-align center
     .site-title-area
         position relative
+        padding-top 35px
         text-align center
         +sm()
             display none
         .site-title
             margin 0 auto
-            color $site-title-text-color
-            font-family $title-font-face !important
+            width 370px
+            height 150px
+            object-fit cover
     .error-content
         height 75vh
         .error-message
             padding 20vh 0
-            color $site-title-text-color
+            color $title-primary-color
             font-size $font-xxlarge
             +sm()
                 font-size $font-xlarge

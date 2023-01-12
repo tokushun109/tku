@@ -1,8 +1,8 @@
 <template>
-    <v-container class="page-contact">
-        <v-container class="page-title-container">
-            <h2 class="page-title text-sm-h3 text-h4">CONTACT</h2>
-        </v-container>
+    <c-layout-container class="page-contact" narrow>
+        <div class="page-title-container">
+            <h1 class="page-title">Contact</h1>
+        </div>
         <div v-if="!isSent" class="contact-introduction">
             <p>お問い合わせ・<br class="sm" />ご意見・ご相談はこちらから</p>
         </div>
@@ -46,16 +46,18 @@
             </v-container>
         </v-sheet>
         <c-breadcrumbs :items="breadCrumbs" />
-    </v-container>
+    </c-layout-container>
 </template>
 
 <script lang="ts">
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
 import { min20, min50, newContact, required, validEmail, validPhoneNumber } from '~/methods'
-import { IBreadCrumb, IContact, ICreator, IError } from '~/types'
+import { ColorType, IBreadCrumb, IContact, ICreator, IError } from '~/types'
 @Component({})
 export default class PageContactIndex extends Vue {
+    ColorType: typeof ColorType = ColorType
+
     creator: ICreator | null = null
 
     contact: IContact = newContact()
@@ -152,13 +154,11 @@ export default class PageContactIndex extends Vue {
     text-align center
     +sm()
         display none
-    .page-title
-        margin-bottom 20px
-        color $site-title-text-color
-        text-align center
 
 .contact-introduction
     text-align center
+    +sm()
+        margin-top 25px
     .sm
         display none
         +sm()
@@ -174,5 +174,9 @@ export default class PageContactIndex extends Vue {
             background-color $danger-bg-color
             color $danger-color
     .content-message-wrapper
+        padding 30vh 0
+        height 65vh
+        color $title-primary-color
         text-align center
+        font-size $font-xlarge
 </style>

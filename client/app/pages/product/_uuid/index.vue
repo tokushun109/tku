@@ -1,16 +1,26 @@
 <template>
-    <c-product-detail v-if="product" :product="product" />
+    <c-layout-container normal class="c-product-detail-page-wrapper">
+        <c-product-detail v-if="product" :product="product" />
+        <c-breadcrumbs :items="breadCrumbs" />
+    </c-layout-container>
 </template>
 
 <script lang="ts">
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
-import { IClientError, IProduct, serverToClientError } from '~/types'
+import { IBreadCrumb, IClientError, IProduct, serverToClientError } from '~/types'
 
 @Component({})
 export default class PageProductDetail extends Vue {
     product: IProduct | null = null
     error: IClientError | null = null
+
+    breadCrumbs: Array<IBreadCrumb> = [
+        { text: 'トップページ', href: '/' },
+        { text: '商品一覧', href: '/product' },
+        { text: this.product ? this.product.name : '', disabled: true },
+    ]
+
     async asyncData({ app, params }: Context) {
         try {
             const product = await app.$axios.$get(`/product/${params.uuid}`)

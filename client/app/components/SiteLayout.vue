@@ -1,30 +1,33 @@
 <template>
     <div class="site-layout">
         <!-- md幅以上 -->
-        <v-btn fab x-large class="toggle-button" @click="toggleMenu">
-            <client-only>
-                <c-icon :type="IconType.Menu.name" x-large @c-click="toggleMenu" />
-            </client-only>
-        </v-btn>
-        <v-sheet v-if="isRoot" color="transparent" class="site-title-area">
-            <v-card flat width="300" color="transparent" class="site-title text-h1" to="/"> tocoriri </v-card>
-            <div class="site-sub-title text-h5">Cotton lace × Macrame</div>
-        </v-sheet>
+        <div @click="toggleMenu">
+            <v-btn :color="ColorType.Primary" fab x-large class="toggle-button">
+                <v-icon :color="ColorType.White" x-large>{{ IconType.Menu.icon }}</v-icon>
+            </v-btn>
+        </div>
+        <div v-if="isRoot" class="site-title-area">
+            <nuxt-link to="/">
+                <h1><img class="site-title" src="/img/logo/tocoriri_logo.png" alt="アクセサリーショップ とこりり" /></h1>
+            </nuxt-link>
+        </div>
         <v-dialog v-model="menuVisible" fullscreen hide-overlay transition="dialog-top-transition" scrollable>
-            <v-sheet :color="ColorType.Grey" class="menu-area">
-                <v-btn fab x-large class="toggle-button" @click="toggleMenu">
-                    <c-icon :type="IconType.Close.name" x-large @c-click="toggleMenu" />
+            <v-sheet :color="ColorType.Primary" class="menu-area">
+                <v-btn :color="ColorType.White" fab x-large class="toggle-button" @click="toggleMenu">
+                    <v-icon :color="ColorType.Title" x-large>{{ IconType.Close.icon }}</v-icon>
                 </v-btn>
-                <v-sheet color="transparent" class="site-title-area">
-                    <v-card color="transparent" width="300" class="site-title text-h1" to="/" flat nuxt @click="toggleMenu"> tocoriri </v-card>
-                </v-sheet>
+                <div class="site-title-area" @click="toggleMenu">
+                    <nuxt-link to="/">
+                        <h1><img class="site-title" src="/img/logo/tocoriri_logo_white.png" alt="とこりり メニュー" /></h1>
+                    </nuxt-link>
+                </div>
                 <v-container class="menu-item">
                     <v-row>
                         <v-col v-for="(item, index) in menuItems" :key="index" cols="4">
                             <v-card height="100%" elevation="20" :to="`/${item.link}`" nuxt class="menu-card" @click="toggleMenu">
                                 <v-card-title class="menu-card-icon">
                                     <v-avatar size="90%">
-                                        <v-icon size="90%">{{ item.icon }}</v-icon>
+                                        <v-icon :color="ColorType.Primary" size="90%">{{ item.icon }}</v-icon>
                                     </v-avatar>
                                 </v-card-title>
                                 <v-card-text class="menu-card-name">
@@ -40,8 +43,12 @@
 
         <!-- sm幅以下 -->
         <div class="sm">
-            <v-app-bar dense class="site-header">
-                <v-card color="transparent" class="site-title text-h4" to="/" flat nuxt>tocoriri</v-card>
+            <v-app-bar :color="ColorType.Primary" dense class="site-header">
+                <div class="site-title-area">
+                    <nuxt-link to="/">
+                        <h1><img class="site-title" src="/img/logo/tocoriri_logo_white.png" alt="アクセサリーショップ とこりり" /></h1>
+                    </nuxt-link>
+                </div>
             </v-app-bar>
         </div>
     </div>
@@ -57,9 +64,9 @@ export default class SiteLayout extends Vue {
     IconType: typeof IconType = IconType
 
     menuItems: Array<ITable> = [
-        { name: 'CREATOR', link: 'creator', icon: mdiFaceWoman },
-        { name: 'PRODUCTS', link: 'product', icon: mdiDiamond },
-        { name: 'CONTACT', link: 'contact', icon: mdiEmail },
+        { name: 'About', link: 'about', icon: mdiFaceWoman },
+        { name: 'Product', link: 'product', icon: mdiDiamond },
+        { name: 'Contact', link: 'contact', icon: mdiEmail },
     ]
 
     menuVisible: boolean = false
@@ -77,9 +84,6 @@ export default class SiteLayout extends Vue {
 <style lang="stylus" scoped>
 .site-layout
     position relative
-    padding 48px 0 0
-    +sm()
-        padding 0
     .toggle-button
         position fixed
         top 40px
@@ -89,17 +93,15 @@ export default class SiteLayout extends Vue {
             display none
     .site-title-area
         position relative
+        padding-top 20px
         text-align center
         +sm()
             display none
         .site-title
             margin 0 auto
-            color $site-title-text-color
-            font-family $title-font-face !important
-        .site-sub-title
-            margin-bottom 40px
-            color $text-color
-            font-size $font-xxlarge
+            width 400px
+            height 200px
+            object-fit cover
     .sm
         display none
         text-align center
@@ -107,15 +109,20 @@ export default class SiteLayout extends Vue {
             display block
             .site-header
                 z-index 10 !important
-                .site-title
+                .site-title-area
+                    position relative
+                    display block
                     margin 0 auto
-                    color $text-color
-                    font-family $title-font-face !important
+                    padding-top 12px
+                    .site-title
+                        width 100px
+                        height 50px
+                        object-fit cover
 
 .menu-area
     position relative
     z-index 5
-    padding-top 65px
+    padding-top 20px
     +sm()
         display none
     .toggle-button
@@ -130,24 +137,26 @@ export default class SiteLayout extends Vue {
             display none
         .site-title
             margin 0 auto
-            color $white-color
-            font-family $title-font-face !important
+            width 400px
+            height 200px
+            object-fit cover
     .menu-item
         position relative
-        top 10%
         .menu-card
             padding 0 0 20px
             border-radius $image-border-radius
             text-align center
             transition all 0.2s
             &:hover
-                background-color #DCEDC8
+                background-color $accent-light-color
                 cursor pointer
                 transform translateY(-10px)
             .menu-card-icon
                 justify-content center
             .menu-card-name
+                color $primary
                 font-size 35px
+                font-family $title-font-face !important
                 +md()
                     font-size 3.5vw
 </style>

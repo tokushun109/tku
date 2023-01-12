@@ -109,7 +109,7 @@ module.exports = {
 
     webfontloader: {
         google: {
-            families: ['Lobster:400,700'],
+            families: ['Lobster', 'Sawarabi Mincho'],
         },
     },
 
@@ -151,7 +151,7 @@ module.exports = {
         theme: {
             themes: {
                 light: {
-                    primary: '#4caf50',
+                    primary: '#6D4C41',
                     secondary: '#8bc34a',
                     accent: '#cddc39',
                     warning: '#fff9c4',

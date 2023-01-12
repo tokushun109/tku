@@ -1,52 +1,41 @@
 <template>
     <v-sheet class="c-creator-edit">
-        <v-container>
-            <v-sheet class="creator-wrapper">
-                <v-container class="logo-content">
-                    <v-img v-if="creator.apiPath" :src="creator.apiPath" max-width="400" aspect-ratio="1" class="logo-image" alt="ロゴ画像" />
-                </v-container>
-                <v-container class="description-content">
-                    <pre class="description-text">{{ creator.introduction }}</pre>
-                </v-container>
-                <div>
-                    <div class="sns-head-title head-title">
-                        <div class="head-title-content">SNS</div>
-                    </div>
-                    <v-container v-if="!admin" class="sns-content">
-                        <div v-for="sns in snsList" :key="sns.name" class="sns-item">
-                            <v-btn fab :color="ColorType.Orange" :href="sns.url" target="_blank" rel="noopener noreferrer" x-large>
-                                <v-icon :color="ColorType.White" class="sns-icon">{{ sns.icon }}</v-icon>
-                            </v-btn>
-                            <a class="sns-name" :href="sns.url" target="_blank" rel="noopener noreferrer">
-                                <small>{{ sns.name }}</small>
-                            </a>
-                        </div>
-                    </v-container>
-                </div>
-                <div>
-                    <div class="sales-site-head-title head-title">
-                        <div class="head-title-content">販売サイト</div>
-                    </div>
-                    <v-container v-if="!admin" class="sales-site-content">
-                        <div v-for="site in salesSiteList" :key="site.name" class="sales-site-item">
-                            <v-btn
-                                :color="ColorType.Orange"
-                                :href="site.url"
-                                class="sales-site-buttons"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                x-large
-                            >
-                                {{ site.name }}
-                            </v-btn>
-                        </div>
-                    </v-container>
-                    <div v-if="admin" class="edit-button">
-                        <v-btn color="primary" @click="openHandler"><c-icon :type="IconType.Edit.name" @c-click="openHandler" />編集</v-btn>
-                    </div>
-                </div>
-            </v-sheet>
+        <v-container class="logo-content">
+            <v-img v-if="creator.apiPath" :src="creator.apiPath" max-width="400" aspect-ratio="1" class="logo-image" alt="ロゴ画像" />
         </v-container>
+        <v-container class="description-content">
+            <pre class="description-text">{{ creator.introduction }}</pre>
+        </v-container>
+        <div>
+            <div v-if="snsList" class="sns-head-title head-title">
+                <div class="head-title-content">SNS</div>
+            </div>
+            <v-container class="sns-content">
+                <div v-for="sns in snsList" :key="sns.name" class="sns-item">
+                    <v-btn fab :color="ColorType.Accent" :href="sns.url" target="_blank" rel="noopener noreferrer" x-large>
+                        <v-icon :color="ColorType.White" class="sns-icon">{{ sns.icon }}</v-icon>
+                    </v-btn>
+                    <a class="sns-name" :href="sns.url" target="_blank" rel="noopener noreferrer">
+                        <small>{{ sns.name }}</small>
+                    </a>
+                </div>
+            </v-container>
+        </div>
+        <div>
+            <div v-if="salesSiteList" class="sales-site-head-title head-title">
+                <div class="head-title-content">販売サイト</div>
+            </div>
+            <v-container class="sales-site-content">
+                <div v-for="site in salesSiteList" :key="site.name" class="sales-site-item">
+                    <v-btn :color="ColorType.Accent" :href="site.url" class="sales-site-buttons" target="_blank" rel="noopener noreferrer" x-large>
+                        {{ site.name }}
+                    </v-btn>
+                </div>
+            </v-container>
+            <div v-if="admin" class="edit-button">
+                <v-btn color="primary" @click="openHandler"><c-icon :type="IconType.Edit.name" @c-click="openHandler" />編集</v-btn>
+            </div>
+        </div>
         <c-dialog
             :visible.sync="dialogVisible"
             title="製作者の編集"
@@ -168,59 +157,58 @@ export default class CCreatorEdit extends Vue {
 
 <style lang="stylus" scoped>
 .c-creator-edit
-    .creator-wrapper
-        padding 16px
-        .logo-content
-            .logo-image
-                margin 0 auto
-                border-radius 50%
-                object-fit cover
-        .description-title
-            color $title-text-color
-        .description-content
+    .logo-content
+        .logo-image
+            margin 0 auto
+            border-radius 50%
+            object-fit cover
+    .description-title
+        color $title-primary-color
+    .description-content
+        text-align center
+        .description-text
+            white-space pre-wrap
+            word-break break-all
+            +sm()
+                font-size 3vw
+    .head-title
+        color $title-primary-color
+        text-align center
+        font-weight $title-font-weight
+        font-size $font-xxlarge
+        .head-title-content
+            margin-top 20px
+    .sns-content
+        position relative
+        display flex
+        justify-content center
+        .sns-item
+            margin 0 10px
             text-align center
-            .description-text
-                white-space pre-wrap
-                word-break break-all
-                +sm()
-                    font-size 3vw
-        .head-title
-            color $title-text-color
-            text-align center
-            font-weight $title-font-weight
-            font-size $font-xxlarge
-            .head-title-content
-                margin-top 20px
-        .sns-content
-            position relative
-            display flex
-            justify-content center
-            .sns-item
-                margin 0 10px
-                text-align center
-                .sns-icon
-                    position absolute
-                    top -23px
-            .sns-name
+            .sns-icon
                 position absolute
-                bottom 27px
-                left 50%
-                margin-top 10px
-                color $white-color
-                font-weight $title-font-weight
-                font-size 12px
-                transform translateX(-50%)
-        .sales-site-content
-            text-align center
-            .sales-site-buttons
-                margin 10px 0
-                width 450px
-                color $white-color
-                font-size $font-large
-                +md()
-                    width 45vw
-                +sm()
-                    width 80%
-        .edit-button
-            text-align center
+                top -23px
+        .sns-name
+            position absolute
+            bottom 27px
+            left 50%
+            margin-top 10px
+            color $white-color
+            font-weight $title-font-weight
+            font-size 12px
+            transform translateX(-50%)
+    .sales-site-content
+        text-align center
+        .sales-site-buttons
+            margin 10px 0
+            width 450px
+            color $white-color
+            font-size $font-large
+            +md()
+                width 45vw
+            +sm()
+                width 80%
+    .edit-button
+        margin-bottom 32px
+        text-align center
 </style>

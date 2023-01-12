@@ -1,12 +1,28 @@
 <template>
     <v-sheet :color="ColorType.Transparent" class="page-top">
         <c-top-image class="top-image" title category :carousel-items="carouselItems" />
-        <div class="more">
-            <v-btn rounded outlined x-large :color="ColorType.Grey" nuxt to="/product">
-                <div class="text-h6">商品一覧へ</div>
-                <v-icon large>{{ mdiArrowRightThick }}</v-icon>
-            </v-btn>
-        </div>
+        <c-layout-container normal>
+            <!-- aboutがページの修正が終わってから表示 -->
+            <div v-if="false" class="page-top-container">
+                <div class="about-section">
+                    <h2 class="page-top-title">About</h2>
+                    <v-container class="about-section__message default">
+                        <p>仕事も育児も頑張る女性の日常に寄り添うアクセサリーを創りたい。</p>
+                        <p>
+                            そんな想いで
+                            <span class="emphasis">オシャレなだけじゃない、あったらちょっと嬉しい作品</span> を制作・販売しております。
+                        </p>
+                    </v-container>
+                    <v-container class="about-section__message sm">
+                        <p>仕事も育児も頑張る女性の日常に寄り添う<br />アクセサリーを創りたい。</p>
+                        <p>そんな想いで</p>
+                        <p><span class="emphasis">オシャレなだけじゃない</span><br /><span class="emphasis">あったらちょっと嬉しい作品</span></p>
+                        <p>を制作・販売しております。</p>
+                    </v-container>
+                    <c-detail-button to="about" />
+                </div>
+            </div>
+        </c-layout-container>
     </v-sheet>
 </template>
 
@@ -89,9 +105,29 @@ export default class PageTop extends Vue {
                 display block
     .top-image
         margin-bottom 16px
-    .more
-        margin-right 16px
-        text-align right
         +sm()
-            display none
+            margin-bottom 40px
+    .page-top-title
+        margin-bottom 10px
+        color $primary
+        text-align center
+        font-size 60px !important
+        font-family $title-font-face !important
+        +sm()
+            font-size 40px !important
+    .page-top-container
+        margin-bottom 64px
+        .about-section
+            &__message
+                color $text-color
+                font-weight 800
+                &.default
+                    +sm()
+                        display none
+                &.sm
+                    display none
+                    +sm()
+                        display block
+                .emphasis
+                    color $accent
 </style>

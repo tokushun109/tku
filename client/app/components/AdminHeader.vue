@@ -1,6 +1,6 @@
 <template>
     <div class="admin-header">
-        <v-app-bar app :color="ColorType.Green" dark clipped-left>
+        <v-app-bar app :color="ColorType.Primary" dark clipped-left>
             <v-app-bar-nav-icon v-if="!$store.getters['user/isGuest']" @click="sidebarVisible = !sidebarVisible">
                 <client-only>
                     <c-icon :type="IconType.Menu.name" @click.native="sidebarVisible = !sidebarVisible" />
@@ -15,7 +15,7 @@
                 <v-card class="sigh-out-area">
                     <v-card-title />
                     <v-card-text class="sigh-out-text">ログアウトします。よろしいですか？</v-card-text>
-                    <v-divider />
+                    <v-divider class="divider" />
                     <v-card-actions class="sigh-out-actions">
                         <v-btn color="primary" outlined @click="dialogVisible = false">いいえ</v-btn>
                         <v-btn color="primary" @click="logoutHandler">はい</v-btn>
@@ -30,7 +30,7 @@
                         <v-list-item-title class="title navigation-title"> 設定 </v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
-                <v-divider />
+                <v-divider class="divider" />
                 <v-list dense nav>
                     <v-list-item v-for="(table, index) in tables" :key="index" nuxt :to="`/admin/${table.link}`">
                         <v-list-item-icon>
@@ -86,5 +86,5 @@ export default class AdminHeader extends Vue {
     .navigation-list
         .navigation-list-item
             .navigation-title
-                color $title-text-color
+                color $title-primary-color
 </style>

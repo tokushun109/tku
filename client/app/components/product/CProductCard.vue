@@ -12,7 +12,6 @@
                     {{ listItem.name }}
                     <v-chip v-if="!listItem.isActive" x-small :color="ColorType.Grey" :text-color="ColorType.White">展示</v-chip>
                 </div>
-                <v-divider />
             </div>
             <c-product-image :product="listItem" />
             <div class="product-card-footer">
@@ -22,7 +21,7 @@
                         <c-icon :type="IconType.Delete.name" @c-click="$emit('c-click', ExecutionType.Delete, listItem)" />
                     </template>
                     <v-spacer />
-                    <div class="text-h6">￥{{ listItem.price | priceFormat }}<span class="text-caption">税込</span></div>
+                    <div class="price">￥{{ listItem.price | priceFormat }}<span class="text-caption">税込</span></div>
                 </div>
             </div>
         </v-card-text>
@@ -46,27 +45,27 @@ export default class CProductCard extends Vue {
 
 <style lang="stylus" scoped>
 .c-product-card
-    background-color $secondary-bg-color
+    background-color $light-dark-color
     &.is-active
-        background-color $light-bg-color
+        background-color $accent-light-color
     .product-card-wrapper
         .product-card-header
             margin 16px 0
             .product-name
                 overflow hidden
                 padding-bottom 10px
-                color $title-text-color
+                color $title-primary-color
                 text-overflow ellipsis
                 white-space nowrap
                 font-weight $title-font-weight
-                font-size 16px
-                +sm()
-                    overflow inherit
-                    text-overflow inherit
-                    white-space inherit
+                font-size $font-xlarge
         .product-card-footer
             margin-top 15px
             text-align right
             .product-card-footer-content
                 display flex
+                .price
+                    color $title-primary-color
+                    font-weight 600
+                    font-size $font-xlarge
 </style>

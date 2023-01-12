@@ -7,7 +7,7 @@
                     <v-spacer />
                     <c-icon :type="IconType.New.name" @c-click="clickHandler(ExecutionType.Create)" />
                 </div>
-                <v-divider />
+                <v-divider class="divider" />
                 <v-list class="product-list-content">
                     <c-message v-if="listItems.length === 0" class="message"> 登録されていません </c-message>
                     <v-row>
@@ -440,7 +440,7 @@ export default class CProductList extends Vue {
         .product-list-header
             display flex
             .product-list-title
-                color $title-text-color
+                color $title-primary-color
         .product-list-content
             .message
                 margin-top 16px

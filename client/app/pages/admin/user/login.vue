@@ -54,5 +54,5 @@ export default class PageAdminUserLogin extends Vue {
         text-align center
         .login-title
             margin-bottom 16px
-            color $title-text-color
+            color $title-primary-color
 </style>
