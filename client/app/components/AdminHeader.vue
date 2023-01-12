@@ -15,7 +15,7 @@
                 <v-card class="sigh-out-area">
                     <v-card-title />
                     <v-card-text class="sigh-out-text">ログアウトします。よろしいですか？</v-card-text>
-                    <v-divider />
+                    <v-divider class="divider" />
                     <v-card-actions class="sigh-out-actions">
                         <v-btn color="primary" outlined @click="dialogVisible = false">いいえ</v-btn>
                         <v-btn color="primary" @click="logoutHandler">はい</v-btn>
@@ -30,7 +30,7 @@
                         <v-list-item-title class="title navigation-title"> 設定 </v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
-                <v-divider />
+                <v-divider class="divider" />
                 <v-list dense nav>
                     <v-list-item v-for="(table, index) in tables" :key="index" nuxt :to="`/admin/${table.link}`">
                         <v-list-item-icon>

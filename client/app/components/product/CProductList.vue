@@ -7,7 +7,7 @@
                     <v-spacer />
                     <c-icon :type="IconType.New.name" @c-click="clickHandler(ExecutionType.Create)" />
                 </div>
-                <v-divider />
+                <v-divider class="divider" />
                 <v-list class="product-list-content">
                     <c-message v-if="listItems.length === 0" class="message"> 登録されていません </c-message>
                     <v-row>

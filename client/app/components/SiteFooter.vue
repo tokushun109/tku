@@ -7,7 +7,7 @@
         </v-container>
         <!-- sm幅以下 -->
         <div class="sm">
-            <v-bottom-navigation color="primary" height="50px" mandatory grow app>
+            <v-bottom-navigation :color="ColorType.Primary" height="50px" grow app>
                 <v-btn v-for="(item, index) in menuItems" :key="index" :color="ColorType.White" nuxt :to="`/${item.link}`">
                     <span class="menu-name">{{ item.name }}</span>
                     <v-icon>{{ item.icon }}</v-icon>

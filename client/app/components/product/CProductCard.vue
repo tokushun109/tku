@@ -12,7 +12,6 @@
                     {{ listItem.name }}
                     <v-chip v-if="!listItem.isActive" x-small :color="ColorType.Grey" :text-color="ColorType.White">展示</v-chip>
                 </div>
-                <v-divider />
             </div>
             <c-product-image :product="listItem" />
             <div class="product-card-footer">

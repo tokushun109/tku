@@ -6,7 +6,7 @@
                 <v-spacer />
                 <c-icon :type="IconType.New.name" @c-click="openHandler(ExecutionType.Create)" />
             </div>
-            <v-divider />
+            <v-divider class="divider" />
             <v-list class="list-content-wrapper" dense>
                 <c-message v-if="listItems.length === 0" class="no-record-message"> 登録されていません </c-message>
                 <v-list-item v-for="listItem in listItems" v-else :key="listItem.uuid" class="list-content">
@@ -17,7 +17,7 @@
                             <c-icon :type="IconType.Edit.name" @c-click="openHandler(ExecutionType.Edit, listItem)" />
                             <c-icon :type="IconType.Delete.name" @c-click="openHandler(ExecutionType.Delete, listItem)" />
                         </v-list-item-title>
-                        <v-divider />
+                        <v-divider class="divider" />
                     </v-list-item-content>
                 </v-list-item>
             </v-list>

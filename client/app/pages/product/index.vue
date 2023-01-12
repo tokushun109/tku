@@ -1,7 +1,7 @@
 <template>
     <c-layout-container normal class="page-product">
         <div class="page-title-container">
-            <h1 class="page-title text-sm-h3 text-h4">Product</h1>
+            <h2 class="page-title">Product</h2>
         </div>
         <v-sheet>
             <v-container>

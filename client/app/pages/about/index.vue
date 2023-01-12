@@ -1,10 +1,9 @@
 <template>
-    <c-layout-container normal class="page-creator">
+    <c-layout-container narrow class="page-creator">
         <div class="page-title-container">
-            <h1 class="page-title text-h4">About</h1>
+            <h2 class="page-title">About</h2>
         </div>
         <v-sheet>
-            <c-top-logo />
             <c-creator-edit v-if="creator" :item.sync="creator" :sales-site-list="salesSiteList" />
         </v-sheet>
         <c-breadcrumbs :items="breadCrumbs" />

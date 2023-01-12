@@ -8,7 +8,7 @@
         </div>
         <div v-if="isRoot" class="site-title-area">
             <nuxt-link to="/">
-                <img class="site-title" src="/img/logo/tocoriri_logo.png" alt="アクセサリーショップ とこりり" />
+                <h1><img class="site-title" src="/img/logo/tocoriri_logo.png" alt="アクセサリーショップ とこりり" /></h1>
             </nuxt-link>
         </div>
         <v-dialog v-model="menuVisible" fullscreen hide-overlay transition="dialog-top-transition" scrollable>
@@ -18,7 +18,7 @@
                 </v-btn>
                 <div class="site-title-area" @click="toggleMenu">
                     <nuxt-link to="/">
-                        <img class="site-title" src="/img/logo/tocoriri_logo_white.png" alt="とこりり メニュー" />
+                        <h1><img class="site-title" src="/img/logo/tocoriri_logo_white.png" alt="とこりり メニュー" /></h1>
                     </nuxt-link>
                 </div>
                 <v-container class="menu-item">
@@ -46,7 +46,7 @@
             <v-app-bar :color="ColorType.Title" dense class="site-header">
                 <div class="site-title-area">
                     <nuxt-link to="/">
-                        <img class="site-title" src="/img/logo/tocoriri_logo_white.png" alt="アクセサリーショップ とこりり" />
+                        <h1><img class="site-title" src="/img/logo/tocoriri_logo_white.png" alt="アクセサリーショップ とこりり" /></h1>
                     </nuxt-link>
                 </div>
             </v-app-bar>
@@ -113,7 +113,7 @@ export default class SiteLayout extends Vue {
                     position relative
                     display block
                     margin 0 auto
-                    padding-top 8px
+                    padding-top 12px
                     .site-title
                         width 100px
                         height 50px
@@ -148,7 +148,7 @@ export default class SiteLayout extends Vue {
             text-align center
             transition all 0.2s
             &:hover
-                background-color #DCEDC8
+                background-color $accent-light-color
                 cursor pointer
                 transform translateY(-10px)
             .menu-card-icon

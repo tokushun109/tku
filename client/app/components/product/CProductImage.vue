@@ -28,11 +28,11 @@
             </v-carousel>
         </template>
         <template v-else>
+            <div class="display-area">
+                <v-img v-if="product.productImages.length > 1" :src="selectImage.apiPath" :alt="selectImage.uuid" class="carousel-image" />
+                <v-img v-else src="/img/product/no-image.png" alt="no-image" class="carousel-image" />
+            </div>
             <v-list>
-                <div class="display-area">
-                    <v-img v-if="product.productImages.length > 1" :src="selectImage.apiPath" :alt="selectImage.uuid" class="carousel-image" />
-                    <v-img v-else src="/img/product/no-image.png" alt="no-image" class="carousel-image" />
-                </div>
                 <v-row dense>
                     <v-col v-for="(productImage, index) in product.productImages" :key="productImage.uuid" cols="2">
                         <v-img

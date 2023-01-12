@@ -1,7 +1,7 @@
 <template>
     <c-layout-container class="page-contact" narrow>
         <div class="page-title-container">
-            <h1 class="page-title text-sm-h3 text-h4">Contact</h1>
+            <h1 class="page-title">Contact</h1>
         </div>
         <div v-if="!isSent" class="contact-introduction">
             <p>お問い合わせ・<br class="sm" />ご意見・ご相談はこちらから</p>
