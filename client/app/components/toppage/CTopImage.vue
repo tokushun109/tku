@@ -16,7 +16,7 @@
                         <v-chip v-if="title" class="title-label" small :color="ColorType.Accent" :text-color="ColorType.White">
                             {{ displayProduct(index).name }}
                         </v-chip>
-                        <v-img eager :src="image" :alt="`image-${index}`" width="530" class="carousel-image" />
+                        <v-img eager lazy-src="/img/product/gray-image.png" :src="image" :alt="`image-${index}`" width="530" class="carousel-image" />
                     </v-card>
                 </div>
                 <div v-for="(image, index) in displayImages" :key="`${index}-sm`" class="slide-show">
@@ -32,7 +32,7 @@
                         <v-chip v-if="title" class="title-label" small :color="ColorType.Accent" :text-color="ColorType.White">
                             {{ displayProduct(index).name }}
                         </v-chip>
-                        <v-img eager :src="image" :alt="`image-${index}`" width="530" class="carousel-image" />
+                        <v-img eager lazy-src="/img/product/gray-image.png" :src="image" :alt="`image-${index}`" width="530" class="carousel-image" />
                     </v-card>
                 </div>
             </div>
@@ -67,7 +67,7 @@
                             <v-chip v-if="title" class="title-label" small :color="ColorType.Accent" :text-color="ColorType.White">
                                 {{ displayProduct(index).name }}
                             </v-chip>
-                            <v-img :src="image" :alt="`image-${index}`" class="carousel-image" />
+                            <v-img :src="image" lazy-src="/img/product/gray-image.png" :alt="`image-${index}`" class="carousel-image" />
                         </v-carousel-item>
                     </v-carousel>
                     <v-carousel v-else :show-arrows="false" height="auto" hide-delimiters>

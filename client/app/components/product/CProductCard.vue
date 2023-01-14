@@ -13,7 +13,12 @@
                     <v-chip v-if="!listItem.isActive" x-small :color="ColorType.Grey" :text-color="ColorType.White">展示</v-chip>
                 </div>
             </div>
-            <v-img class="product-card-image" :src="listItem.productImages[0].apiPath" :alt="listItem.productImages[0].name" />
+            <v-img
+                class="product-card-image"
+                lazy-src="/img/product/gray-image.png"
+                :src="listItem.productImages[0].apiPath"
+                :alt="listItem.productImages[0].name"
+            />
             <div class="product-card-footer">
                 <div class="product-card-footer-content">
                     <template v-if="admin">
