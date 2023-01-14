@@ -17,7 +17,7 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
-var typeToExtension = map[string]string{
+var TypeToExtension = map[string]string{
 	"image/jpeg": ".jpg",
 	"image/png":  ".png",
 	"image/gif":  ".gif",
@@ -310,7 +310,7 @@ func createProductImageHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		// fileのMIMETypeを取得
 		mimeType := handler.Header["Content-Type"][0]
-		savePath := saveDirectory + "/" + uuid + typeToExtension[mimeType]
+		savePath := saveDirectory + "/" + uuid + TypeToExtension[mimeType]
 		if config.Config.Env == "local" {
 			// localの場合はプロジェクト内のディレクトリに保存
 			f, err := os.OpenFile(savePath, os.O_WRONLY|os.O_CREATE, 0666)

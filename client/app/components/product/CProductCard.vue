@@ -13,7 +13,12 @@
                     <v-chip v-if="!listItem.isActive" x-small :color="ColorType.Grey" :text-color="ColorType.White">展示</v-chip>
                 </div>
             </div>
-            <c-product-image :product="listItem" />
+            <v-img
+                class="product-card-image"
+                lazy-src="/img/product/gray-image.png"
+                :src="listItem.productImages[0].apiPath"
+                :alt="listItem.productImages[0].name"
+            />
             <div class="product-card-footer">
                 <div class="product-card-footer-content">
                     <template v-if="admin">
@@ -59,6 +64,11 @@ export default class CProductCard extends Vue {
                 white-space nowrap
                 font-weight $title-font-weight
                 font-size $font-xlarge
+        .product-card-image
+            width 100%
+            border-radius $image-border-radius
+            aspect-ratio 1 / 1
+            object-fit cover
         .product-card-footer
             margin-top 15px
             text-align right

@@ -27,7 +27,7 @@
                     v-model="valid"
                     lazy-validation
                 >
-                    <v-text-field v-model="modalItem.name" :rules="nameRules" label="商品名(必須)" outlined counter="20" />
+                    <v-text-field v-model="modalItem.name" :rules="nameRules" label="商品名(必須)" outlined counter="50" />
                     <v-textarea v-model="modalItem.description" label="商品説明" outlined />
                     <v-row class="price-input">
                         <v-col cols="6">
@@ -65,17 +65,7 @@
                         label="カテゴリー"
                         outlined
                     />
-                    <v-select
-                        v-model="modalItem.tags"
-                        :items="tags"
-                        item-text="name"
-                        return-object
-                        chips
-                        height="56"
-                        multiple
-                        label="タグ"
-                        outlined
-                    />
+                    <v-select v-model="modalItem.tags" :items="tags" item-text="name" return-object chips multiple label="タグ" outlined />
                     <v-row dense>
                         <v-col cols="12" sm="6">
                             <v-select
@@ -154,7 +144,7 @@ import {
     IImagePathOrder,
     BadRequest,
 } from '~/types'
-import { maxPrice, min20, newProduct, newSiteDetail, price, required } from '~/methods'
+import { maxPrice, min50, newProduct, newSiteDetail, price, required } from '~/methods'
 
 interface IIndexOrder {
     [key: number]: number
@@ -200,7 +190,7 @@ export default class CProductList extends Vue {
 
     errors: Array<IError> = []
 
-    nameRules = [required, min20]
+    nameRules = [required, min50]
 
     priceRules = [required, price, maxPrice]
 

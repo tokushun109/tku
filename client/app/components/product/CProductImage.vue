@@ -18,7 +18,7 @@
                     <v-icon large v-bind="attrs" v-on="on">{{ mdiChevronRight }}</v-icon>
                 </template>
                 <v-carousel-item v-for="image in product.productImages" :key="image.uuid">
-                    <v-img :src="image.apiPath" :alt="image.uuid" class="carousel-image" />
+                    <v-img lazy-src="/img/product/gray-image.png" :src="image.apiPath" :alt="image.uuid" class="carousel-image" />
                 </v-carousel-item>
             </v-carousel>
             <v-carousel v-else :show-arrows="false" height="auto" hide-delimiters class="carousel-area">
@@ -29,13 +29,20 @@
         </template>
         <template v-else>
             <div class="display-area">
-                <v-img v-if="product.productImages.length > 1" :src="selectImage.apiPath" :alt="selectImage.uuid" class="carousel-image" />
+                <v-img
+                    v-if="product.productImages.length > 1"
+                    lazy-src="/img/product/gray-image.png"
+                    :src="selectImage.apiPath"
+                    :alt="selectImage.uuid"
+                    class="carousel-image"
+                />
                 <v-img v-else src="/img/product/no-image.png" alt="no-image" class="carousel-image" />
             </div>
             <v-list>
                 <v-row dense>
                     <v-col v-for="(productImage, index) in product.productImages" :key="productImage.uuid" cols="2">
                         <v-img
+                            lazy-src="/img/product/gray-image.png"
                             :src="productImage.apiPath"
                             :alt="productImage.uuid"
                             class="carousel-image list-display"

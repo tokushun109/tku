@@ -148,7 +148,7 @@ func updateCreatorLogoHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// fileのMIMETypeを取得
 	mimeType := handler.Header["Content-Type"][0]
-	savePath := saveDirectory + "/" + uuid + typeToExtension[mimeType]
+	savePath := saveDirectory + "/" + uuid + TypeToExtension[mimeType]
 	if config.Config.Env == "local" {
 		// localの場合はプロジェクト内のディレクトリに保存
 		f, err := os.OpenFile(savePath, os.O_WRONLY|os.O_CREATE, 0666)
