@@ -9,7 +9,7 @@ import (
 type Product struct {
 	DefaultModel
 	Uuid          string          `json:"uuid"`
-	Name          string          `json:"name" validate:"min=1,max=20"`
+	Name          string          `json:"name" validate:"min=1,max=50"`
 	Description   string          `json:"description"`
 	Price         int             `json:"price" validate:"min=1,max=1000000"`
 	IsActive      *bool           `json:"isActive"`
