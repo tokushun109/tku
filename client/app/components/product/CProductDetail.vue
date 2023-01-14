@@ -21,7 +21,7 @@
 
                     <div class="tag-content">
                         <div v-for="tag in product.tags" :key="tag.uuid">
-                            <v-chip small :color="ColorType.Secondary" :text-color="ColorType.White" class="mx-1">{{ tag.name }}</v-chip>
+                            <v-chip small :color="ColorType.Secondary" :text-color="ColorType.White" class="ma-1">{{ tag.name }}</v-chip>
                         </div>
                     </div>
                 </div>
@@ -96,6 +96,7 @@ export default class CProductDetail extends Vue {
                 font-weight $title-font-weight
             .tag-content
                 display flex
+                flex-wrap wrap
         .sales-site-area
             .sales-site
                 margin-top 16px

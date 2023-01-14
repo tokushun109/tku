@@ -53,6 +53,11 @@ func GetSalesSite(uuid string) (salesSite SalesSite) {
 	return salesSite
 }
 
+func GetSalesSiteByName(name string) (salesSite SalesSite) {
+	Db.Limit(1).Find(&salesSite, "name = ?", name)
+	return salesSite
+}
+
 func SalesSiteUniqueCheck(name string) (isUnique bool, err error) {
 	var salesSite SalesSite
 	Db.Limit(1).Find(&salesSite, "name = ?", name)

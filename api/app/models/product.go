@@ -39,9 +39,12 @@ func GetAllProducts(mode string) (products Products, err error) {
 	if mode == "all" {
 		Db.Preload("Category").
 			Preload("ProductImages", func(db *gorm.DB) *gorm.DB {
-				return db.Order("product_image.order Desc")
+				return db.Order("product_image.order Desc, id")
 			}).
 			Preload("Tags").
+			Preload("SiteDetails", func(db *gorm.DB) *gorm.DB {
+				return db.Order("site_detail.detail_url Desc")
+			}).
 			Preload("SiteDetails.SalesSite").
 			Find(&products)
 	} else if mode == "active" {
@@ -51,6 +54,9 @@ func GetAllProducts(mode string) (products Products, err error) {
 				return db.Order("product_image.order Desc")
 			}).
 			Preload("Tags").
+			Preload("SiteDetails", func(db *gorm.DB) *gorm.DB {
+				return db.Order("site_detail.detail_url Desc, id")
+			}).
 			Preload("SiteDetails.SalesSite").
 			Find(&products)
 	} else {
@@ -81,6 +87,9 @@ func GetProduct(uuid string) (product Product, err error) {
 			return db.Order("product_image.order Desc")
 		}).
 		Preload("Tags").
+		Preload("SiteDetails", func(db *gorm.DB) *gorm.DB {
+			return db.Order("site_detail.detail_url Desc, id")
+		}).
 		Preload("SiteDetails.SalesSite").
 		First(&product, "uuid = ?", uuid).Error
 	return product, err

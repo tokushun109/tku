@@ -90,6 +90,11 @@ func GetAllTags() (tags Tags) {
 	return tags
 }
 
+func GetTagsByNames(names []string) (tags Tags) {
+	Db.Find(&tags, "name in (?)", names)
+	return tags
+}
+
 func GetTag(uuid string) (tag Tag) {
 	Db.Limit(1).Find(&tag, "uuid = ?", uuid)
 	return tag
@@ -106,6 +111,21 @@ func TagUniqueCheck(name string) (isUnique bool, err error) {
 }
 
 func InsertTag(tag *Tag) (err error) {
+	// uuidの設定
+	uuid, err := GenerateUuid()
+	if err != nil {
+		return err
+	}
+	tag.Uuid = uuid
+	err = Db.Create(&tag).Error
+	return err
+}
+
+func InsertUnDuplicateTag(tag *Tag, tagName string) (err error) {
+	isUnique, _ := TagUniqueCheck(tagName)
+	if !isUnique {
+		return nil
+	}
 	// uuidの設定
 	uuid, err := GenerateUuid()
 	if err != nil {
