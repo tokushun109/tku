@@ -14,17 +14,17 @@ import { IBreadCrumb, IClientError, IProduct, serverToClientError } from '~/type
 export default class PageProductDetail extends Vue {
     product: IProduct | null = null
     error: IClientError | null = null
-
-    breadCrumbs: Array<IBreadCrumb> = [
-        { text: 'トップページ', href: '/' },
-        { text: '商品一覧', href: '/product' },
-        { text: this.product ? this.product.name : '', disabled: true },
-    ]
+    breadCrumbs: Array<IBreadCrumb> = []
 
     async asyncData({ app, params }: Context) {
         try {
             const product = await app.$axios.$get(`/product/${params.uuid}`)
-            return { product }
+            const breadCrumbs: Array<IBreadCrumb> = [
+                { text: 'トップページ', href: '/' },
+                { text: '商品一覧', href: '/product' },
+                { text: product ? product.name : '', disabled: true },
+            ]
+            return { product, breadCrumbs }
         } catch (e) {
             const error = serverToClientError(e.response)
             return { product: null, error }
