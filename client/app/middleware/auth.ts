@@ -1,6 +1,10 @@
 import { Context } from '@nuxt/types'
 
 export default async function ({ app, route, store, redirect }: Context) {
+    // /creatorを/aboutにリダイレクトさせる
+    if (route.path === '/creator') {
+        return redirect('/about')
+    }
     // SSRの時は認証処理を行わない
     if (!process.server) {
         return
