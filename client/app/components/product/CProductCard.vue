@@ -14,11 +14,14 @@
                 </div>
             </div>
             <v-img
+                v-if="listItem.productImages.length > 0"
                 class="product-card-image"
                 lazy-src="/img/product/gray-image.png"
                 :src="listItem.productImages[0].apiPath"
                 :alt="listItem.productImages[0].name"
             />
+            <v-img v-else class="product-card-image" lazy-src="/img/product/gray-image.png" src="/img/product/no-image.png" alt="no-image" />
+
             <div class="product-card-footer">
                 <div class="product-card-footer-content">
                     <template v-if="admin">
