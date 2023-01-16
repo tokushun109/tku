@@ -113,6 +113,12 @@ export default class CTopImage extends Vue {
 </script>
 
 <style lang="stylus" scoped>
+::v-deep .v-chip__content
+    display inline-block !important
+    overflow hidden
+    text-overflow ellipsis
+    white-space nowrap
+
 .c-top-image
     .default
         +sm()
@@ -138,12 +144,14 @@ export default class CTopImage extends Vue {
                         top 5px
                         left 5px
                         z-index 5
+                        max-width 80%
                         opacity 0.8
                     .category-label
                         position absolute
                         right 5px
                         bottom 5px
                         z-index 5
+                        max-width 80%
                         opacity 0.8
                     .carousel-image
                         width 100%
@@ -167,12 +175,14 @@ export default class CTopImage extends Vue {
                         top 5px
                         left 5px
                         z-index 5
+                        max-width 80%
                         opacity 0.8
                     .category-label
                         position absolute
                         right 5px
                         bottom 5px
                         z-index 5
+                        max-width 80%
                         opacity 0.8
                     .carousel-image
                         width 100%
