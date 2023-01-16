@@ -63,7 +63,40 @@ func GetAllProducts(mode string) (products Products, err error) {
 		err = errors.New("invalid params")
 		return products, err
 	}
-	return products, err
+	return products, nil
+}
+
+func GetAllProductIDs(mode string) (IDs []int, err error) {
+	if mode == "all" {
+		Db.Select("id").
+			Preload("Category").
+			Preload("ProductImages", func(db *gorm.DB) *gorm.DB {
+				return db.Order("product_image.order Desc, id")
+			}).
+			Preload("Tags").
+			Preload("SiteDetails", func(db *gorm.DB) *gorm.DB {
+				return db.Order("site_detail.detail_url Desc")
+			}).
+			Preload("SiteDetails.SalesSite").
+			Find(&IDs)
+	} else if mode == "active" {
+		Db.Select("id").
+			Where("is_active = ?", 1).
+			Preload("Category").
+			Preload("ProductImages", func(db *gorm.DB) *gorm.DB {
+				return db.Order("product_image.order Desc")
+			}).
+			Preload("Tags").
+			Preload("SiteDetails", func(db *gorm.DB) *gorm.DB {
+				return db.Order("site_detail.detail_url Desc, id")
+			}).
+			Preload("SiteDetails.SalesSite").
+			Find(&IDs)
+	} else {
+		err = errors.New("invalid params")
+		return IDs, err
+	}
+	return IDs, nil
 }
 
 func GetNewProducts(limit int) (products Products) {

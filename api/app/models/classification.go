@@ -27,6 +27,13 @@ func GetAllCategories() (categories Categories) {
 	return categories
 }
 
+func GetUsedCategories() (categories Categories) {
+	Db.Joins("INNER JOIN product on product.category_id = category.id").
+		Group("id").
+		Find(&categories)
+	return categories
+}
+
 func GetCategory(uuid string) (category Category) {
 	Db.Limit(1).Find(&category, "uuid = ?", uuid)
 	return category

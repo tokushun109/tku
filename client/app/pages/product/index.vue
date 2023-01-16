@@ -5,6 +5,7 @@
         </div>
         <v-sheet>
             <v-container>
+                <c-select-search :items="categories" />
                 <c-message v-if="products.length === 0" class="mt-4"> 登録されていません </c-message>
                 <v-row>
                     <v-col v-for="listItem in products" :key="listItem.uuid" cols="12" sm="6" md="4">
@@ -21,10 +22,11 @@
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
 import { newProduct } from '~/methods'
-import { IBreadCrumb, IGetProductsParams, IProduct } from '~/types'
+import { IBreadCrumb, IClassification, IGetCategoriesParams, IGetProductsParams, IProduct } from '~/types'
 @Component({})
 export default class PageProductIndex extends Vue {
     products: Array<IProduct> = []
+    categories: Array<IClassification> = []
     // form用のproductModel
     productModel: IProduct = newProduct()
 
@@ -35,13 +37,17 @@ export default class PageProductIndex extends Vue {
 
     async asyncData({ app }: Context) {
         try {
-            const params: IGetProductsParams = {
+            const productParams: IGetProductsParams = {
                 mode: 'active',
             }
-            const products: Array<IProduct> = await app.$axios.$get(`/product`, { params })
-            return { products }
+            const products: Array<IProduct> = await app.$axios.$get(`/product`, { params: productParams })
+            const categoryParams: IGetCategoriesParams = {
+                mode: 'used',
+            }
+            const categories: Array<IProduct> = await app.$axios.$get(`/category`, { params: categoryParams })
+            return { products, categories }
         } catch (e) {
-            return { products: [] }
+            return { products: [], categories: [] }
         }
     }
 
