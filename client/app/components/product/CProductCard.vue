@@ -13,15 +13,21 @@
                     <v-chip v-if="!listItem.isActive" x-small :color="ColorType.Grey" :text-color="ColorType.White">展示</v-chip>
                 </div>
             </div>
-            <v-img
-                v-if="listItem.productImages.length > 0"
-                class="product-card-image"
-                lazy-src="/img/product/gray-image.png"
-                :src="listItem.productImages[0].apiPath"
-                :alt="listItem.productImages[0].name"
-            />
-            <v-img v-else class="product-card-image" lazy-src="/img/product/gray-image.png" src="/img/product/no-image.png" alt="no-image" />
-
+            <div class="product-card-image-container">
+                <v-img
+                    v-if="listItem.productImages.length > 0"
+                    class="product-card-image"
+                    lazy-src="/img/product/gray-image.png"
+                    :src="listItem.productImages[0].apiPath"
+                    :alt="listItem.productImages[0].name"
+                />
+                <v-img v-else class="product-card-image" lazy-src="/img/product/gray-image.png" src="/img/product/no-image.png" alt="no-image" />
+                <div class="product-category">
+                    <v-chip v-if="listItem.category" :color="ColorType.Accent" :text-color="ColorType.White" x-small>
+                        {{ listItem.category.name }}
+                    </v-chip>
+                </div>
+            </div>
             <div class="product-card-footer">
                 <div class="product-card-footer-content">
                     <template v-if="admin">
@@ -58,7 +64,7 @@ export default class CProductCard extends Vue {
         background-color $accent-light-color
     .product-card-wrapper
         .product-card-header
-            margin 16px 0
+            margin 5px 0
             .product-name
                 overflow hidden
                 padding-bottom 10px
@@ -67,11 +73,17 @@ export default class CProductCard extends Vue {
                 white-space nowrap
                 font-weight $title-font-weight
                 font-size $font-xlarge
-        .product-card-image
-            width 100%
-            border-radius $image-border-radius
-            aspect-ratio 1 / 1
-            object-fit cover
+        .product-card-image-container
+            position relative
+            .product-category
+                position absolute
+                top 5px
+                left 10px
+            .product-card-image
+                width 100%
+                border-radius $image-border-radius
+                aspect-ratio 1 / 1
+                object-fit cover
         .product-card-footer
             margin-top 15px
             text-align right
