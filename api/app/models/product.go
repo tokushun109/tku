@@ -91,7 +91,8 @@ func GetProduct(uuid string) (product Product, err error) {
 			return db.Order("site_detail.detail_url Desc, id")
 		}).
 		Preload("SiteDetails.SalesSite").
-		First(&product, "uuid = ?", uuid).Error
+		Limit(1).
+		Find(&product, "uuid = ?", uuid).Error
 	return product, err
 }
 

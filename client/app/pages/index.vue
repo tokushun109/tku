@@ -1,10 +1,10 @@
 <template>
     <v-sheet :color="ColorType.Transparent" class="page-top">
         <c-top-image class="top-image" title category :carousel-items="carouselItems" />
-        <c-layout-container normal>
-            <!-- aboutがページの修正が終わってから表示 -->
-            <div v-if="false" class="page-top-container">
-                <div class="about-section">
+        <!-- aboutがページの修正が終わってから表示 -->
+        <div v-if="false" class="page-top-container">
+            <div class="about-section page-top-section">
+                <c-layout-container normal no-vertical-padding>
                     <h2 class="page-top-title">About</h2>
                     <v-container class="about-section__message default">
                         <p>仕事も育児も頑張る女性の日常に寄り添うアクセサリーを創りたい。</p>
@@ -20,9 +20,18 @@
                         <p>を制作・販売しております。</p>
                     </v-container>
                     <c-detail-button to="about" />
-                </div>
+                </c-layout-container>
             </div>
-        </c-layout-container>
+            <div class="contact-section page-top-section">
+                <c-layout-container normal no-vertical-padding>
+                    <h2 class="page-top-title reverse">Contact</h2>
+                    <v-container class="contact-section__message">
+                        <p>お問い合わせ・ご意見・ご相談はこちらから</p>
+                    </v-container>
+                    <c-detail-button content="お問い合わせフォーム" to="contact" />
+                </c-layout-container>
+            </div>
+        </div>
     </v-sheet>
 </template>
 
@@ -107,16 +116,20 @@ export default class PageTop extends Vue {
         margin-bottom 16px
         +sm()
             margin-bottom 40px
-    .page-top-title
-        margin-bottom 10px
-        color $primary
-        text-align center
-        font-size 60px !important
-        font-family $title-font-face !important
-        +sm()
-            font-size 40px !important
     .page-top-container
         margin-bottom 64px
+        .page-top-section
+            padding 48px 0 80px
+            .page-top-title
+                margin-bottom 10px
+                color $primary
+                text-align center
+                font-size 60px !important
+                font-family $title-font-face !important
+                &.reverse
+                    color $white-color !important
+                +sm()
+                    font-size 40px !important
         .about-section
             &__message
                 color $text-color
@@ -130,4 +143,8 @@ export default class PageTop extends Vue {
                         display block
                 .emphasis
                     color $accent
+        .contact-section
+            background-color $primary
+            &__message
+                color $white-color !important
 </style>

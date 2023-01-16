@@ -12,11 +12,13 @@ export default class CLayoutContainer extends Vue {
     // サイズ
     @Prop({ type: Boolean, default: false }) narrow!: boolean
     @Prop({ type: Boolean, default: false }) normal!: boolean
+    @Prop({ type: Boolean, default: false }) noVerticalPadding!: boolean
 
     get getClass() {
         return {
             narrow: this.narrow,
             normal: this.normal,
+            'no-vertical-padding': this.noVerticalPadding,
         }
     }
 }
@@ -27,8 +29,10 @@ export default class CLayoutContainer extends Vue {
     padding $page-padding
     +sm()
         padding $page-sp-padding
-    &.normalとい
+    &.normal
         max-width 1200px
     &.narrow
         max-width 800px
+    &.no-vertical-padding
+        padding 0
 </style>

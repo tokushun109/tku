@@ -22,6 +22,7 @@ export default class CDetailButton extends Vue {
     padding 10px 30px
     outline none
     border 1px solid $secondary
+    background-color $white-color
     color $primary
     text-decoration none
     font-weight $title-font-weight
@@ -42,7 +43,7 @@ export default class CDetailButton extends Vue {
         &::after
             position absolute
             top 0
-            width 1px
+            width 2px
             height 0
             background $accent
             content ''
