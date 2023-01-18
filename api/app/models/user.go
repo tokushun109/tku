@@ -30,18 +30,21 @@ func Encrypt(plaintext string) (cryptext string) {
 }
 
 func (session *Session) GetUserBySession() (user User) {
-	Db.Limit(1).Find(&user, "id = ?", session.UserId)
+	db := GetDBConnection()
+	db.Limit(1).Find(&user, "id = ?", session.UserId)
 	return user
 
 }
 
 func GetAllUsers() (users Users) {
-	Db.Find(&users)
+	db := GetDBConnection()
+	db.Find(&users)
 	return users
 }
 
 func GeUserByEmail(email string) (user User) {
-	Db.Limit(1).Find(&user, "email = ?", email)
+	db := GetDBConnection()
+	db.Limit(1).Find(&user, "email = ?", email)
 	return user
 }
 
@@ -56,12 +59,14 @@ func InsertUser(user *User, is_admin bool) (err error) {
 	user.Uuid = uuid
 	// パスワードの変換を行う
 	user.Password = Encrypt(user.Password)
-	err = Db.Create(&user).Error
+	db := GetDBConnection()
+	err = db.Create(&user).Error
 	return err
 }
 
 func (user *User) GetSessionByUser() (session Session) {
-	Db.Limit(1).Find(&session, "user_id = ?", user.ID)
+	db := GetDBConnection()
+	db.Limit(1).Find(&session, "user_id = ?", user.ID)
 	return session
 
 }
@@ -77,20 +82,22 @@ func (user *User) CreateSession() (session Session, err error) {
 	session.Uuid = uuid
 	session.UserId = user.ID
 	session.CreatedAt = time.Now()
-
-	err = Db.Create(&session).Error
+	db := GetDBConnection()
+	err = db.Create(&session).Error
 
 	return session, err
 }
 
 func GetSession(uuid string) (session Session) {
-	Db.Limit(1).Find(&session, "uuid = ?", uuid)
+	db := GetDBConnection()
+	db.Limit(1).Find(&session, "uuid = ?", uuid)
 	return session
 }
 
 func (session *Session) IsValidSession() (valid bool) {
 	valid = false
-	Db.Limit(1).Find(&session, "uuid = ?", session.Uuid)
+	db := GetDBConnection()
+	db.Limit(1).Find(&session, "uuid = ?", session.Uuid)
 	if session != nil {
 		valid = true
 	}
@@ -98,6 +105,7 @@ func (session *Session) IsValidSession() (valid bool) {
 }
 
 func (session *Session) DeleteSession() (err error) {
-	err = Db.Delete(&session).Error
+	db := GetDBConnection()
+	err = db.Delete(&session).Error
 	return err
 }

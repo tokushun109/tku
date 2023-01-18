@@ -16,20 +16,23 @@ type Creator struct {
 }
 
 func GetCreator() (creator Creator) {
-	Db.Limit(1).Find(&creator)
+	db := GetDBConnection()
+	db.Limit(1).Find(&creator)
 	return creator
 }
 
 func initialInsertCreator() (err error) {
 	creator := &Creator{}
 	creator.Name = config.Config.CreatorName
-	err = Db.Create(&creator).Error
+	db := GetDBConnection()
+	err = db.Create(&creator).Error
 	return err
 }
 
 func UpdateCreator(creator *Creator) (err error) {
 	ID := GetCreator().ID
-	err = Db.Model(&creator).Where("id = ?", ID).Updates(
+	db := GetDBConnection()
+	err = db.Model(&creator).Where("id = ?", ID).Updates(
 		Creator{Name: creator.Name, Introduction: creator.Introduction},
 	).Error
 	return err
@@ -37,12 +40,13 @@ func UpdateCreator(creator *Creator) (err error) {
 
 func UpdateCreatorLogo(creator *Creator) (err error) {
 	beforeCreator := GetCreator()
+	db := GetDBConnection()
 	// ロゴ画像を更新したら既存の画像を削除
 	if err := removeFile(beforeCreator.Logo); err != nil {
-		Db.Rollback()
+		db.Rollback()
 		return err
 	}
-	err = Db.Model(&Creator{}).Where("id = ?", beforeCreator.ID).Updates(
+	err = db.Model(&Creator{}).Where("id = ?", beforeCreator.ID).Updates(
 		Creator{MimeType: creator.MimeType, Logo: creator.Logo},
 	).Error
 	return err

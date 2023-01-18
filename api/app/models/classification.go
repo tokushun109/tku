@@ -23,12 +23,14 @@ type Tag struct {
 type Tags []Tag
 
 func GetAllCategories() (categories Categories) {
-	Db.Find(&categories)
+	db := GetDBConnection()
+	db.Find(&categories)
 	return categories
 }
 
 func GetUsedCategories() (categories Categories) {
-	Db.Joins("INNER JOIN product on product.category_id = category.id").
+	db := GetDBConnection()
+	db.Joins("INNER JOIN product on product.category_id = category.id").
 		Where("product.deleted_at IS NULL").
 		Group("category.id").
 		Find(&categories)
@@ -36,13 +38,15 @@ func GetUsedCategories() (categories Categories) {
 }
 
 func GetCategory(uuid string) (category Category) {
-	Db.Limit(1).Find(&category, "uuid = ?", uuid)
+	db := GetDBConnection()
+	db.Limit(1).Find(&category, "uuid = ?", uuid)
 	return category
 }
 
 func CategoryUniqueCheck(name string) (isUnique bool, err error) {
 	var category Category
-	Db.Limit(1).Find(&category, "name = ?", name)
+	db := GetDBConnection()
+	db.Limit(1).Find(&category, "name = ?", name)
 	isUnique = category.ID == nil
 	if !isUnique {
 		err = errors.New("name is duplicate")
@@ -57,19 +61,22 @@ func InsertCategory(category *Category) (err error) {
 		return err
 	}
 	category.Uuid = uuid
-	err = Db.Create(&category).Error
+	db := GetDBConnection()
+	err = db.Create(&category).Error
 	return err
 }
 
 func UpdateCategory(category *Category, uuid string) (err error) {
-	err = Db.Model(&category).Where("uuid = ?", uuid).Updates(
+	db := GetDBConnection()
+	err = db.Model(&category).Where("uuid = ?", uuid).Updates(
 		Category{Name: category.Name},
 	).Error
 	return err
 }
 
 func (category *Category) DeleteCategory() (err error) {
-	tx := Db.Begin()
+	db := GetDBConnection()
+	tx := db.Begin()
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()
@@ -89,28 +96,32 @@ func (category *Category) DeleteCategory() (err error) {
 		return err
 	}
 
-	err = Db.Delete(&category).Error
+	err = tx.Delete(&category).Error
 	return tx.Commit().Error
 }
 
 func GetAllTags() (tags Tags) {
-	Db.Find(&tags)
+	db := GetDBConnection()
+	db.Find(&tags)
 	return tags
 }
 
 func GetTagsByNames(names []string) (tags Tags) {
-	Db.Find(&tags, "name in (?)", names)
+	db := GetDBConnection()
+	db.Find(&tags, "name in (?)", names)
 	return tags
 }
 
 func GetTag(uuid string) (tag Tag) {
-	Db.Limit(1).Find(&tag, "uuid = ?", uuid)
+	db := GetDBConnection()
+	db.Limit(1).Find(&tag, "uuid = ?", uuid)
 	return tag
 }
 
 func TagUniqueCheck(name string) (isUnique bool, err error) {
 	var tag Tag
-	Db.Limit(1).Find(&tag, "name = ?", name)
+	db := GetDBConnection()
+	db.Limit(1).Find(&tag, "name = ?", name)
 	isUnique = tag.ID == nil
 	if !isUnique {
 		err = errors.New("name is duplicate")
@@ -125,7 +136,8 @@ func InsertTag(tag *Tag) (err error) {
 		return err
 	}
 	tag.Uuid = uuid
-	err = Db.Create(&tag).Error
+	db := GetDBConnection()
+	err = db.Create(&tag).Error
 	return err
 }
 
@@ -140,19 +152,22 @@ func InsertUnDuplicateTag(tag *Tag, tagName string) (err error) {
 		return err
 	}
 	tag.Uuid = uuid
-	err = Db.Create(&tag).Error
+	db := GetDBConnection()
+	err = db.Create(&tag).Error
 	return err
 }
 
 func UpdateTag(tag *Tag, uuid string) (err error) {
-	err = Db.Model(&tag).Where("uuid = ?", uuid).Updates(
+	db := GetDBConnection()
+	err = db.Model(&tag).Where("uuid = ?", uuid).Updates(
 		Tag{Name: tag.Name},
 	).Error
 	return err
 }
 
 func (tag *Tag) DeleteTag() (err error) {
-	tx := Db.Begin()
+	db := GetDBConnection()
+	tx := db.Begin()
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()

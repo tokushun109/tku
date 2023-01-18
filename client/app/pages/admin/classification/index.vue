@@ -42,7 +42,10 @@ export default class PageAdminClassificationIndex extends Vue {
 
     async loadingCategory(type: string) {
         if (type === CategoryType.Category.name) {
-            this.categories = await this.$axios.$get(`/category`)
+            const params: IGetCategoriesParams = {
+                mode: 'all',
+            }
+            this.categories = await this.$axios.$get(`/category`, { params })
         } else if (type === CategoryType.Tag.name) {
             this.tags = await this.$axios.$get(`/tag`)
         }

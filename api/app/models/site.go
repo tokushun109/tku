@@ -44,23 +44,27 @@ type Sns struct {
 type SnsList []Sns
 
 func GetAllSalesSites() (salesSites SalesSites) {
-	Db.Find(&salesSites)
+	db := GetDBConnection()
+	db.Find(&salesSites)
 	return salesSites
 }
 
 func GetSalesSite(uuid string) (salesSite SalesSite) {
-	Db.Limit(1).Find(&salesSite, "uuid = ?", uuid)
+	db := GetDBConnection()
+	db.Limit(1).Find(&salesSite, "uuid = ?", uuid)
 	return salesSite
 }
 
 func GetSalesSiteByName(name string) (salesSite SalesSite) {
-	Db.Limit(1).Find(&salesSite, "name = ?", name)
+	db := GetDBConnection()
+	db.Limit(1).Find(&salesSite, "name = ?", name)
 	return salesSite
 }
 
 func SalesSiteUniqueCheck(name string) (isUnique bool, err error) {
 	var salesSite SalesSite
-	Db.Limit(1).Find(&salesSite, "name = ?", name)
+	db := GetDBConnection()
+	db.Limit(1).Find(&salesSite, "name = ?", name)
 	isUnique = salesSite.ID == nil
 	if !isUnique {
 		err = errors.New("name is duplicate")
@@ -75,20 +79,22 @@ func InsertSalesSite(salesSite *SalesSite) (err error) {
 		return err
 	}
 	salesSite.Uuid = uuid
-
-	err = Db.Create(&salesSite).Error
+	db := GetDBConnection()
+	err = db.Create(&salesSite).Error
 	return err
 }
 
 func UpdateSalesSite(salesSite *SalesSite, uuid string) (err error) {
-	err = Db.Model(&salesSite).Where("uuid = ?", uuid).Updates(
+	db := GetDBConnection()
+	err = db.Model(&salesSite).Where("uuid = ?", uuid).Updates(
 		SalesSite{Name: salesSite.Name, Url: salesSite.Url, Icon: salesSite.Icon},
 	).Error
 	return err
 }
 
 func (salesSite *SalesSite) DeleteSalesSite() (err error) {
-	tx := Db.Begin()
+	db := GetDBConnection()
+	tx := db.Begin()
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()
@@ -108,23 +114,26 @@ func (salesSite *SalesSite) DeleteSalesSite() (err error) {
 		return err
 	}
 
-	err = Db.Delete(&salesSite).Error
+	err = tx.Delete(&salesSite).Error
 	return tx.Commit().Error
 }
 
 func GetAllSkillMarkets() (skillMarkets SkillMarkets) {
-	Db.Find(&skillMarkets)
+	db := GetDBConnection()
+	db.Find(&skillMarkets)
 	return skillMarkets
 }
 
 func GetSkillMarket(uuid string) (skillMarket SkillMarket) {
-	Db.Limit(1).Find(&skillMarket, "uuid = ?", uuid)
+	db := GetDBConnection()
+	db.Limit(1).Find(&skillMarket, "uuid = ?", uuid)
 	return skillMarket
 }
 
 func SkillMarketUniqueCheck(name string) (isUnique bool, err error) {
 	var skillMarket SkillMarket
-	Db.Limit(1).Find(&skillMarket, "name = ?", name)
+	db := GetDBConnection()
+	db.Limit(1).Find(&skillMarket, "name = ?", name)
 	isUnique = skillMarket.ID == nil
 	if !isUnique {
 		err = errors.New("name is duplicate")
@@ -139,36 +148,41 @@ func InsertSkillMarket(skillMarket *SkillMarket) (err error) {
 		return err
 	}
 	skillMarket.Uuid = uuid
-
-	err = Db.Create(&skillMarket).Error
+	db := GetDBConnection()
+	err = db.Create(&skillMarket).Error
 	return err
 }
 
 func UpdateSkillMarket(skill_market *SkillMarket, uuid string) (err error) {
-	err = Db.Model(&skill_market).Where("uuid = ?", uuid).Updates(
+	db := GetDBConnection()
+	err = db.Model(&skill_market).Where("uuid = ?", uuid).Updates(
 		SkillMarket{Name: skill_market.Name, Url: skill_market.Url, Icon: skill_market.Icon},
 	).Error
 	return err
 }
 
 func (skillMarket *SkillMarket) DeleteSkillMarket() (err error) {
-	err = Db.Delete(&skillMarket).Error
+	db := GetDBConnection()
+	err = db.Delete(&skillMarket).Error
 	return err
 }
 
 func GetAllSnsList() (snsList SnsList) {
-	Db.Find(&snsList)
+	db := GetDBConnection()
+	db.Find(&snsList)
 	return snsList
 }
 
 func GetSns(uuid string) (sns Sns) {
-	Db.Limit(1).Find(&sns, "uuid = ?", uuid)
+	db := GetDBConnection()
+	db.Limit(1).Find(&sns, "uuid = ?", uuid)
 	return sns
 }
 
 func SnsUniqueCheck(name string) (isUnique bool, err error) {
 	var sns Sns
-	Db.Limit(1).Find(&sns, "name = ?", name)
+	db := GetDBConnection()
+	db.Limit(1).Find(&sns, "name = ?", name)
 	isUnique = sns.ID == nil
 	if !isUnique {
 		err = errors.New("name is duplicate")
@@ -183,19 +197,21 @@ func InsertSns(sns *Sns) (err error) {
 		return err
 	}
 	sns.Uuid = uuid
-
-	err = Db.Create(&sns).Error
+	db := GetDBConnection()
+	err = db.Create(&sns).Error
 	return err
 }
 
 func UpdateSns(sns *Sns, uuid string) (err error) {
-	err = Db.Model(&sns).Where("uuid = ?", uuid).Updates(
+	db := GetDBConnection()
+	err = db.Model(&sns).Where("uuid = ?", uuid).Updates(
 		Sns{Name: sns.Name, Url: sns.Url, Icon: sns.Icon},
 	).Error
 	return err
 }
 
 func (sns *Sns) DeleteSns() (err error) {
-	err = Db.Delete(&sns).Error
+	db := GetDBConnection()
+	err = db.Delete(&sns).Error
 	return err
 }
