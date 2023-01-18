@@ -5,7 +5,7 @@
 <script lang="ts">
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
-import { IClassification, IGetProductsParams, IProduct, ISite } from '~/types'
+import { IClassification, IGetCategoriesParams, IGetProductsParams, IProduct, ISite } from '~/types'
 @Component({
     head: {
         title: '商品一覧',
@@ -22,11 +22,16 @@ export default class PageAdminProductIndex extends Vue {
     createDialogVisible: boolean = false
     async asyncData({ app }: Context) {
         try {
-            const params: IGetProductsParams = {
+            const productParams: IGetProductsParams = {
+                mode: 'all',
+                category: 'all',
+            }
+            const products = await app.$axios.$get(`/product`, { params: productParams })
+            const categoryParams: IGetCategoriesParams = {
                 mode: 'all',
             }
-            const products = await app.$axios.$get(`/product`, { params })
-            const categories = await app.$axios.$get(`/category`)
+
+            const categories = await app.$axios.$get(`/category`, { params: categoryParams })
             const tags = await app.$axios.$get(`/tag`)
             const salesSites = await app.$axios.$get(`/sales_site`)
             return { products, categories, tags, salesSites }
@@ -39,6 +44,7 @@ export default class PageAdminProductIndex extends Vue {
     async loadingProduct() {
         const params: IGetProductsParams = {
             mode: 'all',
+            category: 'all',
         }
         this.products = await this.$axios.$get(`/product`, { params })
         this.updateCount += 1

@@ -53,7 +53,9 @@ func setProductImageApiPath(product *models.Product) error {
 // 商品一覧を取得
 func getAllProductsHandler(w http.ResponseWriter, r *http.Request) {
 	mode := r.URL.Query().Get("mode")
-	products, err := models.GetAllProducts(mode)
+	category := r.URL.Query().Get("category")
+
+	products, err := models.GetAllProducts(mode, category)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
