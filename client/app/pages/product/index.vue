@@ -1,21 +1,21 @@
 <template>
-    <c-layout-container normal class="page-product">
+    <div normal class="page-product">
         <div class="page-title-container">
             <h2 class="page-title">Product</h2>
         </div>
         <v-sheet>
-            <v-container>
-                <c-select-search :items="categories" />
+            <div>
+                <c-select-search group-name="Category" :items="categories" />
                 <c-message v-if="products.length === 0" class="mt-4"> 登録されていません </c-message>
                 <v-row>
-                    <v-col v-for="listItem in products" :key="listItem.uuid" cols="12" sm="6" md="4">
+                    <v-col v-for="listItem in products" :key="listItem.uuid" cols="12" sm="6" md="4" lg="3">
                         <c-product-card :list-item="listItem" @c-click="clickHandler(listItem)" />
                     </v-col>
                 </v-row>
-            </v-container>
+            </div>
         </v-sheet>
         <c-breadcrumbs :items="breadCrumbs" />
-    </c-layout-container>
+    </div>
 </template>
 
 <script lang="ts">
@@ -97,6 +97,13 @@ export default class PageProductIndex extends Vue {
 </script>
 
 <style lang="stylus" scoped>
+.page-product
+    margin 0 auto
+    padding 48px
+    max-width $xl-width
+    +sm()
+        padding 16px
+
 .page-title-container
     +sm()
         display none
