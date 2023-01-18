@@ -13,7 +13,7 @@
                 :color="ColorType.Accent"
                 @click="selectItem(index)"
             >
-                <v-list-item-title v-text="item.name"></v-list-item-title>
+                <v-list-item-title class="c-select-search__item" v-text="item.name"></v-list-item-title>
             </v-list-item>
         </v-list-group>
     </v-list>
@@ -83,13 +83,14 @@ export default class CSelectSearch extends Vue {
     padding-left 50px
 
 .c-select-search
-    margin-bottom 16px
     max-width 350px
     .v-list-item__icon
         margin-right 10px !important
     +sm()
         max-width inherit
     &__title
+    &__item
         color $text-color
-        font-weight 800 !important
+        +sm()
+            font-size 12px
 </style>
