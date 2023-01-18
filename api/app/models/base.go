@@ -13,7 +13,7 @@ import (
 	"gorm.io/gorm/schema"
 )
 
-var Db *gorm.DB
+var db *gorm.DB
 
 // ID, CreatedAt, UpdatedAt, DeletedAtのfieldを持つDefaultModelを継承
 type DefaultModel struct {
@@ -31,32 +31,36 @@ func GenerateUuid() (uuidString string, err error) {
 
 func gormConnect() *gorm.DB {
 	// DB接続設定読み込み
-	DBUser := config.Config.DBUser
-	DBPass := config.Config.DBPass
-	Protocol := config.Config.Protocol
-	DBName := config.Config.DBName
-	SQL_CONNECT := DBUser + ":" + DBPass + "@" + Protocol + "/" + "?charset=utf8mb4&parseTime=True&loc=Asia%2FTokyo"
+	dBUser := config.Config.DBUser
+	dBPass := config.Config.DBPass
+	protocol := config.Config.Protocol
+	dBName := config.Config.DBName
+	sqlConnect := dBUser + ":" + dBPass + "@" + protocol + "/" + "?charset=utf8mb4&parseTime=True&loc=Asia%2FTokyo"
 
 	// SQLに接続
-	DbConnection, err := gorm.Open(mysql.Open(SQL_CONNECT), &gorm.Config{NamingStrategy: schema.NamingStrategy{
+	dbConnection, err := gorm.Open(mysql.Open(sqlConnect), &gorm.Config{NamingStrategy: schema.NamingStrategy{
 		SingularTable: true,
 	}})
 	if err != nil {
 		log.Fatalln(err)
 	}
 	// DBの作成
-	cmdCreateDB := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", DBName)
-	DbConnection.Exec(cmdCreateDB)
+	cmdCreateDB := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", dBName)
+	dbConnection.Exec(cmdCreateDB)
 
 	// DBに接続
-	DB_CONNECT := DBUser + ":" + DBPass + "@" + Protocol + "/" + DBName + "?charset=utf8mb4&parseTime=True&loc=Asia%2FTokyo"
-	Db, err := gorm.Open(mysql.Open(DB_CONNECT), &gorm.Config{NamingStrategy: schema.NamingStrategy{
+	dbConnect := dBUser + ":" + dBPass + "@" + protocol + "/" + dBName + "?charset=utf8mb4&parseTime=True&loc=Asia%2FTokyo"
+	db, err := gorm.Open(mysql.Open(dbConnect), &gorm.Config{NamingStrategy: schema.NamingStrategy{
 		SingularTable: true,
 	}})
 	if err != nil {
 		log.Fatalln(err)
 	}
-	return Db.Debug()
+	return db.Debug()
+}
+
+func GetDBConnection() *gorm.DB {
+	return db
 }
 
 func removeFile(path string) (err error) {
@@ -69,7 +73,7 @@ func removeFile(path string) (err error) {
 }
 
 func init() {
-	Db = gormConnect()
+	db = gormConnect()
 	creator := GetCreator()
 	if creator.ID == nil {
 		// 製作者の初期データが未作成の場合のみ作成する

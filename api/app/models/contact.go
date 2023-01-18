@@ -18,12 +18,14 @@ type Contact struct {
 type ContactList []Contact
 
 func GetAllContactList() (contactList ContactList) {
-	Db.Order("created_at desc").Find(&contactList)
+	db := GetDBConnection()
+	db.Order("created_at desc").Find(&contactList)
 
 	return contactList
 }
 
 func InsertContact(contact *Contact) (err error) {
-	err = Db.Create(&contact).Error
+	db := GetDBConnection()
+	err = db.Create(&contact).Error
 	return err
 }

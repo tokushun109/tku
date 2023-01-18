@@ -46,20 +46,19 @@ func GetAllProducts(mode string, category string) (products Products, err error)
 		err = errors.New("invalid params")
 		return products, err
 	}
-
-	query := Db
+	db := GetDBConnection()
 
 	if mode == "active" {
-		query = query.Where("is_active = ?", 1)
+		db = db.Where("is_active = ?", 1)
 	}
 
 	if category != "all" {
-		query = query.
+		db = db.
 			Joins("INNER JOIN category on category.id = product.category_id").
 			Where("category.uuid = ?", category)
 	}
 
-	query.Preload("Category").
+	db.Preload("Category").
 		Preload("ProductImages", func(db *gorm.DB) *gorm.DB {
 			return db.Order("product_image.order Desc, id")
 		}).
@@ -74,7 +73,8 @@ func GetAllProducts(mode string, category string) (products Products, err error)
 }
 
 func GetNewProducts(limit int) (products Products) {
-	Db.Joins("join product_image on product_image.product_id = product.id").
+	db := GetDBConnection()
+	db.Joins("join product_image on product_image.product_id = product.id").
 		Where("product.is_active = ?", 1).
 		Where("product_image.deleted_at is null").
 		Preload("Category").
@@ -89,7 +89,8 @@ func GetNewProducts(limit int) (products Products) {
 }
 
 func GetProduct(uuid string) (product Product, err error) {
-	err = Db.Preload("Category").
+	db := GetDBConnection()
+	err = db.Preload("Category").
 		Preload("ProductImages", func(db *gorm.DB) *gorm.DB {
 			return db.Order("product_image.order Desc")
 		}).
@@ -105,7 +106,8 @@ func GetProduct(uuid string) (product Product, err error) {
 
 func ProductUniqueCheck(name string) (isUnique bool, err error) {
 	var product Product
-	Db.Limit(1).Find(&product, "name = ?", name)
+	db := GetDBConnection()
+	db.Limit(1).Find(&product, "name = ?", name)
 	isUnique = product.ID == nil
 	if !isUnique {
 		err = errors.New("name is duplicate")
@@ -114,7 +116,8 @@ func ProductUniqueCheck(name string) (isUnique bool, err error) {
 }
 
 func InsertProduct(product *Product) (err error) {
-	tx := Db.Begin()
+	db := GetDBConnection()
+	tx := db.Begin()
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()
@@ -185,7 +188,8 @@ func InsertProduct(product *Product) (err error) {
 }
 
 func UpdateProduct(product *Product, uuid string) (err error) {
-	tx := Db.Begin()
+	db := GetDBConnection()
+	tx := db.Begin()
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()
@@ -350,7 +354,8 @@ func UpdateProduct(product *Product, uuid string) (err error) {
 }
 
 func (product *Product) DeleteProduct() (err error) {
-	tx := Db.Begin()
+	db := GetDBConnection()
+	tx := db.Begin()
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()
@@ -383,7 +388,8 @@ func (product *Product) DeleteProduct() (err error) {
 }
 
 func GetProductImage(uuid string) (productImage ProductImage, err error) {
-	err = Db.First(&productImage, "uuid = ?", uuid).Error
+	db := GetDBConnection()
+	err = db.First(&productImage, "uuid = ?", uuid).Error
 	return productImage, err
 }
 
@@ -394,12 +400,14 @@ func InsertProductImage(productImage *ProductImage) (err error) {
 		return err
 	}
 	productImage.Uuid = uuid
-	err = Db.Create(&productImage).Error
+	db := GetDBConnection()
+	err = db.Create(&productImage).Error
 	return err
 }
 
 func (productImage *ProductImage) DeleteProductImage() (err error) {
-	tx := Db.Begin()
+	db := GetDBConnection()
+	tx := db.Begin()
 	if err = tx.Delete(&productImage).Error; err != nil {
 		tx.Rollback()
 		return err
