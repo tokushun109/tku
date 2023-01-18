@@ -41,7 +41,7 @@ export default class CSelectSearch extends Vue {
     targetName: string = 'All'
 
     initSelectSearchItems() {
-        this.selectItems = [{ name: 'All', uuid: 'All', isActive: true }]
+        this.selectItems = [{ name: 'All', uuid: 'all', isActive: true }]
         for (const item of this.items) {
             const newSelectItem: ISelectSearchItem = {
                 ...item,

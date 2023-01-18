@@ -29,7 +29,8 @@ func GetAllCategories() (categories Categories) {
 
 func GetUsedCategories() (categories Categories) {
 	Db.Joins("INNER JOIN product on product.category_id = category.id").
-		Group("id").
+		Where("product.deleted_at IS NULL").
+		Group("category.id").
 		Find(&categories)
 	return categories
 }

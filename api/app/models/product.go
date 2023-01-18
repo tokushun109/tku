@@ -35,68 +35,42 @@ type ProductImage struct {
 	ApiPath string `gorm:"-" json:"apiPath"`
 }
 
-func GetAllProducts(mode string) (products Products, err error) {
-	if mode == "all" {
-		Db.Preload("Category").
-			Preload("ProductImages", func(db *gorm.DB) *gorm.DB {
-				return db.Order("product_image.order Desc, id")
-			}).
-			Preload("Tags").
-			Preload("SiteDetails", func(db *gorm.DB) *gorm.DB {
-				return db.Order("site_detail.detail_url Desc")
-			}).
-			Preload("SiteDetails.SalesSite").
-			Find(&products)
-	} else if mode == "active" {
-		Db.Where("is_active = ?", 1).
-			Preload("Category").
-			Preload("ProductImages", func(db *gorm.DB) *gorm.DB {
-				return db.Order("product_image.order Desc")
-			}).
-			Preload("Tags").
-			Preload("SiteDetails", func(db *gorm.DB) *gorm.DB {
-				return db.Order("site_detail.detail_url Desc, id")
-			}).
-			Preload("SiteDetails.SalesSite").
-			Find(&products)
-	} else {
+func GetAllProducts(mode string, category string) (products Products, err error) {
+
+	if mode != "all" && mode != "active" {
 		err = errors.New("invalid params")
 		return products, err
 	}
-	return products, nil
-}
 
-func GetAllProductIDs(mode string) (IDs []int, err error) {
-	if mode == "all" {
-		Db.Select("id").
-			Preload("Category").
-			Preload("ProductImages", func(db *gorm.DB) *gorm.DB {
-				return db.Order("product_image.order Desc, id")
-			}).
-			Preload("Tags").
-			Preload("SiteDetails", func(db *gorm.DB) *gorm.DB {
-				return db.Order("site_detail.detail_url Desc")
-			}).
-			Preload("SiteDetails.SalesSite").
-			Find(&IDs)
-	} else if mode == "active" {
-		Db.Select("id").
-			Where("is_active = ?", 1).
-			Preload("Category").
-			Preload("ProductImages", func(db *gorm.DB) *gorm.DB {
-				return db.Order("product_image.order Desc")
-			}).
-			Preload("Tags").
-			Preload("SiteDetails", func(db *gorm.DB) *gorm.DB {
-				return db.Order("site_detail.detail_url Desc, id")
-			}).
-			Preload("SiteDetails.SalesSite").
-			Find(&IDs)
-	} else {
+	if category == "" {
 		err = errors.New("invalid params")
-		return IDs, err
+		return products, err
 	}
-	return IDs, nil
+
+	query := Db
+
+	if mode == "active" {
+		query = query.Where("is_active = ?", 1)
+	}
+
+	if category != "all" {
+		query = query.
+			Joins("INNER JOIN category on category.id = product.category_id").
+			Where("category.uuid = ?", category)
+	}
+
+	query.Preload("Category").
+		Preload("ProductImages", func(db *gorm.DB) *gorm.DB {
+			return db.Order("product_image.order Desc, id")
+		}).
+		Preload("Tags").
+		Preload("SiteDetails", func(db *gorm.DB) *gorm.DB {
+			return db.Order("site_detail.detail_url Desc")
+		}).
+		Preload("SiteDetails.SalesSite").
+		Find(&products)
+
+	return products, nil
 }
 
 func GetNewProducts(limit int) (products Products) {

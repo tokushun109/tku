@@ -3,6 +3,7 @@ package controllers
 import (
 	"api/app/models"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -16,11 +17,18 @@ import (
 func getAllCategoriesHandler(w http.ResponseWriter, r *http.Request) {
 	mode := r.URL.Query().Get("mode")
 	var categories models.Categories
-	if mode == "used" {
+
+	if mode == "all" {
+		categories = models.GetAllCategories()
+	} else if mode == "used" {
 		categories = models.GetUsedCategories()
 	} else {
-		categories = models.GetAllCategories()
+		err := errors.New("invalid params")
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
 	}
+
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(categories); err != nil {
 		log.Println(err)

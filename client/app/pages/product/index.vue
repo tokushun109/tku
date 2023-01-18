@@ -5,7 +5,7 @@
         </div>
         <v-sheet>
             <div>
-                <c-select-search group-name="Category" :items="categories" />
+                <c-select-search group-name="Category" :items="categories" @c-select-search="categorySearchHandler" />
                 <c-message v-if="products.length === 0" class="mt-4"> 登録されていません </c-message>
                 <v-row>
                     <v-col v-for="listItem in products" :key="listItem.uuid" cols="12" sm="6" md="4" lg="3">
@@ -27,6 +27,7 @@ import { IBreadCrumb, IClassification, IGetCategoriesParams, IGetProductsParams,
 export default class PageProductIndex extends Vue {
     products: Array<IProduct> = []
     categories: Array<IClassification> = []
+    searchCategory: string = 'all'
     // form用のproductModel
     productModel: IProduct = newProduct()
 
@@ -39,6 +40,7 @@ export default class PageProductIndex extends Vue {
         try {
             const productParams: IGetProductsParams = {
                 mode: 'active',
+                category: 'all',
             }
             const products: Array<IProduct> = await app.$axios.$get(`/product`, { params: productParams })
             const categoryParams: IGetCategoriesParams = {
@@ -51,8 +53,16 @@ export default class PageProductIndex extends Vue {
         }
     }
 
+    async loadingProduct(categoryParams: string) {
+        const productParams: IGetProductsParams = {
+            mode: 'active',
+            category: categoryParams,
+        }
+        this.products = await this.$axios.$get(`/product`, { params: productParams })
+    }
+
     head() {
-        if (!this.products) {
+        if (!this.products || this.products[0].productImages.length < 1) {
             return
         }
         const title = '商品一覧 | とこりり'
@@ -92,6 +102,10 @@ export default class PageProductIndex extends Vue {
 
     clickHandler(item: IProduct) {
         this.$router.push(`/product/${item.uuid}`)
+    }
+
+    async categorySearchHandler(categoryParam: string) {
+        await this.loadingProduct(categoryParam)
     }
 }
 </script>

@@ -12,7 +12,7 @@
 <script lang="ts">
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
-import { IClassification, CategoryType } from '~/types'
+import { IClassification, CategoryType, IGetCategoriesParams } from '~/types'
 @Component({
     head: {
         title: '分類一覧',
@@ -29,7 +29,10 @@ export default class PageAdminClassificationIndex extends Vue {
 
     async asyncData({ app }: Context) {
         try {
-            const categories = await app.$axios.$get(`/category`)
+            const params: IGetCategoriesParams = {
+                mode: 'all',
+            }
+            const categories = await app.$axios.$get(`/category`, { params })
             const tags = await app.$axios.$get(`/tag`)
             return { categories, tags }
         } catch (e) {
