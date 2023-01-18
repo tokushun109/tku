@@ -1,12 +1,16 @@
 <template>
     <v-sheet class="c-creator-edit">
         <v-container class="logo-content">
+            <h3 class="title product-list-title">ページサムネイル</h3>
+            <v-divider class="divider"></v-divider>
             <v-img v-if="creator.apiPath" :src="creator.apiPath" max-width="400" aspect-ratio="1" class="logo-image" alt="ロゴ画像" />
         </v-container>
         <v-container class="description-content">
+            <h3 class="title product-list-title">ページの説明</h3>
+            <v-divider class="divider"></v-divider>
             <pre class="description-text">{{ creator.introduction }}</pre>
         </v-container>
-        <div>
+        <!-- <div>
             <div v-if="snsList" class="sns-head-title head-title">
                 <div class="head-title-content">SNS</div>
             </div>
@@ -32,9 +36,9 @@
                     </v-btn>
                 </div>
             </v-container>
-            <div v-if="admin" class="edit-button">
-                <v-btn color="primary" @click="openHandler"><c-icon :type="IconType.Edit.name" @c-click="openHandler" />編集</v-btn>
-            </div>
+        </div> -->
+        <div v-if="admin" class="edit-button">
+            <v-btn color="primary" @click="openHandler"><c-icon :type="IconType.Edit.name" @c-click="openHandler" />編集</v-btn>
         </div>
         <c-dialog
             :visible.sync="dialogVisible"
@@ -166,8 +170,8 @@ export default class CCreatorEdit extends Vue {
     .description-title
         color $title-primary-color
     .description-content
-        text-align center
         .description-text
+            padding 24px 0
             white-space pre-wrap
             word-break break-all
             +sm()

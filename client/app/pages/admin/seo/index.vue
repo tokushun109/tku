@@ -1,5 +1,5 @@
 <template>
-    <v-sheet class="page-admin-creator">
+    <v-sheet class="page-admin-seo">
         <c-creator-edit :item.sync="creator" admin @c-change="loadingCreator" />
     </v-sheet>
 </template>
@@ -14,7 +14,7 @@ import { newCreator } from '~/methods'
         title: '製作者紹介',
     },
 })
-export default class PageAdminCreatorIndex extends Vue {
+export default class PageAdminSeoIndex extends Vue {
     // 製作者
     creator: ICreator = newCreator()
 

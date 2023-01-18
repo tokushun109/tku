@@ -56,7 +56,7 @@ export default class AdminHeader extends Vue {
     IconType: typeof IconType = IconType
 
     tables: Array<ITable> = [
-        { name: '製作者', link: 'creator', icon: mdiAccount },
+        { name: 'SEO', link: 'seo', icon: mdiAccount },
         { name: '商品', link: 'product', icon: mdiCartVariant },
         { name: '分類', link: 'classification', icon: mdiTagOutline },
         { name: 'サイト', link: 'site', icon: mdiApplicationOutline },

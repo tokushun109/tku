@@ -2,22 +2,20 @@
     <v-sheet :color="ColorType.Transparent" class="page-top">
         <c-top-image class="top-image" title category :carousel-items="carouselItems" />
         <!-- aboutがページの修正が終わってから表示 -->
-        <div v-if="false" class="page-top-container">
+        <div class="page-top-container">
             <div class="about-section page-top-section">
                 <c-layout-container normal no-vertical-padding>
                     <h2 class="page-top-title">About</h2>
                     <v-container class="about-section__message default">
-                        <p>仕事も育児も頑張る女性の日常に寄り添うアクセサリーを創りたい。</p>
-                        <p>
-                            そんな想いで
-                            <span class="emphasis">オシャレなだけじゃない、あったらちょっと嬉しい作品</span> を制作・販売しております。
-                        </p>
+                        <p>仕事や出産、育児、家事...</p>
+                        <p>頑張る女性の味方になりたい、</p>
+                        <p>そんな想いでマクラメ編みのアクセサリーを作っています。</p>
                     </v-container>
                     <v-container class="about-section__message sm">
-                        <p>仕事も育児も頑張る女性の日常に寄り添う<br />アクセサリーを創りたい。</p>
+                        <p>仕事や出産、育児、家事...</p>
+                        <p>頑張る女性の味方になりたい、</p>
                         <p>そんな想いで</p>
-                        <p><span class="emphasis">オシャレなだけじゃない</span><br /><span class="emphasis">あったらちょっと嬉しい作品</span></p>
-                        <p>を制作・販売しております。</p>
+                        <p>マクラメ編みのアクセサリーを作っています。</p>
                     </v-container>
                     <c-detail-button to="about" />
                 </c-layout-container>
@@ -63,7 +61,7 @@ export default class PageTop extends Vue {
             return
         }
         const title = 'アクセサリーショップ とこりり'
-        const description = 'マクラメ編みのアクセサリーショップ【とこりり】の紹介サイトです。'
+        const description = this.creator && this.creator.introduction ? this.creator.introduction : ''
         const image = this.creator && this.creator.apiPath ? this.creator.apiPath : ''
         return {
             title,
