@@ -25,6 +25,13 @@ func getAllSalesSitesHandler(w http.ResponseWriter, r *http.Request) {
 
 // 販売サイトの新規作成
 func createSalesSiteHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := sessionCheck(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Println(err)
@@ -63,6 +70,13 @@ func createSalesSiteHandler(w http.ResponseWriter, r *http.Request) {
 
 // 販売サイトの更新
 func updateSalesSiteHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := sessionCheck(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
 	vars := mux.Vars(r)
 	uuid := vars["sales_site_uuid"]
 
@@ -102,6 +116,13 @@ func updateSalesSiteHandler(w http.ResponseWriter, r *http.Request) {
 
 // 販売サイトの削除
 func deleteSalesSiteHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := sessionCheck(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
 	vars := mux.Vars(r)
 	uuid := vars["sales_site_uuid"]
 
@@ -130,6 +151,13 @@ func getAllSkillMarketsHandler(w http.ResponseWriter, r *http.Request) {
 
 // スキルマーケットの新規作成
 func createSkillMarketHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := sessionCheck(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Println(err)
@@ -167,6 +195,13 @@ func createSkillMarketHandler(w http.ResponseWriter, r *http.Request) {
 
 // スキルマーケットの更新
 func updateSkillMarketHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := sessionCheck(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
 	vars := mux.Vars(r)
 	uuid := vars["skill_market_uuid"]
 
@@ -206,6 +241,13 @@ func updateSkillMarketHandler(w http.ResponseWriter, r *http.Request) {
 
 // スキルマーケットの削除
 func deleteSkillMarketHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := sessionCheck(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
 	vars := mux.Vars(r)
 	uuid := vars["skill_market_uuid"]
 
@@ -234,6 +276,13 @@ func getAllSnsListHandler(w http.ResponseWriter, r *http.Request) {
 
 // SNSの新規作成
 func createSnsHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := sessionCheck(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Println(err)
@@ -271,6 +320,13 @@ func createSnsHandler(w http.ResponseWriter, r *http.Request) {
 
 // SNSの更新
 func updateSnsHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := sessionCheck(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
 	vars := mux.Vars(r)
 	uuid := vars["sns_uuid"]
 
@@ -310,6 +366,13 @@ func updateSnsHandler(w http.ResponseWriter, r *http.Request) {
 
 // SNSの削除
 func deleteSnsHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := sessionCheck(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
 	vars := mux.Vars(r)
 	uuid := vars["sns_uuid"]
 

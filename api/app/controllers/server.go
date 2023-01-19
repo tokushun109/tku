@@ -1,10 +1,8 @@
 package controllers
 
 import (
-	"api/app/models"
 	"api/config"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 
@@ -14,19 +12,6 @@ import (
 
 type successResponse struct {
 	Success bool `json:"success"`
-}
-
-func sessionCheck(uuid string) (session models.Session, err error) {
-	session = models.GetSession(uuid)
-	valid := session.IsValidSession()
-	if session.ID == nil {
-		return session, err
-	}
-	if !valid {
-		err = errors.New("session is invalid")
-		return session, err
-	}
-	return session, err
 }
 
 // 処理の成功結果をレスポンスで返す
@@ -90,15 +75,16 @@ func StartMainServer() error {
 	// // ユーザー
 	// r.HandleFunc("/api/user", getAllUsersHandler).Methods("GET")
 	// ログイン
-	r.HandleFunc("/api/user/login/{session_uuid}", getLoginUserHandler).Methods("GET")
+	r.HandleFunc("/api/user/login", getLoginUserHandler).Methods("GET")
 	r.HandleFunc("/api/user/login", loginHandler).Methods("POST")
 	// ログアウト
-	r.HandleFunc("/api/user/logout/{session_uuid}", logoutHandler).Methods("POST")
+	r.HandleFunc("/api/user/logout", logoutHandler).Methods("POST")
 
 	// corsの設定
 	customizeCors := cors.New(cors.Options{
-		AllowedMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
-		AllowedOrigins: []string{config.Config.ClientUrl},
+		AllowedMethods:   []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
+		AllowedOrigins:   []string{config.Config.ClientUrl},
+		AllowCredentials: true,
 	})
 	c := customizeCors.Handler(r)
 	return http.ListenAndServe(port, c)

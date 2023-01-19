@@ -102,6 +102,13 @@ func getProductHandler(w http.ResponseWriter, r *http.Request) {
 
 // 商品の新規作成
 func createProductHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := sessionCheck(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Println(err)
@@ -143,6 +150,13 @@ func createProductHandler(w http.ResponseWriter, r *http.Request) {
 
 // 商品の更新
 func updateProductHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := sessionCheck(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
 	vars := mux.Vars(r)
 	uuid := vars["product_uuid"]
 
@@ -182,6 +196,13 @@ func updateProductHandler(w http.ResponseWriter, r *http.Request) {
 
 // 商品の削除
 func deleteProductHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := sessionCheck(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
 	vars := mux.Vars(r)
 	uuid := vars["product_uuid"]
 
@@ -262,6 +283,13 @@ func getProductImageBlobHandler(w http.ResponseWriter, r *http.Request) {
 
 // 商品画像の新規作成
 func createProductImageHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := sessionCheck(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
 	vars := mux.Vars(r)
 	uuid := vars["product_uuid"]
 	// requestのuuidから商品のIDを取得しておく
@@ -360,8 +388,15 @@ func createProductImageHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(responseBody)
 }
 
-// 商品の削除
+// 商品画像の削除
 func deleteProductImageHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := sessionCheck(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
 	vars := mux.Vars(r)
 	productUuid := vars["product_uuid"]
 	productImageUuid := vars["product_image_uuid"]

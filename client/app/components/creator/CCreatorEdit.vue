@@ -104,7 +104,7 @@ export default class CCreatorEdit extends Vue {
     async saveHandler() {
         try {
             this.errors = []
-            await this.$axios.$put(`/creator`, this.creator, {}).then(async () => {
+            await this.$axios.$put(`/creator`, this.creator, { withCredentials: true }).then(async () => {
                 if (this.uploadFile) {
                     const params = new FormData()
                     params.append('logo', this.uploadFile)
@@ -112,6 +112,7 @@ export default class CCreatorEdit extends Vue {
                         headers: {
                             'Content-Type': 'multipart/form-data',
                         },
+                        withCredentials: true,
                     })
                 }
             })
@@ -120,7 +121,7 @@ export default class CCreatorEdit extends Vue {
             this.notificationVisible = true
             this.$emit('c-change')
         } catch (e) {
-            this.errors.push(e)
+            this.errors.push(e.response)
         }
     }
 

@@ -8,8 +8,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-
-	"github.com/gorilla/mux"
 )
 
 type loginForm struct {
@@ -17,35 +15,54 @@ type loginForm struct {
 	Password string
 }
 
-// // ユーザー一覧を取得
-// func getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
-// 	users := models.GetAllUsers()
-// 	w.Header().Set("Content-Type", "application/json")
-// 	if err := json.NewEncoder(w).Encode(users); err != nil {
-// 		log.Println(err)
-// 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-// 		return
-// 	}
-// }
+func sessionCheck(r *http.Request) (session models.Session, err error) {
+	cookie, err := r.Cookie("__sess__")
+	if err != nil {
+		err = errors.New("session is invalid")
+		return session, err
+	}
+	session = models.GetSession(cookie.Value)
+	valid := session.IsValidSession()
+	if session.ID == nil || !valid {
+		err = errors.New("session is invalid")
+		return session, err
+	}
+	return session, err
+}
 
-// ログインしているユーザーを取得
-func getLoginUserHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	uuid := vars["session_uuid"]
-	// ログインしているかの確認
-	session, err := sessionCheck(uuid)
+// ユーザー一覧を取得
+func getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := sessionCheck(r)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
-	} else {
-		user := session.GetUserBySession()
-		w.Header().Set("Content-Type", "application/json")
-		if err := json.NewEncoder(w).Encode(user); err != nil {
-			log.Println(err)
-			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-			return
-		}
+	}
+
+	users := models.GetAllUsers()
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(users); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+}
+
+// ログインしているユーザーを取得
+func getLoginUserHandler(w http.ResponseWriter, r *http.Request) {
+	session, err := sessionCheck(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
+	user := session.GetUserBySession()
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(user); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
 	}
 }
 
@@ -98,16 +115,17 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 
 // ユーザーのログアウト(セッションの削除)
 func logoutHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	uuid := vars["session_uuid"]
-
-	session := models.GetSession(uuid)
-	// sessionを取得して、有効なsessionなら削除を行う
-	if valid := session.IsValidSession(); valid {
-		if err := session.DeleteSession(); err != nil {
-			log.Println(err)
-			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
-			return
-		}
+	session, err := sessionCheck(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
 	}
+
+	if err := session.DeleteSession(); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
 }

@@ -134,44 +134,44 @@ export default class CClassificationList extends Vue {
         if (this.executionType === ExecutionType.Create) {
             try {
                 if (this.categoryTypeValue === CategoryType.Category.value) {
-                    await this.$axios.$post(`/category`, this.modalItem)
+                    await this.$axios.$post(`/category`, this.modalItem, { withCredentials: true })
                     this.$emit('c-change', CategoryType.Category.name)
                 } else if (this.categoryTypeValue === CategoryType.Tag.value) {
-                    await this.$axios.$post(`/tag`, this.modalItem)
+                    await this.$axios.$post(`/tag`, this.modalItem, { withCredentials: true })
                     this.$emit('c-change', CategoryType.Tag.name)
                 }
                 this.notificationVisible = true
                 this.dialogVisible = false
             } catch (e) {
-                this.errors.push(e)
+                this.errors.push(e.response)
             }
         } else if (this.executionType === ExecutionType.Edit) {
             try {
                 if (this.categoryTypeValue === CategoryType.Category.value) {
-                    await this.$axios.$put(`/category/${this.modalItem.uuid}`, this.modalItem)
+                    await this.$axios.$put(`/category/${this.modalItem.uuid}`, this.modalItem, { withCredentials: true })
                     this.$emit('c-change', CategoryType.Category.name)
                 } else if (this.categoryTypeValue === CategoryType.Tag.value) {
-                    await this.$axios.$put(`/tag/${this.modalItem.uuid}`, this.modalItem)
+                    await this.$axios.$put(`/tag/${this.modalItem.uuid}`, this.modalItem, { withCredentials: true })
                     this.$emit('c-change', CategoryType.Tag.name)
                 }
                 this.notificationVisible = true
                 this.dialogVisible = false
             } catch (e) {
-                this.errors.push(e)
+                this.errors.push(e.response)
             }
         } else if (this.executionType === ExecutionType.Delete) {
             try {
                 if (this.categoryTypeValue === CategoryType.Category.value) {
-                    await this.$axios.$delete(`/category/${this.modalItem.uuid}`)
+                    await this.$axios.$delete(`/category/${this.modalItem.uuid}`, { withCredentials: true })
                     this.$emit('c-change', CategoryType.Category.name)
                 } else if (this.categoryTypeValue === CategoryType.Tag.value) {
-                    await this.$axios.$delete(`/tag/${this.modalItem.uuid}`)
+                    await this.$axios.$delete(`/tag/${this.modalItem.uuid}`, { withCredentials: true })
                     this.$emit('c-change', CategoryType.Tag.name)
                 }
                 this.notificationVisible = true
                 this.dialogVisible = false
             } catch (e) {
-                this.errors.push(e)
+                this.errors.push(e.response)
             }
         }
     }

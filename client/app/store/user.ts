@@ -35,9 +35,10 @@ export const actions: ActionTree<State, RootState> = {
             const session: ISession = await this.$axios.$post(`/user/login`, loginForm)
             // cookie保存
             this.$cookies.set('__sess__', session.uuid, {
+                domain: process.env.COOKIE_DOMAIN_URL,
                 path: '/',
             })
-            const user = await this.$axios.$get(`/user/login/${session.uuid}`)
+            const user = await this.$axios.$get(`/user/login`, { withCredentials: true })
             // store保存
             context.commit('setUser', user)
             return Promise.resolve(user)
@@ -51,9 +52,9 @@ export const actions: ActionTree<State, RootState> = {
     },
     async logoutUser(context) {
         try {
-            const credential = this.$cookies.get('__sess__')
-            await this.$axios.$post(`/user/logout/${credential}`)
+            await this.$axios.$post(`/user/logout`, null, { withCredentials: true })
             this.$cookies.remove('__sess__', {
+                domain: process.env.COOKIE_DOMAIN_URL,
                 path: '/',
             })
             location.reload()

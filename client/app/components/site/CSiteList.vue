@@ -77,7 +77,7 @@ export default class CSiteList extends Vue {
 
     nameRules = [required, min20]
 
-    urlRules = [nonDoubleByte, nonSpace]
+    urlRules = [required, nonDoubleByte, nonSpace]
 
     get siteTypeValue(): string {
         let siteType = ''
@@ -145,53 +145,53 @@ export default class CSiteList extends Vue {
         if (this.executionType === ExecutionType.Create) {
             try {
                 if (this.siteTypeValue === SiteType.Sns.value) {
-                    await this.$axios.$post(`/sns`, this.modalItem)
+                    await this.$axios.$post(`/sns`, this.modalItem, { withCredentials: true })
                     this.$emit('c-change', SiteType.Sns.name)
                 } else if (this.siteTypeValue === SiteType.SalesSite.value) {
-                    await this.$axios.$post(`/sales_site`, this.modalItem)
+                    await this.$axios.$post(`/sales_site`, this.modalItem, { withCredentials: true })
                     this.$emit('c-change', SiteType.SalesSite.name)
                 } else if (this.siteTypeValue === SiteType.SkillMarket.value) {
-                    await this.$axios.$post(`/skill_market`, this.modalItem)
+                    await this.$axios.$post(`/skill_market`, this.modalItem, { withCredentials: true })
                     this.$emit('c-change', SiteType.SkillMarket.name)
                 }
                 this.notificationVisible = true
                 this.dialogVisible = false
             } catch (e) {
-                this.errors.push(e)
+                this.errors.push(e.response)
             }
         } else if (this.executionType === ExecutionType.Edit) {
             try {
                 if (this.siteTypeValue === SiteType.Sns.value) {
-                    await this.$axios.$put(`/sns/${this.modalItem.uuid}`, this.modalItem)
+                    await this.$axios.$put(`/sns/${this.modalItem.uuid}`, this.modalItem, { withCredentials: true })
                     this.$emit('c-change', SiteType.Sns.name)
                 } else if (this.siteTypeValue === SiteType.SalesSite.value) {
-                    await this.$axios.$put(`/sales_site/${this.modalItem.uuid}`, this.modalItem)
+                    await this.$axios.$put(`/sales_site/${this.modalItem.uuid}`, this.modalItem, { withCredentials: true })
                     this.$emit('c-change', SiteType.SalesSite.name)
                 } else if (this.siteTypeValue === SiteType.SkillMarket.value) {
-                    await this.$axios.$put(`/skill_market/${this.modalItem.uuid}`, this.modalItem)
+                    await this.$axios.$put(`/skill_market/${this.modalItem.uuid}`, this.modalItem, { withCredentials: true })
                     this.$emit('c-change', SiteType.SkillMarket.name)
                 }
                 this.notificationVisible = true
                 this.dialogVisible = false
             } catch (e) {
-                this.errors.push(e)
+                this.errors.push(e.response)
             }
         } else if (this.executionType === ExecutionType.Delete) {
             try {
                 if (this.siteTypeValue === SiteType.Sns.value) {
-                    await this.$axios.$delete(`/sns/${this.modalItem.uuid}`)
+                    await this.$axios.$delete(`/sns/${this.modalItem.uuid}`, { withCredentials: true })
                     this.$emit('c-change', SiteType.Sns.name)
                 } else if (this.siteTypeValue === SiteType.SalesSite.value) {
-                    await this.$axios.$delete(`/sales_site/${this.modalItem.uuid}`)
+                    await this.$axios.$delete(`/sales_site/${this.modalItem.uuid}`, { withCredentials: true })
                     this.$emit('c-change', SiteType.SalesSite.name)
                 } else if (this.siteTypeValue === SiteType.SkillMarket.value) {
-                    await this.$axios.$delete(`/skill_market/${this.modalItem.uuid}`)
+                    await this.$axios.$delete(`/skill_market/${this.modalItem.uuid}`, { withCredentials: true })
                     this.$emit('c-change', SiteType.SkillMarket.name)
                 }
                 this.notificationVisible = true
                 this.dialogVisible = false
             } catch (e) {
-                this.errors.push(e)
+                this.errors.push(e.response)
             }
         }
     }

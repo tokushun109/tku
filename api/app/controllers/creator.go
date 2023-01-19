@@ -92,6 +92,13 @@ func getCreatorLogoBlobHandler(w http.ResponseWriter, r *http.Request) {
 
 // 製作者詳細を更新
 func updateCreatorHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := sessionCheck(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Println(err)
@@ -127,6 +134,13 @@ func updateCreatorHandler(w http.ResponseWriter, r *http.Request) {
 
 // 製作者ロゴを更新
 func updateCreatorLogoHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := sessionCheck(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
 	file, handler, err := r.FormFile("logo")
 	if err != nil {
 		log.Println(err)
