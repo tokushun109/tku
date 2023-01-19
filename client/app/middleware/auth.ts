@@ -18,7 +18,7 @@ export default async function ({ app, route, store, redirect }: Context) {
     const credential = app.$cookies.get('__sess__')
     if (credential) {
         // ログインしているユーザの情報を取得
-        const user = await app.$axios.$get(`/user/login/${credential}`)
+        const user = await app.$axios.$get('/user/login', { withCredentials: true })
         store.dispatch('user/setUser', user)
         if (!user) {
             return redirect('/admin/user/login')

@@ -95,7 +95,6 @@ func GetSession(uuid string) (session Session) {
 }
 
 func (session *Session) IsValidSession() (valid bool) {
-	valid = false
 	db := GetDBConnection()
 	db.Limit(1).Find(&session, "uuid = ?", session.Uuid)
 	if session != nil {

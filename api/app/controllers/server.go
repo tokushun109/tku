@@ -16,13 +16,15 @@ type successResponse struct {
 	Success bool `json:"success"`
 }
 
-func sessionCheck(uuid string) (session models.Session, err error) {
-	session = models.GetSession(uuid)
-	valid := session.IsValidSession()
-	if session.ID == nil {
+func sessionCheck(r *http.Request) (session models.Session, err error) {
+	cookie, err := r.Cookie("__sess__")
+	if err != nil {
+		err = errors.New("session is invalid")
 		return session, err
 	}
-	if !valid {
+	session = models.GetSession(cookie.Value)
+	valid := session.IsValidSession()
+	if session.ID == nil || !valid {
 		err = errors.New("session is invalid")
 		return session, err
 	}
@@ -90,15 +92,16 @@ func StartMainServer() error {
 	// // ユーザー
 	// r.HandleFunc("/api/user", getAllUsersHandler).Methods("GET")
 	// ログイン
-	r.HandleFunc("/api/user/login/{session_uuid}", getLoginUserHandler).Methods("GET")
+	r.HandleFunc("/api/user/login/", getLoginUserHandler).Methods("GET")
 	r.HandleFunc("/api/user/login", loginHandler).Methods("POST")
 	// ログアウト
-	r.HandleFunc("/api/user/logout/{session_uuid}", logoutHandler).Methods("POST")
+	r.HandleFunc("/api/user/logout/", logoutHandler).Methods("POST")
 
 	// corsの設定
 	customizeCors := cors.New(cors.Options{
-		AllowedMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
-		AllowedOrigins: []string{config.Config.ClientUrl},
+		AllowedMethods:   []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
+		AllowedOrigins:   []string{config.Config.ClientUrl},
+		AllowCredentials: true,
 	})
 	c := customizeCors.Handler(r)
 	return http.ListenAndServe(port, c)
