@@ -4,7 +4,7 @@ on:
   push:
     branches: 
       - main
-      - feature/#571
+      - feature/#
 
 jobs:
   Client:
@@ -32,6 +32,7 @@ jobs:
           API_BASE_URL: ${{ secrets.API_BASE_URL }}
           BROWSER_BASE_URL: ${{ secrets.BROWSER_BASE_URL }}
           DOMAIN_URL: ${{ secrets.DOMAIN_URL }}
+          COOKIE_DOMAIN_URL: ${{ secrets.COOKIE_DOMAIN_URL }}
           LINE_TOKEN: ${{ secrets.LINE_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

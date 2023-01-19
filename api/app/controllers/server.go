@@ -75,10 +75,10 @@ func StartMainServer() error {
 	// // ユーザー
 	// r.HandleFunc("/api/user", getAllUsersHandler).Methods("GET")
 	// ログイン
-	r.HandleFunc("/api/user/login/", getLoginUserHandler).Methods("GET")
+	r.HandleFunc("/api/user/login", getLoginUserHandler).Methods("GET")
 	r.HandleFunc("/api/user/login", loginHandler).Methods("POST")
 	// ログアウト
-	r.HandleFunc("/api/user/logout/", logoutHandler).Methods("POST")
+	r.HandleFunc("/api/user/logout", logoutHandler).Methods("POST")
 
 	// corsの設定
 	customizeCors := cors.New(cors.Options{

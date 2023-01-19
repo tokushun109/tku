@@ -17,9 +17,6 @@ type loginForm struct {
 
 func sessionCheck(r *http.Request) (session models.Session, err error) {
 	cookie, err := r.Cookie("__sess__")
-	fmt.Println("cookieの値")
-	fmt.Println(cookie)
-	fmt.Println("==========")
 	if err != nil {
 		err = errors.New("session is invalid")
 		return session, err

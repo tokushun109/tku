@@ -35,6 +35,7 @@ export const actions: ActionTree<State, RootState> = {
             const session: ISession = await this.$axios.$post(`/user/login`, loginForm)
             // cookie保存
             this.$cookies.set('__sess__', session.uuid, {
+                domain: process.env.COOKIE_DOMAIN_URL,
                 path: '/',
             })
             const user = await this.$axios.$get(`/user/login`, { withCredentials: true })
@@ -51,8 +52,9 @@ export const actions: ActionTree<State, RootState> = {
     },
     async logoutUser(context) {
         try {
-            await this.$axios.$post(`/user/logout/`, null, { withCredentials: true })
+            await this.$axios.$post(`/user/logout`, null, { withCredentials: true })
             this.$cookies.remove('__sess__', {
+                domain: process.env.COOKIE_DOMAIN_URL,
                 path: '/',
             })
             location.reload()
