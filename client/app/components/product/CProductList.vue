@@ -314,6 +314,7 @@ export default class CProductList extends Vue {
                         headers: {
                             'Content-Type': 'multipart/form-data',
                         },
+                        withCredentials: true,
                     })
                 }
                 this.$emit('c-change')
@@ -340,6 +341,7 @@ export default class CProductList extends Vue {
                         headers: {
                             'Content-Type': 'multipart/form-data',
                         },
+                        withCredentials: true,
                     })
                 }
                 this.$emit('c-change')
