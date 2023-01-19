@@ -1,10 +1,8 @@
 package controllers
 
 import (
-	"api/app/models"
 	"api/config"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 
@@ -14,21 +12,6 @@ import (
 
 type successResponse struct {
 	Success bool `json:"success"`
-}
-
-func sessionCheck(r *http.Request) (session models.Session, err error) {
-	cookie, err := r.Cookie("__sess__")
-	if err != nil {
-		err = errors.New("session is invalid")
-		return session, err
-	}
-	session = models.GetSession(cookie.Value)
-	valid := session.IsValidSession()
-	if session.ID == nil || !valid {
-		err = errors.New("session is invalid")
-		return session, err
-	}
-	return session, err
 }
 
 // 処理の成功結果をレスポンスで返す

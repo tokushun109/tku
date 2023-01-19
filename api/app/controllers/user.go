@@ -15,6 +15,21 @@ type loginForm struct {
 	Password string
 }
 
+func sessionCheck(r *http.Request) (session models.Session, err error) {
+	cookie, err := r.Cookie("__sess__")
+	if err != nil {
+		err = errors.New("session is invalid")
+		return session, err
+	}
+	session = models.GetSession(cookie.Value)
+	valid := session.IsValidSession()
+	if session.ID == nil || !valid {
+		err = errors.New("session is invalid")
+		return session, err
+	}
+	return session, err
+}
+
 // ユーザー一覧を取得
 func getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 	_, err := sessionCheck(r)

@@ -298,7 +298,7 @@ export default class CProductList extends Vue {
         }
         if (this.executionType === ExecutionType.Create) {
             try {
-                const createProduct = await this.$axios.$post(`/product`, this.modalItem)
+                const createProduct = await this.$axios.$post(`/product`, this.modalItem, { withCredentials: true })
                 // 画像を選択していたら、アップロードを行う
                 if (this.uploadFiles.length > 0) {
                     const params = new FormData()
@@ -324,7 +324,7 @@ export default class CProductList extends Vue {
             }
         } else if (this.executionType === ExecutionType.Edit) {
             try {
-                await this.$axios.$put(`/product/${this.modalItem.uuid}`, this.modalItem)
+                await this.$axios.$put(`/product/${this.modalItem.uuid}`, this.modalItem, { withCredentials: true })
                 // 画像を選択していたら、アップロードを行う
                 if (this.uploadFiles.length > 0) {
                     const params = new FormData()
@@ -350,12 +350,12 @@ export default class CProductList extends Vue {
             }
         } else if (this.executionType === ExecutionType.Delete) {
             try {
-                await this.$axios.$delete(`/product/${this.modalItem.uuid}`)
+                await this.$axios.$delete(`/product/${this.modalItem.uuid}`, { withCredentials: true })
                 this.$emit('c-change')
                 this.notificationVisible = true
                 this.dialogVisible = false
             } catch (e) {
-                this.errors.push(e)
+                this.errors.push(e.response)
             }
         }
         this.orderInit()
