@@ -1,8 +1,8 @@
 <template>
     <v-row>
-        <!-- <v-col cols="12" md="4">
+        <v-col cols="12" md="4">
             <c-site-list :type="SiteType.Sns.name" :items="snsList" @c-change="loadingSite" />
-        </v-col> -->
+        </v-col>
         <v-col cols="12" md="4">
             <c-site-list :type="SiteType.SalesSite.name" :items="salesSites" @c-change="loadingSite" />
         </v-col>

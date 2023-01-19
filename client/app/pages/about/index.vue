@@ -120,20 +120,87 @@
                 </v-col>
             </v-row>
         </section>
-
+        <section class="site-section about-section">
+            <h3 class="about-section__title">Site</h3>
+            <v-row>
+                <v-col cols="12" offset-sm="1" sm="5" align-self="center">
+                    <v-card flat>
+                        <v-card-title class="site-section__subtitle">SNS</v-card-title>
+                        <v-card-text v-if="snsList">
+                            <v-container class="site-section__content">
+                                <div v-for="sns in mdiSnsList" :key="sns.name">
+                                    <v-btn
+                                        height="80"
+                                        width="150"
+                                        class="sns-item"
+                                        fab
+                                        :color="ColorType.Accent"
+                                        :href="sns.url"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        <v-icon :color="ColorType.White" class="sns-icon">{{ sns.icon }}</v-icon>
+                                        <span class="sns-name">{{ sns.name }}</span>
+                                    </v-btn>
+                                </div>
+                            </v-container>
+                        </v-card-text>
+                    </v-card>
+                </v-col>
+                <v-col cols="12" sm="5" align-self="center">
+                    <v-card flat>
+                        <v-card-title class="site-section__subtitle">Shop</v-card-title>
+                        <v-card-text v-if="salesSiteList">
+                            <v-container class="site-section__content">
+                                <div v-for="salesSite in salesSiteList" :key="salesSite.name">
+                                    <div class="site-item">
+                                        <v-btn
+                                            height="80"
+                                            width="150"
+                                            fab
+                                            :color="ColorType.Accent"
+                                            :href="salesSite.url"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            <span class="site-name">{{ salesSite.name }}</span>
+                                        </v-btn>
+                                    </div>
+                                </div>
+                            </v-container>
+                        </v-card-text>
+                    </v-card>
+                </v-col>
+            </v-row>
+        </section>
         <c-breadcrumbs :items="breadCrumbs" />
     </c-layout-container>
 </template>
 
 <script lang="ts">
+import { mdiInstagram } from '@mdi/js'
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
-import { IBreadCrumb, ICreator, ISite } from '~/types'
+import { ColorType, IBreadCrumb, ICreator, ISite } from '~/types'
 @Component({})
 export default class PageAboutIndex extends Vue {
+    ColorType: typeof ColorType = ColorType
+
     creator: ICreator | null = null
     snsList: Array<ISite> | null = []
     salesSiteList: Array<ISite> | null = []
+
+    get mdiSnsList(): Array<ISite> {
+        if (!this.snsList) {
+            return []
+        }
+        for (const sns of this.snsList) {
+            if (sns.name === 'instagram') {
+                sns.icon = mdiInstagram
+            }
+        }
+        return this.snsList
+    }
 
     breadCrumbs: Array<IBreadCrumb> = [
         { text: 'トップページ', href: '/' },
@@ -225,4 +292,41 @@ export default class PageAboutIndex extends Vue {
             vertical-align top
             &>td
                 height 40px
+    .site-section
+        &__subtitle
+            justify-content center !important
+            color $text-color
+            font-size 30px
+            font-family $title-font-face !important
+        &__content
+            display flex
+            justify-content center
+            .sns-item
+                position relative
+                margin 0 10px
+                text-align center
+                .sns-icon
+                    position absolute
+                    top -23px
+                .sns-name
+                    position absolute
+                    top -5px
+                    left 50%
+                    margin-top 10px
+                    color $white-color
+                    font-weight $title-font-weight
+                    font-size 12px !important
+                    transform translateX(-50%)
+            .site-item
+                margin 0 10px
+                text-align center
+                .site-name
+                    position absolute
+                    top -22px
+                    left 50%
+                    margin-top 10px
+                    color $white-color
+                    font-weight $title-font-weight
+                    font-size $font-normal
+                    transform translateX(-50%)
 </style>

@@ -1,6 +1,6 @@
 <template>
     <v-sheet class="page-admin-seo">
-        <c-creator-edit :item.sync="creator" admin @c-change="loadingCreator" />
+        <c-seo-edit :item.sync="creator" admin @c-change="loadingCreator" />
     </v-sheet>
 </template>
 
@@ -28,11 +28,9 @@ export default class PageAdminSeoIndex extends Vue {
     async asyncData({ app }: Context) {
         try {
             const creator = await app.$axios.$get(`/creator`)
-            const snsList = await app.$axios.$get(`/sns`)
-            const salesSites = await app.$axios.$get(`/sales_site`)
-            return { creator, snsList, salesSites }
+            return { creator }
         } catch (e) {
-            return { creator: null, snsList: [], salesSites: [] }
+            return { creator: null }
         }
     }
 
