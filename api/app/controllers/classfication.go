@@ -164,6 +164,13 @@ func getAllTagsHandler(w http.ResponseWriter, r *http.Request) {
 
 // タグの新規作成
 func createTagHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := sessionCheck(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Println(err)
@@ -200,6 +207,13 @@ func createTagHandler(w http.ResponseWriter, r *http.Request) {
 
 // タグの更新
 func updateTagHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := sessionCheck(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
 	vars := mux.Vars(r)
 	uuid := vars["tag_uuid"]
 
@@ -239,6 +253,13 @@ func updateTagHandler(w http.ResponseWriter, r *http.Request) {
 
 // タグの削除
 func deleteTagHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := sessionCheck(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
 	vars := mux.Vars(r)
 	uuid := vars["tag_uuid"]
 
