@@ -39,6 +39,13 @@ func getAllCategoriesHandler(w http.ResponseWriter, r *http.Request) {
 
 // カテゴリーの新規作成
 func createCategoryHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := sessionCheck(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Println(err)
@@ -75,6 +82,13 @@ func createCategoryHandler(w http.ResponseWriter, r *http.Request) {
 
 // カテゴリーの更新
 func updateCategoryHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := sessionCheck(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
 	vars := mux.Vars(r)
 	uuid := vars["category_uuid"]
 
@@ -114,6 +128,13 @@ func updateCategoryHandler(w http.ResponseWriter, r *http.Request) {
 
 // カテゴリーの削除
 func deleteCategoryHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := sessionCheck(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
 	vars := mux.Vars(r)
 	uuid := vars["category_uuid"]
 
