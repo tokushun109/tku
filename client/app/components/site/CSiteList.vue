@@ -77,7 +77,7 @@ export default class CSiteList extends Vue {
 
     nameRules = [required, min20]
 
-    urlRules = [nonDoubleByte, nonSpace]
+    urlRules = [required, nonDoubleByte, nonSpace]
 
     get siteTypeValue(): string {
         let siteType = ''
@@ -148,7 +148,7 @@ export default class CSiteList extends Vue {
                     await this.$axios.$post(`/sns`, this.modalItem)
                     this.$emit('c-change', SiteType.Sns.name)
                 } else if (this.siteTypeValue === SiteType.SalesSite.value) {
-                    await this.$axios.$post(`/sales_site`, this.modalItem)
+                    await this.$axios.$post(`/sales_site`, this.modalItem, { withCredentials: true })
                     this.$emit('c-change', SiteType.SalesSite.name)
                 } else if (this.siteTypeValue === SiteType.SkillMarket.value) {
                     await this.$axios.$post(`/skill_market`, this.modalItem)
@@ -157,7 +157,7 @@ export default class CSiteList extends Vue {
                 this.notificationVisible = true
                 this.dialogVisible = false
             } catch (e) {
-                this.errors.push(e)
+                this.errors.push(e.response)
             }
         } else if (this.executionType === ExecutionType.Edit) {
             try {
@@ -165,7 +165,7 @@ export default class CSiteList extends Vue {
                     await this.$axios.$put(`/sns/${this.modalItem.uuid}`, this.modalItem)
                     this.$emit('c-change', SiteType.Sns.name)
                 } else if (this.siteTypeValue === SiteType.SalesSite.value) {
-                    await this.$axios.$put(`/sales_site/${this.modalItem.uuid}`, this.modalItem)
+                    await this.$axios.$put(`/sales_site/${this.modalItem.uuid}`, this.modalItem, { withCredentials: true })
                     this.$emit('c-change', SiteType.SalesSite.name)
                 } else if (this.siteTypeValue === SiteType.SkillMarket.value) {
                     await this.$axios.$put(`/skill_market/${this.modalItem.uuid}`, this.modalItem)
@@ -174,7 +174,7 @@ export default class CSiteList extends Vue {
                 this.notificationVisible = true
                 this.dialogVisible = false
             } catch (e) {
-                this.errors.push(e)
+                this.errors.push(e.response)
             }
         } else if (this.executionType === ExecutionType.Delete) {
             try {
@@ -182,7 +182,7 @@ export default class CSiteList extends Vue {
                     await this.$axios.$delete(`/sns/${this.modalItem.uuid}`)
                     this.$emit('c-change', SiteType.Sns.name)
                 } else if (this.siteTypeValue === SiteType.SalesSite.value) {
-                    await this.$axios.$delete(`/sales_site/${this.modalItem.uuid}`)
+                    await this.$axios.$delete(`/sales_site/${this.modalItem.uuid}`, { withCredentials: true })
                     this.$emit('c-change', SiteType.SalesSite.name)
                 } else if (this.siteTypeValue === SiteType.SkillMarket.value) {
                     await this.$axios.$delete(`/skill_market/${this.modalItem.uuid}`)
@@ -191,7 +191,7 @@ export default class CSiteList extends Vue {
                 this.notificationVisible = true
                 this.dialogVisible = false
             } catch (e) {
-                this.errors.push(e)
+                this.errors.push(e.response)
             }
         }
     }

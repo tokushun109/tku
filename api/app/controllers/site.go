@@ -25,6 +25,13 @@ func getAllSalesSitesHandler(w http.ResponseWriter, r *http.Request) {
 
 // 販売サイトの新規作成
 func createSalesSiteHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := sessionCheck(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Println(err)
@@ -63,6 +70,13 @@ func createSalesSiteHandler(w http.ResponseWriter, r *http.Request) {
 
 // 販売サイトの更新
 func updateSalesSiteHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := sessionCheck(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
 	vars := mux.Vars(r)
 	uuid := vars["sales_site_uuid"]
 
@@ -102,6 +116,13 @@ func updateSalesSiteHandler(w http.ResponseWriter, r *http.Request) {
 
 // 販売サイトの削除
 func deleteSalesSiteHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := sessionCheck(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
 	vars := mux.Vars(r)
 	uuid := vars["sales_site_uuid"]
 
