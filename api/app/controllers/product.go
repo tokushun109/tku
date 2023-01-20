@@ -13,6 +13,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/gocarina/gocsv"
 	"github.com/gorilla/mux"
 	"gopkg.in/go-playground/validator.v9"
 )
@@ -422,4 +423,36 @@ func deleteProductImageHandler(w http.ResponseWriter, r *http.Request) {
 	responseBody := getSuccessResponse()
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(responseBody)
+}
+
+// 商品一覧をCSVで出力する
+func getProductsCsvHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := sessionCheck(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
+	products, err := models.GetAllProducts("all", "all")
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
+	csv := []*models.ProductCsv{}
+
+	for _, product := range products {
+		csv = append(csv, &models.ProductCsv{
+			ID:           product.ID,
+			Name:         product.Name,
+			Price:        product.Price,
+			CategoryName: product.Category.Name,
+			TargetName:   product.Target.Name,
+		})
+	}
+
+	w.Header().Set("Content-Disposition", "attachment;filename=tests.csv")
+	gocsv.Marshal(csv, w)
 }

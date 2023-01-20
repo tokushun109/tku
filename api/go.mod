@@ -6,6 +6,7 @@ require (
 	github.com/PuerkitoBio/goquery v1.8.0 // indirect
 	github.com/aws/aws-sdk-go v1.44.153
 	github.com/go-playground/universal-translator v0.17.0 // indirect
+	github.com/gocarina/gocsv v0.0.0-20221216233619-1fea7ae8d380 // indirect
 	github.com/google/uuid v1.2.0
 	github.com/gorilla/mux v1.8.0
 	github.com/joho/godotenv v1.3.0

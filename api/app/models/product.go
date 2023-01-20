@@ -15,9 +15,19 @@ type Product struct {
 	IsActive      *bool           `json:"isActive"`
 	CategoryId    *uint           `json:"-"`
 	Category      Category        `json:"category" validate:"-"`
+	TargetId      *uint           `json:"-"`
+	Target        Target          `json:"target" validate:"-"`
 	Tags          []Tag           `gorm:"many2many:product_to_tag" json:"tags"`
 	ProductImages []*ProductImage `gorm:"hasmany:product_image" json:"productImages"`
 	SiteDetails   []*SiteDetail   `gorm:"hasmany:site_detail" json:"siteDetails"`
+}
+
+type ProductCsv struct {
+	ID           *uint  `json:"id"`
+	Name         string `json:"name"`
+	Price        int    `json:"price"`
+	CategoryName string `json:"category_name"`
+	TargetName   string `json:"target_name"`
 }
 
 type Products []Product

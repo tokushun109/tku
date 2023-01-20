@@ -14,6 +14,14 @@ type Category struct {
 
 type Categories []Category
 
+type Target struct {
+	DefaultModel
+	Uuid string `json:"uuid"`
+	Name string `json:"name" validate:"min=1,max=20"`
+}
+
+type Targets []Category
+
 type Tag struct {
 	DefaultModel
 	Uuid string `json:"uuid"`
