@@ -1,7 +1,7 @@
 <template>
     <div class="site-footer">
         <v-container class="site-footer-content">
-            <v-sheet color="transparent">
+            <v-sheet>
                 <div class="copy-right">©︎2022 とこりり</div>
             </v-sheet>
         </v-container>
@@ -42,10 +42,13 @@ export default class SiteFooter extends Vue {
 
 <style lang="stylus" scoped>
 .site-footer
+    background-color $primary
     .site-footer-content
         display flex
         justify-content center
         .copy-right
+            background-color $primary
+            color $white-color
             font-size 10px
     .sm
         display none

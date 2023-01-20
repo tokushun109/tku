@@ -14,14 +14,15 @@
                         <div class="about-section__content">
                             <div class="about-section__content__message">
                                 <p>とこりりはハンドメイドのマクラメ編みアクセサリーを</p>
-                                <p>制作・販売しているお店です。</p>
-                                <p>仕事や出産、育児、家事 慌ただしい毎日の中で</p>
+                                <p class="mb-10">制作・販売しているお店です。</p>
+                                <p class="mb-10">仕事や出産、育児、家事...</p>
+                                <p>慌ただしい毎日の中で</p>
                                 <p>頑張る女性の味方になりたい、</p>
-                                <p>そんな想いでとこりりは生まれました。</p>
+                                <p class="mb-10">そんな想いでとこりりは生まれました。</p>
                                 <p>とこりりのモノづくりの根底には</p>
                                 <p>「人の役に立ちたい」</p>
                                 <p>「私の作品で元気づけたい」</p>
-                                <p>という思いがあり制作活動の原動力となっています。</p>
+                                <p>という思いがあり、制作活動の原動力となっています。</p>
                             </div>
                         </div>
                     </div>
@@ -34,17 +35,17 @@
                 <v-col cols="12" offset-sm="1" sm="10" offset-md="0" md="6">
                     <v-card flat>
                         <v-img class="about-section__image" src="/img/product/gray-image.png"></v-img>
-                        <v-card-title class="concept-section__subtitle">マクラメ編み</v-card-title>
+                        <v-card-title class="concept-section__subtitle">マクラメ編みの繊細さ</v-card-title>
                         <v-card-text>
                             <div class="about-section__content">
                                 <div class="about-section__content__message">
                                     <p>マクラメ編みとは、手で紐を「結ぶ」 という工程を繰り返し</p>
-                                    <p>模様を生み出す技法のこと</p>
+                                    <p>模様を生み出す技法のこと。</p>
                                     <p>同じデザインで編んでも使用する糸によって仕上がりの印象が</p>
                                     <p>大きく変化するマクラメ。</p>
-                                    <p>作品に合わせて 材質・艶感・質感・太さなど選定しています。</p>
-                                    <p>ハンドメイドだからこそ生み出せる</p>
-                                    <p>繊細な模様をぜひお楽しみください♪</p>
+                                    <p>作品に合わせて材質・艶感・質感・太さなど選定しています。</p>
+                                    <p>ハンドメイドだからこそ生み出せる繊細な模様を</p>
+                                    <p>ぜひお楽しみください♪</p>
                                 </div>
                             </div>
                         </v-card-text>
@@ -53,7 +54,7 @@
                 <v-col cols="12" offset-sm="1" sm="10" offset-md="0" md="6">
                     <v-card flat>
                         <v-img class="about-section__image" src="/img/product/gray-image.png"></v-img>
-                        <v-card-title class="concept-section__subtitle">+αの価値をのせる</v-card-title>
+                        <v-card-title class="concept-section__subtitle">オシャレなだけじゃない+α</v-card-title>
                         <v-card-text>
                             <div class="about-section__content">
                                 <div class="about-section__content__message">
@@ -82,36 +83,41 @@
                             <div class="about-section__content__message">
                                 <table>
                                     <tr class="profile-section__row">
-                                        <td width="100">2016年</td>
+                                        <td>2016年</td>
                                         <td>大手服飾品製造メーカー入社</td>
                                     </tr>
                                     <tr class="profile-section__row">
                                         <td></td>
-                                        <td>色彩学と品質管理について学ぶ。</td>
+                                        <td>色彩学と品質管理について学ぶ</td>
                                     </tr>
-                                    <tr class="profile-section__row">
+                                    <tr class="profile-section__row narrow">
                                         <td>2018年</td>
-                                        <td>フリマサイトにて アクセサリー作家tku(とく)として<br />ハンドメイド作品の販売開始。</td>
+                                        <td>フリマサイトにて アクセサリー作家tku(とく)として</td>
                                     </tr>
                                     <tr class="profile-section__row">
                                         <td></td>
-                                        <td>独学でマクラメ編みの技術を磨く。</td>
+                                        <td>ハンドメイド作品の販売開始</td>
+                                    </tr>
+
+                                    <tr class="profile-section__row">
+                                        <td></td>
+                                        <td>独学でマクラメ編みの技術を磨く</td>
                                     </tr>
                                     <tr class="profile-section__row">
                                         <td>2020年</td>
-                                        <td>オンラインショップにて マクラメ編み作品の販売開始。</td>
+                                        <td>オンラインショップにて、マクラメ編み作品の販売開始</td>
                                     </tr>
                                     <tr class="profile-section__row">
                                         <td></td>
-                                        <td>とこりり開業準備をする。</td>
+                                        <td>とこりり開業準備をする</td>
                                     </tr>
                                     <tr class="profile-section__row">
                                         <td>2022年</td>
-                                        <td>作家活動を拡充するため 服飾品メーカー退社。</td>
+                                        <td>作家活動を拡充するため、服飾品メーカー退社</td>
                                     </tr>
                                     <tr class="profile-section__row">
                                         <td></td>
-                                        <td>とこりりを個人事業開業する。</td>
+                                        <td>とこりりを個人事業開業する</td>
                                     </tr>
                                 </table>
                             </div>
@@ -270,6 +276,8 @@ export default class PageAboutIndex extends Vue {
         position relative
         padding 40px 24px 100px
         height 100%
+        +sm()
+            padding-bottom 0
         &__title
             margin-bottom 20px
             color $secondary
@@ -282,16 +290,28 @@ export default class PageAboutIndex extends Vue {
             &__message
                 margin 0 auto
                 width fit-content
+                color $text-color
+                font-size $font-normal
+                +sm()
+                    font-size 2.5vw
         &__image
             border-radius $image-border-radius !important
     .concept-section
         &__subtitle
             justify-content center !important
+            +sm()
+                font-size 5vw
     .profile-section
         &__row
+            height 40px
             vertical-align top
+            &.narrow
+                height 20px
             &>td
-                height 40px
+                &:first-child
+                    width 100px
+                    +sm()
+                        width 50px
     .site-section
         &__subtitle
             justify-content center !important

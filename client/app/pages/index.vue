@@ -115,7 +115,6 @@ export default class PageTop extends Vue {
         +sm()
             margin-bottom 40px
     .page-top-container
-        margin-bottom 64px
         .page-top-section
             padding 48px 0 80px
             .page-top-title
@@ -130,6 +129,7 @@ export default class PageTop extends Vue {
                     font-size 40px !important
         .about-section
             &__message
+                padding 48px 0
                 color $text-color
                 font-weight 800
                 &.default
@@ -144,5 +144,6 @@ export default class PageTop extends Vue {
         .contact-section
             background-color $primary
             &__message
+                padding 48px 0
                 color $white-color !important
 </style>
