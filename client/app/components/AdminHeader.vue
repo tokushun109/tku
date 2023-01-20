@@ -47,7 +47,7 @@
 </template>
 
 <script lang="ts">
-import { mdiAccount, mdiApplicationOutline, mdiCartVariant, mdiEmail, mdiTagOutline } from '@mdi/js'
+import { mdiAccount, mdiApplicationOutline, mdiCartVariant, mdiEmail, mdiFileDocument, mdiTagOutline } from '@mdi/js'
 import { Component, Vue } from 'nuxt-property-decorator'
 import { ColorType, IconType, ITable } from '~/types'
 @Component({})
@@ -61,6 +61,7 @@ export default class AdminHeader extends Vue {
         { name: '分類', link: 'classification', icon: mdiTagOutline },
         { name: 'サイト', link: 'site', icon: mdiApplicationOutline },
         { name: 'お問い合わせ', link: 'contact', icon: mdiEmail },
+        { name: 'CSV', link: 'csv', icon: mdiFileDocument },
     ]
 
     sidebarVisible: boolean = false

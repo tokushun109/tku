@@ -452,7 +452,6 @@ func getProductsCsvHandler(w http.ResponseWriter, r *http.Request) {
 			TargetName:   product.Target.Name,
 		})
 	}
-
-	w.Header().Set("Content-Disposition", "attachment;filename=tests.csv")
+	w.Header().Set("Content-Type", "text/csv; charset=utf8")
 	gocsv.Marshal(csv, w)
 }

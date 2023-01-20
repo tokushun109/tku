@@ -39,6 +39,15 @@ export default class PageAdminCreatorIndex extends Vue {
     async loadingCreator() {
         this.creator = await this.$axios.$get(`/creator`)
     }
+
+    async test() {
+        const test = await this.$axios.$get(`/csv/product`, { withCredentials: true })
+        const blob = new Blob([test], { type: 'text/csv' }) // 配列に上記の文字列(str)を設定
+        const link = document.createElement('a')
+        link.href = URL.createObjectURL(blob)
+        link.download = 'template.csv'
+        link.click()
+    }
 }
 </script>
 
