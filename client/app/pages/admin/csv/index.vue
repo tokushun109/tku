@@ -9,16 +9,26 @@
             <div class="csv-content">
                 <div class="csv-buttons">
                     <v-btn :color="ColorType.Primary" class="button" @click="downloadHandler">ダウンロード</v-btn>
-                    <v-btn :color="ColorType.Primary" class="button">アップロード</v-btn>
+                    <v-btn :color="ColorType.Primary" class="button" @click="uploadDialogHandler">アップロード</v-btn>
                 </div>
             </div>
         </v-sheet>
+        <c-dialog :visible.sync="dialogVisible" title="CSVのアップロード" @confirm="confirmHandler" @close="closeHandler">
+            <template #content>
+                <c-error :errors.sync="errors" />
+                <v-form ref="form" lazy-validation>
+                    <v-file-input v-model="uploadFile" accept="text/csv" label="CSVファイル" :prepend-icon="mdiFileDocument" outlined />
+                </v-form>
+            </template>
+        </c-dialog>
+        <c-notification :visible.sync="notificationVisible">アップロードを完了しました</c-notification>
     </v-container>
 </template>
 
 <script lang="ts">
+import { mdiFileDocument } from '@mdi/js'
 import { Component, Vue } from 'nuxt-property-decorator'
-import { ColorType } from '~/types'
+import { BadRequest, ColorType, IError } from '~/types'
 
 @Component({
     head: {
@@ -27,6 +37,12 @@ import { ColorType } from '~/types'
 })
 export default class PageAdminCsvIndex extends Vue {
     ColorType: typeof ColorType = ColorType
+    mdiFileDocument = mdiFileDocument
+
+    uploadFile: File | null = null
+    dialogVisible: boolean = false
+    notificationVisible: boolean = false
+    errors: Array<IError> = []
 
     async downloadHandler() {
         const csvText = await this.$axios.$get(`/csv/product`, { withCredentials: true })
@@ -35,6 +51,37 @@ export default class PageAdminCsvIndex extends Vue {
         link.href = URL.createObjectURL(blob)
         link.download = '商品レコード.csv'
         link.click()
+    }
+
+    uploadDialogHandler() {
+        this.dialogVisible = true
+    }
+
+    async confirmHandler() {
+        this.errors = []
+        if (!this.uploadFile) {
+            this.errors.push(new BadRequest('CSVファイルが添付されていません'))
+            return
+        }
+        try {
+            const params = new FormData()
+            params.append(`csv`, this.uploadFile)
+            await this.$axios.$post('csv/product', params, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+                withCredentials: true,
+            })
+            this.notificationVisible = true
+            this.dialogVisible = false
+            this.uploadFile = null
+        } catch (e) {
+            this.errors.push(e.response)
+        }
+    }
+
+    closeHandler() {
+        this.dialogVisible = false
     }
 }
 </script>
