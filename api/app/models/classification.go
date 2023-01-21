@@ -205,7 +205,7 @@ func InsertTag(tag *Tag) (err error) {
 }
 
 func InsertUnDuplicateTag(tag *Tag) (err error) {
-	isUnique, _ := TagUniqueCheck(*&tag.Name)
+	isUnique, _ := TagUniqueCheck(tag.Name)
 	if !isUnique {
 		return nil
 	}
