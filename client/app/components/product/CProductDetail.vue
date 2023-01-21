@@ -9,7 +9,14 @@
                 <div class="description-area">
                     <pre class="description">{{ product.description }}</pre>
                 </div>
-                <div v-if="product.category.name" class="category-area">
+                <div v-if="product.target.uuid" class="target-area">
+                    <p class="target">対象</p>
+                    <div class="target-content">
+                        <v-chip small :color="ColorType.Secondary" :text-color="ColorType.White" class="mx-1">{{ product.target.name }}</v-chip>
+                    </div>
+                </div>
+
+                <div v-if="product.category.uuid" class="category-area">
                     <p class="category">カテゴリー</p>
 
                     <div class="category-content">
@@ -21,7 +28,7 @@
 
                     <div class="tag-content">
                         <div v-for="tag in product.tags" :key="tag.uuid">
-                            <v-chip small :color="ColorType.Secondary" :text-color="ColorType.White" class="ma-1">{{ tag.name }}</v-chip>
+                            <v-chip small :color="ColorType.Secondary" :text-color="ColorType.White" class="mx-1">{{ tag.name }}</v-chip>
                         </div>
                     </div>
                 </div>
@@ -78,12 +85,20 @@ export default class CProductDetail extends Vue {
     .detail-area
         .description-area
             .description
-                margin-bottom 60px
+                margin-bottom 30px
                 color $text-color
                 white-space pre-wrap
                 font-weight $title-font-weight
                 font-size $font-large
+        .target-area
+            margin-bottom 16px
+            .target
+                color $title-primary-color
+                font-weight $title-font-weight
+            .target-content
+                display flex
         .category-area
+            margin-bottom 16px
             .category
                 color $title-primary-color
                 font-weight $title-font-weight
@@ -91,7 +106,6 @@ export default class CProductDetail extends Vue {
                 display flex
         .tag-area
             .tag
-                margin-top 16px
                 color $title-primary-color
                 font-weight $title-font-weight
             .tag-content

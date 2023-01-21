@@ -22,9 +22,14 @@
                     :alt="listItem.productImages[0].name"
                 />
                 <v-img v-else class="product-card-image" lazy-src="/img/product/gray-image.png" src="/img/product/no-image.png" alt="no-image" />
-                <div class="product-category">
-                    <v-chip v-if="listItem.category" :color="ColorType.Accent" :text-color="ColorType.White" x-small>
+                <div v-if="listItem.category.uuid" class="product-category">
+                    <v-chip :color="ColorType.Accent" :text-color="ColorType.White" x-small>
                         {{ listItem.category.name }}
+                    </v-chip>
+                </div>
+                <div v-if="listItem.target.uuid" class="product-target">
+                    <v-chip :color="ColorType.Accent" :text-color="ColorType.White" x-small>
+                        {{ listItem.target.name }}
                     </v-chip>
                 </div>
             </div>
@@ -79,6 +84,10 @@ export default class CProductCard extends Vue {
                 position absolute
                 top 5px
                 left 10px
+            .product-target
+                position absolute
+                right 10px
+                bottom 5px
             .product-card-image
                 width 100%
                 border-radius $image-border-radius
