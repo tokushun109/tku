@@ -165,8 +165,8 @@ func createSkillMarketHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var skillmarket models.SkillMarket
-	if err := json.Unmarshal(reqBody, &skillmarket); err != nil {
+	var skillMarket models.SkillMarket
+	if err := json.Unmarshal(reqBody, &skillMarket); err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
@@ -174,14 +174,14 @@ func createSkillMarketHandler(w http.ResponseWriter, r *http.Request) {
 
 	// validationの確認
 	validate := validator.New()
-	if err := validate.Struct(skillmarket); err != nil {
+	if err := validate.Struct(skillMarket); err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
 		return
 	}
 
 	// modelの呼び出し
-	err = models.InsertSkillMarket(&skillmarket)
+	err = models.InsertSkillMarket(&skillMarket)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)

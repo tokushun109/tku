@@ -62,7 +62,7 @@ func createCategoryHandler(w http.ResponseWriter, r *http.Request) {
 
 	// validationの確認
 	validate := validator.New()
-	if errors := validate.Struct(category); errors != nil {
+	if err := validate.Struct(category); err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
 		return
@@ -108,7 +108,7 @@ func updateCategoryHandler(w http.ResponseWriter, r *http.Request) {
 
 	// validationの確認
 	validate := validator.New()
-	if errors := validate.Struct(category); errors != nil {
+	if err := validate.Struct(category); err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
 		return

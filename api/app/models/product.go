@@ -2,7 +2,9 @@ package models
 
 import (
 	"errors"
+	"fmt"
 
+	"gopkg.in/go-playground/validator.v9"
 	"gorm.io/gorm"
 )
 
@@ -43,6 +45,16 @@ type ProductImage struct {
 	Order int    `json:"order"`
 	// フロントで画像を取得する時のapiパス
 	ApiPath string `gorm:"-" json:"apiPath"`
+}
+
+func (p *Product) ProductToProductCsv() ProductCsv {
+	return ProductCsv{
+		ID:           p.ID,
+		Name:         p.Name,
+		Price:        p.Price,
+		CategoryName: p.Category.Name,
+		TargetName:   p.Target.Name,
+	}
 }
 
 func GetAllProducts(mode string, category string) (products Products, err error) {
@@ -111,6 +123,15 @@ func GetProduct(uuid string) (product Product, err error) {
 		Preload("SiteDetails.SalesSite").
 		Limit(1).
 		Find(&product, "uuid = ?", uuid).Error
+	return product, err
+}
+
+func GetProductByID(ID string) (product Product, err error) {
+	db := GetDBConnection()
+	err = db.Preload("Category").
+		Preload("Target").
+		Limit(1).
+		Find(&product, "id = ?", ID).Error
 	return product, err
 }
 
@@ -360,6 +381,49 @@ func UpdateProduct(product *Product, uuid string) (err error) {
 		}
 	}
 
+	return tx.Commit().Error
+}
+
+func (pc *ProductCsv) UpdateProductByCsv() (err error) {
+	tx := GetDBConnection()
+	category := GetCategoryByName(pc.CategoryName)
+	target := GetTargetByName(pc.TargetName)
+
+	tx.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	validate := validator.New()
+	nameValidate := "min=1,max=50"
+	if err := validate.Var(pc.Name, nameValidate); err != nil {
+		err = fmt.Errorf("%s is not %s", pc.Name, nameValidate)
+		return err
+	}
+
+	priceValidate := "min=1,max=1000000"
+	if err := validate.Var(pc.Price, priceValidate); err != nil {
+		err = fmt.Errorf("%d is not %s", pc.Price, priceValidate)
+		return err
+	}
+
+	err = tx.Model(&Product{}).
+		Omit("Category", "Target", "Tags", "ProductImages", "SiteDetails").
+		Where("id = ?", pc.ID).
+		Updates(
+			Product{
+				Name:       pc.Name,
+				Price:      pc.Price,
+				CategoryId: category.ID,
+				TargetId:   target.ID,
+			},
+		).
+		Error
+	if err != nil {
+		return err
+	}
 	return tx.Commit().Error
 }
 

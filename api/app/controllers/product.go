@@ -5,6 +5,7 @@ import (
 	"api/app/models"
 	"api/config"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -12,6 +13,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"sync"
 
 	"github.com/gocarina/gocsv"
 	"github.com/gorilla/mux"
@@ -126,9 +128,9 @@ func createProductHandler(w http.ResponseWriter, r *http.Request) {
 
 	// validationの確認
 	validate := validator.New()
-	if errors := validate.Struct(product); errors != nil {
-		log.Println(errors)
-		http.Error(w, fmt.Sprintf("error: %s", errors), http.StatusBadRequest)
+	if err := validate.Struct(product); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
 		return
 	}
 
@@ -177,7 +179,7 @@ func updateProductHandler(w http.ResponseWriter, r *http.Request) {
 
 	// validationの確認
 	validate := validator.New()
-	if errors := validate.Struct(product); errors != nil {
+	if err := validate.Struct(product); err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
 		return
@@ -444,14 +446,117 @@ func getProductsCsvHandler(w http.ResponseWriter, r *http.Request) {
 	csv := []*models.ProductCsv{}
 
 	for _, product := range products {
-		csv = append(csv, &models.ProductCsv{
-			ID:           product.ID,
-			Name:         product.Name,
-			Price:        product.Price,
-			CategoryName: product.Category.Name,
-			TargetName:   product.Target.Name,
-		})
+		c := product.ProductToProductCsv()
+		csv = append(csv, &c)
 	}
 	w.Header().Set("Content-Type", "text/csv; charset=utf8")
 	gocsv.Marshal(csv, w)
+}
+
+// アップロードしたCSVを元に商品レコードを更新する
+func uploadProductsCsvHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := sessionCheck(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
+	csv, handler, err := r.FormFile("csv")
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+	defer csv.Close()
+
+	mimeType := handler.Header["Content-Type"][0]
+	if mimeType != "text/csv" {
+		err = errors.New("mime-type is invalid")
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+	buffer, _ := ioutil.ReadAll(csv)
+
+	productCsv := []*models.ProductCsv{}
+	if err := gocsv.UnmarshalBytes(buffer, &productCsv); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+	checkCategoryNames := map[string]struct{}{}
+	checkTargetNames := map[string]struct{}{}
+	validate := validator.New()
+
+	// TODO エラーハンドリングを見直し
+	for _, pc := range productCsv {
+		var wg sync.WaitGroup
+		wg.Add(2)
+		go func() {
+			defer wg.Done()
+			if pc.CategoryName == "" {
+				return
+			}
+
+			if _, ok := checkCategoryNames[pc.CategoryName]; ok {
+				return
+			}
+
+			// 新規カテゴリーの作成
+			category := models.Category{
+				Name: pc.CategoryName,
+			}
+			if errors := validate.Struct(category); errors != nil {
+				log.Println(err)
+				http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
+				return
+			}
+			if err = models.InsertUnDuplicateCategory(&category); err != nil {
+				log.Println(err)
+				http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+				return
+			}
+			checkCategoryNames[pc.CategoryName] = struct{}{}
+		}()
+
+		go func() {
+			defer wg.Done()
+			if pc.TargetName == "" {
+				return
+			}
+
+			if _, ok := checkTargetNames[pc.TargetName]; ok {
+				return
+			}
+
+			// 新規ターゲットの作成
+			target := models.Target{
+				Name: pc.TargetName,
+			}
+			if err := validate.Struct(target); err != nil {
+				log.Println(err)
+				http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
+				return
+			}
+			if err = models.InsertUnDuplicateTarget(&target); err != nil {
+				log.Println(err)
+				http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+				return
+			}
+			checkTargetNames[pc.TargetName] = struct{}{}
+
+		}()
+		wg.Wait()
+
+		if err := pc.UpdateProductByCsv(); err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+			return
+		}
+	}
+
+	responseBody := getSuccessResponse()
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(responseBody)
 }

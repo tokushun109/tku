@@ -32,7 +32,7 @@ import { BadRequest, ColorType, IError } from '~/types'
 
 @Component({
     head: {
-        title: '製作者紹介',
+        title: 'CSV操作',
     },
 })
 export default class PageAdminCsvIndex extends Vue {

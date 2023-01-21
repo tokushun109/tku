@@ -51,6 +51,12 @@ func GetCategory(uuid string) (category Category) {
 	return category
 }
 
+func GetCategoryByName(name string) (category Category) {
+	db := GetDBConnection()
+	db.Limit(1).Find(&category, "name = ?", name)
+	return category
+}
+
 func CategoryUniqueCheck(name string) (isUnique bool, err error) {
 	var category Category
 	db := GetDBConnection()
@@ -63,6 +69,22 @@ func CategoryUniqueCheck(name string) (isUnique bool, err error) {
 }
 
 func InsertCategory(category *Category) (err error) {
+	// uuidの設定
+	uuid, err := GenerateUuid()
+	if err != nil {
+		return err
+	}
+	category.Uuid = uuid
+	db := GetDBConnection()
+	err = db.Create(&category).Error
+	return err
+}
+
+func InsertUnDuplicateCategory(category *Category) (err error) {
+	isUnique, _ := CategoryUniqueCheck(category.Name)
+	if !isUnique {
+		return nil
+	}
 	// uuidの設定
 	uuid, err := GenerateUuid()
 	if err != nil {
@@ -108,6 +130,39 @@ func (category *Category) DeleteCategory() (err error) {
 	return tx.Commit().Error
 }
 
+func GetTargetByName(name string) (target Target) {
+	db := GetDBConnection()
+	db.Limit(1).Find(&target, "name = ?", name)
+	return target
+}
+
+func TargetUniqueCheck(name string) (isUnique bool, err error) {
+	var target Target
+	db := GetDBConnection()
+	db.Limit(1).Find(&target, "name = ?", name)
+	isUnique = target.ID == nil
+	if !isUnique {
+		err = errors.New("name is duplicate")
+	}
+	return isUnique, err
+}
+
+func InsertUnDuplicateTarget(target *Target) (err error) {
+	isUnique, _ := TargetUniqueCheck(target.Name)
+	if !isUnique {
+		return nil
+	}
+	// uuidの設定
+	uuid, err := GenerateUuid()
+	if err != nil {
+		return err
+	}
+	target.Uuid = uuid
+	db := GetDBConnection()
+	err = db.Create(&target).Error
+	return err
+}
+
 func GetAllTags() (tags Tags) {
 	db := GetDBConnection()
 	db.Find(&tags)
@@ -149,8 +204,8 @@ func InsertTag(tag *Tag) (err error) {
 	return err
 }
 
-func InsertUnDuplicateTag(tag *Tag, tagName string) (err error) {
-	isUnique, _ := TagUniqueCheck(tagName)
+func InsertUnDuplicateTag(tag *Tag) (err error) {
+	isUnique, _ := TagUniqueCheck(*&tag.Name)
 	if !isUnique {
 		return nil
 	}

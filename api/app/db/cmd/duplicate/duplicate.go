@@ -62,7 +62,7 @@ func duplicateProduct(url string) {
 			tag := models.Tag{
 				Name: trimTagName,
 			}
-			if err = models.InsertUnDuplicateTag(&tag, trimTagName); err != nil {
+			if err = models.InsertUnDuplicateTag(&tag); err != nil {
 				panic(err)
 			}
 		}
