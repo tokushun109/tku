@@ -387,11 +387,11 @@ func UpdateProduct(product *Product, uuid string) (err error) {
 }
 
 func (pc *ProductCsv) UpdateProductByCsv() (err error) {
-	tx := GetDBConnection()
+	db := GetDBConnection()
 	category := GetCategoryByName(pc.CategoryName)
 	target := GetTargetByName(pc.TargetName)
 
-	tx.Begin()
+	tx := db.Begin()
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()
@@ -407,7 +407,7 @@ func (pc *ProductCsv) UpdateProductByCsv() (err error) {
 
 	priceValidate := "min=1,max=1000000"
 	if err := validate.Var(pc.Price, priceValidate); err != nil {
-		err = fmt.Errorf("%s is not %s", pc.Price, priceValidate)
+		err = fmt.Errorf("%d is not %s", pc.Price, priceValidate)
 		return err
 	}
 

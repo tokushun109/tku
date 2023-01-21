@@ -15,6 +15,7 @@ export function newProduct(): IProduct {
         description: '',
         price: 1,
         category: newClassification(),
+        target: newClassification(),
         tags: [],
         productImages: [],
         siteDetails: [],
