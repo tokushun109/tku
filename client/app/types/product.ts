@@ -19,6 +19,7 @@ export interface IProduct {
     description: string
     price: number
     category: IClassification
+    target: IClassification
     tags: Array<IClassification>
     productImages: Array<IProductImage>
     siteDetails: Array<ISiteDetail>

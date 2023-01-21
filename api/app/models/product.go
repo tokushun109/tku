@@ -81,6 +81,7 @@ func GetAllProducts(mode string, category string) (products Products, err error)
 	}
 
 	db.Preload("Category").
+		Preload("Target").
 		Preload("ProductImages", func(db *gorm.DB) *gorm.DB {
 			return db.Order("product_image.order Desc, id")
 		}).
@@ -113,6 +114,7 @@ func GetNewProducts(limit int) (products Products) {
 func GetProduct(uuid string) (product Product, err error) {
 	db := GetDBConnection()
 	err = db.Preload("Category").
+		Preload("Target").
 		Preload("ProductImages", func(db *gorm.DB) *gorm.DB {
 			return db.Order("product_image.order Desc")
 		}).
@@ -405,7 +407,7 @@ func (pc *ProductCsv) UpdateProductByCsv() (err error) {
 
 	priceValidate := "min=1,max=1000000"
 	if err := validate.Var(pc.Price, priceValidate); err != nil {
-		err = fmt.Errorf("%d is not %s", pc.Price, priceValidate)
+		err = fmt.Errorf("%s is not %s", pc.Price, priceValidate)
 		return err
 	}
 
