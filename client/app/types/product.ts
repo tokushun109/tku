@@ -23,6 +23,7 @@ export interface IProduct {
     tags: Array<IClassification>
     productImages: Array<IProductImage>
     siteDetails: Array<ISiteDetail>
+    isRecommend: boolean
     isActive: boolean
 }
 

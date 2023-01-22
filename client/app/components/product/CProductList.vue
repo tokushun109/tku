@@ -129,9 +129,18 @@
                             {{ siteDetail.salesSite.name }}
                         </v-chip>
                     </div>
-                    <div class="active-check-box">
+                    <div class="check-box-area">
+                        <v-checkbox
+                            v-model="modalItem.isRecommend"
+                            class="check-box"
+                            :off-icon="mdiCheckboxBlankOutline"
+                            :on-icon="mdiCheckboxMarked"
+                            label="おすすめに設定"
+                            dense
+                        />
                         <v-checkbox
                             v-model="modalItem.isActive"
+                            class="check-box"
                             :off-icon="mdiCheckboxBlankOutline"
                             :on-icon="mdiCheckboxMarked"
                             label="販売中"
@@ -480,7 +489,9 @@ export default class CProductList extends Vue {
     .site-detail-chip
         margin 8px 0 8px 8px
 
-.active-check-box
+.check-box-area
     display flex
     justify-content center
+    .check-box
+        margin 20px
 </style>

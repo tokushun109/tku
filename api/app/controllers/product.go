@@ -229,7 +229,11 @@ func deleteProductHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getCarouselImageHandler(w http.ResponseWriter, r *http.Request) {
-	products := models.GetNewProducts(5)
+	products := models.GetRecommendProducts()
+	limit := 5
+	if len(products) < limit {
+		products = models.GetNewProducts(limit)
+	}
 	for _, product := range products {
 		if err := setProductImageApiPath(&product); err != nil {
 			log.Println(err)
