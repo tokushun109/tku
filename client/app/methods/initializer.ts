@@ -19,6 +19,7 @@ export function newProduct(): IProduct {
         tags: [],
         productImages: [],
         siteDetails: [],
+        isRecommend: false,
         isActive: true,
     }
 }

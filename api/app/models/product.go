@@ -14,6 +14,7 @@ type Product struct {
 	Name          string          `json:"name" validate:"min=1,max=50"`
 	Description   string          `json:"description"`
 	Price         int             `json:"price" validate:"min=1,max=1000000"`
+	IsRecommend   *bool           `json:"isRecommend"`
 	IsActive      *bool           `json:"isActive"`
 	CategoryId    *uint           `json:"-"`
 	Category      Category        `json:"category" validate:"-"`
@@ -28,8 +29,8 @@ type ProductCsv struct {
 	ID           *uint  `json:"id"`
 	Name         string `json:"name"`
 	Price        int    `json:"price"`
-	CategoryName string `json:"category_name"`
-	TargetName   string `json:"target_name"`
+	CategoryName string `json:"categoryName"`
+	TargetName   string `json:"targetName"`
 }
 
 type Products []Product
@@ -107,6 +108,22 @@ func GetNewProducts(limit int) (products Products) {
 		Order("id desc").
 		Group("product.id").
 		Limit(limit).
+		Find(&products)
+	return products
+}
+
+func GetRecommendProducts() (products Products) {
+	db := GetDBConnection()
+	db.Joins("join product_image on product_image.product_id = product.id").
+		Where("product.is_recommend = ?", 1).
+		Where("product.is_active = ?", 1).
+		Where("product_image.deleted_at is null").
+		Preload("Category").
+		Preload("ProductImages", func(db *gorm.DB) *gorm.DB {
+			return db.Order("product_image.order Desc")
+		}).
+		Order("id desc").
+		Group("product.id").
 		Find(&products)
 	return products
 }
@@ -242,6 +259,7 @@ func UpdateProduct(product *Product, uuid string) (err error) {
 				Name:        product.Name,
 				Description: product.Description,
 				Price:       product.Price,
+				IsRecommend: product.IsRecommend,
 				IsActive:    product.IsActive,
 				CategoryId:  GetCategory(product.Category.Uuid).ID,
 				TargetId:    GetTarget(product.Target.Uuid).ID,
