@@ -20,7 +20,7 @@ type Target struct {
 	Name string `json:"name" validate:"min=1,max=20"`
 }
 
-type Targets []Category
+type Targets []Target
 
 type Tag struct {
 	DefaultModel
@@ -136,6 +136,39 @@ func GetTargetByName(name string) (target Target) {
 	return target
 }
 
+func GetAllTargets() (targets Targets) {
+	db := GetDBConnection()
+	db.Find(&targets)
+	return targets
+}
+
+func GetUsedTargets() (targets Targets) {
+	db := GetDBConnection()
+	db.Joins("INNER JOIN product on product.target_id = target.id").
+		Where("product.deleted_at IS NULL").
+		Group("target.id").
+		Find(&targets)
+	return targets
+}
+
+func GetTarget(uuid string) (target Target) {
+	db := GetDBConnection()
+	db.Limit(1).Find(&target, "uuid = ?", uuid)
+	return target
+}
+
+func InsertTarget(target *Target) (err error) {
+	// uuidの設定
+	uuid, err := GenerateUuid()
+	if err != nil {
+		return err
+	}
+	target.Uuid = uuid
+	db := GetDBConnection()
+	err = db.Create(&target).Error
+	return err
+}
+
 func TargetUniqueCheck(name string) (isUnique bool, err error) {
 	var target Target
 	db := GetDBConnection()
@@ -145,6 +178,40 @@ func TargetUniqueCheck(name string) (isUnique bool, err error) {
 		err = errors.New("name is duplicate")
 	}
 	return isUnique, err
+}
+
+func UpdateTarget(target *Target, uuid string) (err error) {
+	db := GetDBConnection()
+	err = db.Model(&target).Where("uuid = ?", uuid).Updates(
+		Target{Name: target.Name},
+	).Error
+	return err
+}
+
+func (target *Target) DeleteTarget() (err error) {
+	db := GetDBConnection()
+	tx := db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := tx.Error; err != nil {
+		return err
+	}
+
+	// 商品の外部キーをnullにする
+	if err = tx.Model(&Product{}).
+		Where("target_id = ?", GetTarget(target.Uuid).ID).
+		Update("target_id", gorm.Expr("NULL")).
+		Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	err = tx.Delete(&target).Error
+	return tx.Commit().Error
 }
 
 func InsertUnDuplicateTarget(target *Target) (err error) {

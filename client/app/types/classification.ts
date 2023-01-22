@@ -3,6 +3,6 @@ export interface IClassification {
     name: string
 }
 
-export interface IGetCategoriesParams {
+export interface IGetClassificationParams {
     mode: 'all' | 'used'
 }

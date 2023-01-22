@@ -151,6 +151,144 @@ func deleteCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(responseBody)
 }
 
+// ターゲット一覧を取得
+func getAllTargetsHandler(w http.ResponseWriter, r *http.Request) {
+	mode := r.URL.Query().Get("mode")
+	var targets models.Targets
+
+	if mode == "all" {
+		targets = models.GetAllTargets()
+	} else if mode == "used" {
+		targets = models.GetUsedTargets()
+	} else {
+		err := errors.New("invalid params")
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(targets); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+}
+
+// ターゲットの新規作成
+func createTargetHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := sessionCheck(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
+	reqBody, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
+	var target models.Target
+	if err := json.Unmarshal(reqBody, &target); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
+	// validationの確認
+	validate := validator.New()
+	if err := validate.Struct(target); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
+		return
+	}
+
+	if err = models.InsertTarget(&target); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
+	// responseBodyで処理の成功を返す
+	responseBody := getSuccessResponse()
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(responseBody)
+}
+
+// ターゲットの更新
+func updateTargetHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := sessionCheck(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
+	vars := mux.Vars(r)
+	uuid := vars["target_uuid"]
+
+	reqBody, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
+	var target models.Target
+	if err := json.Unmarshal(reqBody, &target); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
+	// validationの確認
+	validate := validator.New()
+	if err := validate.Struct(target); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusBadRequest)
+		return
+	}
+
+	if err = models.UpdateTarget(&target, uuid); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
+	// responseBodyで処理の成功を返す
+	responseBody := getSuccessResponse()
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(responseBody)
+}
+
+// ターゲットの削除
+func deleteTargetHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := sessionCheck(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
+	vars := mux.Vars(r)
+	uuid := vars["target_uuid"]
+
+	target := models.GetTarget(uuid)
+	if err := target.DeleteTarget(); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
+	// responseBodyで処理の成功を返す
+	responseBody := getSuccessResponse()
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(responseBody)
+}
+
 // タグ一覧を取得
 func getAllTagsHandler(w http.ResponseWriter, r *http.Request) {
 	tags := models.GetAllTags()
