@@ -55,7 +55,7 @@
                         @c-order-image-handler="orderImageHandler"
                     />
                     <v-btn v-if="isChangedOrder" class="order-reset" @click="orderInit">表示順リセット</v-btn>
-                    <v-select
+                    <v-autocomplete
                         v-model="modalItem.category"
                         :items="categories"
                         item-text="name"
@@ -65,7 +65,7 @@
                         label="カテゴリー"
                         outlined
                     />
-                    <v-select
+                    <v-autocomplete
                         v-model="modalItem.target"
                         :items="targets"
                         item-text="name"
@@ -75,7 +75,18 @@
                         label="ターゲット"
                         outlined
                     />
-                    <v-select v-model="modalItem.tags" :items="tags" item-text="name" return-object chips multiple label="タグ" outlined />
+                    <v-autocomplete
+                        v-model="modalItem.tags"
+                        :search-input.sync="searchText"
+                        :items="tags"
+                        item-text="name"
+                        return-object
+                        chips
+                        multiple
+                        label="タグ"
+                        outlined
+                        @change="searchText = ''"
+                    />
                     <v-row dense>
                         <v-col cols="12" sm="6">
                             <v-select
@@ -204,6 +215,8 @@ export default class CProductList extends Vue {
     nameRules = [required, min50]
 
     priceRules = [required, price, maxPrice]
+
+    searchText: string = ''
 
     // 既存登録リスト
     get registeredList(): Array<IImagePathOrder> {
@@ -437,6 +450,9 @@ export default class CProductList extends Vue {
 </script>
 
 <style lang="stylus" scoped>
+::v-deep .v-list-item__action
+    display none
+
 .c-product-list
     .product-list-area
         padding 16px
