@@ -22,7 +22,7 @@
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
 import { newProduct } from '~/methods'
-import { IBreadCrumb, IClassification, IGetCategoriesParams, IGetProductsParams, IProduct } from '~/types'
+import { IBreadCrumb, IClassification, IGetClassificationParams, IGetProductsParams, IProduct } from '~/types'
 @Component({})
 export default class PageProductIndex extends Vue {
     products: Array<IProduct> = []
@@ -43,7 +43,7 @@ export default class PageProductIndex extends Vue {
                 category: 'all',
             }
             const products: Array<IProduct> = await app.$axios.$get(`/product`, { params: productParams })
-            const categoryParams: IGetCategoriesParams = {
+            const categoryParams: IGetClassificationParams = {
                 mode: 'used',
             }
             const categories: Array<IProduct> = await app.$axios.$get(`/category`, { params: categoryParams })

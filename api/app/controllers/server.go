@@ -46,6 +46,11 @@ func StartMainServer() error {
 	r.HandleFunc("/api/category", createCategoryHandler).Methods("POST")
 	r.HandleFunc("/api/category/{category_uuid}", updateCategoryHandler).Methods("PUT")
 	r.HandleFunc("/api/category/{category_uuid}", deleteCategoryHandler).Methods("DELETE")
+	// ターゲット
+	r.HandleFunc("/api/target", getAllTargetsHandler).Methods("GET")
+	r.HandleFunc("/api/target", createTargetHandler).Methods("POST")
+	r.HandleFunc("/api/target/{target_uuid}", updateTargetHandler).Methods("PUT")
+	r.HandleFunc("/api/target/{target_uuid}", deleteTargetHandler).Methods("DELETE")
 	// タグ
 	r.HandleFunc("/api/tag", getAllTagsHandler).Methods("GET")
 	r.HandleFunc("/api/tag", createTagHandler).Methods("POST")

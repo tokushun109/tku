@@ -5,7 +5,7 @@
 <script lang="ts">
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
-import { IClassification, IGetCategoriesParams, IGetProductsParams, IProduct, ISite } from '~/types'
+import { IClassification, IGetClassificationParams, IGetProductsParams, IProduct, ISite } from '~/types'
 @Component({
     head: {
         title: '商品一覧',
@@ -27,7 +27,7 @@ export default class PageAdminProductIndex extends Vue {
                 category: 'all',
             }
             const products = await app.$axios.$get(`/product`, { params: productParams })
-            const categoryParams: IGetCategoriesParams = {
+            const categoryParams: IGetClassificationParams = {
                 mode: 'all',
             }
 

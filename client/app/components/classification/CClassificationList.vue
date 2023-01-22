@@ -43,7 +43,7 @@
 <script lang="ts">
 import { Component, Prop, PropSync, Vue, Watch } from 'nuxt-property-decorator'
 import _ from 'lodash'
-import { IClassification, IError, CategoryType, ExecutionType, IconType, TExecutionType } from '~/types'
+import { IClassification, IError, ExecutionType, IconType, TExecutionType, ClassificationType } from '~/types'
 import { min20, newClassification, required } from '~/methods'
 @Component({})
 export default class CClassificationList extends Vue {
@@ -70,9 +70,9 @@ export default class CClassificationList extends Vue {
 
     get categoryTypeValue(): string {
         let categoryType = ''
-        for (const type in CategoryType) {
-            if (this.type === CategoryType[type].name) {
-                categoryType = CategoryType[type].value
+        for (const type in ClassificationType) {
+            if (this.type === ClassificationType[type].name) {
+                categoryType = ClassificationType[type].value
             }
         }
         return categoryType
@@ -131,48 +131,19 @@ export default class CClassificationList extends Vue {
 
     async confirmHandler() {
         this.errors = []
-        if (this.executionType === ExecutionType.Create) {
-            try {
-                if (this.categoryTypeValue === CategoryType.Category.value) {
-                    await this.$axios.$post(`/category`, this.modalItem, { withCredentials: true })
-                    this.$emit('c-change', CategoryType.Category.name)
-                } else if (this.categoryTypeValue === CategoryType.Tag.value) {
-                    await this.$axios.$post(`/tag`, this.modalItem, { withCredentials: true })
-                    this.$emit('c-change', CategoryType.Tag.name)
-                }
-                this.notificationVisible = true
-                this.dialogVisible = false
-            } catch (e) {
-                this.errors.push(e.response)
+        try {
+            if (this.executionType === ExecutionType.Create) {
+                await this.$axios.$post(`/${this.type}`, this.modalItem, { withCredentials: true })
+            } else if (this.executionType === ExecutionType.Edit) {
+                await this.$axios.$put(`/${this.type}/${this.modalItem.uuid}`, this.modalItem, { withCredentials: true })
+            } else if (this.executionType === ExecutionType.Delete) {
+                await this.$axios.$delete(`/${this.type}/${this.modalItem.uuid}`, { withCredentials: true })
             }
-        } else if (this.executionType === ExecutionType.Edit) {
-            try {
-                if (this.categoryTypeValue === CategoryType.Category.value) {
-                    await this.$axios.$put(`/category/${this.modalItem.uuid}`, this.modalItem, { withCredentials: true })
-                    this.$emit('c-change', CategoryType.Category.name)
-                } else if (this.categoryTypeValue === CategoryType.Tag.value) {
-                    await this.$axios.$put(`/tag/${this.modalItem.uuid}`, this.modalItem, { withCredentials: true })
-                    this.$emit('c-change', CategoryType.Tag.name)
-                }
-                this.notificationVisible = true
-                this.dialogVisible = false
-            } catch (e) {
-                this.errors.push(e.response)
-            }
-        } else if (this.executionType === ExecutionType.Delete) {
-            try {
-                if (this.categoryTypeValue === CategoryType.Category.value) {
-                    await this.$axios.$delete(`/category/${this.modalItem.uuid}`, { withCredentials: true })
-                    this.$emit('c-change', CategoryType.Category.name)
-                } else if (this.categoryTypeValue === CategoryType.Tag.value) {
-                    await this.$axios.$delete(`/tag/${this.modalItem.uuid}`, { withCredentials: true })
-                    this.$emit('c-change', CategoryType.Tag.name)
-                }
-                this.notificationVisible = true
-                this.dialogVisible = false
-            } catch (e) {
-                this.errors.push(e.response)
-            }
+            this.$emit('c-change', this.type)
+            this.notificationVisible = true
+            this.dialogVisible = false
+        } catch (e) {
+            this.errors.push(e.response)
         }
     }
 }
