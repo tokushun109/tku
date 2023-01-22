@@ -43,7 +43,7 @@ export default class PageProductDetail extends Vue {
         }
         const title = `${this.product.name} | とこりり`
         const description = this.product.description.replace(/\r?\n/g, '')
-        const image = this.product && this.product.productImages.length ? this.product.productImages[0].apiPath : ''
+        const image = this.product.uuid && this.product.productImages.length ? this.product.productImages[0].apiPath : ''
         return {
             title,
             meta: [

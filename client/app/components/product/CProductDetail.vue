@@ -1,5 +1,5 @@
 <template>
-    <v-sheet class="c-product-detail-page-area">
+    <v-sheet v-if="product.uuid" class="c-product-detail-page-area">
         <p class="product-name">{{ product.name }}</p>
         <v-row class="detail-area">
             <v-col cols="12" sm="6">
@@ -23,7 +23,7 @@
                         <v-chip small :color="ColorType.Secondary" :text-color="ColorType.White" class="mx-1">{{ product.category.name }}</v-chip>
                     </div>
                 </div>
-                <div v-if="product.tags.length > 0" class="tag-area">
+                <div v-if="product && product.tags.length > 0" class="tag-area">
                     <p v class="tag">タグ</p>
 
                     <div class="tag-content">
@@ -32,7 +32,7 @@
                         </div>
                     </div>
                 </div>
-                <div v-if="product.siteDetails.length > 0" class="sales-site-area">
+                <div v-if="product && product.siteDetails.length > 0" class="sales-site-area">
                     <div class="sales-site text-body-1">
                         <p>販売サイト</p>
                     </div>
