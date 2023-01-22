@@ -65,6 +65,16 @@
                         label="カテゴリー"
                         outlined
                     />
+                    <v-select
+                        v-model="modalItem.target"
+                        :items="targets"
+                        item-text="name"
+                        return-object
+                        height="56"
+                        chips
+                        label="ターゲット"
+                        outlined
+                    />
                     <v-select v-model="modalItem.tags" :items="tags" item-text="name" return-object chips multiple label="タグ" outlined />
                     <v-row dense>
                         <v-col cols="12" sm="6">
@@ -159,6 +169,7 @@ interface IProductImageParams {
 export default class CProductList extends Vue {
     @PropSync('items') listItems!: Array<IProduct>
     @Prop({ type: Array, default: [] }) categories!: Array<IClassification>
+    @Prop({ type: Array, default: [] }) targets!: Array<IClassification>
     @Prop({ type: Array, default: [] }) tags!: Array<IClassification>
     @Prop({ type: Array, default: [] }) salesSites!: Array<ISite>
     @Prop({ type: String, default: '' }) type!: string

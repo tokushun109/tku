@@ -169,7 +169,9 @@ func InsertProduct(product *Product) (err error) {
 	// カテゴリーの設定
 	category := GetCategory(product.Category.Uuid)
 	product.CategoryId = category.ID
-	if err := tx.Omit("Category", "Tags", "ProductImages", "SiteDetails").Create(&product).Error; err != nil {
+	target := GetTarget(product.Target.Uuid)
+	product.TargetId = target.ID
+	if err := tx.Omit("Category", "Target", "Tags", "ProductImages", "SiteDetails").Create(&product).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -242,6 +244,7 @@ func UpdateProduct(product *Product, uuid string) (err error) {
 				Price:       product.Price,
 				IsActive:    product.IsActive,
 				CategoryId:  GetCategory(product.Category.Uuid).ID,
+				TargetId:    GetTarget(product.Target.Uuid).ID,
 			},
 		).
 		Error
