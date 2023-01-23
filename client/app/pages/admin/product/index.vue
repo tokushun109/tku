@@ -35,6 +35,7 @@ export default class PageAdminProductIndex extends Vue {
             const productParams: IGetProductsParams = {
                 mode: 'all',
                 category: 'all',
+                target: 'all',
             }
             const products = await app.$axios.$get(`/product`, { params: productParams })
             const classificationParams: IGetClassificationParams = {
@@ -56,6 +57,7 @@ export default class PageAdminProductIndex extends Vue {
         const params: IGetProductsParams = {
             mode: 'all',
             category: 'all',
+            target: 'all',
         }
         this.products = await this.$axios.$get(`/product`, { params })
         this.updateCount += 1

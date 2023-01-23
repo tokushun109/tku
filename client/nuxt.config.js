@@ -152,8 +152,8 @@ module.exports = {
             themes: {
                 light: {
                     primary: '#6D4C41',
-                    secondary: '#8bc34a',
-                    accent: '#cddc39',
+                    secondary: '#BCAAA4',
+                    accent: '#FFB74D',
                     warning: '#fff9c4',
                     info: '#a7ffeb',
                     success: '#b3e5fc',

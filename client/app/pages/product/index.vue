@@ -5,69 +5,99 @@
         </div>
         <v-sheet>
             <div>
-                <c-select-search group-name="Category" :items="categories" @c-select-search="categorySearchHandler" />
-                <c-message v-if="products.length === 0" class="mt-4"> 登録されていません </c-message>
-                <v-row>
-                    <v-col v-for="listItem in products" :key="listItem.uuid" cols="12" sm="6" md="4" lg="3">
-                        <c-product-card :list-item="listItem" @c-click="clickHandler(listItem)" />
-                    </v-col>
-                </v-row>
+                <v-btn text :color="ColorType.Grey" class="search-button sm" @click="toggleSearchArea">
+                    <v-icon>{{ mdiMagnify }}</v-icon>
+                    <span class="icon-text">SEARCH</span>
+                </v-btn>
+                <v-expand-transition>
+                    <div v-if="isSearchAreaDisplay" class="search-area">
+                        <c-select-search
+                            group-name="Category"
+                            :items="categories"
+                            :target-content.sync="productParams.category"
+                            @c-select-search="selectSearchHandler"
+                        />
+                        <c-select-search
+                            group-name="Target"
+                            :items="targets"
+                            :target-content.sync="productParams.target"
+                            @c-select-search="selectSearchHandler"
+                        />
+                    </div>
+                </v-expand-transition>
             </div>
+            <c-message v-if="products.length === 0" wide>該当する商品が<br class="sm" />見つかりませんでした</c-message>
+            <v-row>
+                <v-col v-for="listItem in products" :key="listItem.uuid" cols="12" sm="6" md="4" lg="3">
+                    <c-product-card :list-item="listItem" @c-click="clickHandler(listItem)" />
+                </v-col>
+            </v-row>
         </v-sheet>
         <c-breadcrumbs :items="breadCrumbs" />
     </div>
 </template>
 
 <script lang="ts">
+import { mdiMagnify } from '@mdi/js'
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
 import { newProduct } from '~/methods'
-import { IBreadCrumb, IClassification, IGetClassificationParams, IGetProductsParams, IProduct } from '~/types'
+import { ColorType, IBreadCrumb, IClassification, IGetClassificationParams, IGetProductsParams, IProduct } from '~/types'
 @Component({})
 export default class PageProductIndex extends Vue {
+    ColorType: typeof ColorType = ColorType
+
     products: Array<IProduct> = []
     categories: Array<IClassification> = []
+    targets: Array<IClassification> = []
     searchCategory: string = 'all'
     // form用のproductModel
     productModel: IProduct = newProduct()
+    mdiMagnify = mdiMagnify
+
+    isSearchAreaDisplay: boolean = false
 
     breadCrumbs: Array<IBreadCrumb> = [
         { text: 'トップページ', href: '/' },
         { text: '商品一覧', disabled: true },
     ]
 
+    productParams: IGetProductsParams = {
+        mode: 'active',
+        category: 'all',
+        target: 'all',
+    }
+
     async asyncData({ app }: Context) {
         try {
             const productParams: IGetProductsParams = {
                 mode: 'active',
                 category: 'all',
+                target: 'all',
             }
             const products: Array<IProduct> = await app.$axios.$get(`/product`, { params: productParams })
-            const categoryParams: IGetClassificationParams = {
+            const classificationParams: IGetClassificationParams = {
                 mode: 'used',
             }
-            const categories: Array<IProduct> = await app.$axios.$get(`/category`, { params: categoryParams })
-            return { products, categories }
+            const categories: Array<IProduct> = await app.$axios.$get(`/category`, { params: classificationParams })
+            const targets: Array<IProduct> = await app.$axios.$get(`/target`, { params: classificationParams })
+            return { products, categories, targets }
         } catch (e) {
-            return { products: [], categories: [] }
+            return { products: [], categories: [], targets: [] }
         }
     }
 
-    async loadingProduct(categoryParams: string) {
-        const productParams: IGetProductsParams = {
-            mode: 'active',
-            category: categoryParams,
-        }
-        this.products = await this.$axios.$get(`/product`, { params: productParams })
+    async loadingProduct() {
+        this.products = await this.$axios.$get(`/product`, { params: this.productParams })
     }
 
     head() {
-        if (!this.products || this.products[0].productImages.length < 1) {
+        if (this.products.length === 0 || this.products[0].productImages.length === 0) {
             return
         }
         const title = '商品一覧 | とこりり'
         const description = 'とこりりの商品一覧ページです。'
-        const image = this.products[0].productImages[0].apiPath
+        const image = this.products[0].productImages[0].apiPath ? this.products[0].productImages[0].apiPath : ''
         return {
             title,
             meta: [
@@ -100,12 +130,20 @@ export default class PageProductIndex extends Vue {
         }
     }
 
+    mounted() {
+        this.isSearchAreaDisplay = window.innerWidth > 600
+    }
+
+    toggleSearchArea() {
+        this.isSearchAreaDisplay = !this.isSearchAreaDisplay
+    }
+
     clickHandler(item: IProduct) {
         this.$router.push(`/product/${item.uuid}`)
     }
 
-    async categorySearchHandler(categoryParam: string) {
-        await this.loadingProduct(categoryParam)
+    async selectSearchHandler() {
+        await this.loadingProduct()
     }
 }
 </script>
@@ -121,4 +159,22 @@ export default class PageProductIndex extends Vue {
 .page-title-container
     +sm()
         display none
+
+.search-button
+    justify-content start
+    margin 8px 0
+    width 100%
+    .icon-text
+        height 24px
+        line-height 24px
+
+.search-area
+    display flex
+    flex-wrap wrap
+    margin-bottom 8px
+
+.sm
+    display none
+    +sm()
+        display block
 </style>

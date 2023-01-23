@@ -58,7 +58,7 @@ func (p *Product) ProductToProductCsv() ProductCsv {
 	}
 }
 
-func GetAllProducts(mode string, category string) (products Products, err error) {
+func GetAllProducts(mode, category, target string) (products Products, err error) {
 
 	if mode != "all" && mode != "active" {
 		err = errors.New("invalid params")
@@ -79,6 +79,12 @@ func GetAllProducts(mode string, category string) (products Products, err error)
 		db = db.
 			Joins("INNER JOIN category on category.id = product.category_id").
 			Where("category.uuid = ?", category)
+	}
+
+	if target != "all" {
+		db = db.
+			Joins("INNER JOIN target on target.id = product.target_id").
+			Where("target.uuid = ?", target)
 	}
 
 	db.Preload("Category").

@@ -10,7 +10,7 @@
             <div class="product-card-header">
                 <div class="product-name">
                     {{ listItem.name }}
-                    <v-chip v-if="listItem.isRecommend" x-small :color="ColorType.Accent" :text-color="ColorType.White">おすすめ</v-chip>
+                    <v-chip v-if="admin && listItem.isRecommend" x-small :color="ColorType.Accent" :text-color="ColorType.White">おすすめ</v-chip>
                     <v-chip v-if="!listItem.isActive" x-small :color="ColorType.Grey" :text-color="ColorType.White">展示</v-chip>
                 </div>
             </div>

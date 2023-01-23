@@ -8,11 +8,12 @@
 <script lang="ts">
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
+import { newProduct } from '~/methods'
 import { IBreadCrumb, IClientError, IProduct, serverToClientError } from '~/types'
 
 @Component({})
 export default class PageProductDetail extends Vue {
-    product: IProduct | null = null
+    product: IProduct = newProduct()
     error: IClientError | null = null
     breadCrumbs: Array<IBreadCrumb> = []
 
@@ -27,7 +28,7 @@ export default class PageProductDetail extends Vue {
             return { product, breadCrumbs }
         } catch (e) {
             const error = serverToClientError(e.response)
-            return { product: null, error }
+            return { product: newProduct(), error }
         }
     }
 
@@ -38,12 +39,12 @@ export default class PageProductDetail extends Vue {
     }
 
     head() {
-        if (!this.product) {
+        if (!this.product.uuid) {
             return
         }
         const title = `${this.product.name} | とこりり`
         const description = this.product.description.replace(/\r?\n/g, '')
-        const image = this.product.uuid && this.product.productImages.length ? this.product.productImages[0].apiPath : ''
+        const image = this.product.productImages.length ? this.product.productImages[0].apiPath : ''
         return {
             title,
             meta: [

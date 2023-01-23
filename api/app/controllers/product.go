@@ -57,8 +57,9 @@ func setProductImageApiPath(product *models.Product) error {
 func getAllProductsHandler(w http.ResponseWriter, r *http.Request) {
 	mode := r.URL.Query().Get("mode")
 	category := r.URL.Query().Get("category")
+	target := r.URL.Query().Get("target")
 
-	products, err := models.GetAllProducts(mode, category)
+	products, err := models.GetAllProducts(mode, category, target)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
@@ -440,7 +441,7 @@ func getProductsCsvHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	products, err := models.GetAllProducts("all", "all")
+	products, err := models.GetAllProducts("all", "all", "all")
 	if err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
