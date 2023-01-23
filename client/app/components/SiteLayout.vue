@@ -1,5 +1,6 @@
 <template>
     <div class="site-layout">
+        <c-top-loading :is-root="isRoot" />
         <!-- md幅以上 -->
         <div @click="toggleMenu">
             <v-btn :color="ColorType.Primary" fab x-large class="toggle-button">
