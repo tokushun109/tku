@@ -39,11 +39,12 @@
                         <v-card-text>
                             <div class="about-section__content">
                                 <div class="about-section__content__message">
-                                    <p>マクラメ編みとは、手で紐を「結ぶ」 という工程を繰り返し</p>
-                                    <p>模様を生み出す技法のこと。</p>
+                                    <p>マクラメ編みとは</p>
+                                    <p>手で紐を「結ぶ」 という工程を繰り返し</p>
+                                    <p class="mb-10">模様を生み出す技法のこと。</p>
                                     <p>同じデザインで編んでも使用する糸によって仕上がりの印象が</p>
-                                    <p>大きく変化するマクラメ。</p>
-                                    <p>作品に合わせて材質・艶感・質感・太さなど選定しています。</p>
+                                    <p class="mb-10">大きく変化するマクラメ。</p>
+                                    <p class="mb-10">作品に合わせて材質・艶感・質感・太さなど選定しています。</p>
                                     <p>ハンドメイドだからこそ生み出せる繊細な模様を</p>
                                     <p>ぜひお楽しみください♪</p>
                                 </div>
@@ -58,12 +59,14 @@
                         <v-card-text>
                             <div class="about-section__content">
                                 <div class="about-section__content__message">
-                                    <p>・日常の小さな悩みを解決する</p>
-                                    <p>・目に留まるたび励まされる</p>
-                                    <p>様々な+αの価値を乗せた</p>
+                                    <p>「日常の小さな悩みを解決する」</p>
+                                    <p class="mb-10">「目に留まるたび励まされる」</p>
+                                    <p>そんなモノづくりを大切にしています。</p>
+                                    <p>アロマを楽しむアイテムや、静電気対策に役立つアイテム</p>
+                                    <p class="mb-10">大事な人と分かち合うお揃いアイテムなど</p>
                                     <p>「オシャレなだけじゃない！」</p>
-                                    <p>「あったら、ちょっと嬉しい♪」</p>
-                                    <p>アクセサリーをお届けします。</p>
+                                    <p class="mb-10">「あったら、ちょっと嬉しい♪」</p>
+                                    <p>アクセサリーを制作しています。</p>
                                 </div>
                             </div>
                         </v-card-text>
@@ -75,7 +78,7 @@
             <h3 class="about-section__title">Profile</h3>
             <v-row>
                 <v-col cols="12" offset-sm="1" sm="10" offset-md="0" md="6" align-self="center">
-                    <v-img class="about-section__image" src="/img/product/gray-image.png"></v-img>
+                    <v-img class="about-section__image" src="/img/about/profile.JPG"></v-img>
                 </v-col>
                 <v-col cols="12" sm="12" md="6" align-self="center">
                     <div>
@@ -295,7 +298,10 @@ export default class PageAboutIndex extends Vue {
                 +sm()
                     font-size 2.5vw
         &__image
+            width 100%
             border-radius $image-border-radius !important
+            aspect-ratio 1 / 1
+            object-fit cover
     .concept-section
         &__subtitle
             justify-content center !important
