@@ -21,7 +21,7 @@
 
 <script lang="ts">
 import { mdiChevronDown } from '@mdi/js'
-import { Component, Vue, Prop } from 'nuxt-property-decorator'
+import { Component, Vue, Prop, PropSync } from 'nuxt-property-decorator'
 import { ColorType, IClassification } from '~/types'
 
 interface ISelectSearchItem extends IClassification {
@@ -30,6 +30,7 @@ interface ISelectSearchItem extends IClassification {
 
 @Component({})
 export default class CSelectSearch extends Vue {
+    @PropSync('targetContent') content!: string
     @Prop({ type: Array, default: () => [] }) items!: Array<IClassification>
     @Prop({ type: String, default: '' }) groupName!: string
 
@@ -38,7 +39,15 @@ export default class CSelectSearch extends Vue {
 
     isExpand: boolean = false
     selectItems: Array<ISelectSearchItem> = []
-    targetName: string = 'All'
+
+    get targetName(): string {
+        for (const selectItem of this.selectItems) {
+            if (selectItem.isActive) {
+                return selectItem.name
+            }
+        }
+        return 'all'
+    }
 
     initSelectSearchItems() {
         this.selectItems = [{ name: 'All', uuid: 'all', isActive: true }]
@@ -59,8 +68,8 @@ export default class CSelectSearch extends Vue {
         this.selectItems.forEach((item, i) => {
             if (i === index) {
                 item.isActive = true
-                this.targetName = item.name
-                this.$emit('c-select-search', item.uuid)
+                this.content = item.uuid
+                this.$emit('c-select-search')
                 setTimeout(() => {
                     this.isExpand = false
                 }, 200)
@@ -83,11 +92,13 @@ export default class CSelectSearch extends Vue {
     padding-left 50px
 
 .c-select-search
-    max-width 350px
-    .v-list-item__icon
-        margin-right 10px !important
+    padding 0
+    min-width 350px
     +sm()
         max-width inherit
+        width 100%
+    .v-list-item__icon
+        margin-right 10px !important
     &__title
     &__item
         color $text-color

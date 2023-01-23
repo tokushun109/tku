@@ -30,6 +30,7 @@ export interface IProduct {
 export interface IGetProductsParams {
     mode: 'all' | 'active'
     category: 'all' | string
+    target: 'all' | string
 }
 
 export interface ICarouselItem {

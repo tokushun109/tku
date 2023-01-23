@@ -142,6 +142,7 @@ export default class SiteLayout extends Vue {
             object-fit cover
     .menu-item
         position relative
+        max-width $lg-width
         .menu-card
             padding 0 0 20px
             border-radius $image-border-radius
