@@ -101,7 +101,7 @@ export default class PageTop extends Vue {
     margin 0 auto
     text-align center
     +sm()
-        padding-top 35px
+        padding-top 16px
     .site-sub-title
         display none
         padding 30px 40px
@@ -112,7 +112,7 @@ export default class PageTop extends Vue {
     .top-image
         margin-bottom 16px
         +sm()
-            margin-bottom 40px
+            margin-bottom 0
     .page-top-container
         .page-top-section
             padding 48px 0 80px

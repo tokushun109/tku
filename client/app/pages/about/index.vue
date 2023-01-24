@@ -13,8 +13,8 @@
                     <div>
                         <div class="about-section__content">
                             <div class="about-section__content__message">
-                                <p>とこりりはハンドメイドのマクラメ編みアクセサリーを</p>
-                                <p class="mb-10">制作・販売しているお店です。</p>
+                                <p>とこりりはハンドメイドのマクラメ編み</p>
+                                <p class="mb-10">アクセサリーを制作・販売しているお店です。</p>
                                 <p>仕事や出産、育児、家事...</p>
                                 <p>慌ただしい毎日の中で</p>
                                 <p>頑張る女性の味方になりたい、</p>
@@ -22,7 +22,8 @@
                                 <p>とこりりのモノづくりの根底には</p>
                                 <p>「人の役に立ちたい」</p>
                                 <p>「私の作品で元気づけたい」</p>
-                                <p>という思いがあり、制作活動の原動力となっています。</p>
+                                <p>という思いがあり、</p>
+                                <p>制作活動の原動力となっています。</p>
                             </div>
                         </div>
                     </div>
@@ -44,7 +45,8 @@
                                     <p class="mb-10">模様を生み出す技法のこと。</p>
                                     <p>同じデザインで編んでも使用する糸によって</p>
                                     <p class="mb-10">仕上がりの印象が大きく変化するマクラメ。</p>
-                                    <p class="mb-10">作品に合わせて材質・艶感・質感・太さなど選定しています。</p>
+                                    <p>作品に合わせて材質・艶感・質感・太さなど</p>
+                                    <p class="mb-10">を選定しています。</p>
                                     <p>ハンドメイドだからこそ生み出せる繊細な模様を</p>
                                     <p>ぜひお楽しみください♪</p>
                                 </div>
@@ -62,7 +64,8 @@
                                     <p>「日常の小さな悩みを解決する」</p>
                                     <p class="mb-10">「目に留まるたび励まされる」</p>
                                     <p>そんなモノづくりを大切にしています。</p>
-                                    <p>アロマを楽しむアイテムや、静電気対策に役立つアイテム</p>
+                                    <p>アロマを楽しむアイテムや、</p>
+                                    <p>静電気対策に役立つアイテム、</p>
                                     <p class="mb-10">大事な人と分かち合うお揃いアイテムなど</p>
                                     <p>「オシャレなだけじゃない！」</p>
                                     <p class="mb-10">「あったら、ちょっと嬉しい♪」</p>
@@ -74,51 +77,65 @@
                 </v-col>
             </v-row>
         </section>
-        <section class="profile-section about-section">
-            <h3 class="about-section__title">Profile</h3>
+        <section class="creator-section about-section">
+            <h3 class="about-section__title">Creator</h3>
             <v-row>
                 <v-col cols="12" offset-sm="1" sm="10" offset-md="0" md="6" align-self="center">
-                    <v-img class="about-section__image" src="/img/about/profile.jpg"></v-img>
+                    <v-img class="about-section__image" src="/img/about/creator.jpg"></v-img>
                 </v-col>
                 <v-col cols="12" sm="12" md="6" align-self="center">
                     <div>
                         <div class="about-section__content">
+                            <h4 class="creator-section__name">tku</h4>
                             <div class="about-section__content__message">
                                 <table>
-                                    <tr class="profile-section__row">
+                                    <tr class="creator-section__row">
                                         <td>2016年</td>
                                         <td>大手服飾品製造メーカー入社</td>
                                     </tr>
-                                    <tr class="profile-section__row">
+                                    <tr class="creator-section__row">
                                         <td></td>
                                         <td>色彩学と品質管理について学ぶ</td>
                                     </tr>
-                                    <tr class="profile-section__row narrow">
+                                    <tr class="creator-section__row narrow">
                                         <td>2018年</td>
-                                        <td>フリマサイトにて アクセサリー作家tku(とく)として</td>
+                                        <td>フリマサイトにて、</td>
                                     </tr>
-                                    <tr class="profile-section__row">
+                                    <tr class="creator-section__row narrow">
+                                        <td></td>
+                                        <td>アクセサリー作家 tku(とく)として</td>
+                                    </tr>
+                                    <tr class="creator-section__row">
                                         <td></td>
                                         <td>ハンドメイド作品の販売開始</td>
                                     </tr>
 
-                                    <tr class="profile-section__row">
+                                    <tr class="creator-section__row">
                                         <td></td>
                                         <td>独学でマクラメ編みの技術を磨く</td>
                                     </tr>
-                                    <tr class="profile-section__row">
+                                    <tr class="creator-section__row narrow">
                                         <td>2020年</td>
-                                        <td>オンラインショップにて、マクラメ編み作品の販売開始</td>
+                                        <td>オンラインショップにて、</td>
                                     </tr>
-                                    <tr class="profile-section__row">
+                                    <tr class="creator-section__row">
+                                        <td></td>
+                                        <td>マクラメ編み作品の販売開始</td>
+                                    </tr>
+
+                                    <tr class="creator-section__row">
                                         <td></td>
                                         <td>とこりり開業準備をする</td>
                                     </tr>
-                                    <tr class="profile-section__row">
+                                    <tr class="creator-section__row narrow">
                                         <td>2022年</td>
-                                        <td>作家活動を拡充するため、服飾品メーカー退社</td>
+                                        <td>作家活動を拡充するため、</td>
                                     </tr>
-                                    <tr class="profile-section__row">
+                                    <tr class="creator-section__row">
+                                        <td></td>
+                                        <td>服飾品メーカー退社</td>
+                                    </tr>
+                                    <tr class="creator-section__row">
                                         <td></td>
                                         <td>とこりりを個人事業開業する</td>
                                     </tr>
@@ -213,7 +230,7 @@ export default class PageAboutIndex extends Vue {
 
     breadCrumbs: Array<IBreadCrumb> = [
         { text: 'トップページ', href: '/' },
-        { text: '製作者紹介', disabled: true },
+        { text: 'とこりりについて', disabled: true },
     ]
 
     async asyncData({ app }: Context) {
@@ -231,9 +248,8 @@ export default class PageAboutIndex extends Vue {
         if (!this.creator) {
             return
         }
-        const title = '製作者紹介 | とこりり'
-        const description =
-            'とこりり 開店4年目です♪たくさんのステキなお客様とのご縁に感謝です。平成生まれの新米ママ。服飾品の色開発に携わった経験を活かし優しい色味・配色のアクセサリーを作成・販売しています。皆様とご縁があることを楽しみにしています！'
+        const title = 'とこりりについて | とこりり'
+        const description = 'とこりりはハンドメイドのマクラメ編みアクセサリーを制作・販売しているお店です。'
         const image = this.creator.apiPath
         return {
             title,
@@ -285,8 +301,10 @@ export default class PageAboutIndex extends Vue {
             margin-bottom 20px
             color $secondary
             text-align center
-            font-size 50px !important
+            font-size 50px
             font-family $title-font-face !important
+            +sm()
+                font-size 30px
         &__content
             width 100%
             height 100%
@@ -297,7 +315,7 @@ export default class PageAboutIndex extends Vue {
                 font-size $font-normal
                 line-height 100%
                 +sm()
-                    font-size 2.5vw
+                    font-size 3.5vw
         &__image
             width 100%
             border-radius $image-border-radius !important
@@ -310,7 +328,15 @@ export default class PageAboutIndex extends Vue {
             justify-content center !important
             +sm()
                 font-size 5vw
-    .profile-section
+    .creator-section
+        &__name
+            margin-bottom 50px
+            color $text-color
+            text-align center
+            font-size 40px
+            font-family $title-font-face !important
+            +sm()
+                margin-bottom 20px
         &__row
             height 40px
             vertical-align top
