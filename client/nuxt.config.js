@@ -119,7 +119,7 @@ module.exports = {
         routes: async () => {
             // 商品詳細ページ
             const baseURL = process.env.API_BASE_URL || 'http://localhost:8080/api'
-            const { data } = await axios.get(`${baseURL}/product?mode=active`)
+            const { data } = await axios.get(`${baseURL}/product?mode=active&category=all&target=all`)
             return data.map((product) => `/product/${product.uuid}`)
         },
     },
