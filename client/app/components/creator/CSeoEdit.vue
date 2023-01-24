@@ -1,40 +1,17 @@
 <template>
     <v-sheet class="c-creator-edit">
         <v-container class="logo-content">
+            <h3 class="title product-list-title">ページサムネイル</h3>
+            <v-divider class="divider"></v-divider>
             <v-img v-if="creator.apiPath" :src="creator.apiPath" max-width="400" aspect-ratio="1" class="logo-image" alt="ロゴ画像" />
         </v-container>
         <v-container class="description-content">
+            <h3 class="title product-list-title">ページの説明</h3>
+            <v-divider class="divider"></v-divider>
             <pre class="description-text">{{ creator.introduction }}</pre>
         </v-container>
-        <div>
-            <div v-if="snsList" class="sns-head-title head-title">
-                <div class="head-title-content">SNS</div>
-            </div>
-            <v-container class="sns-content">
-                <div v-for="sns in snsList" :key="sns.name" class="sns-item">
-                    <v-btn fab :color="ColorType.Accent" :href="sns.url" target="_blank" rel="noopener noreferrer" x-large>
-                        <v-icon :color="ColorType.White" class="sns-icon">{{ sns.icon }}</v-icon>
-                    </v-btn>
-                    <a class="sns-name" :href="sns.url" target="_blank" rel="noopener noreferrer">
-                        <small>{{ sns.name }}</small>
-                    </a>
-                </div>
-            </v-container>
-        </div>
-        <div>
-            <div v-if="salesSiteList" class="sales-site-head-title head-title">
-                <div class="head-title-content">販売サイト</div>
-            </div>
-            <v-container class="sales-site-content">
-                <div v-for="site in salesSiteList" :key="site.name" class="sales-site-item">
-                    <v-btn :color="ColorType.Accent" :href="site.url" class="sales-site-buttons" target="_blank" rel="noopener noreferrer" x-large>
-                        {{ site.name }}
-                    </v-btn>
-                </div>
-            </v-container>
-            <div v-if="admin" class="edit-button">
-                <v-btn color="primary" @click="openHandler"><c-icon :type="IconType.Edit.name" @c-click="openHandler" />編集</v-btn>
-            </div>
+        <div v-if="admin" class="edit-button">
+            <v-btn color="primary" @click="openHandler"><c-icon :type="IconType.Edit.name" @c-click="openHandler" />編集</v-btn>
         </div>
         <c-dialog
             :visible.sync="dialogVisible"
@@ -57,28 +34,19 @@
 </template>
 
 <script lang="ts">
-import { mdiCamera, mdiInstagram } from '@mdi/js'
+import { mdiCamera } from '@mdi/js'
 import { Component, Vue, Watch, Prop, PropSync } from 'nuxt-property-decorator'
 import _ from 'lodash'
 import { ICreator, IError, ISite, IconType, ColorType } from '~/types'
 import { newCreator } from '~/methods'
 @Component({})
-export default class CCreatorEdit extends Vue {
+export default class CSeoEdit extends Vue {
     mdiCamera = mdiCamera
     IconType: typeof IconType = IconType
     ColorType: typeof ColorType = ColorType
-    snsList: Array<ISite> = [
-        {
-            name: 'instagram',
-            url: 'https://instagram.com/tku_accessory?igshid=YmMyMTA2M2Y=',
-            icon: mdiInstagram,
-        },
-    ]
 
     // 製作者
     @PropSync('item') creator!: ICreator
-    // 販売サイト一覧
-    @Prop({ type: Array, default: () => {} }) salesSiteList!: Array<ISite>
     // 管理画面での使用
     @Prop({ type: Boolean, default: false }) admin!: boolean
 
@@ -166,8 +134,8 @@ export default class CCreatorEdit extends Vue {
     .description-title
         color $title-primary-color
     .description-content
-        text-align center
         .description-text
+            padding 24px 0
             white-space pre-wrap
             word-break break-all
             +sm()
