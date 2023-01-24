@@ -36,6 +36,8 @@ export default class CDetailButton extends Vue {
         background-color $primary
         content ''
         transition all 0.3s
+        +md()
+            transition none
     span
         z-index 2
         display block
@@ -47,7 +49,7 @@ export default class CDetailButton extends Vue {
             height 0
             background $accent
             content ''
-            transition all 0.3s
+            transition none
         &::before
             left 0
         &::after
@@ -58,6 +60,9 @@ export default class CDetailButton extends Vue {
         color $white-color
         transition all 0.3s
         transition-delay 0.6s
+        +md()
+            transition none
+            transition-delay 0
         span
             &::before
             &::after
@@ -65,4 +70,6 @@ export default class CDetailButton extends Vue {
         &::before
             height 100%
             transition-delay 0.4s
+            +md()
+                transition-delay 0
 </style>
