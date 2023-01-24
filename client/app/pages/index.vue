@@ -19,13 +19,19 @@
                     <c-detail-button to="about" />
                 </c-layout-container>
             </div>
-            <div class="contact-section page-top-section">
+            <div class="contact-section page-top-section reverse">
                 <c-layout-container normal no-vertical-padding>
                     <h2 class="page-top-title reverse">Contact</h2>
                     <v-container class="contact-section__message">
                         <p>お問い合わせ・ご意見・ご相談はこちらから</p>
                     </v-container>
                     <c-detail-button content="お問い合わせフォーム" to="contact" />
+                </c-layout-container>
+            </div>
+            <v-divider />
+            <div class="share-section">
+                <c-layout-container normal no-vertical-padding>
+                    <c-share-buttons></c-share-buttons>
                 </c-layout-container>
             </div>
         </div>
@@ -116,21 +122,29 @@ export default class PageTop extends Vue {
     .page-top-container
         .page-top-section
             padding 48px 0 80px
+            background-color $white-color
+            &.reverse
+                background-color $primary
+            &.sub
+                padding 8px 0
             .page-top-title
                 margin-bottom 10px
                 color $primary
                 text-align center
-                font-size 60px !important
+                font-size 60px
                 font-family $title-font-face !important
-                &.reverse
-                    color $white-color !important
                 +sm()
-                    font-size 40px !important
+                    font-size 40px
+                &.reverse
+                    color $white-color
+                &.sub
+                    font-size 30px
+                    +sm()
+                        font-size 20px
         .about-section
             &__message
                 padding 48px 0
                 color $text-color
-                font-weight 800
                 &.default
                     +sm()
                         display none
@@ -141,8 +155,10 @@ export default class PageTop extends Vue {
                 .emphasis
                     color $accent
         .contact-section
-            background-color $primary
             &__message
                 padding 48px 0
                 color $white-color !important
+        .share-section
+            padding-top 16px
+            background-color $primary
 </style>
