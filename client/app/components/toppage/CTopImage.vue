@@ -116,6 +116,7 @@ export default class CTopImage extends Vue {
 ::v-deep .v-chip__content
     display inline-block !important
     overflow hidden
+    height auto !important
     text-overflow ellipsis
     white-space nowrap
 

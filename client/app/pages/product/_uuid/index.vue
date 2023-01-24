@@ -73,6 +73,21 @@ export default class PageProductDetail extends Vue {
                     property: 'og:image',
                     content: image,
                 },
+                {
+                    hid: 'twitter:image',
+                    property: 'twitter:image',
+                    content: image,
+                },
+                {
+                    hid: 'twitter:title',
+                    property: 'twitter:title',
+                    content: title,
+                },
+                {
+                    hid: 'twitter:description',
+                    property: 'twitter:description',
+                    content: description,
+                },
             ],
         }
     }
