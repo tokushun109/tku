@@ -88,7 +88,6 @@ export default class CProductDetail extends Vue {
                 margin-bottom 30px
                 color $text-color
                 white-space pre-wrap
-                font-weight $title-font-weight
                 font-size $font-large
         .target-area
             margin-bottom 16px

@@ -148,7 +148,7 @@
         </section>
         <section class="site-section about-section">
             <h3 class="about-section__title">Site</h3>
-            <v-row>
+            <v-row no-gutters>
                 <v-col cols="12" offset-sm="1" sm="5" align-self="center">
                     <v-card flat>
                         <v-card-title class="site-section__subtitle">SNS</v-card-title>
@@ -156,8 +156,8 @@
                             <v-container class="site-section__content">
                                 <div v-for="sns in mdiSnsList" :key="sns.name">
                                     <v-btn
-                                        height="80"
-                                        width="150"
+                                        height="90"
+                                        width="90"
                                         class="sns-item"
                                         fab
                                         :color="ColorType.Accent"
@@ -166,7 +166,7 @@
                                         rel="noopener noreferrer"
                                     >
                                         <v-icon :color="ColorType.White" class="sns-icon">{{ sns.icon }}</v-icon>
-                                        <span class="sns-name">{{ sns.name }}</span>
+                                        <small class="sns-name">{{ sns.name }}</small>
                                     </v-btn>
                                 </div>
                             </v-container>
@@ -181,15 +181,15 @@
                                 <div v-for="salesSite in salesSiteList" :key="salesSite.name">
                                     <div class="site-item">
                                         <v-btn
-                                            height="80"
-                                            width="150"
+                                            height="90"
+                                            width="90"
                                             fab
                                             :color="ColorType.Accent"
                                             :href="salesSite.url"
                                             target="_blank"
                                             rel="noopener noreferrer"
                                         >
-                                            <span class="site-name">{{ salesSite.name }}</span>
+                                            <small class="site-name">{{ salesSite.name }}</small>
                                         </v-btn>
                                     </div>
                                 </div>
@@ -371,6 +371,8 @@ export default class PageAboutIndex extends Vue {
             color $text-color
             font-size 30px
             font-family $title-font-face !important
+            +sm()
+                font-size 20px
         &__content
             display flex
             justify-content center
@@ -383,23 +385,21 @@ export default class PageAboutIndex extends Vue {
                     top -23px
                 .sns-name
                     position absolute
-                    top -5px
+                    top 5px
                     left 50%
-                    margin-top 10px
                     color $white-color
-                    font-weight $title-font-weight
-                    font-size 12px !important
+                    letter-spacing 0
+                    font-size 10px !important
                     transform translateX(-50%)
             .site-item
                 margin 0 10px
                 text-align center
                 .site-name
                     position absolute
-                    top -22px
+                    top -8px
                     left 50%
-                    margin-top 10px
                     color $white-color
-                    font-weight $title-font-weight
-                    font-size $font-normal
+                    letter-spacing 0
+                    font-size 12px !important
                     transform translateX(-50%)
 </style>
