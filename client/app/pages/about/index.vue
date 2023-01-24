@@ -279,6 +279,21 @@ export default class PageAboutIndex extends Vue {
                     property: 'og:image',
                     content: image,
                 },
+                {
+                    hid: 'twitter:image',
+                    property: 'twitter:image',
+                    content: image,
+                },
+                {
+                    hid: 'twitter:title',
+                    property: 'twitter:title',
+                    content: title,
+                },
+                {
+                    hid: 'twitter:description',
+                    property: 'twitter:description',
+                    content: description,
+                },
             ],
         }
     }
@@ -317,12 +332,15 @@ export default class PageAboutIndex extends Vue {
                 +sm()
                     font-size 3.5vw
         &__image
-            width 100%
             border-radius $image-border-radius !important
             aspect-ratio 1 / 1
             object-fit cover
             &.short
-                aspect-ratio 1 / 0.7
+                margin 0 auto
+                width 90%
+                aspect-ratio 1 / 0.8
+                +sm()
+                    width 100%
     .concept-section
         &__subtitle
             justify-content center !important
