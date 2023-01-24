@@ -7,7 +7,7 @@
             <h3 class="about-section__title">Story</h3>
             <v-row>
                 <v-col cols="12" offset-sm="1" sm="10" offset-md="0" md="6" align-self="center">
-                    <v-img class="about-section__image" src="/img/product/gray-image.png"></v-img>
+                    <v-img class="about-section__image" src="/img/about/story.jpg"></v-img>
                 </v-col>
                 <v-col cols="12" sm="12" md="6" align-self="center">
                     <div>
@@ -15,7 +15,7 @@
                             <div class="about-section__content__message">
                                 <p>とこりりはハンドメイドのマクラメ編みアクセサリーを</p>
                                 <p class="mb-10">制作・販売しているお店です。</p>
-                                <p class="mb-10">仕事や出産、育児、家事...</p>
+                                <p>仕事や出産、育児、家事...</p>
                                 <p>慌ただしい毎日の中で</p>
                                 <p>頑張る女性の味方になりたい、</p>
                                 <p class="mb-10">そんな想いでとこりりは生まれました。</p>
@@ -34,7 +34,7 @@
             <v-row>
                 <v-col cols="12" offset-sm="1" sm="10" offset-md="0" md="6">
                     <v-card flat>
-                        <v-img class="about-section__image" src="/img/product/gray-image.png"></v-img>
+                        <v-img class="about-section__image short" src="/img/about/concept1.jpg"></v-img>
                         <v-card-title class="concept-section__subtitle">マクラメ編みの繊細さ</v-card-title>
                         <v-card-text>
                             <div class="about-section__content">
@@ -42,8 +42,8 @@
                                     <p>マクラメ編みとは</p>
                                     <p>手で紐を「結ぶ」 という工程を繰り返し</p>
                                     <p class="mb-10">模様を生み出す技法のこと。</p>
-                                    <p>同じデザインで編んでも使用する糸によって仕上がりの印象が</p>
-                                    <p class="mb-10">大きく変化するマクラメ。</p>
+                                    <p>同じデザインで編んでも使用する糸によって</p>
+                                    <p class="mb-10">仕上がりの印象が大きく変化するマクラメ。</p>
                                     <p class="mb-10">作品に合わせて材質・艶感・質感・太さなど選定しています。</p>
                                     <p>ハンドメイドだからこそ生み出せる繊細な模様を</p>
                                     <p>ぜひお楽しみください♪</p>
@@ -54,7 +54,7 @@
                 </v-col>
                 <v-col cols="12" offset-sm="1" sm="10" offset-md="0" md="6">
                     <v-card flat>
-                        <v-img class="about-section__image" src="/img/product/gray-image.png"></v-img>
+                        <v-img class="about-section__image short" src="/img/about/concept2.jpg"></v-img>
                         <v-card-title class="concept-section__subtitle">オシャレなだけじゃない+α</v-card-title>
                         <v-card-text>
                             <div class="about-section__content">
@@ -78,7 +78,7 @@
             <h3 class="about-section__title">Profile</h3>
             <v-row>
                 <v-col cols="12" offset-sm="1" sm="10" offset-md="0" md="6" align-self="center">
-                    <v-img class="about-section__image" src="/img/about/profile.JPG"></v-img>
+                    <v-img class="about-section__image" src="/img/about/profile.jpg"></v-img>
                 </v-col>
                 <v-col cols="12" sm="12" md="6" align-self="center">
                     <div>
@@ -295,6 +295,7 @@ export default class PageAboutIndex extends Vue {
                 width fit-content
                 color $text-color
                 font-size $font-normal
+                line-height 100%
                 +sm()
                     font-size 2.5vw
         &__image
@@ -302,6 +303,8 @@ export default class PageAboutIndex extends Vue {
             border-radius $image-border-radius !important
             aspect-ratio 1 / 1
             object-fit cover
+            &.short
+                aspect-ratio 1 / 0.7
     .concept-section
         &__subtitle
             justify-content center !important

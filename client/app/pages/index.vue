@@ -1,7 +1,6 @@
 <template>
     <v-sheet :color="ColorType.Transparent" class="page-top">
         <c-top-image class="top-image" title category :carousel-items="carouselItems" />
-        <!-- aboutがページの修正が終わってから表示 -->
         <div class="page-top-container">
             <div class="about-section page-top-section">
                 <c-layout-container normal no-vertical-padding>
