@@ -4,30 +4,32 @@
             <h2 class="page-title">Product</h2>
         </div>
         <v-sheet>
-            <div>
+            <div class="fade-up">
                 <v-btn text :color="ColorType.Grey" class="search-button sm" @click="toggleSearchArea">
                     <v-icon>{{ mdiMagnify }}</v-icon>
                     <span class="icon-text">SEARCH</span>
                 </v-btn>
                 <v-expand-transition>
-                    <div v-if="isSearchAreaDisplay" class="search-area">
-                        <c-select-search
-                            group-name="Category"
-                            :items="categories"
-                            :target-content.sync="productParams.category"
-                            @c-select-search="selectSearchHandler"
-                        />
-                        <c-select-search
-                            group-name="Target"
-                            :items="targets"
-                            :target-content.sync="productParams.target"
-                            @c-select-search="selectSearchHandler"
-                        />
+                    <div class="search-area">
+                        <div v-if="isSearchAreaDisplay" class="search-area__content">
+                            <c-select-search
+                                group-name="Category"
+                                :items="categories"
+                                :target-content.sync="productParams.category"
+                                @c-select-search="selectSearchHandler"
+                            />
+                            <c-select-search
+                                group-name="Target"
+                                :items="targets"
+                                :target-content.sync="productParams.target"
+                                @c-select-search="selectSearchHandler"
+                            />
+                        </div>
                     </div>
                 </v-expand-transition>
             </div>
             <c-message v-if="products.length === 0" wide>該当する商品が<br class="sm" />見つかりませんでした</c-message>
-            <v-row>
+            <v-row class="fade-up">
                 <v-col v-for="listItem in products" :key="listItem.uuid" cols="12" sm="6" md="4" lg="3">
                     <c-product-card :list-item="listItem" @c-click="clickHandler(listItem)" />
                 </v-col>
@@ -184,9 +186,13 @@ export default class PageProductIndex extends Vue {
         line-height 24px
 
 .search-area
-    display flex
-    flex-wrap wrap
     margin-bottom 8px
+    min-height 56px
+    +sm()
+        min-height inherit
+    &__content
+        display flex
+        flex-wrap wrap
 
 .sm
     display none

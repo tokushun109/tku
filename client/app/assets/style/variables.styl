@@ -67,3 +67,36 @@ $page-content-section-margin-bottom = 16px
  * image layout
  */
 $image-border-radius = 24px
+
+.fade-up
+    animation fadeUp 1s
+
+@keyframes fadeIn
+    from
+        opacity 0
+    to
+        opacity 1
+
+@keyframes fadeUp
+    from
+        opacity 0
+        transform translateY(50px)
+    to
+        opacity 1
+        transform translateY(0)
+
+@keyframes shake
+    0%
+    20%
+    40%
+    60%
+    80%
+    100%
+        transform rotate(0)
+    10%
+    50%
+    90%
+        transform rotate(5deg)
+    30%
+    70%
+        transform rotate(-5deg)

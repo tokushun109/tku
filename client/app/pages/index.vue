@@ -1,31 +1,46 @@
 <template>
     <v-sheet :color="ColorType.Transparent" class="page-top">
-        <c-top-image class="top-image" title category :carousel-items="carouselItems" />
+        <div class="site-title-area">
+            <nuxt-link to="/">
+                <h1><img class="site-title" src="/img/logo/tocoriri_logo.png" alt="アクセサリーショップ とこりり" /></h1>
+            </nuxt-link>
+        </div>
+        <c-top-image class="top-image fade-up" title category :carousel-items="carouselItems" />
         <div class="page-top-container">
             <div class="about-section page-top-section">
                 <c-layout-container normal no-vertical-padding>
-                    <h2 class="page-top-title">About</h2>
+                    <h2 class="page-top-title fade-up">About</h2>
                     <v-container class="about-section__message default">
-                        <p>仕事や出産、育児、家事...</p>
-                        <p>頑張る女性の味方になりたい、</p>
-                        <p>そんな想いでマクラメ編みのアクセサリーを作っています。</p>
+                        <c-scroll-transition>
+                            <p>仕事や出産、育児、家事...</p>
+                            <p>頑張る女性の味方になりたい、</p>
+                            <p>そんな想いでマクラメ編みのアクセサリーを作っています。</p>
+                        </c-scroll-transition>
                     </v-container>
-                    <v-container class="about-section__message sm">
+                    <v-container class="about-section__message sm fade-up">
                         <p>仕事や出産、育児、家事...</p>
                         <p>頑張る女性の味方になりたい、</p>
                         <p>そんな想いで</p>
                         <p>マクラメ編みのアクセサリーを作っています。</p>
                     </v-container>
-                    <c-detail-button to="about" />
+                    <c-scroll-transition>
+                        <c-detail-button to="about" />
+                    </c-scroll-transition>
                 </c-layout-container>
             </div>
             <div class="contact-section page-top-section reverse">
                 <c-layout-container normal no-vertical-padding>
-                    <h2 class="page-top-title reverse">Contact</h2>
+                    <c-scroll-transition>
+                        <h2 class="page-top-title reverse">Contact</h2>
+                    </c-scroll-transition>
                     <v-container class="contact-section__message">
-                        <p>お問い合わせ・ご意見・ご相談はこちらから</p>
+                        <c-scroll-transition>
+                            <p>お問い合わせ・ご意見・ご相談はこちらから</p>
+                        </c-scroll-transition>
                     </v-container>
-                    <c-detail-button content="お問い合わせフォーム" to="contact" />
+                    <c-scroll-transition>
+                        <c-detail-button content="お問い合わせフォーム" to="contact" />
+                    </c-scroll-transition>
                 </c-layout-container>
             </div>
             <v-divider />
@@ -116,6 +131,17 @@ export default class PageTop extends Vue {
 .page-top
     margin 0 auto
     text-align center
+    .site-title-area
+        position relative
+        padding-top 20px
+        text-align center
+        +sm()
+            display none
+        .site-title
+            margin 0 auto
+            width 400px
+            height 200px
+            object-fit cover
     +sm()
         padding-top 16px
     .site-sub-title

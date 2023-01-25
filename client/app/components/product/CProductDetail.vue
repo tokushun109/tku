@@ -1,7 +1,7 @@
 <template>
     <v-sheet v-if="product.uuid" class="c-product-detail-page-area">
         <p class="product-name">{{ product.name }}</p>
-        <v-row class="detail-area">
+        <v-row class="detail-area fade-up">
             <v-col cols="12" sm="6">
                 <c-product-image class="mb-4" :show-arrows="false" list-display :product="product" />
             </v-col>
