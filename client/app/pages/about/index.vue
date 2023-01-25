@@ -7,7 +7,7 @@
             <h3 class="about-section__title">Story</h3>
             <v-row>
                 <v-col cols="12" offset-sm="1" sm="10" offset-md="0" md="6" align-self="center">
-                    <v-img class="about-section__image" src="/img/about/story.jpg"></v-img>
+                    <img class="about-section__image" src="/img/about/story.jpg" />
                 </v-col>
                 <v-col cols="12" sm="12" md="6" align-self="center">
                     <div>
@@ -31,115 +31,137 @@
             </v-row>
         </section>
         <section class="concept-section about-section">
-            <h3 class="about-section__title">Concept</h3>
+            <c-scroll-transition>
+                <h3 class="about-section__title">Concept</h3>
+            </c-scroll-transition>
             <v-row>
                 <v-col cols="12" offset-sm="1" sm="10" offset-md="0" md="6">
                     <v-card flat>
-                        <v-img class="about-section__image short" src="/img/about/concept1.jpg"></v-img>
-                        <v-card-title class="concept-section__subtitle">マクラメ編みの繊細さ</v-card-title>
-                        <v-card-text>
-                            <div class="about-section__content">
-                                <div class="about-section__content__message">
-                                    <p>マクラメ編みとは</p>
-                                    <p>手で紐を「結ぶ」 という工程を繰り返し</p>
-                                    <p class="mb-10">模様を生み出す技法のこと。</p>
-                                    <p>同じデザインで編んでも使用する糸によって</p>
-                                    <p class="mb-10">仕上がりの印象が大きく変化するマクラメ。</p>
-                                    <p>作品に合わせて材質・艶感・質感・太さなど</p>
-                                    <p class="mb-10">を選定しています。</p>
-                                    <p>ハンドメイドだからこそ生み出せる繊細な模様を</p>
-                                    <p>ぜひお楽しみください♪</p>
-                                </div>
+                        <c-scroll-transition>
+                            <div class="concept-section__image-area">
+                                <img class="about-section__image short" src="/img/about/concept1.jpg" />
                             </div>
-                        </v-card-text>
+                        </c-scroll-transition>
+                        <c-scroll-transition>
+                            <v-card-title class="concept-section__subtitle">マクラメ編みの繊細さ</v-card-title>
+                            <v-card-text>
+                                <div class="about-section__content">
+                                    <div class="about-section__content__message">
+                                        <p>マクラメ編みとは</p>
+                                        <p>手で紐を「結ぶ」 という工程を繰り返し</p>
+                                        <p class="mb-10">模様を生み出す技法のこと。</p>
+                                        <p>同じデザインで編んでも使用する糸によって</p>
+                                        <p class="mb-10">仕上がりの印象が大きく変化するマクラメ。</p>
+                                        <p>作品に合わせて材質・艶感・質感・太さなど</p>
+                                        <p class="mb-10">を選定しています。</p>
+                                        <p>ハンドメイドだからこそ生み出せる繊細な模様を</p>
+                                        <p>ぜひお楽しみください♪</p>
+                                    </div>
+                                </div>
+                            </v-card-text>
+                        </c-scroll-transition>
                     </v-card>
                 </v-col>
                 <v-col cols="12" offset-sm="1" sm="10" offset-md="0" md="6">
                     <v-card flat>
-                        <v-img class="about-section__image short" src="/img/about/concept2.jpg"></v-img>
-                        <v-card-title class="concept-section__subtitle">オシャレなだけじゃない+α</v-card-title>
-                        <v-card-text>
-                            <div class="about-section__content">
-                                <div class="about-section__content__message">
-                                    <p>「日常の小さな悩みを解決する」</p>
-                                    <p class="mb-10">「目に留まるたび励まされる」</p>
-                                    <p>そんなモノづくりを大切にしています。</p>
-                                    <p>アロマを楽しむアイテムや、</p>
-                                    <p>静電気対策に役立つアイテム、</p>
-                                    <p class="mb-10">大事な人と分かち合うお揃いアイテムなど</p>
-                                    <p>「オシャレなだけじゃない！」</p>
-                                    <p class="mb-10">「あったら、ちょっと嬉しい♪」</p>
-                                    <p>アクセサリーを制作しています。</p>
+                        <c-scroll-transition>
+                            <img class="about-section__image short" src="/img/about/concept2.jpg" />
+                        </c-scroll-transition>
+                        <c-scroll-transition>
+                            <v-card-title class="concept-section__subtitle">オシャレなだけじゃない+α</v-card-title>
+                            <v-card-text>
+                                <div class="about-section__content">
+                                    <div class="about-section__content__message">
+                                        <p>「日常の小さな悩みを解決する」</p>
+                                        <p class="mb-10">「目に留まるたび励まされる」</p>
+                                        <p>そんなモノづくりを大切にしています。</p>
+                                        <p>アロマを楽しむアイテムや、</p>
+                                        <p>静電気対策に役立つアイテム、</p>
+                                        <p class="mb-10">大事な人と分かち合うお揃いアイテムなど</p>
+                                        <p>「オシャレなだけじゃない！」</p>
+                                        <p class="mb-10">「あったら、ちょっと嬉しい♪」</p>
+                                        <p>アクセサリーを制作しています。</p>
+                                    </div>
                                 </div>
-                            </div>
-                        </v-card-text>
+                            </v-card-text>
+                        </c-scroll-transition>
                     </v-card>
                 </v-col>
             </v-row>
         </section>
         <section class="creator-section about-section">
-            <h3 class="about-section__title">Creator</h3>
+            <c-scroll-transition>
+                <h3 class="about-section__title">Creator</h3>
+            </c-scroll-transition>
             <v-row>
                 <v-col cols="12" offset-sm="1" sm="10" offset-md="0" md="6" align-self="center">
-                    <v-img class="about-section__image" src="/img/about/creator.jpg"></v-img>
+                    <c-scroll-transition>
+                        <img class="about-section__image" src="/img/about/creator.jpg" />
+                    </c-scroll-transition>
                 </v-col>
                 <v-col cols="12" sm="12" md="6" align-self="center">
                     <div>
                         <div class="about-section__content">
-                            <h4 class="creator-section__name">tku</h4>
+                            <c-scroll-transition>
+                                <h4 class="creator-section__name">tku</h4>
+                            </c-scroll-transition>
                             <div class="about-section__content__message">
-                                <table>
-                                    <tr class="creator-section__row">
-                                        <td>2016年</td>
-                                        <td>大手服飾品製造メーカー入社</td>
-                                    </tr>
-                                    <tr class="creator-section__row">
-                                        <td></td>
-                                        <td>色彩学と品質管理について学ぶ</td>
-                                    </tr>
-                                    <tr class="creator-section__row narrow">
-                                        <td>2018年</td>
-                                        <td>フリマサイトにて、</td>
-                                    </tr>
-                                    <tr class="creator-section__row narrow">
-                                        <td></td>
-                                        <td>アクセサリー作家 tku(とく)として</td>
-                                    </tr>
-                                    <tr class="creator-section__row">
-                                        <td></td>
-                                        <td>ハンドメイド作品の販売開始</td>
-                                    </tr>
+                                <c-scroll-transition>
+                                    <table>
+                                        <tbody>
+                                            <tr class="creator-section__row">
+                                                <td>2016年</td>
+                                                <td>大手服飾品製造メーカー入社</td>
+                                            </tr>
+                                            <tr class="creator-section__row">
+                                                <td></td>
+                                                <td>色彩学と品質管理について学ぶ</td>
+                                            </tr>
+                                            <tr class="creator-section__row narrow">
+                                                <td>2018年</td>
+                                                <td>フリマサイトにて、</td>
+                                            </tr>
+                                            <tr class="creator-section__row narrow">
+                                                <td></td>
+                                                <td>アクセサリー作家 tku(とく)として</td>
+                                            </tr>
+                                            <tr class="creator-section__row">
+                                                <td></td>
+                                                <td>ハンドメイド作品の販売開始</td>
+                                            </tr>
 
-                                    <tr class="creator-section__row">
-                                        <td></td>
-                                        <td>独学でマクラメ編みの技術を磨く</td>
-                                    </tr>
-                                    <tr class="creator-section__row narrow">
-                                        <td>2020年</td>
-                                        <td>オンラインショップにて、</td>
-                                    </tr>
-                                    <tr class="creator-section__row">
-                                        <td></td>
-                                        <td>マクラメ編み作品の販売開始</td>
-                                    </tr>
+                                            <tr class="creator-section__row">
+                                                <td></td>
+                                                <td>独学でマクラメ編みの技術を磨く</td>
+                                            </tr>
+                                            <tr class="creator-section__row narrow">
+                                                <td>2020年</td>
+                                                <td>オンラインショップにて、</td>
+                                            </tr>
+                                            <tr class="creator-section__row">
+                                                <td></td>
+                                                <td>マクラメ編み作品の販売開始</td>
+                                            </tr>
 
-                                    <tr class="creator-section__row">
-                                        <td></td>
-                                        <td>とこりり開業準備をする</td>
-                                    </tr>
-                                    <tr class="creator-section__row narrow">
-                                        <td>2022年</td>
-                                        <td>作家活動を拡充するため、</td>
-                                    </tr>
-                                    <tr class="creator-section__row">
-                                        <td></td>
-                                        <td>服飾品メーカー退社</td>
-                                    </tr>
-                                    <tr class="creator-section__row">
-                                        <td></td>
-                                        <td>とこりりを個人事業開業する</td>
-                                    </tr>
-                                </table>
+                                            <tr class="creator-section__row">
+                                                <td></td>
+                                                <td>とこりり開業準備をする</td>
+                                            </tr>
+                                            <tr class="creator-section__row narrow">
+                                                <td>2022年</td>
+                                                <td>作家活動を拡充するため、</td>
+                                            </tr>
+                                            <tr class="creator-section__row">
+                                                <td></td>
+                                                <td>服飾品メーカー退社</td>
+                                            </tr>
+                                            <tr class="creator-section__row">
+                                                <td></td>
+                                                <td>とこりりを個人事業開業する</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </c-scroll-transition>
                             </div>
                         </div>
                     </div>
@@ -147,54 +169,64 @@
             </v-row>
         </section>
         <section class="site-section about-section">
-            <h3 class="about-section__title">Relation</h3>
+            <c-scroll-transition>
+                <h3 class="about-section__title">Relation</h3>
+            </c-scroll-transition>
             <v-row no-gutters>
                 <v-col cols="12" offset-sm="1" sm="5" align-self="center">
                     <v-card flat>
-                        <v-card-title class="site-section__subtitle">SNS</v-card-title>
-                        <v-card-text v-if="snsList">
-                            <v-container class="site-section__content">
-                                <div v-for="sns in mdiSnsList" :key="sns.name">
-                                    <v-btn
-                                        height="90"
-                                        width="90"
-                                        class="sns-item"
-                                        fab
-                                        :color="ColorType.Accent"
-                                        :href="sns.url"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                    >
-                                        <v-icon :color="ColorType.White" class="sns-icon">{{ sns.icon }}</v-icon>
-                                        <small class="sns-name">{{ sns.name }}</small>
-                                    </v-btn>
-                                </div>
-                            </v-container>
-                        </v-card-text>
+                        <c-scroll-transition>
+                            <v-card-title class="site-section__subtitle">SNS</v-card-title>
+                        </c-scroll-transition>
+                        <c-scroll-transition>
+                            <v-card-text v-if="snsList">
+                                <v-container class="site-section__content">
+                                    <div v-for="sns in mdiSnsList" :key="sns.name">
+                                        <v-btn
+                                            height="90"
+                                            width="90"
+                                            class="sns-item"
+                                            fab
+                                            :color="ColorType.Accent"
+                                            :href="sns.url"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            <v-icon :color="ColorType.White" class="sns-icon">{{ sns.icon }}</v-icon>
+                                            <small class="sns-name">{{ sns.name }}</small>
+                                        </v-btn>
+                                    </div>
+                                </v-container>
+                            </v-card-text>
+                        </c-scroll-transition>
                     </v-card>
                 </v-col>
                 <v-col cols="12" sm="5" align-self="center">
                     <v-card flat>
-                        <v-card-title class="site-section__subtitle">Shop Site</v-card-title>
-                        <v-card-text v-if="salesSiteList">
-                            <v-container class="site-section__content">
-                                <div v-for="salesSite in salesSiteList" :key="salesSite.name">
-                                    <div class="site-item">
-                                        <v-btn
-                                            height="90"
-                                            width="90"
-                                            fab
-                                            :color="ColorType.Accent"
-                                            :href="salesSite.url"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                        >
-                                            <small class="site-name">{{ salesSite.name }}</small>
-                                        </v-btn>
+                        <c-scroll-transition>
+                            <v-card-title class="site-section__subtitle">Shop Site</v-card-title>
+                        </c-scroll-transition>
+                        <c-scroll-transition>
+                            <v-card-text v-if="salesSiteList">
+                                <v-container class="site-section__content">
+                                    <div v-for="salesSite in salesSiteList" :key="salesSite.name">
+                                        <div class="site-item">
+                                            <v-btn
+                                                height="90"
+                                                width="90"
+                                                fab
+                                                :color="ColorType.Accent"
+                                                :href="salesSite.url"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                <small class="site-name">{{ salesSite.name }}</small>
+                                            </v-btn>
+                                        </div>
                                     </div>
-                                </div>
-                            </v-container>
-                        </v-card-text>
+                                </v-container>
+                            </v-card-text>
+                        </c-scroll-transition>
                     </v-card>
                 </v-col>
             </v-row>
@@ -332,6 +364,7 @@ export default class PageAboutIndex extends Vue {
                 +sm()
                     font-size 3.5vw
         &__image
+            width 100%
             border-radius $image-border-radius !important
             aspect-ratio 1 / 1
             object-fit cover
@@ -346,6 +379,8 @@ export default class PageAboutIndex extends Vue {
             justify-content center !important
             +sm()
                 font-size 5vw
+        &__image-area
+            text-align center
     .creator-section
         &__name
             margin-bottom 50px

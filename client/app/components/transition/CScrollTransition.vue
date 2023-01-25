@@ -31,7 +31,7 @@ export default class CScrollAppear extends Vue {
         if (!this.isDisplay) {
             const content = this.$refs.content as Element
             const top = content.getBoundingClientRect().top
-            this.isDisplay = top < window.innerHeight + 100
+            this.isDisplay = top < window.innerHeight + 20
         }
     }
 }
@@ -40,7 +40,4 @@ export default class CScrollAppear extends Vue {
 <style lang="stylus" scoped>
 .fade-enter-active
     animation fadeUp 1s
-
-.fade-leave-active
-    animation fadeUp 1s reverse
 </style>
