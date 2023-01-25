@@ -5,27 +5,40 @@
             <div class="about-section page-top-section">
                 <c-layout-container normal no-vertical-padding>
                     <h2 class="page-top-title">About</h2>
+
                     <v-container class="about-section__message default">
-                        <p>仕事や出産、育児、家事...</p>
-                        <p>頑張る女性の味方になりたい、</p>
-                        <p>そんな想いでマクラメ編みのアクセサリーを作っています。</p>
+                        <c-scroll-transition>
+                            <p>仕事や出産、育児、家事...</p>
+                            <p>頑張る女性の味方になりたい、</p>
+                            <p>そんな想いでマクラメ編みのアクセサリーを作っています。</p>
+                        </c-scroll-transition>
                     </v-container>
                     <v-container class="about-section__message sm">
-                        <p>仕事や出産、育児、家事...</p>
-                        <p>頑張る女性の味方になりたい、</p>
-                        <p>そんな想いで</p>
-                        <p>マクラメ編みのアクセサリーを作っています。</p>
+                        <c-scroll-transition>
+                            <p>仕事や出産、育児、家事...</p>
+                            <p>頑張る女性の味方になりたい、</p>
+                            <p>そんな想いで</p>
+                            <p>マクラメ編みのアクセサリーを作っています。</p>
+                        </c-scroll-transition>
                     </v-container>
-                    <c-detail-button to="about" />
+                    <c-scroll-transition>
+                        <c-detail-button to="about" />
+                    </c-scroll-transition>
                 </c-layout-container>
             </div>
             <div class="contact-section page-top-section reverse">
                 <c-layout-container normal no-vertical-padding>
-                    <h2 class="page-top-title reverse">Contact</h2>
+                    <c-scroll-transition>
+                        <h2 class="page-top-title reverse">Contact</h2>
+                    </c-scroll-transition>
                     <v-container class="contact-section__message">
-                        <p>お問い合わせ・ご意見・ご相談はこちらから</p>
+                        <c-scroll-transition>
+                            <p>お問い合わせ・ご意見・ご相談はこちらから</p>
+                        </c-scroll-transition>
                     </v-container>
-                    <c-detail-button content="お問い合わせフォーム" to="contact" />
+                    <c-scroll-transition>
+                        <c-detail-button content="お問い合わせフォーム" to="contact" />
+                    </c-scroll-transition>
                 </c-layout-container>
             </div>
             <v-divider />
