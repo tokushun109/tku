@@ -147,7 +147,7 @@
             </v-row>
         </section>
         <section class="site-section about-section">
-            <h3 class="about-section__title">Site</h3>
+            <h3 class="about-section__title">Relation</h3>
             <v-row no-gutters>
                 <v-col cols="12" offset-sm="1" sm="5" align-self="center">
                     <v-card flat>
@@ -175,7 +175,7 @@
                 </v-col>
                 <v-col cols="12" sm="5" align-self="center">
                     <v-card flat>
-                        <v-card-title class="site-section__subtitle">Shop</v-card-title>
+                        <v-card-title class="site-section__subtitle">Shop Site</v-card-title>
                         <v-card-text v-if="salesSiteList">
                             <v-container class="site-section__content">
                                 <div v-for="salesSite in salesSiteList" :key="salesSite.name">
@@ -385,21 +385,21 @@ export default class PageAboutIndex extends Vue {
                     top -23px
                 .sns-name
                     position absolute
-                    top 5px
+                    top 0
                     left 50%
                     color $white-color
                     letter-spacing 0
-                    font-size 10px !important
+                    font-size $font-medium !important
                     transform translateX(-50%)
             .site-item
                 margin 0 10px
                 text-align center
                 .site-name
                     position absolute
-                    top -8px
+                    top -12px
                     left 50%
                     color $white-color
                     letter-spacing 0
-                    font-size 12px !important
+                    font-size $font-normal !important
                     transform translateX(-50%)
 </style>

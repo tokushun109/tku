@@ -61,5 +61,6 @@ export default class LayoutDefault extends Vue {
     background-color $primary-bg-color
 
 * :not(.v-icon)
+    text-transform none !important
     font-family $font-face !important
 </style>
