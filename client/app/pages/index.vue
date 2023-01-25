@@ -29,11 +29,6 @@
                 </c-layout-container>
             </div>
             <v-divider />
-            <div class="share-section">
-                <c-layout-container normal no-vertical-padding>
-                    <c-share-buttons></c-share-buttons>
-                </c-layout-container>
-            </div>
         </div>
     </v-sheet>
 </template>

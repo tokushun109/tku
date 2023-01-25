@@ -2,6 +2,7 @@
     <div class="site-footer">
         <v-container class="site-footer-content">
             <v-sheet>
+                <c-share-buttons />
                 <div class="copy-right">©︎2022 とこりり</div>
             </v-sheet>
         </v-container>
@@ -49,6 +50,7 @@ export default class SiteFooter extends Vue {
         .copy-right
             background-color $primary
             color $white-color
+            text-align center
             font-size 10px
     .sm
         display none

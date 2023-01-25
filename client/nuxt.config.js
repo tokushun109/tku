@@ -164,7 +164,7 @@ module.exports = {
         defaultAssets: false,
     },
     env: {
-        DOMAIN_URL: process.env.DOMAIN_URL,
+        DOMAIN_URL: process.env.DOMAIN_URL ? process.env.DOMAIN_URL : 'http://localhost:3000',
         COOKIE_DOMAIN_URL: process.env.COOKIE_DOMAIN_URL,
     },
 }
