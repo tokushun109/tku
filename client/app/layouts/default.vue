@@ -63,4 +63,10 @@ export default class LayoutDefault extends Vue {
 * :not(.v-icon)
     text-transform none !important
     font-family $font-face !important
+
+.page-enter-active
+    animation fadeIn 0.3s
+
+.page-leave-active
+    animation fadeIn 0.3s reverse
 </style>

@@ -9,7 +9,7 @@
         </div>
         <div v-if="isRoot" class="site-title-area">
             <nuxt-link to="/">
-                <h1><img class="site-title" src="/img/logo/tocoriri_logo.png" alt="アクセサリーショップ とこりり" /></h1>
+                <h1><img class="site-title fade-in" src="/img/logo/tocoriri_logo.png" alt="アクセサリーショップ とこりり" /></h1>
             </nuxt-link>
         </div>
         <v-dialog v-model="menuVisible" fullscreen hide-overlay transition="dialog-top-transition" scrollable>
