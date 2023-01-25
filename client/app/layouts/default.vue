@@ -65,8 +65,8 @@ export default class LayoutDefault extends Vue {
     font-family $font-face !important
 
 .page-enter-active
-    animation fadeIn 0.3s
+    animation fadeIn 0.1s
 
 .page-leave-active
-    animation fadeIn 0.3s reverse
+    animation fadeIn 0.5s reverse
 </style>

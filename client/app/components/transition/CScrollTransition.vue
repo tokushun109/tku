@@ -1,6 +1,6 @@
 <template>
     <div ref="content">
-        <transition name="fade">
+        <transition :name="transition">
             <div v-if="isDisplay">
                 <slot />
             </div>
@@ -13,13 +13,10 @@ import { Component, Prop, Vue } from 'nuxt-property-decorator'
 
 @Component
 export default class CScrollAppear extends Vue {
-    @Prop({ type: Boolean, default: false }) init!: boolean
+    @Prop({ type: String, default: 'fade' }) transition!: string
     isDisplay: boolean = false
 
     mounted() {
-        if (this.init) {
-            this.isDisplay = true
-        }
         window.addEventListener('scroll', this.handleScroll)
     }
 
@@ -31,7 +28,7 @@ export default class CScrollAppear extends Vue {
         if (!this.isDisplay) {
             const content = this.$refs.content as Element
             const top = content.getBoundingClientRect().top
-            this.isDisplay = top < window.innerHeight + 20
+            this.isDisplay = top < window.innerHeight - 50
         }
     }
 }
@@ -40,4 +37,8 @@ export default class CScrollAppear extends Vue {
 <style lang="stylus" scoped>
 .fade-enter-active
     animation fadeUp 1s
+
+.shake-enter-active
+    animation shake 1.5s
+    animation-delay 2s
 </style>

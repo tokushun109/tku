@@ -7,11 +7,6 @@
                 <v-icon :color="ColorType.White" x-large>{{ IconType.Menu.icon }}</v-icon>
             </v-btn>
         </div>
-        <div v-if="isRoot" class="site-title-area">
-            <nuxt-link to="/">
-                <h1><img class="site-title fade-in" src="/img/logo/tocoriri_logo.png" alt="アクセサリーショップ とこりり" /></h1>
-            </nuxt-link>
-        </div>
         <v-dialog v-model="menuVisible" fullscreen hide-overlay transition="dialog-top-transition" scrollable>
             <v-sheet :color="ColorType.Primary" class="menu-area">
                 <template v-if="menuVisible">
@@ -94,17 +89,6 @@ export default class SiteLayout extends Vue {
         z-index 5
         +sm()
             display none
-    .site-title-area
-        position relative
-        padding-top 20px
-        text-align center
-        +sm()
-            display none
-        .site-title
-            margin 0 auto
-            width 400px
-            height 200px
-            object-fit cover
     .sm
         display none
         text-align center

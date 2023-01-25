@@ -3,14 +3,14 @@
         <div class="page-title-container">
             <h1 class="page-title">Contact</h1>
         </div>
-        <div v-if="!isSent" class="contact-introduction">
+        <div v-if="!isSent" class="contact-introduction fade-up">
             <p>お問い合わせ・<br class="sm" />ご意見・ご相談はこちらから</p>
         </div>
         <v-sheet>
             <v-container>
                 <v-sheet class="content-form-wrapper">
                     <template v-if="!isSent">
-                        <v-container>
+                        <v-container class="fade-up">
                             <c-error :errors.sync="errors" />
                             <v-form ref="form" v-model="valid" lazy-validation>
                                 <div class="require-form">
