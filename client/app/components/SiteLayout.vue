@@ -14,31 +14,33 @@
         </div>
         <v-dialog v-model="menuVisible" fullscreen hide-overlay transition="dialog-top-transition" scrollable>
             <v-sheet :color="ColorType.Primary" class="menu-area">
-                <v-btn :color="ColorType.White" fab x-large class="toggle-button" @click="toggleMenu">
-                    <v-icon :color="ColorType.Title" x-large>{{ IconType.Close.icon }}</v-icon>
-                </v-btn>
-                <div class="site-title-area" @click="toggleMenu">
-                    <nuxt-link to="/">
-                        <h1><img class="site-title" src="/img/logo/tocoriri_logo_white.png" alt="とこりり メニュー" /></h1>
-                    </nuxt-link>
-                </div>
-                <v-container class="menu-item">
-                    <v-row>
-                        <v-col v-for="(item, index) in menuItems" :key="index" cols="4">
-                            <v-card height="100%" elevation="20" :to="`/${item.link}`" nuxt class="menu-card" @click="toggleMenu">
-                                <v-card-title class="menu-card-icon">
-                                    <v-avatar size="90%">
-                                        <v-icon :color="ColorType.Primary" size="90%">{{ item.icon }}</v-icon>
-                                    </v-avatar>
-                                </v-card-title>
-                                <v-card-text class="menu-card-name">
-                                    {{ item.name }}
-                                </v-card-text>
-                            </v-card>
-                        </v-col>
-                        <v-spacer />
-                    </v-row>
-                </v-container>
+                <template v-if="menuVisible">
+                    <v-btn :color="ColorType.White" fab x-large class="toggle-button" @click="toggleMenu">
+                        <v-icon :color="ColorType.Title" x-large>{{ IconType.Close.icon }}</v-icon>
+                    </v-btn>
+                    <div class="site-title-area" @click="toggleMenu">
+                        <nuxt-link to="/">
+                            <h1><img class="site-title" src="/img/logo/tocoriri_logo_white.png" alt="とこりり メニュー" /></h1>
+                        </nuxt-link>
+                    </div>
+                    <v-container class="menu-item">
+                        <v-row>
+                            <v-col v-for="(item, index) in menuItems" :key="index" cols="4">
+                                <v-card height="100%" elevation="20" :to="`/${item.link}`" nuxt class="menu-card" @click="toggleMenu">
+                                    <v-card-title class="menu-card-icon">
+                                        <v-avatar size="90%">
+                                            <v-icon :color="ColorType.Primary" size="90%">{{ item.icon }}</v-icon>
+                                        </v-avatar>
+                                    </v-card-title>
+                                    <v-card-text class="menu-card-name">
+                                        {{ item.name }}
+                                    </v-card-text>
+                                </v-card>
+                            </v-col>
+                            <v-spacer />
+                        </v-row>
+                    </v-container>
+                </template>
             </v-sheet>
         </v-dialog>
 
