@@ -565,3 +565,54 @@ func uploadProductsCsvHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(responseBody)
 }
+
+// カテゴリー別商品一覧を取得
+func getAllCategoryProductsHandler(w http.ResponseWriter, r *http.Request) {
+	mode := r.URL.Query().Get("mode")
+	categoryUuid := r.URL.Query().Get("category")
+	targetUuid := r.URL.Query().Get("target")
+
+	if categoryUuid == "" || targetUuid == "" {
+		err := errors.New("invalid params")
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+
+	categoryProductsList := models.CategoryProductsList{}
+	if categoryUuid == "all" {
+		categories := models.GetUsedCategories()
+		for _, category := range categories {
+			products, err := models.GetAllProducts(mode, category.Uuid, targetUuid)
+			if err != nil {
+				log.Println(err)
+				http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+				return
+			}
+			categoryProduct := models.CategoryProducts{
+				Category: category,
+				Products: products,
+			}
+			categoryProductsList = append(categoryProductsList, categoryProduct)
+		}
+	} else {
+		products, err := models.GetAllProducts(mode, categoryUuid, targetUuid)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+			return
+		}
+		category := models.GetCategory(categoryUuid)
+		categoryProduct := models.CategoryProducts{
+			Category: category,
+			Products: products,
+		}
+		categoryProductsList = append(categoryProductsList, categoryProduct)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(categoryProductsList); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+		return
+	}
+}
