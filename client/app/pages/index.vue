@@ -6,6 +6,7 @@
             </nuxt-link>
         </div>
         <c-top-image class="top-image fade-up" title category :carousel-items="carouselItems" />
+        <c-scroll-down />
         <div class="page-top-container">
             <div class="about-section page-top-section">
                 <c-layout-container normal no-vertical-padding>

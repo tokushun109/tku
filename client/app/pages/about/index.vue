@@ -30,6 +30,7 @@
                 </v-col>
             </v-row>
         </section>
+        <c-scroll-down />
         <section class="concept-section about-section">
             <c-scroll-transition>
                 <h3 class="about-section__title">Concept</h3>
