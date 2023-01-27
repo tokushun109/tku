@@ -36,6 +36,7 @@ func StartMainServer() error {
 	r.HandleFunc("/api/product/{product_uuid}", deleteProductHandler).Methods("DELETE")
 	r.HandleFunc("/api/csv/product", getProductsCsvHandler).Methods("GET")
 	r.HandleFunc("/api/csv/product", uploadProductsCsvHandler).Methods("POST")
+	r.HandleFunc("/api/category/product", getAllCategoryProductsHandler).Methods("GET")
 	// 商品画像
 	r.HandleFunc("/api/carousel_image", getCarouselImageHandler).Methods("GET")
 	r.HandleFunc("/api/product_image/{product_image_uuid}/blob", getProductImageBlobHandler).Methods("GET")

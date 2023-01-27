@@ -35,6 +35,13 @@ type ProductCsv struct {
 
 type Products []Product
 
+type CategoryProducts struct {
+	Category Category `json:"category" `
+	Products Products `json:"products" `
+}
+
+type CategoryProductsList []CategoryProducts
+
 type ProductImage struct {
 	DefaultModel
 	Uuid      string `json:"uuid"`
@@ -65,7 +72,7 @@ func GetAllProducts(mode, category, target string) (products Products, err error
 		return products, err
 	}
 
-	if category == "" {
+	if category == "" || target == "" {
 		err = errors.New("invalid params")
 		return products, err
 	}

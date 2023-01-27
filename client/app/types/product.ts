@@ -27,6 +27,11 @@ export interface IProduct {
     isActive: boolean
 }
 
+export interface ICategoryProducts {
+    category: IClassification
+    products: Array<IProduct>
+}
+
 export interface IGetProductsParams {
     mode: 'all' | 'active'
     category: 'all' | string

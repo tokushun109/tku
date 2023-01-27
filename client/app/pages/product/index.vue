@@ -3,7 +3,7 @@
         <div class="page-title-container">
             <h2 class="page-title">Product</h2>
         </div>
-        <v-sheet>
+        <v-sheet class="page-product__container">
             <div class="fade-up">
                 <v-btn text :color="ColorType.Grey" class="search-button sm" @click="toggleSearchArea">
                     <v-icon>{{ mdiMagnify }}</v-icon>
@@ -28,12 +28,12 @@
                     </div>
                 </v-expand-transition>
             </div>
-            <c-message v-if="products.length === 0" wide>該当する商品が<br class="sm" />見つかりませんでした</c-message>
-            <v-row class="fade-up">
-                <v-col v-for="listItem in products" :key="listItem.uuid" cols="12" sm="6" md="4" lg="3">
-                    <c-product-card :list-item="listItem" @c-click="clickHandler(listItem)" />
-                </v-col>
-            </v-row>
+            <template v-if="isExistProducts">
+                <div v-for="categoryProducts in categoryProductsList" :key="categoryProducts.category.uuid" class="fade-up">
+                    <c-category-products :category-products="categoryProducts" />
+                </div>
+            </template>
+            <c-message v-else wide>該当する商品が<br class="sm" />見つかりませんでした</c-message>
         </v-sheet>
         <c-breadcrumbs :items="breadCrumbs" />
     </div>
@@ -44,12 +44,12 @@ import { mdiMagnify } from '@mdi/js'
 import { Context } from '@nuxt/types'
 import { Component, Vue } from 'nuxt-property-decorator'
 import { newProduct } from '~/methods'
-import { ColorType, IBreadCrumb, IClassification, IGetClassificationParams, IGetProductsParams, IProduct } from '~/types'
+import { ColorType, IBreadCrumb, ICategoryProducts, IClassification, IGetClassificationParams, IGetProductsParams, IProduct } from '~/types'
 @Component({})
 export default class PageProductIndex extends Vue {
     ColorType: typeof ColorType = ColorType
 
-    products: Array<IProduct> = []
+    categoryProductsList: Array<ICategoryProducts> = []
     categories: Array<IClassification> = []
     targets: Array<IClassification> = []
     searchCategory: string = 'all'
@@ -77,29 +77,37 @@ export default class PageProductIndex extends Vue {
                 category: 'all',
                 target: 'all',
             }
-            const products: Array<IProduct> = await app.$axios.$get(`/product`, { params: productParams })
+            const categoryProductsList: Array<ICategoryProducts> = await app.$axios.$get(`/category/product`, { params: productParams })
             const classificationParams: IGetClassificationParams = {
                 mode: 'used',
             }
             const categories: Array<IProduct> = await app.$axios.$get(`/category`, { params: classificationParams })
             const targets: Array<IProduct> = await app.$axios.$get(`/target`, { params: classificationParams })
-            return { products, categories, targets }
+            return { categoryProductsList, categories, targets }
         } catch (e) {
-            return { products: [], categories: [], targets: [] }
+            return { categoryProductsList: [], categories: [], targets: [] }
         }
     }
 
     async loadingProduct() {
-        this.products = await this.$axios.$get(`/product`, { params: this.productParams })
+        this.categoryProductsList = await this.$axios.$get(`/category/product`, { params: this.productParams })
+    }
+
+    get isExistProducts(): boolean {
+        let result = false
+        for (const categoryProducts of this.categoryProductsList) {
+            if (categoryProducts.products.length > 0) {
+                result = true
+                break
+            }
+        }
+        return result
     }
 
     head() {
-        if (this.products.length === 0 || this.products[0].productImages.length === 0) {
-            return
-        }
         const title = '商品一覧 | とこりり'
         const description = 'とこりりの商品一覧ページです。'
-        const image = this.products[0].productImages[0].apiPath ? this.products[0].productImages[0].apiPath : ''
+        const image = '/img/about/story.jpg'
         return {
             title,
             meta: [
@@ -172,6 +180,8 @@ export default class PageProductIndex extends Vue {
     max-width $xl-width
     +sm()
         padding 16px
+    &__container
+        min-height 56vh
 
 .page-title-container
     +sm()
