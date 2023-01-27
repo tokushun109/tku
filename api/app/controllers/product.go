@@ -589,6 +589,13 @@ func getAllCategoryProductsHandler(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 				return
 			}
+			for _, product := range products {
+				if err := setProductImageApiPath(&product); err != nil {
+					log.Println(err)
+					http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+					return
+				}
+			}
 			categoryProduct := models.CategoryProducts{
 				Category: category,
 				Products: products,
@@ -601,6 +608,13 @@ func getAllCategoryProductsHandler(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 			return
+		}
+		for _, product := range products {
+			if err := setProductImageApiPath(&product); err != nil {
+				log.Println(err)
+				http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
+				return
+			}
 		}
 		category := models.GetCategory(categoryUuid)
 		categoryProduct := models.CategoryProducts{
