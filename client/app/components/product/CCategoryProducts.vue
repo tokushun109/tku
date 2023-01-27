@@ -5,68 +5,67 @@
         </div>
         <v-list class="product-list">
             <v-row>
-                <v-col v-for="(product, index) in categoryProducts.products" :key="product.uuid" cols="6" md="3">
-                    <template v-if="index < 4 || isExpand">
-                        <div class="product-list__container">
-                            <nuxt-link :to="`/product/${product.uuid}`">
-                                <v-img
-                                    v-if="product.productImages.length > 0"
-                                    class="product-list__container__image"
-                                    lazy-src="/img/product/gray-image.png"
-                                    :src="product.productImages[0].apiPath"
-                                    :alt="product.productImages[0].name"
-                                />
-                                <v-img
-                                    v-else
-                                    class="product-list__container__image"
-                                    lazy-src="/img/product/gray-image.png"
-                                    src="/img/product/no-image.png"
-                                    alt="no-image"
-                                />
-                            </nuxt-link>
-                            <div class="default">
-                                <v-chip
-                                    v-if="product.target.name"
-                                    :color="ColorType.Secondary"
-                                    :text-color="ColorType.White"
-                                    class="product-list__container__target"
-                                >
-                                    {{ product.target.name }}
-                                </v-chip>
-                                <v-chip
-                                    v-if="product.price"
-                                    :color="ColorType.Accent"
-                                    :text-color="ColorType.White"
-                                    class="product-list__container__price"
-                                >
-                                    ￥{{ product.price | priceFormat }}<span class="text-caption">(税込)</span>
-                                </v-chip>
+                <v-col
+                    v-for="(product, index) in categoryProducts.products"
+                    :key="product.uuid"
+                    :class="{ 'no-display': index >= 4 && !isExpand }"
+                    cols="6"
+                    md="3"
+                >
+                    <transition name="fadeDown">
+                        <div v-if="index < 4 || isExpand">
+                            <div class="product-list__container">
+                                <nuxt-link :to="`/product/${product.uuid}`">
+                                    <v-img
+                                        v-if="product.productImages.length > 0"
+                                        class="product-list__container__image"
+                                        lazy-src="/img/product/gray-image.png"
+                                        :src="product.productImages[0].apiPath"
+                                        :alt="product.productImages[0].name"
+                                    />
+                                    <v-img
+                                        v-else
+                                        class="product-list__container__image"
+                                        lazy-src="/img/product/gray-image.png"
+                                        src="/img/product/no-image.png"
+                                        alt="no-image"
+                                    />
+                                </nuxt-link>
+                                <div class="default">
+                                    <v-chip
+                                        v-if="product.target.name"
+                                        :color="ColorType.Secondary"
+                                        :text-color="ColorType.White"
+                                        class="product-list__container__target"
+                                    >
+                                        {{ product.target.name }}
+                                    </v-chip>
+                                </div>
+                                <div class="sm">
+                                    <v-chip
+                                        v-if="product.target.name"
+                                        :color="ColorType.Secondary"
+                                        :text-color="ColorType.White"
+                                        class="product-list__container__target"
+                                        x-small
+                                    >
+                                        {{ product.target.name }}
+                                    </v-chip>
+                                </div>
                             </div>
-                            <div class="sm">
-                                <v-chip
-                                    v-if="product.target.name"
-                                    :color="ColorType.Secondary"
-                                    :text-color="ColorType.White"
-                                    class="product-list__container__target"
-                                    x-small
-                                >
-                                    {{ product.target.name }}
-                                </v-chip>
-                                <v-chip
-                                    v-if="product.price"
-                                    :color="ColorType.Accent"
-                                    :text-color="ColorType.White"
-                                    class="product-list__container__price"
-                                    x-small
-                                >
+                            <div class="product-list__footer">
+                                <div class="product-list__footer__name">{{ product.name }}</div>
+                                <div v-if="product.price" :color="ColorType.Accent" :text-color="ColorType.White" class="product-list__footer__price">
                                     ￥{{ product.price | priceFormat }}<span class="text-caption">(税込)</span>
-                                </v-chip>
+                                </div>
                             </div>
                         </div>
-                        <p class="product-list__name">{{ product.name }}</p>
-                    </template>
+                    </transition>
                 </v-col>
             </v-row>
+            <div v-if="categoryProducts.products.length > 3" class="product-list__button" @click="expandHandler">
+                <c-detail-button v-if="!isExpand" class="product-list__button__content" to="/product" fall-down content="もっと見る" :link="false" />
+            </div>
         </v-list>
     </v-sheet>
 </template>
@@ -80,8 +79,11 @@ export default class CCategoryProduct extends Vue {
     @Prop({ type: Object, default: () => {} }) categoryProducts!: ICategoryProducts
 
     ColorType: typeof ColorType = ColorType
-
     isExpand: boolean = false
+
+    expandHandler() {
+        this.isExpand = !this.isExpand
+    }
 }
 </script>
 
@@ -94,28 +96,21 @@ export default class CCategoryProduct extends Vue {
     white-space nowrap
 
 .c-category-product
+    padding 16px 0
     .category-name-container
         margin 16px 0
+        +sm()
+            margin 8px 0
         .category-name
-            color $secondary
+            color $text-color
             text-align left
             font-size 30px
             +sm()
-                font-size 18px
+                font-size 20px
     .product-list
         padding-bottom 24px
         +sm()
             16px
-        &__name
-            overflow hidden
-            padding 4px 0
-            color $text-color
-            text-align center
-            text-overflow ellipsis
-            white-space nowrap
-            font-size $font-large
-            +sm()
-                font-size $font-medium
         &__container
             position relative
             &__image
@@ -128,10 +123,25 @@ export default class CCategoryProduct extends Vue {
                 top 8px
                 left 8px
                 max-width 70%
+        &__footer
+            text-align center
+            &__name
+                overflow hidden
+                padding 4px 0
+                color $text-color
+                text-overflow ellipsis
+                white-space nowrap
+                font-size $font-large
+                +sm()
+                    font-size $font-medium
             &__price
-                position absolute
-                right 8px
-                bottom 8px
+                color $primary-text-color
+                font-size $font-xlarge
+                +sm()
+                    font-size $font-large
+        &__button
+            margin-top 16px
+            text-align center
 
 .default
     +sm()
@@ -141,4 +151,10 @@ export default class CCategoryProduct extends Vue {
     display none
     +sm()
         display block
+
+.no-display
+    display none
+
+.fadeDown-enter-active
+    animation fadeDown 1s
 </style>

@@ -1,7 +1,12 @@
 <template>
-    <nuxt-link :to="`/${to}`" class="c-detail-button c-detail-button">
-        <span>{{ content }}</span>
-    </nuxt-link>
+    <div>
+        <nuxt-link v-if="link" :to="`/${to}`" class="c-detail-button" :class="getClass">
+            <span>{{ content }}</span>
+        </nuxt-link>
+        <div v-else class="c-detail-button" :class="getClass">
+            <span>{{ content }}</span>
+        </div>
+    </div>
 </template>
 
 <script lang="ts">
@@ -10,12 +15,23 @@ import { Component, Vue, Prop } from 'nuxt-property-decorator'
 @Component
 export default class CDetailButton extends Vue {
     @Prop({ type: String, default: '/' }) to?: string
+    @Prop({ type: Boolean, default: true }) link?: boolean
     @Prop({ type: String, default: '詳しくはこちら' }) content?: string
+    @Prop({ type: Boolean, default: false }) fallDown?: boolean
+
+    get getClass() {
+        return {
+            'fall-down': this.fallDown,
+        }
+    }
 }
 </script>
 
 <style lang="stylus" scoped>
 .c-detail-button
+    cursor pointer
+
+.fall-down
     position relative
     display inline-block
     overflow hidden

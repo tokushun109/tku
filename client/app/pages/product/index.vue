@@ -3,7 +3,7 @@
         <div class="page-title-container">
             <h2 class="page-title">Product</h2>
         </div>
-        <v-sheet>
+        <v-sheet class="page-product__container">
             <div class="fade-up">
                 <v-btn text :color="ColorType.Grey" class="search-button sm" @click="toggleSearchArea">
                     <v-icon>{{ mdiMagnify }}</v-icon>
@@ -180,6 +180,8 @@ export default class PageProductIndex extends Vue {
     max-width $xl-width
     +sm()
         padding 16px
+    &__container
+        min-height 56vh
 
 .page-title-container
     +sm()

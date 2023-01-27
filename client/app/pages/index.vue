@@ -25,7 +25,7 @@
                         <p>マクラメ編みのアクセサリーを作っています。</p>
                     </v-container>
                     <c-scroll-transition>
-                        <c-detail-button to="about" />
+                        <c-detail-button fall-down to="about" />
                     </c-scroll-transition>
                 </c-layout-container>
             </div>
@@ -40,7 +40,7 @@
                         </c-scroll-transition>
                     </v-container>
                     <c-scroll-transition>
-                        <c-detail-button content="お問い合わせフォーム" to="contact" />
+                        <c-detail-button fall-down content="お問い合わせフォーム" to="contact" />
                     </c-scroll-transition>
                 </c-layout-container>
             </div>
