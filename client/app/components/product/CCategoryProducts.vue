@@ -120,8 +120,8 @@ export default class CCategoryProduct extends Vue {
                 object-fit cover
             &__target
                 position absolute
-                top 8px
-                left 8px
+                right 8px
+                bottom 8px
                 max-width 70%
         &__footer
             text-align center
