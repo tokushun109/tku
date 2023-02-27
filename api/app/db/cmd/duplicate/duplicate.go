@@ -74,12 +74,15 @@ func duplicateProduct(url string) {
 		SalesSite: models.GetSalesSiteByName("creema"),
 	})
 	isActive := false
+	IsRecommend := false
 	product := models.Product{
 		Name:        strings.TrimSpace(title),
 		Description: strings.TrimSpace(productDetail),
 		Price:       intPrice,
 		IsActive:    &isActive,
+		IsRecommend: &IsRecommend,
 		CategoryId:  nil,
+		TargetId:    nil,
 		Tags:        tags,
 		SiteDetails: siteDetails,
 	}
