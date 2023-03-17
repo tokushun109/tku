@@ -2,14 +2,12 @@ package controllers
 
 import (
 	"api/config"
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
-	"golang.org/x/crypto/acme/autocert"
 )
 
 type successResponse struct {
@@ -89,23 +87,6 @@ func StartMainServer() error {
 	r.HandleFunc("/api/user/login", loginHandler).Methods("POST")
 	// ログアウト
 	r.HandleFunc("/api/user/logout", logoutHandler).Methods("POST")
-
-	certManager := autocert.Manager{
-		Prompt:     autocert.AcceptTOS,
-		HostPolicy: autocert.HostWhitelist("api.tocoriri.com"),
-		Cache:      autocert.DirCache("./certs"),
-	}
-
-	// 裏側で起動させておく
-	server := &http.Server{
-		Addr:    ":https",
-		Handler: r,
-		TLSConfig: &tls.Config{
-			GetCertificate: certManager.GetCertificate,
-		},
-	}
-
-	go server.ListenAndServeTLS("", "")
 
 	// corsの設定
 	customizeCors := cors.New(cors.Options{
