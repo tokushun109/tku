@@ -1,83 +1,83 @@
 name: tku-ci
 
-on: 
-  push:
-    branches: 
-      - main
-      - feature/#
+on:
+    push:
+        branches:
+            - main
+            - feature/#
 
 jobs:
-  Client:
-    name: Client Auto Deploy
-    runs-on: ubuntu-latest
-    timeout-minutes: 300
-    steps:
-      - uses: actions/checkout@v3
+    Client:
+        name: Client Auto Deploy
+        runs-on: ubuntu-latest
+        timeout-minutes: 300
+        steps:
+            - uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16.x'
+            - name: Setup Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: "16.x"
 
-      - name: Install Dependencies
-        run: |
-          npm install -g serverless
-          npm install -g yarn                              
-          yarn install --production=true
-        working-directory: ./client
+            - name: Install Dependencies
+              run: |
+                  npm install -g serverless
+                  npm install -g yarn                              
+                  yarn install --production=true
+              working-directory: ./client
 
-      - name: Deploy to Lambda
-        run: yarn deploy
-        env:
-          API_BASE_URL: ${{ secrets.API_BASE_URL }}
-          BROWSER_BASE_URL: ${{ secrets.BROWSER_BASE_URL }}
-          DOMAIN_URL: ${{ secrets.DOMAIN_URL }}
-          COOKIE_DOMAIN_URL: ${{ secrets.COOKIE_DOMAIN_URL }}
-          LINE_TOKEN: ${{ secrets.LINE_TOKEN }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
-          GOOGLE_TAG: ${{ secrets.GOOGLE_TAG }}
-        working-directory: ./client
+            - name: Deploy to Lambda
+              run: yarn deploy
+              env:
+                  API_BASE_URL: ${{ secrets.API_BASE_URL }}
+                  BROWSER_BASE_URL: ${{ secrets.BROWSER_BASE_URL }}
+                  DOMAIN_URL: ${{ secrets.DOMAIN_URL }}
+                  COOKIE_DOMAIN_URL: ${{ secrets.COOKIE_DOMAIN_URL }}
+                  LINE_TOKEN: ${{ secrets.LINE_TOKEN }}
+                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
+                  GOOGLE_TAG: ${{ secrets.GOOGLE_TAG }}
+              working-directory: ./client
 
-  Api:
-    name: Api Auto Deploy
-    runs-on: ubuntu-latest
-    timeout-minutes: 300
+    Api:
+        name: Api Auto Deploy
+        runs-on: ubuntu-latest
+        timeout-minutes: 300
 
-    steps:
-      - uses: actions/checkout@v3
+        steps:
+            - uses: actions/checkout@v3
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-northeast-1
+            - name: Configure AWS Credentials
+              uses: aws-actions/configure-aws-credentials@v1-node16
+              with:
+                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  aws-region: ap-northeast-1
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+            - name: Login to Amazon ECR
+              id: login-ecr
+              uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build and push image to Amazon ECR
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: tku_api
-        run: |
-          docker build -t $ECR_REPOSITORY -f ./api/docker/api/Dockerfile ./api
-          TAG=$ECR_REGISTRY/$ECR_REPOSITORY:latest
-          docker tag $ECR_REPOSITORY:latest $TAG
-          docker push $TAG
-      - name: Render Amazon ECS task definition
-        id: render-api-container
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
-        with:
-          task-definition: ./infra/tasks/api.json
-          container-name: api
-          image: ${{ steps.login-ecr.outputs.registry }}/tku_api:latest
-      - name: Deploy to Amazon ECS service
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: ${{ steps.render-api-container.outputs.task-definition }}
-          service: ${{ secrets.API_SERVICE }}
-          cluster: ${{ secrets.API_CLUSTER }}
+            - name: Build and push image to Amazon ECR
+              env:
+                  ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+                  ECR_REPOSITORY: tku_api
+              run: |
+                  docker build -t $ECR_REPOSITORY -f ./api/docker/api/Dockerfile ./api
+                  TAG=$ECR_REGISTRY/$ECR_REPOSITORY:latest
+                  docker tag $ECR_REPOSITORY:latest $TAG
+                  docker push $TAG
+            - name: Render Amazon ECS task definition
+              id: render-api-container
+              uses: aws-actions/amazon-ecs-render-task-definition@v1
+              with:
+                  task-definition: ./infra/tasks/api.json
+                  container-name: api
+                  image: ${{ steps.login-ecr.outputs.registry }}/tku_api:latest
+            - name: Deploy to Amazon ECS service
+              uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+              with:
+                  task-definition: ${{ steps.render-api-container.outputs.task-definition }}
+                  service: ${{ secrets.API_SERVICE }}
+                  cluster: ${{ secrets.API_CLUSTER }}
