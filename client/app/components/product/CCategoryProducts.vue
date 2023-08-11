@@ -63,7 +63,7 @@
                     </transition>
                 </v-col>
             </v-row>
-            <div v-if="categoryProducts.products.length > 3" class="product-list__button" @click="expandHandler">
+            <div v-if="categoryProducts.products.length > 4" class="product-list__button" @click="expandHandler">
                 <c-detail-button v-if="!isExpand" class="product-list__button__content" to="/product" fall-down content="もっと見る" :link="false" />
             </div>
         </v-list>
