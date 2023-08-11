@@ -21,8 +21,14 @@
         <c-dialog :visible.sync="dialogVisible" :title="modalTitle" :confirm-button-disabled="!valid" @confirm="confirmHandler" @close="closeHandler">
             <template #content>
                 <c-error :errors.sync="errors" />
+                <div class="radio-button-area">
+                    <v-radio-group v-if="executionType === ExecutionType.Create" v-model="createProductType" row>
+                        <v-radio :off-icon="mdiCheckboxBlankOutline" :on-icon="mdiCheckboxMarked" label="手動で入力" value="input" />
+                        <v-radio :off-icon="mdiCheckboxBlankOutline" :on-icon="mdiCheckboxMarked" label="Creemaから複製" value="duplicate" />
+                    </v-radio-group>
+                </div>
                 <v-form
-                    v-if="executionType === ExecutionType.Create || executionType === ExecutionType.Edit"
+                    v-if="(executionType === ExecutionType.Create && createProductType === 'input') || executionType === ExecutionType.Edit"
                     ref="form"
                     v-model="valid"
                     lazy-validation
@@ -148,6 +154,9 @@
                         />
                     </div>
                 </v-form>
+                <v-form v-else-if="executionType === ExecutionType.Create && createProductType === 'duplicate'">
+                    <v-text-field v-model="creemaUrl" :rules="urlRules" label="URL(必須)" outlined counter="50" />
+                </v-form>
                 <p v-else-if="executionType === ExecutionType.Delete">削除してもよろしいですか？</p>
             </template>
         </c-dialog>
@@ -174,7 +183,7 @@ import {
     IImagePathOrder,
     BadRequest,
 } from '~/types'
-import { maxPrice, min50, newProduct, newSiteDetail, price, required } from '~/methods'
+import { maxPrice, min50, newProduct, newSiteDetail, nonDoubleByte, nonSpace, price, required } from '~/methods'
 
 interface IIndexOrder {
     [key: number]: number
@@ -205,7 +214,10 @@ export default class CProductList extends Vue {
 
     products: Array<IProduct> = []
     modalItem: IProduct = newProduct()
+    creemaUrl: string = ''
 
+    // 商品を作成するときに手動入力か複製するか
+    createProductType: 'input' | 'duplicate' = 'input'
     // アップロードする商品画像
     uploadFiles: Array<File> = []
     // ダイアログの表示
@@ -224,6 +236,8 @@ export default class CProductList extends Vue {
     nameRules = [required, min50]
 
     priceRules = [required, price, maxPrice]
+
+    urlRules = [required, nonDoubleByte, nonSpace]
 
     searchText: string = ''
 
@@ -274,7 +288,7 @@ export default class CProductList extends Vue {
 
     @Watch('dialogVisible')
     resetValidation() {
-        if (!this.dialogVisible && this.executionType !== ExecutionType.Delete) {
+        if (!this.dialogVisible && this.executionType !== ExecutionType.Delete && this.createProductType === 'input') {
             const refs: any = this.$refs.form
             refs.resetValidation()
         }
@@ -331,24 +345,41 @@ export default class CProductList extends Vue {
         }
         if (this.executionType === ExecutionType.Create) {
             try {
-                const createProduct = await this.$axios.$post(`/product`, this.modalItem, { withCredentials: true })
-                // 画像を選択していたら、アップロードを行う
-                if (this.uploadFiles.length > 0) {
-                    const params = new FormData()
-                    const orderParams: IProductImageParams = {
-                        isChanged: this.isChangedOrder,
-                        order: this.uploadFileOrder,
+                if (this.createProductType === 'input') {
+                    const createProduct = await this.$axios.$post(`/product`, this.modalItem, { withCredentials: true })
+                    // 画像を選択していたら、アップロードを行う
+                    if (this.uploadFiles.length > 0) {
+                        const params = new FormData()
+                        const orderParams: IProductImageParams = {
+                            isChanged: this.isChangedOrder,
+                            order: this.uploadFileOrder,
+                        }
+                        params.append('order', JSON.stringify(orderParams))
+                        this.uploadFiles.forEach((file, index) => {
+                            params.append(`file${index}`, file)
+                        })
+                        await this.$axios.$post(`/product/${createProduct.uuid}/product_image`, params, {
+                            headers: {
+                                'Content-Type': 'multipart/form-data',
+                            },
+                            withCredentials: true,
+                        })
                     }
-                    params.append('order', JSON.stringify(orderParams))
-                    this.uploadFiles.forEach((file, index) => {
-                        params.append(`file${index}`, file)
-                    })
-                    await this.$axios.$post(`/product/${createProduct.uuid}/product_image`, params, {
-                        headers: {
-                            'Content-Type': 'multipart/form-data',
-                        },
-                        withCredentials: true,
-                    })
+                } else if (this.createProductType === 'duplicate') {
+                    if (!this.creemaUrl.includes('creema')) {
+                        this.errors.push(new BadRequest('urlにcreemaが含まれていません'))
+                        return
+                    }
+                    await this.$axios.$post(
+                        `/product/duplicate`,
+                        { url: this.creemaUrl },
+                        {
+                            headers: {
+                                'Content-Type': 'multipart/form-data',
+                            },
+                            withCredentials: true,
+                        }
+                    )
                 }
                 this.$emit('c-change')
                 this.notificationVisible = true
@@ -472,6 +503,10 @@ export default class CProductList extends Vue {
         .product-list-content
             .message
                 margin-top 16px
+
+.radio-button-area
+    display flex
+    justify-content center
 
 .price-input
     .price-unit
