@@ -50,9 +50,8 @@ func duplicateProduct(url string) {
 	// 価格
 	price := strings.Trim(strings.TrimSpace(document.Find("#js-item-detail > aside > div.p-item-detail-info.p-item-detail-info--side > div > div:nth-child(1) > div.p-item-detail-info__item.p-item-detail-info__item--price").Text()), "￥")
 	intPrice, _ := strconv.Atoi(strings.Replace(price, ",", "", -1))
-
 	// タグ
-	tagsDom := document.Find("#js-item-detail > aside > div:nth-child(5) > ul > li > a")
+	tagsDom := document.Find("#js-item-detail > aside > div:nth-child(6) > ul:nth-child(3) > li > a")
 	tagNames := []string{}
 	tagsDom.Each(func(i int, s *goquery.Selection) {
 		tagName := s.Text()
