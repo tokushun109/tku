@@ -110,6 +110,7 @@ export default class CProductImage extends Vue {
         aspect-ratio 1 / 1
         object-fit cover
         &.list-display
+            cursor pointer
             border solid 0.5px
         &.is-select
             border solid red 2px
