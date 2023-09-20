@@ -3,6 +3,7 @@ import { App, TerraformStack } from "cdktf";
 import * as aws from '@cdktf/provider-aws/lib'
 import { compileForLambdaFunction } from "./libs/compile";
 import path = require("path");
+import * as dotenv from 'dotenv'
 
 interface OptionType {
   region: string
@@ -22,6 +23,7 @@ const getDateString = (date: Date | null = null): string => {
   )
 }
 
+dotenv.config()
 class TkuStack extends TerraformStack {
   constructor(scope: Construct, name: string, option: OptionType) {
     super(scope, name);
@@ -91,9 +93,16 @@ class TkuStack extends TerraformStack {
         runtime: 'nodejs18.x',
         memorySize: 512,
         role: role.arn,
+        environment: {
+          variables: {
+            LINE_HEALTH_CHECK_TOKEN: process.env.LINE_HEALTH_CHECK_TOKEN!
+          }
+        }
       }
     )
   }
+
+  // コード上でスケジューラを追加する
 }
 
 const app = new App();

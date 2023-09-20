@@ -13,6 +13,7 @@ export const handler = async () => {
         if (result.success === undefined) {
             throw new Error('api取得失敗')
         }
+        console.log('api取得OK')
         return {
             statusCode: 200,
             body: {
@@ -21,6 +22,7 @@ export const handler = async () => {
             },
         }
     } catch (e) {
+        await lineNotification()
         return {
             statusCode: 500,
             body: {
@@ -30,3 +32,18 @@ export const handler = async () => {
         }
     }
 }
+
+const lineNotification = async () => {
+    const qs = require('querystring')
+    await fetch('https://notify-api.line.me/api/notify', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            Authorization: `Bearer ${process.env.LINE_HEALTH_CHECK_TOKEN}`,
+        },
+        body: qs.stringify({
+            message: 'とこりりのヘルスチェックに失敗しました。サーバーが落ちている可能性があります。',
+        }),
+    })
+}
+
