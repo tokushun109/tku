@@ -1,8 +1,12 @@
 import fetch from 'node-fetch'
 
 export const handler = async () => {
-
+    const timeout = setTimeout(async () => {
+        await lineNotification()
+        throw new Error('タイムアウトしました')
+    }, 15000);
     try {
+
         const res = await fetch('https://api.tocoriri.com/api/health_check', {
             headers: {
                 'Content-Type': 'application/json',
@@ -30,7 +34,7 @@ export const handler = async () => {
                 result: null
             },
         }
-    }
+    } finally { clearTimeout(timeout); }
 }
 
 const lineNotification = async () => {
