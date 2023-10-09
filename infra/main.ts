@@ -89,6 +89,7 @@ class TkuStack extends TerraformStack {
         functionName: `${name}-health-check`,
         s3Bucket: bucket.bucket,
         s3Key: lambdaArchive.key,
+        timeout: 30,
         handler: 'index.handler',
         runtime: 'nodejs18.x',
         memorySize: 512,
