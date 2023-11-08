@@ -1,10 +1,12 @@
 module api
 
-go 1.18
+go 1.21
+
+toolchain go1.21.3
 
 require (
 	github.com/PuerkitoBio/goquery v1.8.1
-	github.com/aws/aws-sdk-go v1.47.4
+	github.com/aws/aws-sdk-go v1.47.5
 	github.com/gocarina/gocsv v0.0.0-20230616125104-99d496ca653d
 	github.com/google/uuid v1.4.0
 	github.com/gorilla/mux v1.8.1
