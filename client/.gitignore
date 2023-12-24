@@ -89,3 +89,6 @@ sw.*
 
 # Vim swap files
 *.swp
+
+# node-version
+.node-version
