@@ -6,4 +6,4 @@
 
 ## インフラ構成図
 
-![インフラ構成図](./infra/infra-diagram.png)
+![インフラ構成図](./infra/diagram.png)
