@@ -23,7 +23,7 @@ class TkuStack extends TerraformStack {
         })
 
         // VPCの作成
-        const tkuVpc = new aws.vpc.Vpc(this, `${name}-vpc`, {
+        const vpc = new aws.vpc.Vpc(this, `${name}-vpc`, {
             cidrBlock: VPC_CIDR_BLOCK,
             tags: {
                 Name: `${name}-vpc`,
@@ -33,7 +33,7 @@ class TkuStack extends TerraformStack {
         // subnetの作成
         new aws.subnet.Subnet(this, `${name}-public-subnet-a`, {
             cidrBlock: SUBNET_CIDR_BLOCK.PublicA,
-            vpcId: tkuVpc.id,
+            vpcId: vpc.id,
             tags: {
                 Name: `${name}-public-subnet-a`,
             },
@@ -41,9 +41,17 @@ class TkuStack extends TerraformStack {
 
         new aws.subnet.Subnet(this, `${name}-public-subnet-c`, {
             cidrBlock: SUBNET_CIDR_BLOCK.PublicC,
-            vpcId: tkuVpc.id,
+            vpcId: vpc.id,
             tags: {
                 Name: `${name}-public-subnet-c`,
+            },
+        })
+
+        // Internet Gatewayの作成
+        const internetGateway = new aws.internetGateway.InternetGateway(this, `${name}-igw`, {
+            vpcId: vpc.id,
+            tags: {
+                Name: `${name}-igw`,
             },
         })
 
