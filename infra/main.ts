@@ -6,6 +6,7 @@ import path = require('path')
 import * as dotenv from 'dotenv'
 import { getDateString } from './libs/date'
 import { VPC_CIDR_BLOCK } from './constants/vpc'
+import { SUBNET_CIDR_BLOCK } from './constants/subnet'
 
 interface OptionType {
     region: string
@@ -22,10 +23,27 @@ class TkuStack extends TerraformStack {
         })
 
         // VPCの作成
-        const vpc = new aws.vpc.Vpc(this, `${name}-vpc`, {
+        const tkuVpc = new aws.vpc.Vpc(this, `${name}-vpc`, {
             cidrBlock: VPC_CIDR_BLOCK,
             tags: {
                 Name: `${name}-vpc`,
+            },
+        })
+
+        // subnetの作成
+        new aws.subnet.Subnet(this, `${name}-public-subnet-a`, {
+            cidrBlock: SUBNET_CIDR_BLOCK.PublicA,
+            vpcId: tkuVpc.id,
+            tags: {
+                Name: `${name}-public-subnet-a`,
+            },
+        })
+
+        new aws.subnet.Subnet(this, `${name}-public-subnet-c`, {
+            cidrBlock: SUBNET_CIDR_BLOCK.PublicC,
+            vpcId: tkuVpc.id,
+            tags: {
+                Name: `${name}-public-subnet-c`,
             },
         })
 
