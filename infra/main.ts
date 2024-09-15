@@ -4,23 +4,10 @@ import * as aws from '@cdktf/provider-aws/lib'
 import { compileForLambdaFunction } from './libs/compile'
 import path = require('path')
 import * as dotenv from 'dotenv'
+import { getDateString } from './libs/date'
 
 interface OptionType {
     region: string
-}
-
-// 日付をYYYYMMddhhmmssの文字列で取得
-const getDateString = (date: Date | null = null): string => {
-    const d = date || new Date()
-
-    return (
-        d.getFullYear() +
-        String(d.getMonth() + 1).padStart(2, '0') +
-        String(d.getDate()).padStart(2, '0') +
-        String(d.getHours()).padStart(2, '0') +
-        String(d.getMinutes()).padStart(2, '0') +
-        String(d.getSeconds()).padStart(2, '0')
-    )
 }
 
 dotenv.config()
@@ -35,7 +22,7 @@ class TkuStack extends TerraformStack {
 
         // lambda関数用のハンドラをコンパイルする
         const lambda = new compileForLambdaFunction(this, name, {
-            path: path.join(__dirname, 'lambda', 'healthCheck', 'handlers'),
+            path: path.join(__dirname, 'resources', 'lambda', 'healthCheck', 'handlers'),
         })
 
         const lambdaAssumeRolePolicy = {
