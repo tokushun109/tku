@@ -5,6 +5,7 @@ import { compileForLambdaFunction } from './libs/compile'
 import path = require('path')
 import * as dotenv from 'dotenv'
 import { getDateString } from './libs/date'
+import { VPC_CIDR_BLOCK } from './constants/vpc'
 
 interface OptionType {
     region: string
@@ -18,6 +19,14 @@ class TkuStack extends TerraformStack {
         const { region } = option
         new aws.provider.AwsProvider(this, `${name}-aws-provider`, {
             region,
+        })
+
+        // VPCの作成
+        const vpc = new aws.vpc.Vpc(this, `${name}-vpc`, {
+            cidrBlock: VPC_CIDR_BLOCK,
+            tags: {
+                Name: `${name}-vpc`,
+            },
         })
 
         // lambda関数用のハンドラをコンパイルする
