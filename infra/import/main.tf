@@ -17,3 +17,12 @@ resource "aws_route_table" "public-rt" {
 resource "aws_internet_gateway" "tku-igw" {
   # (resource arguments)
 }
+
+
+resource "aws_security_group" "public-ecs-sg" {
+  # (resource arguments)
+}
+
+resource "aws_security_group" "db-sg" {
+  # (resource arguments)
+}

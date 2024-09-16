@@ -64,6 +64,78 @@ class TkuStack extends TerraformStack {
             },
         })
 
+        // Security Groupの作成
+        const ecsSecurityGroup = new aws.securityGroup.SecurityGroup(this, 'public-ecs-sg', {
+            description: 'sg for public ecs',
+            egress: [
+                {
+                    cidrBlocks: ['0.0.0.0/0'],
+                    fromPort: 0,
+                    protocol: '-1',
+                    toPort: 0,
+                },
+            ],
+            ingress: [
+                {
+                    cidrBlocks: ['0.0.0.0/0'],
+                    fromPort: 443,
+                    protocol: 'tcp',
+                    toPort: 443,
+                },
+                {
+                    cidrBlocks: ['0.0.0.0/0'],
+                    fromPort: 8080,
+                    protocol: 'tcp',
+                    toPort: 8080,
+                },
+                {
+                    cidrBlocks: ['0.0.0.0/0'],
+                    fromPort: 80,
+                    protocol: 'tcp',
+                    toPort: 80,
+                },
+                {
+                    cidrBlocks: [process.env.HOME_IP!],
+                    fromPort: 22,
+                    protocol: 'tcp',
+                    toPort: 22,
+                },
+            ],
+            tags: {
+                Name: 'public-ecs-sg',
+            },
+        })
+
+        new aws.securityGroup.SecurityGroup(this, 'db-sg', {
+            description: 'sg for db',
+            egress: [
+                {
+                    cidrBlocks: ['0.0.0.0/0'],
+                    fromPort: 0,
+                    protocol: '-1',
+                    toPort: 0,
+                },
+            ],
+            ingress: [
+                {
+                    cidrBlocks: [],
+                    fromPort: 3306,
+                    protocol: 'tcp',
+                    toPort: 3306,
+                    securityGroups: [ecsSecurityGroup.id],
+                },
+                {
+                    cidrBlocks: [process.env.HOME_IP!],
+                    fromPort: 22,
+                    protocol: 'tcp',
+                    toPort: 22,
+                },
+            ],
+            tags: {
+                Name: 'db-sg',
+            },
+        })
+
         // lambda関数用のハンドラをコンパイルする
         const lambda = new compileForLambdaFunction(this, name, {
             path: path.join(__dirname, 'resources', 'lambda', 'healthCheck', 'handlers'),
