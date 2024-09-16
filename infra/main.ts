@@ -136,6 +136,16 @@ class TkuStack extends TerraformStack {
             },
         })
 
+        // TODO: 空のECSクラスターを作成する
+
+        // TODO: ECSで使用する用のEC2を作成して、作成したECSクラスターと関連付ける
+
+        // TODO: EIPを作成して、作成したEC2に割り当てる
+
+        // TODO: タスクを作成する
+
+        // TODO: 作成したタスクを元にサービスを作成する
+
         // lambda関数用のハンドラをコンパイルする
         const lambda = new compileForLambdaFunction(this, name, {
             path: path.join(__dirname, 'resources', 'lambda', 'healthCheck', 'handlers'),
