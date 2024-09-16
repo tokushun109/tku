@@ -30,7 +30,7 @@ class TkuStack extends TerraformStack {
             },
         })
 
-        // subnetの作成
+        // Subnetの作成
         new aws.subnet.Subnet(this, `${name}-public-subnet-a`, {
             cidrBlock: SUBNET_CIDR_BLOCK.PublicA,
             vpcId: vpc.id,
@@ -52,6 +52,15 @@ class TkuStack extends TerraformStack {
             vpcId: vpc.id,
             tags: {
                 Name: `${name}-igw`,
+            },
+        })
+
+        // Route Tableの作成
+        new aws.routeTable.RouteTable(this, 'public-rt', {
+            vpcId: vpc.id,
+            route: [{ cidrBlock: '0.0.0.0/0', gatewayId: internetGateway.id }],
+            tags: {
+                Name: 'public-rt',
             },
         })
 
