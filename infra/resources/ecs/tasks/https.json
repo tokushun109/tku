@@ -37,15 +37,6 @@
     ],
     "family": "https-prod",
     "volumes": [],
-    "status": "ACTIVE",
-    "requiresAttributes": [
-        {
-            "name": "ecs.capability.secrets.asm.environment-variables"
-        },
-        {
-            "name": "com.amazonaws.ecs.capability.task-iam-role"
-        }
-    ],
     "placementConstraints": [],
     "requiresCompatibilities": [
         "EC2"
