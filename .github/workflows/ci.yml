@@ -21,7 +21,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          npm install -g serverless
+          npm install -g serverless@3
           npm install -g yarn
           yarn install --production=true
         working-directory: ./client
