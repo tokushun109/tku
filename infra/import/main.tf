@@ -26,3 +26,15 @@ resource "aws_security_group" "public-ecs-sg" {
 resource "aws_security_group" "db-sg" {
   # (resource arguments)
 }
+
+resource "aws_ecs_cluster" "tku-ecs-api-cluster" {
+  # (resource arguments)
+}
+
+resource "aws_ecs_service" "tku-api-service" {
+
+}
+
+resource "aws_ecs_task_definition" "tku-api-task-definition" {
+
+}

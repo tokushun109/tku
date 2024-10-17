@@ -4,9 +4,12 @@ import * as aws from '@cdktf/provider-aws/lib'
 import { compileForLambdaFunction } from './libs/compile'
 import path = require('path')
 import * as dotenv from 'dotenv'
+// import * as fs from 'fs'
 import { getDateString } from './libs/date'
 import { VPC_CIDR_BLOCK } from './constants/vpc'
 import { SUBNET_CIDR_BLOCK } from './constants/subnet'
+// import { API_CLUSTER_NAME, ECS_TASK_ASSUME_ROLE_POLICY } from './constants/ecs'
+// import { getUserData } from './resources/ec2/userData'
 
 interface OptionType {
     region: string
@@ -31,6 +34,7 @@ class TkuStack extends TerraformStack {
         })
 
         // Subnetの作成
+        // const publicSubnetA = new aws.subnet.Subnet(this, `${name}-public-subnet-a`, {
         new aws.subnet.Subnet(this, `${name}-public-subnet-a`, {
             cidrBlock: SUBNET_CIDR_BLOCK.PublicA,
             vpcId: vpc.id,
@@ -136,15 +140,124 @@ class TkuStack extends TerraformStack {
             },
         })
 
-        // TODO: 空のECSクラスターを作成する
+        // // TODO: 空のECSクラスターを作成する
+        // const apiCluster = new aws.ecsCluster.EcsCluster(this, `${name}-ecs-api-cluster`, {
+        //     name: API_CLUSTER_NAME,
+        //     setting: [
+        //         {
+        //             name: 'containerInsights',
+        //             value: 'disabled',
+        //         },
+        //     ],
+        // })
 
-        // TODO: ECSで使用する用のEC2を作成して、作成したECSクラスターと関連付ける
+        // // TODO: ECSで使用する用のEC2を作成して、作成したECSクラスターと関連付ける
+        // const apiInstance = new aws.instance.Instance(this, `${name}-api-instance`, {
+        //     ami: 'ami-01e9b1393f6f885a6',
+        //     associatePublicIpAddress: true,
+        //     availabilityZone: 'ap-northeast-1a',
+        //     iamInstanceProfile: 'ecsInstanceRole',
+        //     instanceType: 't2.small',
+        //     keyName: `${name}_rsa`,
+        //     userData: Buffer.from(getUserData(API_CLUSTER_NAME)).toString('base64'),
+        //     vpcSecurityGroupIds: [ecsSecurityGroup.id],
+        //     instanceMarketOptions: {
+        //         marketType: 'spot',
+        //         spotOptions: {
+        //             maxPrice: '0.030400',
+        //             spotInstanceType: 'one-time',
+        //         },
+        //     },
+        //     monitoring: false,
+        //     tags: {
+        //         Name: `test-instance`,
+        //     },
+        //     subnetId: publicSubnetA.id,
+        // })
 
-        // TODO: EIPを作成して、作成したEC2に割り当てる
+        // new aws.eip.Eip(this, `${name}-api-eip`, {
+        //     domain: 'vpc',
+        //     instance: apiInstance.id,
+        //     tags: {
+        //         Name: 'test-api-eip',
+        //     },
+        // })
 
-        // TODO: タスクを作成する
+        // // ecsのタスク実行用のroleを作成
+        // const ecsTaskExecRole = new aws.iamRole.IamRole(this, `${name}-ecs-task-exec-role`, {
+        //     name: `${name}-ecs-task-exec-role`,
+        //     assumeRolePolicy: JSON.stringify(ECS_TASK_ASSUME_ROLE_POLICY),
+        // })
 
-        // TODO: 作成したタスクを元にサービスを作成する
+        // const policyArnsIterator = TerraformIterator.fromList([
+        //     'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy',
+        //     // secret managerの読み取り権限も追加
+        //     'arn:aws:iam::aws:policy/SecretsManagerReadWrite',
+        // ])
+
+        // new aws.iamRolePolicyAttachment.IamRolePolicyAttachment(this, `${name}-ecs-task-managed-policy`, {
+        //     forEach: policyArnsIterator,
+        //     policyArn: policyArnsIterator.value,
+        //     role: ecsTaskExecRole.name,
+        // })
+
+        // const { containerDefinitions: apiContainerDefinition }: { containerDefinitions: string } = JSON.parse(
+        //     fs.readFileSync(path.join(__dirname, 'resources', 'ecs', 'tasks', 'api.json'), 'utf-8')
+        // )
+
+        // // TODO: タスクを作成する
+        // const apiTask = new aws.ecsTaskDefinition.EcsTaskDefinition(this, `${name}-api-task`, {
+        //     family: `${name}-api`,
+        //     containerDefinitions: JSON.stringify(apiContainerDefinition),
+        //     executionRoleArn: ecsTaskExecRole.arn,
+        //     taskRoleArn: ecsTaskExecRole.arn,
+        // })
+
+        // new aws.ecsService.EcsService(this, `${name}-api-service`, {
+        //     name: 'test-api-prod',
+        //     cluster: apiCluster.id,
+        //     taskDefinition: apiTask.arn,
+        //     desiredCount: 1,
+        //     orderedPlacementStrategy: [
+        //         {
+        //             field: 'attribute:ecs.availability-zone',
+        //             type: 'spread',
+        //         },
+        //         {
+        //             field: 'instanceId',
+        //             type: 'spread',
+        //         },
+        //     ],
+        // })
+
+        // const { containerDefinitions: httpsContainerDefinition }: { containerDefinitions: string } = JSON.parse(
+        //     fs.readFileSync(path.join(__dirname, 'resources', 'ecs', 'tasks', 'https.json'), 'utf-8')
+        // )
+
+        // // TODO: タスクを作成する
+        // const httpsTask = new aws.ecsTaskDefinition.EcsTaskDefinition(this, `${name}-https-task`, {
+        //     family: `${name}-https`,
+        //     containerDefinitions: JSON.stringify(httpsContainerDefinition),
+        //     executionRoleArn: ecsTaskExecRole.arn,
+        //     taskRoleArn: ecsTaskExecRole.arn,
+        // })
+
+        // new aws.ecsService.EcsService(this, `${name}-https-service`, {
+        //     name: 'test-https-prod',
+        //     cluster: apiCluster.id,
+        //     taskDefinition: httpsTask.arn,
+        //     desiredCount: 1,
+        //     orderedPlacementStrategy: [
+        //         {
+        //             field: 'attribute:ecs.availability-zone',
+        //             type: 'spread',
+        //         },
+        //         {
+        //             field: 'instanceId',
+        //             type: 'spread',
+        //         },
+        //     ],
+        // })
 
         // lambda関数用のハンドラをコンパイルする
         const lambda = new compileForLambdaFunction(this, name, {
