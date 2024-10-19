@@ -75,7 +75,7 @@ jobs:
         id: render-api-container
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: ./infra/ecs/tasks/api.json
+          task-definition: ./infra/resources/ecs/tasks/api.json
           container-name: api
           image: ${{ steps.login-ecr.outputs.registry }}/tku_api:latest
       - name: Deploy to Amazon ECS service

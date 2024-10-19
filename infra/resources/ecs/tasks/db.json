@@ -1,0 +1,60 @@
+{
+    "containerDefinitions": [
+        {
+            "name": "db",
+            "image": "418549683327.dkr.ecr.ap-northeast-1.amazonaws.com/tku_db",
+            "cpu": 0,
+            "memory": 700,
+            "portMappings": [
+                {
+                    "containerPort": 3306,
+                    "hostPort": 3306,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "entryPoint": [],
+            "command": [
+                "mysqld",
+                "--innodb_use_native_aio=0"
+            ],
+            "environment": [],
+            "volumesFrom": [],
+            "secrets": [
+                {
+                    "name": "DB_NAME",
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku-secrets-manager-wndNhr:DB_NAME::"
+                },
+                {
+                    "name": "MYSQL_DATABASE",
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku-secrets-manager-wndNhr:DB_NAME::"
+                },
+                {
+                    "name": "MYSQL_PASSWORD",
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku-secrets-manager-wndNhr:MYSQL_ROOT_PASSWORD::"
+                },
+                {
+                    "name": "MYSQL_ROOT_PASSWORD",
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku-secrets-manager-wndNhr:MYSQL_ROOT_PASSWORD::"
+                },
+                {
+                    "name": "MYSQL_USER",
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku-secrets-manager-wndNhr:DB_USER::"
+                }
+            ],
+            "healthCheck": {
+                "command": [
+                    "CMD-SHELL",
+                    "mysqladmin ping -h 127.0.0.1 -u$MYSQL_USER -p$MYSQL_PASSWORD"
+                ],
+                "interval": 5,
+                "timeout": 30,
+                "retries": 3
+            }
+        }
+    ],
+    "placementConstraints": [],
+    "requiresCompatibilities": [
+        "EC2"
+    ]
+}

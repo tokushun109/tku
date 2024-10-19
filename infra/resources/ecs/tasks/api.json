@@ -1,8 +1,9 @@
 {
     "ipcMode": null,
-    "executionRoleArn": "arn:aws:iam::418549683327:role/tku-task-role",
+    "executionRoleArn": "arn:aws:iam::418549683327:role/tku-ecs-task-exec-role",
     "containerDefinitions": [
         {
+            "image": "418549683327.dkr.ecr.ap-northeast-1.amazonaws.com/tku_api",
             "dnsSearchDomains": null,
             "environmentFiles": null,
             "logConfiguration": null,
@@ -28,63 +29,63 @@
             "workingDirectory": null,
             "secrets": [
                 {
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:CLIENT_URL::",
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku-secrets-manager-wndNhr:CLIENT_URL::",
                     "name": "CLIENT_URL"
                 },
                 {
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:API_BASE_URL::",
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku-secrets-manager-wndNhr:API_BASE_URL::",
                     "name": "API_BASE_URL"
                 },
                 {
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:CREATOR_NAME::",
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku-secrets-manager-wndNhr:CREATOR_NAME::",
                     "name": "CREATOR_NAME"
                 },
                 {
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:DB_NAME::",
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku-secrets-manager-wndNhr:DB_NAME::",
                     "name": "DB_NAME"
                 },
                 {
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:DB_PASS::",
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku-secrets-manager-wndNhr:DB_PASS::",
                     "name": "DB_PASS"
                 },
                 {
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:DB_USER::",
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku-secrets-manager-wndNhr:DB_USER::",
                     "name": "DB_USER"
                 },
                 {
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:ENV::",
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku-secrets-manager-wndNhr:ENV::",
                     "name": "ENV"
                 },
                 {
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:MYSQL_HOST::",
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku-secrets-manager-wndNhr:MYSQL_HOST::",
                     "name": "MYSQL_HOST"
                 },
                 {
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:MYSQL_ROOT_PASSWORD::",
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku-secrets-manager-wndNhr:MYSQL_ROOT_PASSWORD::",
                     "name": "MYSQL_ROOT_PASSWORD"
                 },
                 {
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:AWS_SECRET_ACCESS_KEY::",
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku-secrets-manager-wndNhr:AWS_SECRET_ACCESS_KEY::",
                     "name": "AWS_SECRET_ACCESS_KEY"
                 },
                 {
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:AWS_ACCESS_KEY_ID::",
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku-secrets-manager-wndNhr:AWS_ACCESS_KEY_ID::",
                     "name": "AWS_ACCESS_KEY_ID"
                 },
                 {
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:AWS_REGION::",
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku-secrets-manager-wndNhr:AWS_REGION::",
                     "name": "AWS_REGION"
                 },
                 {
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:API_BUCKET_NAME::",
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku-secrets-manager-wndNhr:API_BUCKET_NAME::",
                     "name": "API_BUCKET_NAME"
                 },
                 {
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:SEND_GRID_API_KEY::",
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku-secrets-manager-wndNhr:SEND_GRID_API_KEY::",
                     "name": "SEND_GRID_API_KEY"
                 },
                 {
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:LINE_CONTACT_TOKEN::",
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku-secrets-manager-wndNhr:LINE_CONTACT_TOKEN::",
                     "name": "LINE_CONTACT_TOKEN"
                 }
             ],
@@ -114,8 +115,8 @@
     ],
     "placementConstraints": [],
     "memory": null,
-    "taskRoleArn": "arn:aws:iam::418549683327:role/tku-task-role",
-    "family": "api-prod",
+    "taskRoleArn": "arn:aws:iam::418549683327:role/tku-ecs-task-exec-role",
+    "family": "tku-api",
     "pidMode": null,
     "requiresCompatibilities": [
         "EC2"
