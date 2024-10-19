@@ -1,14 +1,15 @@
 import { Construct } from 'constructs'
-import { App, TerraformIterator, TerraformStack } from 'cdktf'
+import { App, TerraformStack } from 'cdktf'
 import * as aws from '@cdktf/provider-aws/lib'
 import { compileForLambdaFunction } from './libs/compile'
 import path = require('path')
 import * as dotenv from 'dotenv'
 import { getDateString } from './libs/date'
-import { ECS_TASK_ASSUME_ROLE_POLICY, API_CLUSTER_NAME, DB_CLUSTER_NAME } from './constants/ecs'
+import { API_CLUSTER_NAME, DB_CLUSTER_NAME } from './constants/ecs'
 import { getUserData } from './resources/ec2/userData'
 import { importTaskDefinition } from './libs/task'
 import { NetworkResource } from './resources/network'
+import { EcsTaskRole } from './resources/ecs'
 
 interface OptionType {
     region: string
@@ -27,23 +28,8 @@ class TkuStack extends TerraformStack {
         // ネットワーク関連のリソースを作成
         const { subnetIds, securityGroupIds } = new NetworkResource(this, name)
 
-        // ecsのタスク実行用のroleを作成
-        const ecsTaskExecRole = new aws.iamRole.IamRole(this, `${name}-ecs-task-exec-role`, {
-            name: `${name}-ecs-task-exec-role`,
-            assumeRolePolicy: JSON.stringify(ECS_TASK_ASSUME_ROLE_POLICY),
-        })
-
-        const policyArnsIterator = TerraformIterator.fromList([
-            'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy',
-            // secret managerの読み取り権限も追加
-            'arn:aws:iam::aws:policy/SecretsManagerReadWrite',
-        ])
-
-        new aws.iamRolePolicyAttachment.IamRolePolicyAttachment(this, `${name}-ecs-task-managed-policy`, {
-            forEach: policyArnsIterator,
-            policyArn: policyArnsIterator.value,
-            role: ecsTaskExecRole.name,
-        })
+        // ECSのタスク実行用のroleを作成
+        const { roleArn: ecsTaskRoleArn } = new EcsTaskRole(this, name)
 
         const apiCluster = new aws.ecsCluster.EcsCluster(this, `${name}-ecs-api-cluster`, {
             name: API_CLUSTER_NAME,
@@ -89,8 +75,8 @@ class TkuStack extends TerraformStack {
         const apiTask = new aws.ecsTaskDefinition.EcsTaskDefinition(this, `${name}-api-task`, {
             family: `${name}-api`,
             containerDefinitions: importTaskDefinition(path.join(__dirname, 'resources', 'ecs', 'tasks', 'api.json')),
-            executionRoleArn: ecsTaskExecRole.arn,
-            taskRoleArn: ecsTaskExecRole.arn,
+            executionRoleArn: ecsTaskRoleArn,
+            taskRoleArn: ecsTaskRoleArn,
             requiresCompatibilities: ['EC2'],
         })
 
@@ -114,8 +100,8 @@ class TkuStack extends TerraformStack {
         const httpsTask = new aws.ecsTaskDefinition.EcsTaskDefinition(this, `${name}-https-task`, {
             family: `${name}-https`,
             containerDefinitions: importTaskDefinition(path.join(__dirname, 'resources', 'ecs', 'tasks', 'https.json')),
-            executionRoleArn: ecsTaskExecRole.arn,
-            taskRoleArn: ecsTaskExecRole.arn,
+            executionRoleArn: ecsTaskRoleArn,
+            taskRoleArn: ecsTaskRoleArn,
             requiresCompatibilities: ['EC2'],
         })
 
@@ -172,8 +158,8 @@ class TkuStack extends TerraformStack {
         const dbTask = new aws.ecsTaskDefinition.EcsTaskDefinition(this, `${name}-db-task`, {
             family: `${name}-db`,
             containerDefinitions: importTaskDefinition(path.join(__dirname, 'resources', 'ecs', 'tasks', 'db.json')),
-            executionRoleArn: ecsTaskExecRole.arn,
-            taskRoleArn: ecsTaskExecRole.arn,
+            executionRoleArn: ecsTaskRoleArn,
+            taskRoleArn: ecsTaskRoleArn,
             requiresCompatibilities: ['EC2'],
         })
 
