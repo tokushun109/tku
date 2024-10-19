@@ -43,7 +43,7 @@ class TkuStack extends TerraformStack {
 
         const apiInstance = new aws.instance.Instance(this, `${name}-api-instance`, {
             ami: 'ami-01e9b1393f6f885a6',
-            associatePublicIpAddress: true,
+            associatePublicIpAddress: false,
             availabilityZone: 'ap-northeast-1a',
             iamInstanceProfile: 'ecsInstanceRole',
             instanceType: 't2.small',
@@ -62,6 +62,9 @@ class TkuStack extends TerraformStack {
                 Name: `${name}-api-instance`,
             },
             subnetId: subnetIds.a,
+            lifecycle: {
+                ignoreChanges: ['associate_public_ip_address'],
+            },
         })
 
         const apiEip = new aws.eip.Eip(this, `${name}-api-eip`, {
@@ -134,7 +137,7 @@ class TkuStack extends TerraformStack {
 
         const dbInstance = new aws.instance.Instance(this, `${name}-db-instance`, {
             ami: 'ami-01e9b1393f6f885a6',
-            associatePublicIpAddress: true,
+            associatePublicIpAddress: false,
             availabilityZone: 'ap-northeast-1a',
             iamInstanceProfile: 'ecsInstanceRole',
             instanceType: 't2.small',
@@ -153,7 +156,19 @@ class TkuStack extends TerraformStack {
                 Name: `${name}-db-instance`,
             },
             subnetId: subnetIds.a,
+            lifecycle: {
+                ignoreChanges: ['associate_public_ip_address'],
+            },
         })
+
+        // DBへのEIPの設定用
+        // new aws.eip.Eip(this, `${name}-db-eip`, {
+        //     domain: 'vpc',
+        //     instance: dbInstance.id,
+        //     tags: {
+        //         Name: `${name}-db-eip`,
+        //     },
+        // })
 
         const dbTask = new aws.ecsTaskDefinition.EcsTaskDefinition(this, `${name}-db-task`, {
             family: `${name}-db`,
