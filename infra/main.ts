@@ -5,11 +5,10 @@ import { compileForLambdaFunction } from './libs/compile'
 import path = require('path')
 import * as dotenv from 'dotenv'
 import { getDateString } from './libs/date'
-import { VPC_CIDR_BLOCK } from './constants/vpc'
-import { SUBNET_CIDR_BLOCK } from './constants/subnet'
 import { ECS_TASK_ASSUME_ROLE_POLICY, API_CLUSTER_NAME, DB_CLUSTER_NAME } from './constants/ecs'
 import { getUserData } from './resources/ec2/userData'
 import { importTaskDefinition } from './libs/task'
+import { NetworkResource } from './resources/network'
 
 interface OptionType {
     region: string
@@ -25,119 +24,8 @@ class TkuStack extends TerraformStack {
             region,
         })
 
-        // VPCの作成
-        const vpc = new aws.vpc.Vpc(this, `${name}-vpc`, {
-            cidrBlock: VPC_CIDR_BLOCK,
-            tags: {
-                Name: `${name}-vpc`,
-            },
-        })
-
-        // Subnetの作成
-        const publicSubnetA = new aws.subnet.Subnet(this, `${name}-public-subnet-a`, {
-            cidrBlock: SUBNET_CIDR_BLOCK.PublicA,
-            vpcId: vpc.id,
-            tags: {
-                Name: `${name}-public-subnet-a`,
-            },
-        })
-
-        new aws.subnet.Subnet(this, `${name}-public-subnet-c`, {
-            cidrBlock: SUBNET_CIDR_BLOCK.PublicC,
-            vpcId: vpc.id,
-            tags: {
-                Name: `${name}-public-subnet-c`,
-            },
-        })
-
-        // Internet Gatewayの作成
-        const internetGateway = new aws.internetGateway.InternetGateway(this, `${name}-igw`, {
-            vpcId: vpc.id,
-            tags: {
-                Name: `${name}-igw`,
-            },
-        })
-
-        // Route Tableの作成
-        new aws.routeTable.RouteTable(this, 'public-rt', {
-            vpcId: vpc.id,
-            route: [{ cidrBlock: '0.0.0.0/0', gatewayId: internetGateway.id }],
-            tags: {
-                Name: 'public-rt',
-            },
-        })
-
-        // Security Groupの作成
-        const apiSecurityGroup = new aws.securityGroup.SecurityGroup(this, 'public-ecs-sg', {
-            description: 'sg for public ecs',
-            egress: [
-                {
-                    cidrBlocks: ['0.0.0.0/0'],
-                    fromPort: 0,
-                    protocol: '-1',
-                    toPort: 0,
-                },
-            ],
-            ingress: [
-                {
-                    cidrBlocks: ['0.0.0.0/0'],
-                    fromPort: 443,
-                    protocol: 'tcp',
-                    toPort: 443,
-                },
-                {
-                    cidrBlocks: ['0.0.0.0/0'],
-                    fromPort: 8080,
-                    protocol: 'tcp',
-                    toPort: 8080,
-                },
-                {
-                    cidrBlocks: ['0.0.0.0/0'],
-                    fromPort: 80,
-                    protocol: 'tcp',
-                    toPort: 80,
-                },
-                {
-                    cidrBlocks: [process.env.HOME_IP!],
-                    fromPort: 22,
-                    protocol: 'tcp',
-                    toPort: 22,
-                },
-            ],
-            tags: {
-                Name: 'public-ecs-sg',
-            },
-        })
-
-        const dbSecurityGroup = new aws.securityGroup.SecurityGroup(this, 'db-sg', {
-            description: 'sg for db',
-            egress: [
-                {
-                    cidrBlocks: ['0.0.0.0/0'],
-                    fromPort: 0,
-                    protocol: '-1',
-                    toPort: 0,
-                },
-            ],
-            ingress: [
-                {
-                    cidrBlocks: [],
-                    fromPort: 3306,
-                    protocol: 'tcp',
-                    toPort: 3306,
-                    securityGroups: [apiSecurityGroup.id],
-                },
-                {
-                    cidrBlocks: [process.env.HOME_IP!],
-                    fromPort: 22,
-                    protocol: 'tcp',
-                    toPort: 22,
-                },
-            ],
-            tags: {
-                Name: 'db-sg',
-            },
-        })
+        // ネットワーク関連のリソースを作成
+        const { subnetIds, securityGroupIds } = new NetworkResource(this, name)
 
         // ecsのタスク実行用のroleを作成
         const ecsTaskExecRole = new aws.iamRole.IamRole(this, `${name}-ecs-task-exec-role`, {
@@ -175,7 +63,7 @@ class TkuStack extends TerraformStack {
             instanceType: 't2.small',
             keyName: `${name}_rsa`,
             userData: Buffer.from(getUserData(API_CLUSTER_NAME)).toString('base64'),
-            vpcSecurityGroupIds: [apiSecurityGroup.id],
+            vpcSecurityGroupIds: [securityGroupIds.api],
             instanceMarketOptions: {
                 marketType: 'spot',
                 spotOptions: {
@@ -187,7 +75,7 @@ class TkuStack extends TerraformStack {
             tags: {
                 Name: `${name}-api-instance`,
             },
-            subnetId: publicSubnetA.id,
+            subnetId: subnetIds.a,
         })
 
         const apiEip = new aws.eip.Eip(this, `${name}-api-eip`, {
@@ -266,7 +154,7 @@ class TkuStack extends TerraformStack {
             instanceType: 't2.small',
             keyName: `${name}_rsa`,
             userData: Buffer.from(getUserData(DB_CLUSTER_NAME)).toString('base64'),
-            vpcSecurityGroupIds: [dbSecurityGroup.id],
+            vpcSecurityGroupIds: [securityGroupIds.db],
             instanceMarketOptions: {
                 marketType: 'spot',
                 spotOptions: {
@@ -278,7 +166,7 @@ class TkuStack extends TerraformStack {
             tags: {
                 Name: `${name}-db-instance`,
             },
-            subnetId: publicSubnetA.id,
+            subnetId: subnetIds.a,
         })
 
         const dbTask = new aws.ecsTaskDefinition.EcsTaskDefinition(this, `${name}-db-task`, {
