@@ -5,11 +5,9 @@ import { compileForLambdaFunction } from './libs/compile'
 import path = require('path')
 import * as dotenv from 'dotenv'
 import { getDateString } from './libs/date'
-import { API_CLUSTER_NAME, DB_CLUSTER_NAME } from './constants/ecs'
-import { getUserData } from './resources/ec2/userData'
-import { importTaskDefinition } from './libs/task'
 import { NetworkResource } from './resources/network'
-import { EcsTaskRole } from './resources/ecs'
+import { EcsClusterResource, EcsTaskRole, ServiceEnum } from './resources/ecs'
+import { SecretsManagerResource } from './resources/asm'
 
 interface OptionType {
     region: string
@@ -31,197 +29,32 @@ class TkuStack extends TerraformStack {
         // ECSのタスク実行用のroleを作成
         const { roleArn: ecsTaskRoleArn } = new EcsTaskRole(this, name)
 
-        const apiCluster = new aws.ecsCluster.EcsCluster(this, `${name}-ecs-api-cluster`, {
-            name: API_CLUSTER_NAME,
-            setting: [
-                {
-                    name: 'containerInsights',
-                    value: 'disabled',
-                },
-            ],
-        })
+        // APIのECSクラスターに関連するリソースを作成
+        const { instance: apiInstance } = new EcsClusterResource(this, name, ServiceEnum.Api, securityGroupIds.api, subnetIds.a, ecsTaskRoleArn)
 
-        const apiInstance = new aws.instance.Instance(this, `${name}-api-instance`, {
-            ami: 'ami-01e9b1393f6f885a6',
-            associatePublicIpAddress: false,
-            availabilityZone: 'ap-northeast-1a',
-            iamInstanceProfile: 'ecsInstanceRole',
-            instanceType: 't2.small',
-            keyName: `${name}_rsa`,
-            userData: Buffer.from(getUserData(API_CLUSTER_NAME)).toString('base64'),
-            vpcSecurityGroupIds: [securityGroupIds.api],
-            instanceMarketOptions: {
-                marketType: 'spot',
-                spotOptions: {
-                    maxPrice: '0.030400',
-                    spotInstanceType: 'one-time',
-                },
-            },
-            monitoring: false,
-            tags: {
-                Name: `${name}-api-instance`,
-            },
-            subnetId: subnetIds.a,
-            lifecycle: {
-                ignoreChanges: ['associate_public_ip_address'],
-            },
-        })
-
-        const apiEip = new aws.eip.Eip(this, `${name}-api-eip`, {
+        // apiインスタンスをEIPに紐付け
+        const apiEip = new aws.eip.Eip(this, `${name}-${ServiceEnum.Api}-eip`, {
             domain: 'vpc',
             instance: apiInstance.id,
             tags: {
-                Name: `${name}-api-eip`,
+                Name: `${name}-${ServiceEnum.Api}-eip`,
             },
         })
 
-        const apiTask = new aws.ecsTaskDefinition.EcsTaskDefinition(this, `${name}-api-task`, {
-            family: `${name}-api`,
-            containerDefinitions: importTaskDefinition(path.join(__dirname, 'resources', 'ecs', 'tasks', 'api.json')),
-            executionRoleArn: ecsTaskRoleArn,
-            taskRoleArn: ecsTaskRoleArn,
-            requiresCompatibilities: ['EC2'],
-        })
+        // DBのECSクラスターに関連するリソースを作成
+        const { instance: dbInstance } = new EcsClusterResource(this, name, ServiceEnum.Db, securityGroupIds.db, subnetIds.a, ecsTaskRoleArn)
 
-        new aws.ecsService.EcsService(this, `${name}-api-service`, {
-            name: `${name}-api-service`,
-            cluster: apiCluster.id,
-            taskDefinition: apiTask.arn,
-            desiredCount: 1,
-            orderedPlacementStrategy: [
-                {
-                    field: 'attribute:ecs.availability-zone',
-                    type: 'spread',
-                },
-                {
-                    field: 'instanceId',
-                    type: 'spread',
-                },
-            ],
-        })
-
-        const httpsTask = new aws.ecsTaskDefinition.EcsTaskDefinition(this, `${name}-https-task`, {
-            family: `${name}-https`,
-            containerDefinitions: importTaskDefinition(path.join(__dirname, 'resources', 'ecs', 'tasks', 'https.json')),
-            executionRoleArn: ecsTaskRoleArn,
-            taskRoleArn: ecsTaskRoleArn,
-            requiresCompatibilities: ['EC2'],
-        })
-
-        new aws.ecsService.EcsService(this, `${name}-https-service`, {
-            name: `${name}-https-service`,
-            cluster: apiCluster.id,
-            taskDefinition: httpsTask.arn,
-            desiredCount: 1,
-            orderedPlacementStrategy: [
-                {
-                    field: 'attribute:ecs.availability-zone',
-                    type: 'spread',
-                },
-                {
-                    field: 'instanceId',
-                    type: 'spread',
-                },
-            ],
-        })
-
-        const dbCluster = new aws.ecsCluster.EcsCluster(this, `${name}-ecs-db-cluster`, {
-            name: DB_CLUSTER_NAME,
-            setting: [
-                {
-                    name: 'containerInsights',
-                    value: 'disabled',
-                },
-            ],
-        })
-
-        const dbInstance = new aws.instance.Instance(this, `${name}-db-instance`, {
-            ami: 'ami-01e9b1393f6f885a6',
-            associatePublicIpAddress: false,
-            availabilityZone: 'ap-northeast-1a',
-            iamInstanceProfile: 'ecsInstanceRole',
-            instanceType: 't2.small',
-            keyName: `${name}_rsa`,
-            userData: Buffer.from(getUserData(DB_CLUSTER_NAME)).toString('base64'),
-            vpcSecurityGroupIds: [securityGroupIds.db],
-            instanceMarketOptions: {
-                marketType: 'spot',
-                spotOptions: {
-                    maxPrice: '0.030400',
-                    spotInstanceType: 'one-time',
-                },
-            },
-            monitoring: false,
-            tags: {
-                Name: `${name}-db-instance`,
-            },
-            subnetId: subnetIds.a,
-            lifecycle: {
-                ignoreChanges: ['associate_public_ip_address'],
-            },
-        })
-
-        // DBへのEIPの設定用
-        // new aws.eip.Eip(this, `${name}-db-eip`, {
+        // DBインスタンスに対してのEIP
+        // new aws.eip.Eip(this, `${name}-${ServiceEnum.Db}-eip`, {
         //     domain: 'vpc',
         //     instance: dbInstance.id,
         //     tags: {
-        //         Name: `${name}-db-eip`,
+        //         Name: `${name}-${ServiceEnum.Db}-eip`,
         //     },
         // })
 
-        const dbTask = new aws.ecsTaskDefinition.EcsTaskDefinition(this, `${name}-db-task`, {
-            family: `${name}-db`,
-            containerDefinitions: importTaskDefinition(path.join(__dirname, 'resources', 'ecs', 'tasks', 'db.json')),
-            executionRoleArn: ecsTaskRoleArn,
-            taskRoleArn: ecsTaskRoleArn,
-            requiresCompatibilities: ['EC2'],
-        })
-
-        new aws.ecsService.EcsService(this, `${name}-db-service`, {
-            name: `${name}-db-service`,
-            cluster: dbCluster.id,
-            taskDefinition: dbTask.arn,
-            desiredCount: 1,
-            orderedPlacementStrategy: [
-                {
-                    field: 'attribute:ecs.availability-zone',
-                    type: 'spread',
-                },
-                {
-                    field: 'instanceId',
-                    type: 'spread',
-                },
-            ],
-        })
-
-        const secretsManager = new aws.secretsmanagerSecret.SecretsmanagerSecret(this, `${name}-secrets-manager`, {
-            name: `${name}-secrets-manager`,
-            description: `${name}-secrets-manager`,
-        })
-
-        new aws.secretsmanagerSecretVersion.SecretsmanagerSecretVersion(this, `${name}-secrets-manager-version`, {
-            secretId: secretsManager.id,
-            secretString: JSON.stringify({
-                API_BASE_URL: process.env.API_BASE_URL,
-                DB_PASS: process.env.DB_PASS,
-                MYSQL_ROOT_PASSWORD: process.env.MYSQL_ROOT_PASSWORD,
-                DB_USER: process.env.DB_USER,
-                CREATOR_NAME: process.env.CREATOR_NAME,
-                DB_NAME: process.env.DB_NAME,
-                ENV: 'prod',
-                MYSQL_HOST: dbInstance.privateIp,
-                AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
-                AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
-                AWS_REGION: process.env.AWS_REGION,
-                API_BUCKET_NAME: process.env.API_BUCKET_NAME,
-                SEND_GRID_API_KEY: process.env.SEND_GRID_API_KEY,
-                LINE_CONTACT_TOKEN: process.env.LINE_CONTACT_TOKEN,
-                CLIENT_URL: process.env.CLIENT_URL,
-                DOMAINS: `api.tocoriri.com -> http://${apiEip.publicIp}:8080`,
-                STAGE: process.env.STAGE,
-            }),
-        })
+        // Amazon Secrets Managerのリソースを作成
+        new SecretsManagerResource(this, name, dbInstance.privateIp, apiEip.publicIp)
 
         // lambda関数用のハンドラをコンパイルする
         const lambda = new compileForLambdaFunction(this, name, {
@@ -284,8 +117,6 @@ class TkuStack extends TerraformStack {
             },
         })
     }
-
-    // TODO: 冗長なコードの書き方をリファクタする
 }
 
 const app = new App()
