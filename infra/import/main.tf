@@ -38,3 +38,8 @@ resource "aws_ecs_service" "tku-api-service" {
 resource "aws_ecs_task_definition" "tku-api-task-definition" {
 
 }
+
+resource "aws_secretsmanager_secret" "tku-secret-manager" {
+
+}
+

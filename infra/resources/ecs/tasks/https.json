@@ -26,20 +26,13 @@
             "secrets": [
                 {
                     "name": "DOMAINS",
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:DOMAINS::"
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku-secrets-manager-wndNhr:DOMAINS::"
                 },
                 {
                     "name": "STAGE",
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku_prod_env-SBS9fy:STAGE::"
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:418549683327:secret:tku-secrets-manager-wndNhr:STAGE::"
                 }
             ]
         }
-    ],
-    "family": "https-prod",
-    "volumes": [],
-    "placementConstraints": [],
-    "requiresCompatibilities": [
-        "EC2"
-    ],
-    "tags": []
+    ]
 }
