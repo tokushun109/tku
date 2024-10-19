@@ -1,6 +1,6 @@
 {
     "ipcMode": null,
-    "executionRoleArn": "arn:aws:iam::418549683327:role/tku-task-role",
+    "executionRoleArn": "arn:aws:iam::418549683327:role/tku-ecs-task-exec-role",
     "containerDefinitions": [
         {
             "image": "418549683327.dkr.ecr.ap-northeast-1.amazonaws.com/tku_api",
@@ -115,8 +115,8 @@
     ],
     "placementConstraints": [],
     "memory": null,
-    "taskRoleArn": "arn:aws:iam::418549683327:role/tku-task-role",
-    "family": "api-prod",
+    "taskRoleArn": "arn:aws:iam::418549683327:role/tku-ecs-task-exec-role",
+    "family": "tku-api",
     "pidMode": null,
     "requiresCompatibilities": [
         "EC2"

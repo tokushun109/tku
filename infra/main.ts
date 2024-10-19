@@ -157,7 +157,6 @@ class TkuStack extends TerraformStack {
             role: ecsTaskExecRole.name,
         })
 
-        // TODO: 空のECSクラスターを作成する
         const apiCluster = new aws.ecsCluster.EcsCluster(this, `${name}-ecs-api-cluster`, {
             name: API_CLUSTER_NAME,
             setting: [
@@ -168,7 +167,6 @@ class TkuStack extends TerraformStack {
             ],
         })
 
-        // TODO: ECSで使用する用のEC2を作成して、作成したECSクラスターと関連付ける
         const apiInstance = new aws.instance.Instance(this, `${name}-api-instance`, {
             ami: 'ami-01e9b1393f6f885a6',
             associatePublicIpAddress: true,
