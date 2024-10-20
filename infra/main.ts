@@ -53,7 +53,7 @@ class TkuStack extends TerraformStack {
         // })
 
         // Amazon Secrets Managerのリソースを作成
-        new SecretsManagerResource(this, name, dbInstance.privateIp, apiEip.publicIp)
+        new SecretsManagerResource(this, name, apiEip.publicIp, dbInstance.privateIp)
 
         // ヘルスチェック用のlambda関数を作成
         const { lambdaFunction } = new LambdaResource(this, name, 'health-check')
