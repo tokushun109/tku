@@ -1,13 +1,12 @@
 import { Construct } from 'constructs'
 import { App, TerraformStack } from 'cdktf'
 import * as aws from '@cdktf/provider-aws/lib'
-import { compileForLambdaFunction } from './libs/compile'
-import path = require('path')
 import * as dotenv from 'dotenv'
-import { getDateString } from './libs/date'
 import { NetworkResource } from './resources/network'
 import { EcsClusterResource, EcsTaskRole, ServiceEnum } from './resources/ecs'
 import { SecretsManagerResource } from './resources/asm'
+import { LambdaResource } from './resources/lambda/healthCheck/handlers'
+import { EventBridgeResource } from './resources/eventBridge'
 
 interface OptionType {
     region: string
@@ -56,66 +55,11 @@ class TkuStack extends TerraformStack {
         // Amazon Secrets Managerのリソースを作成
         new SecretsManagerResource(this, name, dbInstance.privateIp, apiEip.publicIp)
 
-        // lambda関数用のハンドラをコンパイルする
-        const lambda = new compileForLambdaFunction(this, name, {
-            path: path.join(__dirname, 'resources', 'lambda', 'healthCheck', 'handlers'),
-        })
+        // ヘルスチェック用のlambda関数を作成
+        const { lambdaFunction } = new LambdaResource(this, name, 'health-check')
 
-        const lambdaAssumeRolePolicy = {
-            Version: '2012-10-17',
-            Statement: [
-                {
-                    Action: 'sts:AssumeRole',
-                    Principal: {
-                        Service: 'lambda.amazonaws.com',
-                    },
-                    Effect: 'Allow',
-                },
-            ],
-        }
-
-        // lambda実行用のroleを作成
-        const role = new aws.iamRole.IamRole(this, 'lambda-exec', {
-            name: `${name}-lambda-role`,
-            assumeRolePolicy: JSON.stringify(lambdaAssumeRolePolicy),
-        })
-
-        // CloudWatchログへの書き込み権限を追加
-        const policyArn = 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
-
-        new aws.iamRolePolicyAttachment.IamRolePolicyAttachment(this, 'lambda-managed-policy', {
-            policyArn,
-            role: role.name,
-        })
-
-        // lambdaのarchiveを保存するS3を作成
-        const bucket = new aws.s3Bucket.S3Bucket(this, `${name}-lambda-archive`, {
-            bucket: `${name}-lambda-archive`,
-        })
-
-        // S3にlambda関数をアップロード
-        const lambdaArchive = new aws.s3Object.S3Object(this, 'lambda-archive', {
-            bucket: bucket.bucket,
-            key: `${name}/${getDateString()}/${lambda.asset.fileName}`,
-            source: lambda.asset.path,
-        })
-
-        // lambdaを作成
-        new aws.lambdaFunction.LambdaFunction(this, `lambda-function-${name}-health-check`, {
-            functionName: `${name}-health-check`,
-            s3Bucket: bucket.bucket,
-            s3Key: lambdaArchive.key,
-            timeout: 30,
-            handler: 'index.handler',
-            runtime: 'nodejs18.x',
-            memorySize: 512,
-            role: role.arn,
-            environment: {
-                variables: {
-                    LINE_HEALTH_CHECK_TOKEN: process.env.LINE_HEALTH_CHECK_TOKEN!,
-                },
-            },
-        })
+        // ヘルスチェックのlambda関数を6時〜20時の間で1時間おきに実行(cron式はUTCを日本時間に変換したものを設定)
+        new EventBridgeResource(this, name, 'health-check', lambdaFunction, 'cron(0 21-23,0-11/1 * * ? *)')
     }
 }
 

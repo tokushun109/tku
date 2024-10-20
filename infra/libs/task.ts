@@ -1,5 +1,7 @@
 import * as fs from 'fs'
-import { TaskDefinition } from '../resources/ecs/types'
+interface TaskDefinition {
+    containerDefinitions: string
+}
 
 export const importTaskDefinition = (path: string): string => {
     const { containerDefinitions }: TaskDefinition = JSON.parse(fs.readFileSync(path, 'utf-8'))

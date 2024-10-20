@@ -4,7 +4,7 @@ import { getUserData } from '../ec2/userData'
 import { importTaskDefinition } from '../../libs/task'
 import path = require('path')
 
-export const ECS_TASK_ASSUME_ROLE_POLICY = {
+const ECS_TASK_ASSUME_ROLE_POLICY = {
     Version: '2012-10-17',
     Statement: [
         {
@@ -22,7 +22,7 @@ export class EcsTaskRole {
 
     constructor(private stack: TerraformStack, private name: string) {
         // ecsのタスク実行用のroleを作成
-        const ecsTaskExecRole = new aws.iamRole.IamRole(this.stack, `${this.name}-ecs-task-exec-role`, {
+        const role = new aws.iamRole.IamRole(this.stack, `${this.name}-ecs-task-exec-role`, {
             name: `${name}-ecs-task-exec-role`,
             assumeRolePolicy: JSON.stringify(ECS_TASK_ASSUME_ROLE_POLICY),
         })
@@ -36,10 +36,10 @@ export class EcsTaskRole {
         new aws.iamRolePolicyAttachment.IamRolePolicyAttachment(this.stack, `${this.name}-ecs-task-managed-policy`, {
             forEach: policyArnsIterator,
             policyArn: policyArnsIterator.value,
-            role: ecsTaskExecRole.name,
+            role: role.name,
         })
 
-        this.roleArn = ecsTaskExecRole.arn
+        this.roleArn = role.arn
     }
 }
 
