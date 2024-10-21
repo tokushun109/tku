@@ -1,7 +1,7 @@
 <template>
     <v-card
         width="100%"
-        :class="{ 'is-active': listItem.isActive }"
+        :class="{ 'is-active': listItem.isActive, 'is-recommend': listItem.isActive && listItem.isRecommend }"
         hover
         class="c-product-card"
         @click.native="$emit('c-click', ExecutionType.Detail, listItem)"
@@ -10,6 +10,8 @@
             <div class="product-card-header">
                 <div class="product-name">
                     {{ listItem.name }}
+                </div>
+                <div class="product-status">
                     <v-chip v-if="admin && listItem.isRecommend" x-small :color="ColorType.Accent" :text-color="ColorType.White">おすすめ</v-chip>
                     <v-chip v-if="!listItem.isActive" x-small :color="ColorType.Grey" :text-color="ColorType.White">展示</v-chip>
                 </div>
@@ -68,6 +70,8 @@ export default class CProductCard extends Vue {
     background-color $light-dark-color
     &.is-active
         background-color $accent-light-color
+    &.is-recommend
+        background-color $bright-color
     .product-card-wrapper
         .product-card-header
             margin 5px 0
@@ -79,6 +83,12 @@ export default class CProductCard extends Vue {
                 white-space nowrap
                 font-weight $title-font-weight
                 font-size $font-xlarge
+            .product-status
+                height 24px
+                display flex
+                align-items center
+                gap 8px
+                justify-content flex-end
         .product-card-image-container
             position relative
             .product-category
