@@ -1,13 +1,20 @@
 import { Context } from '@nuxt/types'
 
 export default async function ({ app, route, store, redirect }: Context) {
+    try {
+        await app.$axios.$get('/health_check', { withCredentials: true })
+    } catch (e) {
+        redirect('/maintenance')
+    }
+
+    // CSRの時は認証処理を行わない
+    if (!process.server) {
+        return
+    }
+
     // /creatorを/aboutにリダイレクトさせる
     if (route.path === '/creator') {
         return redirect('/about')
-    }
-    // SSRの時は認証処理を行わない
-    if (!process.server) {
-        return
     }
 
     // ログイン画面の時は認証処理を行わない
