@@ -5,7 +5,7 @@
                 <v-main>
                     <site-layout />
                     <Nuxt />
-                    <site-footer />
+                    <site-footer v-if="!isMaintenance" />
                 </v-main>
             </template>
             <template v-else>
@@ -29,9 +29,14 @@ export default class LayoutDefault extends Vue {
         return this.$route.path.includes('admin')
     }
 
+    // urlにmaintenanceが含まれているかを確認
+    get isMaintenance() {
+        return this.$route.path.includes('maintenance')
+    }
+
     head() {
         const url = (process.env.DOMAIN_URL || 'https://tocoriri.com') + this.$route.path
-        const robots = this.isAdmin ? 'noindex' : ''
+        const robots = this.isAdmin || this.isMaintenance ? 'noindex' : ''
         return {
             meta: [
                 {

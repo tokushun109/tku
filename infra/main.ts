@@ -43,7 +43,7 @@ class TkuStack extends TerraformStack {
         // DBのECSクラスターに関連するリソースを作成
         const { instance: dbInstance } = new EcsClusterResource(this, name, ServiceEnum.Db, securityGroupIds.db, subnetIds.a, ecsTaskRoleArn)
 
-        // DBインスタンスに対してのEIP
+        // // DBインスタンスに対してのEIP
         // new aws.eip.Eip(this, `${name}-${ServiceEnum.Db}-eip`, {
         //     domain: 'vpc',
         //     instance: dbInstance.id,

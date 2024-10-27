@@ -1,5 +1,5 @@
 #!/bin/bash
 
 set -e
-go build -o ./bin/main
+go install github.com/cosmtrek/air@v1.40.0
 air
