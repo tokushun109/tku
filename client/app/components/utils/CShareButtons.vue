@@ -16,7 +16,7 @@
                 small
                 :large="!small"
             >
-                <v-icon :color="contentColor" :x-large="!small">{{ mdiTwitter }}</v-icon>
+                <v-img :src="'img/sns/x.svg'" max-width="16" aspect-ratio="1" alt="x-fa-icon" />
             </v-btn>
             <v-btn
                 class="share-button"
