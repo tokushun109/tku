@@ -24,7 +24,6 @@ export class SecretsManagerResource {
                 AWS_REGION: process.env.AWS_REGION,
                 API_BUCKET_NAME: process.env.API_BUCKET_NAME,
                 SEND_GRID_API_KEY: process.env.SEND_GRID_API_KEY,
-                LINE_CONTACT_TOKEN: process.env.LINE_CONTACT_TOKEN,
                 CLIENT_URL: process.env.CLIENT_URL,
                 DOMAINS: `api.tocoriri.com -> http://${this.apiPublicIp}:8080`,
                 STAGE: process.env.STAGE,

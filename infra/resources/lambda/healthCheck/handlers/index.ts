@@ -65,6 +65,7 @@ export class LambdaResource {
             environment: {
                 variables: {
                     LINE_HEALTH_CHECK_TOKEN: process.env.LINE_HEALTH_CHECK_TOKEN!,
+                    LINE_HEALTH_CHECK_USER_ID: process.env.LINE_HEALTH_CHECK_USER_ID!,
                 },
             },
         })
