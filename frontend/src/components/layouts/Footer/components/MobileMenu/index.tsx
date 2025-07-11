@@ -9,7 +9,7 @@ import { labelFontFace } from '@/utils/font'
 
 import styles from './styles.module.scss'
 
-const MobileMenu = () => {
+export const MobileMenu = () => {
     const router = useRouter()
     const pathname = usePathname() as NavigationType
 
@@ -35,5 +35,3 @@ const MobileMenu = () => {
         </ul>
     )
 }
-
-export default MobileMenu
