@@ -1,0 +1,32 @@
+.container {
+    position: relative;
+    background: $primary;
+    color: $white-text-color;
+    text-align: center;
+    width: 100%;
+    padding: 12px;
+
+    @include media(sm) {
+        padding-bottom: 78px;
+    }
+
+    span {
+        font-size: 10px;
+    }
+
+    .mobile-menu {
+        display: none;
+        width: 100vw;
+        position: fixed;
+        background: $primary-bg-color;
+        color: $primary;
+        z-index: 9999;
+        bottom: 0;
+        left: 0;
+        box-shadow: $box-shadow;
+
+        @include media(sm) {
+            display: block;
+        }
+    }
+}

@@ -1,0 +1,29 @@
+.container {
+    .main {
+        margin: 0 auto;
+        max-width: $xl;
+        min-height: calc(100svh - $pc-footer-height);
+        padding: 0 48px;
+
+        @include media(sm) {
+            padding: 0 16px;
+            min-height: calc(100svh - $sp-footer-height - $sp-menu-height);
+        }
+
+        .title {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 160px;
+            font-size: 70px;
+            font-weight: 700;
+            color: $primary;
+
+            &.default {
+                @include media(sm) {
+                    display: none;
+                }
+            }
+        }
+    }
+}

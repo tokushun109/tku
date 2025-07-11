@@ -1,0 +1,25 @@
+.container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+
+    &.shadow {
+        box-shadow: $box-shadow;
+    }
+
+    .chip {
+        position: absolute;
+        z-index: 1;
+
+        &.category {
+            top: 8px;
+            left: 8px;
+        }
+
+        &.name {
+            bottom: 12px;
+            right: 20px;
+        }
+    }
+}

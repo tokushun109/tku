@@ -1,0 +1,31 @@
+.container {
+    position: relative;
+    color: $primary;
+    text-align: center;
+
+    &.selected {
+        color: $accent;
+    }
+
+    .content {
+        padding: 32px;
+
+        .icon {
+            svg {
+                font-size: 6em; // iconのサイズ
+
+                @include media(md) {
+                    font-size: 5em;
+                }
+            }
+        }
+
+        .label {
+            font-size: 48px;
+
+            @include media(md) {
+                font-size: 36px;
+            }
+        }
+    }
+}

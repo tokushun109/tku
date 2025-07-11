@@ -1,0 +1,28 @@
+.container {
+    display: flex;
+    cursor: pointer;
+
+    .menu-list {
+        padding: 8px 0;
+        text-align: center;
+        width: calc(100% / 3);
+        transition: $transition;
+
+        &:hover {
+            background: #eeeeee;
+            opacity: 0.8;
+        }
+
+        &.active {
+            color: $accent;
+        }
+
+        .icon {
+            height: 24px;
+        }
+
+        .label {
+            font-size: 12px;
+        }
+    }
+}

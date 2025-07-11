@@ -1,0 +1,34 @@
+$product-list-gap: 16px;
+
+.container {
+    .category-name {
+        text-align: left;
+        font-size: 30px;
+        margin-bottom: 24px;
+        color: $text-color;
+        font-weight: $title-font-weight;
+
+        @include media(sm) {
+            font-size: 20px;
+        }
+    }
+
+    .product-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: $product-list-gap;
+        margin-bottom: 24px;
+
+        .product-thumbnail {
+            width: calc((100% - $product-list-gap * 3) / 4);
+
+            @include media(md) {
+                width: calc((100% - $product-list-gap * 1) / 2);
+            }
+        }
+    }
+
+    .more-button {
+        text-align: center;
+    }
+}

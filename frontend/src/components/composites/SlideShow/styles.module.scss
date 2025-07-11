@@ -1,0 +1,88 @@
+.container {
+    box-shadow: $box-shadow;
+    display: flex;
+    align-items: center;
+
+    .wrapper {
+        position: relative;
+        overflow-x: hidden;
+        display: flex;
+        width: 100%;
+        height: 100%;
+        justify-content: center;
+        align-items: center;
+
+        .content {
+            position: absolute;
+            transition: $transition;
+
+            &.previous {
+                transform: translateX(-100vw);
+
+                &.left-swipe {
+                    animation: left-previous-swipe 0.3s ease-in-out;
+                }
+            }
+
+            &.display {
+                transform: translateX(0);
+
+                &.right-swipe {
+                    animation: right-display-swipe 0.3s ease-in-out;
+                }
+
+                &.left-swipe {
+                    animation: left-display-swipe 0.3s ease-in-out;
+                }
+            }
+
+            &.next {
+                transform: translateX(100vw);
+
+                &.right-swipe {
+                    animation: right-next-swipe 0.3s ease-in-out;
+                }
+            }
+        }
+    }
+}
+
+@keyframes left-previous-swipe {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(calc(-1 * (100% + 16px)));
+    }
+}
+
+@keyframes left-display-swipe {
+    from {
+        transform: translateX(calc(100% + 16px));
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes right-display-swipe {
+    from {
+        transform: translateX(calc(-1 * (100% + 16px)));
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes right-next-swipe {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(calc(100% + 16px));
+    }
+}

@@ -1,0 +1,43 @@
+$gap: 24px;
+$image-size: 512px;
+$image-length: 10; // 画像の数
+
+// ループカルーセルのアニメーション
+@keyframes loop-slide {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        // (イメージの数 + 1) ✖️ 画像幅 + paddingと画像のgap
+        transform: translate(calc((-1 * $image-size * ($image-length + 1) + $gap * (2 + $image-length - 1))));
+    }
+}
+
+.container {
+    position: relative;
+    height: calc($image-size + ($gap * 2));
+    background: $accent-light-color;
+    padding: $gap;
+    overflow-x: hidden;
+
+    .wrapper {
+        position: absolute;
+        background: $accent-light-color;
+        display: flex;
+        gap: $gap;
+        animation: loop-slide 60s infinite linear 1s both;
+
+        .product-image {
+            cursor: pointer;
+            flex-grow: 1;
+            aspect-ratio: 1 /1;
+            width: $image-size;
+            transition: $transition;
+
+            &:hover {
+                transform: translateY(-12px);
+            }
+        }
+    }
+}

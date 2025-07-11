@@ -1,0 +1,50 @@
+.container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+
+    .image-container {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        border-radius: 12px;
+
+        .chip {
+            position: absolute;
+            z-index: 1;
+            bottom: 12px;
+            right: 12px;
+        }
+    }
+
+    .name {
+        overflow: hidden;
+        padding: 4px 0;
+        color: $text-color;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: $font-large;
+
+        @include media(sm) {
+            font-size: $font-medium;
+        }
+    }
+
+    .price {
+        color: $black-text-color;
+        font-size: $font-xlarge;
+
+        span {
+            font-size: 12px;
+        }
+
+        @include media(sm) {
+            font-size: $font-large;
+
+            span {
+                font-size: $font-medium;
+            }
+        }
+    }
+}
