@@ -1,0 +1,48 @@
+.container {
+    position: relative;
+
+    .header {
+        display: none;
+        text-align: center;
+        height: 48px;
+        background: $primary;
+
+        &.sm {
+            @include media(sm) {
+                display: block;
+
+                .logo-area {
+                    cursor: pointer;
+                }
+            }
+        }
+    }
+
+    .menu-icon {
+        position: fixed;
+        display: inline-block;
+        top: 32px;
+        right: 32px;
+        z-index: 9998;
+
+        &.default {
+            @include media(sm) {
+                display: none;
+            }
+        }
+    }
+
+    .menu-screen {
+        position: relative;
+        z-index: 9999;
+        position: fixed;
+        top: 0;
+        left: 0;
+
+        &.default {
+            @include media(sm) {
+                display: none;
+            }
+        }
+    }
+}

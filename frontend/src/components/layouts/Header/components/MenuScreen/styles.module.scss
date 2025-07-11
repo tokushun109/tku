@@ -1,0 +1,47 @@
+.container {
+    text-align: center;
+    background: $primary;
+    width: 100vw;
+    height: 100vh;
+
+    .logo-area {
+        display: inline-block;
+        user-select: none;
+        margin-top: 24px;
+        cursor: pointer;
+    }
+
+    .close-icon {
+        display: inline-block;
+        position: fixed;
+        top: 32px;
+        right: 32px;
+
+        @include media(sm) {
+            display: none;
+        }
+    }
+
+    .icon-card-area {
+        align-items: center;
+        max-width: $lg;
+        text-align: center;
+        margin: 0 auto;
+        padding: 24px;
+
+        &-wrapper {
+            display: flex;
+            gap: 24px;
+            width: 100%;
+
+            .icon-card {
+                width: calc(100% / 3 - 16px);
+                transition: $transition;
+
+                &:hover {
+                    transform: translateY(-16px);
+                }
+            }
+        }
+    }
+}

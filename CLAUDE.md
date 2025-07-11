@@ -6,7 +6,7 @@
 
 ハンドメイドアクセサリー作家「tku」の商品販売サイト（tocoriri.com）です。プロジェクト構成：
 
-- **フロントエンド**: Vue.js 2 + Nuxt.js 2 with TypeScript、AWS Lambda にデプロイ
+- **フロントエンド**: Next.js with TypeScript への移行中（従来の Vue.js 2 + Nuxt.js 2 から置き換え）
 - **バックエンド**: Go REST API with GORM、AWS ECS にデプロイ
 - **データベース**: MySQL with golang-migrate によるスキーマ管理
 - **インフラ**: CDK for Terraform による AWS リソース管理
@@ -25,7 +25,23 @@ docker-compose up
 # - データベース: localhost:3306
 ```
 
-### フロントエンド（client/）
+### フロントエンド（新規開発：frontend/）
+
+```bash
+# 依存関係インストール
+yarn install
+
+# 開発サーバー
+yarn dev
+
+# ビルド
+yarn build
+
+# コードリント
+yarn lint
+```
+
+### レガシーフロントエンド（client/）
 
 ```bash
 # 依存関係インストール
@@ -73,7 +89,15 @@ cdktf synth
 
 ## プロジェクトアーキテクチャ
 
-### フロントエンド構造
+### 新規フロントエンド構造（frontend/）
+
+- **Pages/App Router**: Next.js App Router による自動ルーティング
+- **Components**: 機能別に整理された React コンポーネント
+- **管理画面**: 自作の管理者向けコンテンツ管理画面
+- **Types**: TypeScript 型定義
+- **Store**: 状態管理（Redux Toolkit または Zustand）
+
+### レガシーフロントエンド構造（client/）
 
 - **Pages**: `/pages/` - Nuxt.js 自動ルーティング対応ページ
 - **Components**: `/components/` - 機能別に整理された Vue.js コンポーネント
@@ -120,7 +144,17 @@ cdktf synth
 ## 重要な注意事項
 
 - 日本語の EC サイト（コンテンツは日本語）
-- Vue 2 / Nuxt 2（旧バージョン）を TypeScript で使用
+- **フロントエンド移行中**: Next.js で新規開発（frontend/）、レガシーコードは client/ に残存
+- 新規実装では元の client/ アプリの外観と動作を忠実に再現することが目標
 - バックエンドはフレームワークなしの Go + Gorilla Mux
 - データベースマイグレーションはバージョン管理され ECS タスクで実行
 - 画像は S3 に UUID ベースで保存
+
+## 開発方針
+
+### フロントエンド移行について
+
+- **移行対象**: client/ ディレクトリの Vue.js 2 + Nuxt.js 2 アプリケーション
+- **移行先**: frontend/ ディレクトリの Next.js + TypeScript アプリケーション
+- **移行目標**: 元のアプリケーションの UI/UX を忠実に再現し、機能を完全に移植
+- **並行開発**: レガシーコードを参照しながら新規実装を進める

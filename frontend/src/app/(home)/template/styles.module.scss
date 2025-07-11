@@ -1,0 +1,63 @@
+.container {
+    text-align: center;
+    position: relative;
+
+    .logo-area {
+        height: 200px;
+        display: inline-block;
+        user-select: none;
+        margin-top: 24px;
+
+        &.default {
+            @include media(sm) {
+                display: none;
+            }
+        }
+    }
+
+    .carousel-area {
+        &.default {
+            @include media(sm) {
+                display: none;
+            }
+        }
+    }
+
+    .slide-show-area {
+        &.sm {
+            display: none;
+
+            @include media(sm) {
+                display: flex;
+                margin-top: 16px;
+                justify-content: center;
+            }
+        }
+    }
+
+    .border {
+        height: 1px;
+        width: 100%;
+    }
+
+    .indicator {
+        position: absolute;
+        top: 92vh;
+        right: 8px;
+        color: $primary;
+
+        @include media(sm) {
+            top: 60vh;
+        }
+    }
+
+    br {
+        &.sm {
+            display: none;
+
+            @include media(sm) {
+                display: block;
+            }
+        }
+    }
+}

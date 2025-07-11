@@ -1,0 +1,23 @@
+.container {
+    padding: 48px 0 80px;
+
+    .title {
+        margin-bottom: 10px;
+        text-align: center;
+        font-size: 56px;
+        font-weight: $title-font-weight;
+
+        @include media(sm) {
+            font-size: 40px;
+        }
+    }
+
+    .sentence {
+        margin-top: 48px;
+        line-height: 42px;
+    }
+
+    .button {
+        margin-top: 48px;
+    }
+}

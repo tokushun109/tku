@@ -1,0 +1,74 @@
+$suffix-size: 24px;
+$suffix-gap: 8px;
+$side-padding: 16px;
+
+.container {
+    background: white;
+    font-size: $font-normal;
+    user-select: none;
+    cursor: pointer;
+
+    &__title {
+        position: relative;
+        overflow: hidden;
+        padding: 12px $side-padding;
+        display: flex;
+        gap: $suffix-gap;
+        transition: background 0.2s;
+
+        &__suffix {
+            width: $suffix-size;
+            height: $suffix-size;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            &.active {
+                color: $title-primary-color;
+            }
+        }
+
+        &:hover {
+            background: rgba(123, 103, 91, 0.2);
+        }
+    }
+
+    &__options {
+        display: grid;
+        grid-template-rows: 0fr;
+        transition:
+            grid-template-rows 0.2s,
+            background 0.2s;
+
+        &.visible {
+            grid-template-rows: 1fr;
+        }
+
+        &__inner {
+            overflow: hidden;
+        }
+    }
+
+    &__option {
+        overflow: hidden;
+        position: relative;
+        padding: 12px $side-padding;
+        transition: background 0.2s;
+
+        &.suffix-padding {
+            padding-left: calc($suffix-size + $suffix-gap + $side-padding);
+        }
+
+        &:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        &.active {
+            background: rgba(255, 183, 77, 0.15);
+
+            &:hover {
+                background: rgba(255, 183, 77, 0.3);
+            }
+        }
+    }
+}

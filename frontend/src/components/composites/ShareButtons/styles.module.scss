@@ -1,0 +1,25 @@
+.container {
+    .message {
+        position: relative;
+        font-size: 12px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 4px;
+        margin-bottom: 4px;
+
+        .reply {
+            display: inline-block;
+            transform: scaleX(-1);
+            position: relative;
+            top: 2px;
+        }
+    }
+
+    .icon-area {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 24px;
+    }
+}

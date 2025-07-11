@@ -7,39 +7,40 @@ on:
       - feature/#
 
 jobs:
-  Client:
-    name: Client Auto Deploy
-    runs-on: ubuntu-latest
-    timeout-minutes: 300
-    steps:
-      - uses: actions/checkout@v3
+  # リプレイスまでclientの自動デプロイはコメントアウト
+  # Client:
+  #   name: Client Auto Deploy
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 300
+  #   steps:
+  #     - uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: "18.x"
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: "18.x"
 
-      - name: Install Dependencies
-        run: |
-          npm install -g serverless@3
-          npm install -g yarn
-          yarn install --production=true
-        working-directory: ./client
+  #     - name: Install Dependencies
+  #       run: |
+  #         npm install -g serverless@3
+  #         npm install -g yarn
+  #         yarn install --production=true
+  #       working-directory: ./client
 
-      - name: Deploy to Lambda
-        run: yarn deploy
-        env:
-          API_BASE_URL: ${{ secrets.API_BASE_URL }}
-          BROWSER_BASE_URL: ${{ secrets.BROWSER_BASE_URL }}
-          DOMAIN_URL: ${{ secrets.DOMAIN_URL }}
-          COOKIE_DOMAIN_URL: ${{ secrets.COOKIE_DOMAIN_URL }}
-          LINE_TOKEN: ${{ secrets.LINE_TOKEN }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
-          GOOGLE_TAG: ${{ secrets.GOOGLE_TAG }}
-          NODE_OPTIONS: --openssl-legacy-provider
-        working-directory: ./client
+  #     - name: Deploy to Lambda
+  #       run: yarn deploy
+  #       env:
+  #         API_BASE_URL: ${{ secrets.API_BASE_URL }}
+  #         BROWSER_BASE_URL: ${{ secrets.BROWSER_BASE_URL }}
+  #         DOMAIN_URL: ${{ secrets.DOMAIN_URL }}
+  #         COOKIE_DOMAIN_URL: ${{ secrets.COOKIE_DOMAIN_URL }}
+  #         LINE_TOKEN: ${{ secrets.LINE_TOKEN }}
+  #         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
+  #         GOOGLE_TAG: ${{ secrets.GOOGLE_TAG }}
+  #         NODE_OPTIONS: --openssl-legacy-provider
+  #       working-directory: ./client
 
   Api:
     name: Api Auto Deploy

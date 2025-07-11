@@ -1,0 +1,24 @@
+.container {
+    cursor: pointer;
+    display: inline-block;
+    border-radius: 50%;
+    box-shadow: $box-shadow;
+    transition: $transition;
+
+    &:hover {
+        opacity: 0.8;
+    }
+
+    &.no-shadow {
+        box-shadow: none;
+    }
+
+    .content {
+        font-size: 24px;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}
