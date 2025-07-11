@@ -4,7 +4,7 @@ import { IThumbnail } from '@/features/product/type'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const mockThumbnail: IThumbnail = {
-    apiPath: '/image/about/concept1.jpg',
+    apiPath: '/image/about/story.jpg',
     product: {
         uuid: '1',
         name: 'ハンドメイドピアス',
