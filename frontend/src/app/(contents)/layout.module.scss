@@ -25,5 +25,13 @@
                 }
             }
         }
+
+        .no-title-space {
+            height: 48px;
+
+            @include media(sm) {
+                height: 0;
+            }
+        }
     }
 }

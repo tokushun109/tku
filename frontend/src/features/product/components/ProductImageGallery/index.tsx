@@ -1,6 +1,7 @@
 'use client'
 
-import Image from 'next/image'
+import { Image } from '@/components/bases/Image'
+
 import { useState } from 'react'
 
 import { IProduct } from '@/features/product/type'
@@ -17,8 +18,6 @@ export const ProductImageGallery = ({ product }: Props) => {
     // 商品画像を順序でソート
     const sortedImages = [...product.productImages].sort((a, b) => a.order - b.order)
 
-    // 画像がない場合のデフォルト画像
-    const noImagePath = '/image/product/no-image.png'
     const hasImages = sortedImages.length > 0
 
     const currentImage = hasImages ? sortedImages[selectedImageIndex] : null
@@ -26,32 +25,19 @@ export const ProductImageGallery = ({ product }: Props) => {
     return (
         <div className={styles['container']}>
             <div className={styles['main-image-area']}>
-                <Image
-                    alt={product.name}
-                    className={styles['main-image']}
-                    fill
-                    src={currentImage?.apiPath || noImagePath}
-                    style={{ objectFit: 'cover' }}
-                />
+                <Image alt={product.name} src={currentImage?.apiPath || ''} />
             </div>
 
             {hasImages && sortedImages.length > 1 && (
                 <div className={styles['thumbnail-area']}>
                     {sortedImages.map((image, index) => (
-                        <button
+                        <div
                             className={`${styles['thumbnail']} ${index === selectedImageIndex ? styles['thumbnail--active'] : ''}`}
                             key={image.uuid}
                             onClick={() => setSelectedImageIndex(index)}
-                            type="button"
                         >
-                            <Image
-                                alt={`${product.name} ${index + 1}`}
-                                className={styles['thumbnail-image']}
-                                fill
-                                src={image.apiPath}
-                                style={{ objectFit: 'cover' }}
-                            />
-                        </button>
+                            <Image alt={`${product.name} ${index + 1}`} src={image.apiPath} />
+                        </div>
                     ))}
                 </div>
             )}

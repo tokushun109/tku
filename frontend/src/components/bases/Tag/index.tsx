@@ -10,6 +10,6 @@ type Props = {
     color?: ColorType
 }
 
-export const Tag = ({ children, color = 'primary', className }: Props) => {
+export const Tag = ({ children, color = ColorType.Primary, className }: Props) => {
     return <span className={classNames(styles['tag'], styles[`tag--${color}`], className)}>{children}</span>
 }

@@ -22,7 +22,7 @@
     grid-template-columns: 1fr 1fr;
     gap: 24px;
 
-    @include media(sm) {
+    @include media(md) {
         grid-template-columns: 1fr;
         gap: 16px;
     }
@@ -88,6 +88,7 @@
         text-align: center;
         border-radius: 4px;
         font-size: $font-large;
+        box-shadow: $box-shadow;
         transition: background-color 0.2s ease;
 
         &:hover {

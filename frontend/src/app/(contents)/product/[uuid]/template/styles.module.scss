@@ -3,7 +3,6 @@
 
 .container {
     margin: 0 auto;
-    padding: 48px;
     max-width: $lg;
 
     @include media(sm) {
