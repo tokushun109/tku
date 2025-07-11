@@ -1,4 +1,4 @@
-import { ColorCode, ColorType } from '@/types'
+import { ColorCode, ColorType, FontSizeType, FontSizeValue } from '@/types'
 
 import styles from './styles.module.scss'
 
@@ -6,17 +6,17 @@ type Props = {
     children: React.ReactNode
     color: ColorType
     fontColor?: string
-    fontSize?: number
+    fontSize?: FontSizeType
 }
 
-export const Chip = ({ color, fontColor = '#ffffff', fontSize = 16, children }: Props) => {
+export const Chip = ({ color, fontColor = '#ffffff', fontSize = FontSizeType.Medium, children }: Props) => {
     return (
         <span
             className={styles.container}
             style={{
                 background: ColorCode[color],
                 color: fontColor,
-                fontSize: `${fontSize}px`,
+                fontSize: `${FontSizeValue[fontSize]}px`,
             }}
         >
             {children}

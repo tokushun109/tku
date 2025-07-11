@@ -1,7 +1,8 @@
 import { ExternalLink } from '@/components/bases/ExternalLink'
-import { Tag } from '@/components/bases/Tag'
+import { Chip } from '@/components/bases/Chip'
 import { ProductImageGallery } from '@/features/product/components/ProductImageGallery'
 import { IProduct } from '@/features/product/type'
+import { FontSizeType } from '@/types'
 import { formatPrice } from '@/utils/price'
 
 import styles from './styles.module.scss'
@@ -27,7 +28,9 @@ export const ProductDetail = ({ product }: Props) => {
                         <div className={styles['target-area']}>
                             <p className={styles['label']}>対象</p>
                             <div className={styles['content']}>
-                                <Tag color="secondary">{product.target.name}</Tag>
+                                <Chip fontSize={FontSizeType.SmMd} color="secondary">
+                                    {product.target.name}
+                                </Chip>
                             </div>
                         </div>
                     )}
@@ -36,7 +39,9 @@ export const ProductDetail = ({ product }: Props) => {
                         <div className={styles['category-area']}>
                             <p className={styles['label']}>カテゴリー</p>
                             <div className={styles['content']}>
-                                <Tag color="secondary">{product.category.name}</Tag>
+                                <Chip fontSize={FontSizeType.SmMd} color="secondary">
+                                    {product.category.name}
+                                </Chip>
                             </div>
                         </div>
                     )}
@@ -46,9 +51,9 @@ export const ProductDetail = ({ product }: Props) => {
                             <p className={styles['label']}>タグ</p>
                             <div className={styles['tag-content']}>
                                 {product.tags.map((tag) => (
-                                    <Tag color="secondary" key={tag.uuid}>
+                                    <Chip fontSize={FontSizeType.SmMd} color="secondary" key={tag.uuid}>
                                         {tag.name}
-                                    </Tag>
+                                    </Chip>
                                 ))}
                             </div>
                         </div>
