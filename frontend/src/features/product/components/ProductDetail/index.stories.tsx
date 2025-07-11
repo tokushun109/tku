@@ -8,10 +8,12 @@ const mockProduct: IProduct = {
     name: 'ハンドメイドピアス',
     description: 'シンプルで上品なデザインのハンドメイドピアスです。\n日常使いにも特別な日にもお使いいただけます。\n\n素材: 真鍮、コットンパール\nサイズ: 約2cm',
     price: 1500,
-    images: [
-        { uuid: '1', url: 'https://via.placeholder.com/400x400' },
-        { uuid: '2', url: 'https://via.placeholder.com/400x400' },
-        { uuid: '3', url: 'https://via.placeholder.com/400x400' },
+    isActive: true,
+    isRecommend: false,
+    productImages: [
+        { uuid: '1', apiPath: '/image/about/story.jpg', name: 'image1', order: 1 },
+        { uuid: '2', apiPath: '/image/about/concept1.jpg', name: 'image2', order: 2 },
+        { uuid: '3', apiPath: '/image/about/concept2.jpg', name: 'image3', order: 3 },
     ],
     target: { uuid: '1', name: 'レディース' },
     category: { uuid: '1', name: 'ピアス' },
@@ -109,8 +111,8 @@ export const SingleImage: Story = {
     args: {
         product: {
             ...mockProduct,
-            images: [
-                { uuid: '1', url: 'https://via.placeholder.com/400x400' },
+            productImages: [
+                { uuid: '1', apiPath: '/image/about/story.jpg', name: 'image1', order: 1 },
             ],
         },
     },

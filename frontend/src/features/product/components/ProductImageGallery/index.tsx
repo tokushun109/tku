@@ -15,8 +15,8 @@ type Props = {
 export const ProductImageGallery = ({ product }: Props) => {
     const [selectedImageIndex, setSelectedImageIndex] = useState(0)
 
-    // 商品画像を順序でソート
-    const sortedImages = [...product.productImages].sort((a, b) => a.order - b.order)
+    // 商品画像を順序でソート（productImagesが存在しない場合は空配列を使用）
+    const sortedImages = [...(product.productImages || [])].sort((a, b) => a.order - b.order)
 
     const hasImages = sortedImages.length > 0
 

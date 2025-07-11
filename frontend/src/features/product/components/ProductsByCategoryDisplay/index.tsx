@@ -38,7 +38,7 @@ export const ProductsByCategoryDisplay = ({ productsByCategory }: Props) => {
                 {displayProducts.map((v) => (
                     <div className={styles['product-thumbnail']} key={v.uuid}>
                         <Slide>
-                            <ProductThumbnail item={{ product: v, apiPath: v.productImages[0].apiPath }} />
+                            <ProductThumbnail item={{ product: v, apiPath: v.productImages?.[0]?.apiPath || '' }} />
                         </Slide>
                     </div>
                 ))}
