@@ -1,4 +1,4 @@
-import { MaterialIconEnum } from '@/types'
+import { MaterialIconType } from '@/types'
 
 import { IconCard } from '.'
 
@@ -14,20 +14,20 @@ type Story = StoryObj<typeof IconCard>
 
 export const About: Story = {
     args: {
-        Icon: MaterialIconEnum.Face,
+        Icon: MaterialIconType.Face,
         label: 'about',
     },
 }
 export const Product: Story = {
     args: {
-        Icon: MaterialIconEnum.Diamond,
+        Icon: MaterialIconType.Diamond,
         label: 'product',
     },
 }
 
 export const Contact: Story = {
     args: {
-        Icon: MaterialIconEnum.Email,
+        Icon: MaterialIconType.Email,
         label: 'contact',
     },
 }

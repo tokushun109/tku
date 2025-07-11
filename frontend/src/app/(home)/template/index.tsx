@@ -10,8 +10,8 @@ import Carousel from '@/components/composites/Carousel'
 import SlideShow from '@/components/composites/SlideShow'
 import Section from '@/components/layouts/Section'
 import { IThumbnail } from '@/features/product/type'
-import { ColorEnum } from '@/types'
-import { NavigationEnum } from '@/types/enum/navigation'
+import { ColorType } from '@/types'
+import { NavigationType } from '@/types/enum/navigation'
 
 import styles from './styles.module.scss'
 
@@ -51,9 +51,9 @@ const HomeTemplate = ({ carouselImages }: Props) => {
             <Section
                 button
                 buttonLabel="詳しくはこちら"
-                color={ColorEnum.Primary}
+                color={ColorType.Primary}
                 onButtonClick={() => {
-                    router.push(NavigationEnum.About)
+                    router.push(NavigationType.About)
                 }}
                 title="About"
             >
@@ -68,10 +68,10 @@ const HomeTemplate = ({ carouselImages }: Props) => {
             <Section
                 button
                 buttonLabel="お問い合わせフォーム"
-                color={ColorEnum.Primary}
+                color={ColorType.Primary}
                 contrast
                 onButtonClick={() => {
-                    router.push(NavigationEnum.Contact)
+                    router.push(NavigationType.Contact)
                 }}
                 title="Contact"
             >

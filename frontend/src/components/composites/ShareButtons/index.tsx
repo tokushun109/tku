@@ -1,7 +1,7 @@
 import { Facebook, Reply, X } from '@mui/icons-material'
 
 import { Icon } from '@/components/bases/Icon'
-import { ColorEnum } from '@/types'
+import { ColorType } from '@/types'
 
 import styles from './styles.module.scss'
 
@@ -16,12 +16,12 @@ export const ShareButtons = () => {
             </div>
             <div className={styles['icon-area']}>
                 <div>
-                    <Icon color={ColorEnum.Primary} contrast shadow={false} size={40}>
+                    <Icon color={ColorType.Primary} contrast shadow={false} size={40}>
                         <X />
                     </Icon>
                 </div>
                 <div>
-                    <Icon color={ColorEnum.Primary} contrast shadow={false} size={40}>
+                    <Icon color={ColorType.Primary} contrast shadow={false} size={40}>
                         <Facebook />
                     </Icon>
                 </div>

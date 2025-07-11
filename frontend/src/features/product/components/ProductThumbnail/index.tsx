@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 
 import { Chip } from '@/components/bases/Chip'
 import { Image } from '@/components/bases/Image'
-import { ColorEnum } from '@/types'
+import { ColorType } from '@/types'
 import { numToPrice } from '@/utils/convert'
 
 import styles from './styles.module.scss'
@@ -26,7 +26,7 @@ const ProductThumbnail = ({ item }: Props) => {
             <div className={styles['image-container']}>
                 <Image alt={item.product.name} src={item.apiPath} />
                 <div className={styles['chip']}>
-                    <Chip color={ColorEnum.Secondary} fontSize={12}>
+                    <Chip color={ColorType.Secondary} fontSize={12}>
                         {item.product.target.name}
                     </Chip>
                 </div>

@@ -2,19 +2,19 @@ import { Diamond, Email, Face3 } from '@mui/icons-material'
 
 import { capitalize } from '@/utils/string'
 
-export const MaterialIconEnum = {
+export const MaterialIconType = {
     Face: Face3,
     Diamond: Diamond,
     Email: Email,
 } as const
-export type MaterialIconType = (typeof MaterialIconEnum)[keyof typeof MaterialIconEnum]
+export type MaterialIconType = (typeof MaterialIconType)[keyof typeof MaterialIconType]
 
-export const MenuEnum = {
+export const MenuType = {
     About: 'about',
     Product: 'product',
     Contact: 'contact',
 } as const
-export type MenuType = (typeof MenuEnum)[keyof typeof MenuEnum]
+export type MenuType = (typeof MenuType)[keyof typeof MenuType]
 
 type MenuObject = {
     icon: MaterialIconType
@@ -23,19 +23,19 @@ type MenuObject = {
 }
 
 export const MenuList: { [_ in MenuType]: MenuObject } = {
-    [MenuEnum.About]: {
-        icon: MaterialIconEnum.Face,
-        label: capitalize(MenuEnum.About),
-        link: '/' + MenuEnum.About,
+    [MenuType.About]: {
+        icon: MaterialIconType.Face,
+        label: capitalize(MenuType.About),
+        link: '/' + MenuType.About,
     },
-    [MenuEnum.Product]: {
-        icon: MaterialIconEnum.Diamond,
-        label: capitalize(MenuEnum.Product),
-        link: '/' + MenuEnum.Product,
+    [MenuType.Product]: {
+        icon: MaterialIconType.Diamond,
+        label: capitalize(MenuType.Product),
+        link: '/' + MenuType.Product,
     },
-    [MenuEnum.Contact]: {
-        icon: MaterialIconEnum.Email,
-        label: capitalize(MenuEnum.Contact),
-        link: '/' + MenuEnum.Contact,
+    [MenuType.Contact]: {
+        icon: MaterialIconType.Email,
+        label: capitalize(MenuType.Contact),
+        link: '/' + MenuType.Contact,
     },
 } as const

@@ -2,7 +2,7 @@
 
 import classNames from 'classnames'
 
-import { ColorCodeEnum, ColorEnum, ColorType } from '@/types'
+import { ColorCode, ColorType } from '@/types'
 
 import styles from './styles.module.scss'
 import { ColorObject } from './types'
@@ -21,11 +21,11 @@ export const Icon = ({ color, size, children, onClick = () => {}, contrast = fal
         if (!contrast)
             return {
                 backGround: color,
-                text: ColorEnum.White,
+                text: ColorType.White,
             }
         else
             return {
-                backGround: ColorEnum.White,
+                backGround: ColorType.White,
                 text: color,
             }
     })()
@@ -37,8 +37,8 @@ export const Icon = ({ color, size, children, onClick = () => {}, contrast = fal
             style={{
                 width: `${size}px`,
                 height: `${size}px`,
-                background: ColorCodeEnum[colorObject.backGround],
-                color: ColorCodeEnum[colorObject.text],
+                background: ColorCode[colorObject.backGround],
+                color: ColorCode[colorObject.text],
             }}
         >
             <div className={styles['content']}>{children}</div>

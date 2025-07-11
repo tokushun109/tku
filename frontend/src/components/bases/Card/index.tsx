@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 
-import { ColorCodeEnum, ColorEnum, ColorType } from '@/types'
+import { ColorCode, ColorType } from '@/types'
 
 import styles from './styles.module.scss'
 
@@ -12,14 +12,14 @@ type Props = {
     width?: string
 }
 
-export const Card = ({ color = ColorEnum.White, width = 'auto', height = 'auto', shadow = true, children }: Props) => {
+export const Card = ({ color = ColorType.White, width = 'auto', height = 'auto', shadow = true, children }: Props) => {
     return (
         <div
             className={classNames(styles['container'], !shadow && styles['no-shadow'])}
             style={{
                 width,
                 height,
-                background: ColorCodeEnum[color],
+                background: ColorCode[color],
             }}
         >
             <div className={styles['content']}>{children}</div>

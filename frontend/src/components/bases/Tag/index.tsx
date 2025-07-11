@@ -2,13 +2,12 @@ import classNames from 'classnames'
 import { ReactNode } from 'react'
 
 import styles from './styles.module.scss'
-
-type Color = 'primary' | 'secondary' | 'accent'
+import { ColorType } from '@/types'
 
 type Props = {
     children: ReactNode
     className?: string
-    color?: Color
+    color?: ColorType
 }
 
 export const Tag = ({ children, color = 'primary', className }: Props) => {

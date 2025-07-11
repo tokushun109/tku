@@ -1,4 +1,4 @@
-import { ColorCodeEnum, ColorType } from '@/types'
+import { ColorCode, ColorType } from '@/types'
 
 import styles from './styles.module.scss'
 
@@ -14,7 +14,7 @@ export const Chip = ({ color, fontColor = '#ffffff', fontSize = 16, children }: 
         <span
             className={styles.container}
             style={{
-                background: ColorCodeEnum[color],
+                background: ColorCode[color],
                 color: fontColor,
                 fontSize: `${fontSize}px`,
             }}

@@ -2,7 +2,7 @@ import classNames from 'classnames'
 
 import { Slide } from '@/components/animations/Slide'
 import { Button } from '@/components/bases/Button'
-import { ColorCodeEnum, ColorEnum, ColorType } from '@/types'
+import { ColorCode, ColorType } from '@/types'
 import { labelFontFace } from '@/utils/font'
 
 import styles from './styles.module.scss'
@@ -32,20 +32,17 @@ const Section = (props: Props) => {
         // ボタンがある時
         const { title, contrast, children, buttonLabel, color, onButtonClick } = props
         return (
-            <div
-                className={classNames(styles['container'], contrast && styles['contrast'])}
-                style={contrast ? { background: ColorCodeEnum[color] } : {}}
-            >
+            <div className={classNames(styles['container'], contrast && styles['contrast'])} style={contrast ? { background: ColorCode[color] } : {}}>
                 <Slide>
                     <div
                         className={classNames(styles['title'], labelFontFace.className)}
-                        style={{ color: ColorCodeEnum[!contrast ? color : ColorEnum.White] }}
+                        style={{ color: ColorCode[!contrast ? color : ColorType.White] }}
                     >
                         {title}
                     </div>
                 </Slide>
                 <Slide>
-                    <div className={styles['sentence']} style={{ color: !contrast ? '#757575' : ColorCodeEnum[ColorEnum.White] }}>
+                    <div className={styles['sentence']} style={{ color: !contrast ? '#757575' : ColorCode[ColorType.White] }}>
                         {children}
                     </div>
                 </Slide>
@@ -62,7 +59,7 @@ const Section = (props: Props) => {
         return (
             <div className={classNames(styles['container'], contrast && styles['contrast'])}>
                 <Slide>
-                    <div className={classNames(styles['title'], labelFontFace.className)} style={{ color: ColorCodeEnum[color] }}>
+                    <div className={classNames(styles['title'], labelFontFace.className)} style={{ color: ColorCode[color] }}>
                         {title}
                     </div>
                 </Slide>

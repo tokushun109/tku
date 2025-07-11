@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation'
 
 import { Icon } from '@/components/bases/Icon'
 import { IconCard } from '@/components/composites/IconCard'
-import { MenuEnum, MenuList, ColorEnum, MenuType } from '@/types'
+import { MenuType, MenuList, ColorType } from '@/types'
 import { NavigationType } from '@/types/enum/navigation'
 
 import styles from './styles.module.scss'
@@ -34,7 +34,7 @@ export const MenuScreen = ({ onCloseClick }: Props) => {
     return (
         <div className={styles['container']}>
             <div className={styles['close-icon']}>
-                <Icon color={ColorEnum.Primary} contrast onClick={onCloseClick} size={72}>
+                <Icon color={ColorType.Primary} contrast onClick={onCloseClick} size={72}>
                     <Close fontSize="large" />
                 </Icon>
             </div>
@@ -59,7 +59,7 @@ export const MenuScreen = ({ onCloseClick }: Props) => {
             </div>
             <div className={styles['icon-card-area']}>
                 <div className={styles['icon-card-area-wrapper']}>
-                    {Object.values(MenuEnum).map((menu) => (
+                    {Object.values(MenuType).map((menu) => (
                         <div
                             className={styles['icon-card']}
                             key={MenuList[menu].label}
