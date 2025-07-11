@@ -1,5 +1,4 @@
-import { X, Facebook } from '@mui/icons-material'
-import ReplyIcon from '@mui/icons-material/Reply'
+import { Facebook, Reply, X } from '@mui/icons-material'
 
 import { Icon } from '@/components/bases/Icon'
 import { ColorEnum } from '@/types'
@@ -11,7 +10,7 @@ export const ShareButtons = () => {
         <div className={styles['container']}>
             <div className={styles['message']}>
                 <div className={styles['reply']}>
-                    <ReplyIcon />
+                    <Reply />
                 </div>
                 <div>Share This Page♪</div>
             </div>

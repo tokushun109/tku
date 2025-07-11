@@ -1,4 +1,5 @@
 import classNames from 'classnames'
+import { useRouter } from 'next/navigation'
 
 import { Chip } from '@/components/bases/Chip'
 import { Image } from '@/components/bases/Image'
@@ -13,8 +14,14 @@ type Props = {
 }
 
 export const CarouselImage = ({ item, shadow = true }: Props) => {
+    const router = useRouter()
+
+    const handleClick = () => {
+        router.push(`/product/${item.product.uuid}`)
+    }
+
     return (
-        <div className={classNames(styles['container'], shadow && styles['shadow'])}>
+        <div className={classNames(styles['container'], shadow && styles['shadow'])} onClick={handleClick} style={{ cursor: 'pointer' }}>
             {item.product.category.uuid && (
                 <div className={classNames(styles['chip'], styles['category'])}>
                     <Chip color={ColorEnum.Accent} fontSize={12}>

@@ -1,3 +1,7 @@
+'use client'
+
+import { useRouter } from 'next/navigation'
+
 import { Chip } from '@/components/bases/Chip'
 import { Image } from '@/components/bases/Image'
 import { ColorEnum } from '@/types'
@@ -11,8 +15,14 @@ type Props = {
 }
 
 const ProductThumbnail = ({ item }: Props) => {
+    const router = useRouter()
+
+    const handleClick = () => {
+        router.push(`/product/${item.product.uuid}`)
+    }
+
     return (
-        <div className={styles['container']}>
+        <div className={styles['container']} onClick={handleClick} style={{ cursor: 'pointer' }}>
             <div className={styles['image-container']}>
                 <Image alt={item.product.name} src={item.apiPath} />
                 <div className={styles['chip']}>

@@ -24,6 +24,7 @@
         "@emotion/styled": "^11.14.0",
         "@fontsource/roboto": "^5.1.1",
         "@mui/icons-material": "^6.4.5",
+        "@mui/material": "^7.2.0",
         "@storybook/addon-styling-webpack": "^1.0.1",
         "@storybook/addon-themes": "^8.5.8",
         "@types/react-transition-group": "^4.4.12",

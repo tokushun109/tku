@@ -1,0 +1,26 @@
+@use '/src/styles/variables';
+
+.tag {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: $font-small;
+    font-weight: 500;
+    text-decoration: none;
+    white-space: nowrap;
+
+    &--primary {
+        background-color: $primary;
+        color: $white-text-color;
+    }
+
+    &--secondary {
+        background-color: $secondary;
+        color: $white-text-color;
+    }
+
+    &--accent {
+        background-color: $accent;
+        color: $white-text-color;
+    }
+}

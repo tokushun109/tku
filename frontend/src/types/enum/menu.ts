@@ -1,4 +1,4 @@
-import { Email, Diamond, Face3 } from '@mui/icons-material'
+import { Diamond, Email, Face3 } from '@mui/icons-material'
 
 import { capitalize } from '@/utils/string'
 
