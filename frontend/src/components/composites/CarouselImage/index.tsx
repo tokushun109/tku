@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { Chip } from '@/components/bases/Chip'
 import { Image } from '@/components/bases/Image'
 import { IThumbnail } from '@/features/product/type'
-import { ColorType } from '@/types'
+import { ColorType, FontSizeType } from '@/types'
 
 import styles from './styles.module.scss'
 
@@ -24,14 +24,14 @@ export const CarouselImage = ({ item, shadow = true }: Props) => {
         <div className={classNames(styles['container'], shadow && styles['shadow'])} onClick={handleClick} style={{ cursor: 'pointer' }}>
             {item.product.category.uuid && (
                 <div className={classNames(styles['chip'], styles['category'])}>
-                    <Chip color={ColorType.Accent} fontSize={12}>
+                    <Chip color={ColorType.Accent} fontSize={FontSizeType.SmMd}>
                         {item.product.category.name}
                     </Chip>
                 </div>
             )}
             <Image alt={item.product.name} key={item.product.name} src={item.apiPath} />
             <div className={classNames(styles['chip'], styles['name'])}>
-                <Chip color={ColorType.Accent} fontSize={12}>
+                <Chip color={ColorType.Accent} fontSize={FontSizeType.SmMd}>
                     {item.product.name}
                 </Chip>
             </div>

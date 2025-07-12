@@ -7,7 +7,6 @@ import { formatPrice } from '@/utils/price'
 
 import styles from './styles.module.scss'
 
-
 type Props = {
     product: IProduct
 }

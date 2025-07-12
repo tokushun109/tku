@@ -1,6 +1,6 @@
 import { ColorType } from '@/types'
 
-import { Section } from '.'
+import Section from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
 

@@ -3,7 +3,6 @@
 import { Instagram } from '@mui/icons-material'
 import classNames from 'classnames'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
 
 import { Breadcrumbs } from '@/components/bases/Breadcrumbs'
 import { Icon } from '@/components/bases/Icon'
@@ -20,8 +19,6 @@ type Props = {
 }
 
 const AboutTemplate = ({ snsList, salesSiteList }: Props) => {
-    const router = useRouter()
-
     return (
         <div className={styles['container']}>
             <Section button={false} color={ColorType.Secondary} title="Story">
@@ -173,7 +170,7 @@ const AboutTemplate = ({ snsList, salesSiteList }: Props) => {
                                         color={ColorType.Accent}
                                         key={v.name}
                                         onClick={() => {
-                                            router.push(v.url)
+                                            window.open(v.url, '_blank', 'noopener')
                                         }}
                                         size={90}
                                     >

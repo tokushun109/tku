@@ -1,7 +1,7 @@
 export interface ISite {
-    icon: string
+    icon?: string
     name: string
-    url: string
+    url?: string
     uuid?: string
 }
 

@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 
 import { Slide } from '@/components/animations/Slide'
 import { Indicator } from '@/components/bases/Indicator'
-import Carousel from '@/components/composites/Carousel'
+import { Carousel } from '@/components/composites/Carousel'
 import SlideShow from '@/components/composites/SlideShow'
 import Section from '@/components/layouts/Section'
 import { IThumbnail } from '@/features/product/type'
