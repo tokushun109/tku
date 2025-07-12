@@ -2,13 +2,18 @@ import { ExternalLink } from '@/components/bases/ExternalLink'
 import { Chip } from '@/components/bases/Chip'
 import { ProductImageGallery } from '@/features/product/components/ProductImageGallery'
 import { IProduct } from '@/features/product/type'
-import { FontSizeType } from '@/types'
+import { ColorType, FontSizeType } from '@/types'
 import { formatPrice } from '@/utils/price'
 
 import styles from './styles.module.scss'
+import { Button } from '@/components/bases/Button'
 
 type Props = {
     product: IProduct
+}
+
+const handleOpenExternal = (url: string) => {
+    window.open(url, '_blank', 'noopener')
 }
 
 export const ProductDetail = ({ product }: Props) => {
@@ -64,9 +69,13 @@ export const ProductDetail = ({ product }: Props) => {
                             <p className={styles['label']}>販売サイト</p>
                             <div className={styles['site-buttons']}>
                                 {product.siteDetails.map((siteDetail) => (
-                                    <ExternalLink className={styles['site-button']} href={siteDetail.detailUrl} key={siteDetail.uuid}>
+                                    <Button
+                                        onClick={() => handleOpenExternal(siteDetail.detailUrl)}
+                                        colorType={ColorType.Accent}
+                                        key={siteDetail.uuid}
+                                    >
                                         {siteDetail.salesSite.name}
-                                    </ExternalLink>
+                                    </Button>
                                 ))}
                             </div>
                         </div>

@@ -197,7 +197,7 @@ const AboutTemplate = ({ snsList, salesSiteList }: Props) => {
                                         color={ColorType.Accent}
                                         key={v.name}
                                         onClick={() => {
-                                            router.push(v.url)
+                                            window.open(v.url, '_blank', 'noopener')
                                         }}
                                         size={90}
                                     >
