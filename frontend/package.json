@@ -17,7 +17,8 @@
         "fmt": "prettier --write .",
         "tsc": "tsc --noEmit",
         "sb": "storybook dev -p 6006",
-        "build-storybook": "storybook build"
+        "build-storybook": "storybook build",
+        "prepare": "npx --no-install --prefix frontend husky frontend/.husky"
     },
     "dependencies": {
         "@emotion/react": "^11.14.0",
