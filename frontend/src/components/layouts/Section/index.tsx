@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 
 import { Slide } from '@/components/animations/Slide'
-import { Button } from '@/components/bases/Button'
+import { AnimatedButton } from '@/components/bases/AnimatedButton'
 import { ColorCode, ColorType } from '@/types'
 import { labelFontFace } from '@/utils/font'
 
@@ -48,7 +48,7 @@ const Section = (props: Props) => {
                 </Slide>
                 <Slide>
                     <div className={styles['button']}>
-                        <Button onClick={onButtonClick}>{buttonLabel}</Button>
+                        <AnimatedButton onClick={onButtonClick}>{buttonLabel}</AnimatedButton>
                     </div>
                 </Slide>
             </div>

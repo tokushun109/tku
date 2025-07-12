@@ -2,7 +2,7 @@ import classNames from 'classnames'
 import { useState } from 'react'
 
 import { Slide } from '@/components/animations/Slide'
-import { Button } from '@/components/bases/Button'
+import { AnimatedButton } from '@/components/bases/AnimatedButton'
 import ProductThumbnail from '@/features/product/components/ProductThumbnail'
 import { mainFontFace } from '@/utils/font'
 
@@ -45,7 +45,7 @@ export const ProductsByCategoryDisplay = ({ productsByCategory }: Props) => {
             </div>
             {!isAllDisplayed && productsByCategory.products.length > 4 && (
                 <div className={styles['more-button']}>
-                    <Button onClick={onClickMoreButton}>もっと見る</Button>
+                    <AnimatedButton onClick={onClickMoreButton}>もっと見る</AnimatedButton>
                 </div>
             )}
         </div>
