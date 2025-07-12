@@ -1,5 +1,6 @@
-import { SlideShow } from '.'
 import { IThumbnail } from '@/features/product/type'
+
+import { SlideShow } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
 

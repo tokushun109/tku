@@ -1,5 +1,6 @@
-import { CarouselImage } from '.'
 import { IThumbnail } from '@/features/product/type'
+
+import { CarouselImage } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
 

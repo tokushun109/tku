@@ -1,4 +1,5 @@
 import { ColorCode, ColorType } from '@/types'
+
 import styles from './styles.module.scss'
 
 type Props = {

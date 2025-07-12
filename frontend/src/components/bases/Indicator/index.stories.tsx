@@ -47,7 +47,7 @@ export const WithCustomContent: Story = {
     args: {
         children: (
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <div style={{ width: '8px', height: '8px', backgroundColor: '#ff0000', borderRadius: '50%' }}></div>
+                <div style={{ width: '8px', height: '8px', backgroundColor: '#ff0000', borderRadius: '50%' }} />
                 <span>Status</span>
             </div>
         ),

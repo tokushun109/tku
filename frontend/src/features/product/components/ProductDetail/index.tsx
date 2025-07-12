@@ -1,4 +1,4 @@
-import { ExternalLink } from '@/components/bases/ExternalLink'
+import { Button } from '@/components/bases/Button'
 import { Chip } from '@/components/bases/Chip'
 import { ProductImageGallery } from '@/features/product/components/ProductImageGallery'
 import { IProduct } from '@/features/product/type'
@@ -6,7 +6,7 @@ import { ColorType, FontSizeType } from '@/types'
 import { formatPrice } from '@/utils/price'
 
 import styles from './styles.module.scss'
-import { Button } from '@/components/bases/Button'
+
 
 type Props = {
     product: IProduct
@@ -33,7 +33,7 @@ export const ProductDetail = ({ product }: Props) => {
                         <div className={styles['target-area']}>
                             <p className={styles['label']}>対象</p>
                             <div className={styles['content']}>
-                                <Chip fontSize={FontSizeType.SmMd} color="secondary">
+                                <Chip color="secondary" fontSize={FontSizeType.SmMd}>
                                     {product.target.name}
                                 </Chip>
                             </div>
@@ -44,7 +44,7 @@ export const ProductDetail = ({ product }: Props) => {
                         <div className={styles['category-area']}>
                             <p className={styles['label']}>カテゴリー</p>
                             <div className={styles['content']}>
-                                <Chip fontSize={FontSizeType.SmMd} color="secondary">
+                                <Chip color="secondary" fontSize={FontSizeType.SmMd}>
                                     {product.category.name}
                                 </Chip>
                             </div>
@@ -56,7 +56,7 @@ export const ProductDetail = ({ product }: Props) => {
                             <p className={styles['label']}>タグ</p>
                             <div className={styles['tag-content']}>
                                 {product.tags.map((tag) => (
-                                    <Chip fontSize={FontSizeType.SmMd} color="secondary" key={tag.uuid}>
+                                    <Chip color="secondary" fontSize={FontSizeType.SmMd} key={tag.uuid}>
                                         {tag.name}
                                     </Chip>
                                 ))}
@@ -70,9 +70,9 @@ export const ProductDetail = ({ product }: Props) => {
                             <div className={styles['site-buttons']}>
                                 {product.siteDetails.map((siteDetail) => (
                                     <Button
-                                        onClick={() => handleOpenExternal(siteDetail.detailUrl)}
                                         colorType={ColorType.Accent}
                                         key={siteDetail.uuid}
+                                        onClick={() => handleOpenExternal(siteDetail.detailUrl)}
                                     >
                                         {siteDetail.salesSite.name}
                                     </Button>

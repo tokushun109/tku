@@ -1,9 +1,8 @@
 'use client'
 
-import { Image } from '@/components/bases/Image'
-
 import { useState } from 'react'
 
+import { Image } from '@/components/bases/Image'
 import { IProduct } from '@/features/product/type'
 
 import styles from './styles.module.scss'

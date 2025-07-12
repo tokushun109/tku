@@ -1,5 +1,6 @@
-import { ProductsByCategoryDisplay } from '.'
 import { IProductsByCategory } from '@/features/product/type'
+
+import { ProductsByCategoryDisplay } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
 

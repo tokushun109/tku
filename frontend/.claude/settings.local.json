@@ -1,8 +1,8 @@
 {
-  "permissions": {
-    "allow": [
-      "Bash(yarn dev)"
-    ],
-    "deny": []
-  }
+    "permissions": {
+        "allow": [
+            "Bash(pnpm dev)"
+        ],
+        "deny": []
+    }
 }

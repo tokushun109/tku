@@ -1,5 +1,6 @@
-import { Card } from '.'
 import { ColorType } from '@/types'
+
+import { Card } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
 

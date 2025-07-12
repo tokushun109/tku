@@ -1,5 +1,6 @@
-import ProductThumbnail from '.'
 import { IThumbnail } from '@/features/product/type'
+
+import ProductThumbnail from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
 

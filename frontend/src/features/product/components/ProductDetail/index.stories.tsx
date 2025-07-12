@@ -1,12 +1,14 @@
-import { ProductDetail } from '.'
 import { IProduct } from '@/features/product/type'
+
+import { ProductDetail } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
 const mockProduct: IProduct = {
     uuid: '1',
     name: 'ハンドメイドピアス',
-    description: 'シンプルで上品なデザインのハンドメイドピアスです。\n日常使いにも特別な日にもお使いいただけます。\n\n素材: 真鍮、コットンパール\nサイズ: 約2cm',
+    description:
+        'シンプルで上品なデザインのハンドメイドピアスです。\n日常使いにも特別な日にもお使いいただけます。\n\n素材: 真鍮、コットンパール\nサイズ: 約2cm',
     price: 1500,
     isActive: true,
     isRecommend: false,
@@ -77,7 +79,8 @@ export const ExpensiveItem: Story = {
             ...mockProduct,
             name: 'プレミアムゴールドネックレス',
             price: 25000,
-            description: '18金を使用した高級ネックレスです。\n特別な日にふさわしい上品な輝きを放ちます。\n\n素材: 18金、天然石\nサイズ: チェーン長さ 40cm\n付属品: 専用ケース、品質保証書',
+            description:
+                '18金を使用した高級ネックレスです。\n特別な日にふさわしい上品な輝きを放ちます。\n\n素材: 18金、天然石\nサイズ: チェーン長さ 40cm\n付属品: 専用ケース、品質保証書',
             category: { uuid: '2', name: 'ネックレス' },
             tags: [
                 { uuid: '1', name: 'プレミアム' },
@@ -95,7 +98,8 @@ export const MensAccessory: Story = {
             ...mockProduct,
             name: 'メンズレザーブレスレット',
             price: 3500,
-            description: '本革を使用したメンズ向けブレスレットです。\nシンプルなデザインで様々なスタイルに合わせやすく、\n長く愛用していただけます。\n\n素材: 本革、真鍮\nサイズ: 約18cm（調整可能）',
+            description:
+                '本革を使用したメンズ向けブレスレットです。\nシンプルなデザインで様々なスタイルに合わせやすく、\n長く愛用していただけます。\n\n素材: 本革、真鍮\nサイズ: 約18cm（調整可能）',
             target: { uuid: '2', name: 'メンズ' },
             category: { uuid: '3', name: 'ブレスレット' },
             tags: [
@@ -111,9 +115,7 @@ export const SingleImage: Story = {
     args: {
         product: {
             ...mockProduct,
-            productImages: [
-                { uuid: '1', apiPath: '/image/about/story.jpg', name: 'image1', order: 1 },
-            ],
+            productImages: [{ uuid: '1', apiPath: '/image/about/story.jpg', name: 'image1', order: 1 }],
         },
     },
 }

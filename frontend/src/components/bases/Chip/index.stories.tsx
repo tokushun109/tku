@@ -1,5 +1,6 @@
-import { Chip } from '.'
 import { ColorType, FontSizeType } from '@/types'
+
+import { Chip } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
 

@@ -21,10 +21,7 @@ export const Default: Story = {}
 
 export const TwoItems: Story = {
     args: {
-        breadcrumbs: [
-            { label: 'ホーム', link: '/' },
-            { label: '商品一覧' }
-        ],
+        breadcrumbs: [{ label: 'ホーム', link: '/' }, { label: '商品一覧' }],
     },
 }
 
@@ -35,7 +32,7 @@ export const LongPath: Story = {
             { label: 'カテゴリ', link: '/category' },
             { label: 'ネックレス', link: '/category/necklace' },
             { label: 'シルバーネックレス', link: '/category/necklace/silver' },
-            { label: '商品詳細' }
+            { label: '商品詳細' },
         ],
     },
 }
@@ -45,16 +42,14 @@ export const AllLinked: Story = {
         breadcrumbs: [
             { label: 'ホーム', link: '/' },
             { label: '商品一覧', link: '/products' },
-            { label: 'カテゴリ', link: '/category' }
+            { label: 'カテゴリ', link: '/category' },
         ],
     },
 }
 
 export const SingleItem: Story = {
     args: {
-        breadcrumbs: [
-            { label: 'ホーム' }
-        ],
+        breadcrumbs: [{ label: 'ホーム' }],
     },
 }
 
@@ -63,7 +58,7 @@ export const JapaneseLongLabels: Story = {
         breadcrumbs: [
             { label: 'ハンドメイドアクセサリー', link: '/' },
             { label: 'ネックレス・ペンダント', link: '/necklace' },
-            { label: 'シルバー925チェーンネックレス' }
+            { label: 'シルバー925チェーンネックレス' },
         ],
     },
 }

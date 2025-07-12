@@ -1,5 +1,6 @@
-import { ProductImageGallery } from '.'
 import { IProduct } from '@/features/product/type'
+
+import { ProductImageGallery } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
@@ -40,9 +41,7 @@ export const SingleImage: Story = {
     args: {
         product: {
             ...mockProduct,
-            productImages: [
-                { uuid: '1', apiPath: '/image/about/story.jpg', name: 'image1', order: 1 },
-            ],
+            productImages: [{ uuid: '1', apiPath: '/image/about/story.jpg', name: 'image1', order: 1 }],
         },
     },
 }
