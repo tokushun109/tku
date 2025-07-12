@@ -2,7 +2,7 @@ import { MaterialIconType } from '@/types'
 
 import { IconCard } from '.'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/nextjs'
 
 const meta: Meta<typeof IconCard> = {
     component: IconCard,

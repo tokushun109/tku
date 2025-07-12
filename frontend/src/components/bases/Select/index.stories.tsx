@@ -2,7 +2,7 @@ import { KeyboardArrowDown } from '@mui/icons-material'
 
 import { Select } from '.'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/nextjs'
 
 const meta: Meta<typeof Select> = {
     component: Select,

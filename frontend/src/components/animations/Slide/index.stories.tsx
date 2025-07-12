@@ -1,6 +1,6 @@
 import { Slide } from '.'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/nextjs'
 
 const meta: Meta<typeof Slide> = {
     component: Slide,

@@ -1,6 +1,6 @@
 import { PageFadeTransition } from '.'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/nextjs'
 
 const meta: Meta<typeof PageFadeTransition> = {
     component: PageFadeTransition,

@@ -1,6 +1,6 @@
 import { MobileMenu } from '.'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/nextjs'
 
 const meta: Meta<typeof MobileMenu> = {
     title: 'Components/Layouts/Footer/Components/MobileMenu',
