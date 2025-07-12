@@ -27,7 +27,7 @@
         }
 
         .no-title-space {
-            height: 48px;
+            height: 32px;
 
             @include media(sm) {
                 height: 0;
