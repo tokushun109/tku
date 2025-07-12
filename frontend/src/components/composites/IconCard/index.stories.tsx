@@ -1,8 +1,8 @@
-import { MaterialIconEnum } from '@/types'
+import { MaterialIconType } from '@/types'
 
 import { IconCard } from '.'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/nextjs'
 
 const meta: Meta<typeof IconCard> = {
     component: IconCard,
@@ -14,20 +14,20 @@ type Story = StoryObj<typeof IconCard>
 
 export const About: Story = {
     args: {
-        Icon: MaterialIconEnum.Face,
+        Icon: MaterialIconType.Face,
         label: 'about',
     },
 }
 export const Product: Story = {
     args: {
-        Icon: MaterialIconEnum.Diamond,
+        Icon: MaterialIconType.Diamond,
         label: 'product',
     },
 }
 
 export const Contact: Story = {
     args: {
-        Icon: MaterialIconEnum.Email,
+        Icon: MaterialIconType.Email,
         label: 'contact',
     },
 }

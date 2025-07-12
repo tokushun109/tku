@@ -3,19 +3,19 @@
 import classNames from 'classnames'
 import { usePathname, useRouter } from 'next/navigation'
 
-import { MenuEnum, MenuList } from '@/types'
+import { MenuType, MenuList } from '@/types'
 import { NavigationType } from '@/types/enum/navigation'
 import { labelFontFace } from '@/utils/font'
 
 import styles from './styles.module.scss'
 
-const MobileMenu = () => {
+export const MobileMenu = () => {
     const router = useRouter()
     const pathname = usePathname() as NavigationType
 
     return (
         <ul className={styles['container']}>
-            {Object.values(MenuEnum).map((menu) => (
+            {Object.values(MenuType).map((menu) => (
                 <li
                     className={classNames(styles['menu-list'], pathname === MenuList[menu].link && styles['active'])}
                     key={MenuList[menu].label}
@@ -35,5 +35,3 @@ const MobileMenu = () => {
         </ul>
     )
 }
-
-export default MobileMenu

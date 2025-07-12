@@ -1,4 +1,4 @@
-import { IProductsByCategory, IThumbnail } from '@/features/product/type'
+import { IProduct, IProductsByCategory, IThumbnail } from '@/features/product/type'
 import { ApiError } from '@/utils/error'
 import { convertObjectToURLSearchParams } from '@/utils/request'
 
@@ -17,6 +17,20 @@ export const getProductsByCategory = async (params: IGetProductsByCategoryParams
         },
         method: 'GET',
     })
+
+    return await res.json()
+}
+
+/** 商品詳細を取得 */
+export const getProduct = async (uuid: string): Promise<IProduct> => {
+    const res = await fetch(`${process.env.API_URL}/product/${uuid}`, {
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        method: 'GET',
+    })
+
+    if (!res.ok) throw new ApiError(res)
 
     return await res.json()
 }

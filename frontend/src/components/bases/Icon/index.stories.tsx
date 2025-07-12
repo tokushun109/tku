@@ -1,13 +1,13 @@
-import { ColorEnum } from '@/types'
+import { ColorType } from '@/types'
 
 import { Icon } from '.'
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/nextjs'
 
 const meta: Meta<typeof Icon> = {
     component: Icon,
     args: {
-        color: ColorEnum.Primary,
+        color: ColorType.Primary,
         size: 80,
         children: 'Icon',
         onClick: () => {

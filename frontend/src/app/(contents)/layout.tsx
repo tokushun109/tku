@@ -19,7 +19,11 @@ const DetailsLayout = ({ children }: { children: React.ReactNode }) => {
             <Header />
             <main className={styles['main']}>
                 <PageFadeTransition>
-                    <div className={classNames(styles['title'], styles['default'], labelFontFace.className)}>{NavigationTitleEnum[pathname]}</div>
+                    {NavigationTitleEnum[pathname] ? (
+                        <div className={classNames(styles['title'], styles['default'], labelFontFace.className)}>{NavigationTitleEnum[pathname]}</div>
+                    ) : (
+                        <div className={styles['no-title-space']} />
+                    )}
                     {children}
                 </PageFadeTransition>
             </main>

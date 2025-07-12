@@ -1,5 +1,5 @@
 import NextImage from 'next/image'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import styles from './styles.module.scss'
 
@@ -11,6 +11,12 @@ type Props = {
 export const Image = ({ src, alt }: Props) => {
     const [isLoading, setIsLoading] = useState<boolean>(true)
     const [displaySrc, setDisplaySrc] = useState<string>(src)
+
+    // srcが変わったらdisplaySrcも更新
+    useEffect(() => {
+        setDisplaySrc(src)
+        setIsLoading(true)
+    }, [src])
 
     return (
         <div className={styles['container']}>

@@ -1,7 +1,7 @@
 // 登録画像の種類
-export const ImageEnum = {
+export const ImageType = {
     Registered: 'registered',
     Preview: 'preview',
 } as const
 
-export type ImageType = (typeof ImageEnum)[keyof typeof ImageEnum]
+export type ImageType = (typeof ImageType)[keyof typeof ImageType]

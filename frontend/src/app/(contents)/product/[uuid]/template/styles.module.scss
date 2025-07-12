@@ -1,0 +1,15 @@
+@use '/src/styles/variables';
+@use '/src/styles/mixins';
+
+.container {
+    margin: 0 auto;
+    max-width: $lg;
+
+    @include media(sm) {
+        padding: 16px;
+    }
+}
+
+.product-detail-area {
+    min-height: 56vh;
+}

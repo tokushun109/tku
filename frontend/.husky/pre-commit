@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
+
+cd frontend
 
 # コードの整形
 npx lint-staged

@@ -7,7 +7,7 @@ type Props = {
     items: IThumbnail[]
 }
 
-const Carousel = ({ items }: Props) => {
+export const Carousel = ({ items }: Props) => {
     return (
         <div className={styles['container']}>
             <div className={styles['wrapper']}>
@@ -20,5 +20,3 @@ const Carousel = ({ items }: Props) => {
         </div>
     )
 }
-
-export default Carousel

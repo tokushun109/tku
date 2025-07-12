@@ -1,14 +1,14 @@
-export const ColorEnum = {
+export const ColorType = {
     Primary: 'primary',
     Secondary: 'secondary',
     Accent: 'accent',
     White: 'white',
 } as const
-export type ColorType = (typeof ColorEnum)[keyof typeof ColorEnum]
+export type ColorType = (typeof ColorType)[keyof typeof ColorType]
 
-export const ColorCodeEnum = {
-    [ColorEnum.Primary]: '#7b675b',
-    [ColorEnum.Secondary]: '#bcaaa4',
-    [ColorEnum.Accent]: '#ffb74D',
-    [ColorEnum.White]: '#ffffff',
+export const ColorCode = {
+    [ColorType.Primary]: '#7b675b',
+    [ColorType.Secondary]: '#bcaaa4',
+    [ColorType.Accent]: '#ffb74D',
+    [ColorType.White]: '#ffffff',
 } as const

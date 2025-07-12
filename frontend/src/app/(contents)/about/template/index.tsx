@@ -3,13 +3,12 @@
 import { Instagram } from '@mui/icons-material'
 import classNames from 'classnames'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
 
 import { Breadcrumbs } from '@/components/bases/Breadcrumbs'
 import { Icon } from '@/components/bases/Icon'
 import Section from '@/components/layouts/Section'
 import { ISite } from '@/features/site/type'
-import { ColorEnum } from '@/types'
+import { ColorType } from '@/types'
 import { labelFontFace } from '@/utils/font'
 
 import styles from './styles.module.scss'
@@ -20,11 +19,9 @@ type Props = {
 }
 
 const AboutTemplate = ({ snsList, salesSiteList }: Props) => {
-    const router = useRouter()
-
     return (
         <div className={styles['container']}>
-            <Section button={false} color={ColorEnum.Secondary} title="Story">
+            <Section button={false} color={ColorType.Secondary} title="Story">
                 <div className={styles['content']}>
                     <div className={styles['column']}>
                         <div className={styles['image']}>
@@ -50,7 +47,7 @@ const AboutTemplate = ({ snsList, salesSiteList }: Props) => {
                     </div>
                 </div>
             </Section>
-            <Section button={false} color={ColorEnum.Secondary} title="Concept">
+            <Section button={false} color={ColorType.Secondary} title="Concept">
                 <div className={styles['content']}>
                     <div className={styles['column']}>
                         <div className={styles['column__wrapper']}>
@@ -108,7 +105,7 @@ const AboutTemplate = ({ snsList, salesSiteList }: Props) => {
                     </div>
                 </div>
             </Section>
-            <Section button={false} color={ColorEnum.Secondary} title="Story">
+            <Section button={false} color={ColorType.Secondary} title="Story">
                 <div className={styles['content']}>
                     <div className={styles['column']}>
                         <div className={styles['image']}>
@@ -162,7 +159,7 @@ const AboutTemplate = ({ snsList, salesSiteList }: Props) => {
                     </div>
                 </div>
             </Section>
-            <Section button={false} color={ColorEnum.Secondary} title="Relation">
+            <Section button={false} color={ColorType.Secondary} title="Relation">
                 <div className={classNames(styles['content'], styles['relation'])}>
                     <div className={styles['column']}>
                         <div className={styles['column__wrapper']}>
@@ -170,10 +167,10 @@ const AboutTemplate = ({ snsList, salesSiteList }: Props) => {
                             <div className={styles['button-area']}>
                                 {snsList.map((v) => (
                                     <Icon
-                                        color={ColorEnum.Accent}
+                                        color={ColorType.Accent}
                                         key={v.name}
                                         onClick={() => {
-                                            router.push(v.url)
+                                            window.open(v.url, '_blank', 'noopener')
                                         }}
                                         size={90}
                                     >
@@ -194,10 +191,10 @@ const AboutTemplate = ({ snsList, salesSiteList }: Props) => {
                             <div className={styles['button-area']}>
                                 {salesSiteList.map((v) => (
                                     <Icon
-                                        color={ColorEnum.Accent}
+                                        color={ColorType.Accent}
                                         key={v.name}
                                         onClick={() => {
-                                            router.push(v.url)
+                                            window.open(v.url, '_blank', 'noopener')
                                         }}
                                         size={90}
                                     >

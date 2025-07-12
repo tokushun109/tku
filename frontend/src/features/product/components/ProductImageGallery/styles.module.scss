@@ -1,0 +1,101 @@
+@use '/src/styles/variables';
+@use '/src/styles/mixins';
+
+$thumbnail-gap: 4px;
+
+@mixin thumbnail-width($columns, $gap-size) {
+    width: calc((100% - #{$columns - 1} * #{$gap-size}) / #{$columns});
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.main-image-area {
+    position: relative;
+    max-width: 604px;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 8px;
+    background-color: $page-background-color;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    @include media(md) {
+        max-width: 100%;
+    }
+}
+
+.main-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.thumbnail-area-wrapper {
+    display: flex;
+    justify-content: center;
+}
+
+.thumbnail-area {
+    display: flex;
+    gap: $thumbnail-gap;
+    overflow-x: auto;
+    flex-wrap: wrap;
+
+    @include media(md) {
+        max-width: 100%;
+    }
+
+    // スクロールバーのスタイリング
+    &::-webkit-scrollbar {
+        height: $thumbnail-gap;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: $page-background-color;
+        border-radius: 2px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: $text-color;
+        border-radius: 2px;
+    }
+}
+
+.thumbnail {
+    position: relative;
+    flex-shrink: 0;
+    @include thumbnail-width(6, $thumbnail-gap);
+    aspect-ratio: 1;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    overflow: hidden;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+
+    &:hover {
+        border-color: $secondary;
+    }
+
+    &--active {
+        border-color: $accent;
+    }
+
+    @include media(sm) {
+        @include thumbnail-width(6, $thumbnail-gap);
+    }
+}
+
+.thumbnail-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}

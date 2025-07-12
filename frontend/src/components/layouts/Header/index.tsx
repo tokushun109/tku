@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import { Icon } from '@/components/bases/Icon'
-import { ColorEnum } from '@/types'
+import { ColorType } from '@/types'
 
 import { slideAnimation } from './animations'
 import { MenuScreen } from './components/MenuScreen'
@@ -42,7 +42,7 @@ export const Header = () => {
             {!isVisibleMenu && (
                 <div className={classNames(styles['menu-icon'], styles['default'])}>
                     <Icon
-                        color={ColorEnum.Primary}
+                        color={ColorType.Primary}
                         onClick={() => {
                             setIsVisibleMenu(true)
                         }}
