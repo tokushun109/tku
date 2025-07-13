@@ -1,9 +1,12 @@
-import { ISite } from '@/features/site/type'
 import { ApiError } from '@/utils/error'
 
-export const getSnsList = async (): Promise<ISite[]> => {
+export interface IHealthCheckResponse {
+    message?: string
+}
+
+export const healthCheck = async (): Promise<IHealthCheckResponse> => {
     try {
-        const res = await fetch(`${process.env.API_URL}/sns/`, {
+        const res = await fetch(`${process.env.API_URL}/health_check`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -17,6 +20,6 @@ export const getSnsList = async (): Promise<ISite[]> => {
         if (error instanceof ApiError) {
             throw error
         }
-        throw new Error('SNS一覧の取得に失敗しました')
+        throw new Error('APIサーバーのヘルスチェックに失敗しました')
     }
 }

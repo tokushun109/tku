@@ -7,15 +7,22 @@ export interface IGetCategoriesParams {
 }
 
 export const getCategories = async (params: IGetCategoriesParams): Promise<IClassification[]> => {
-    const query = convertObjectToURLSearchParams(params)
-    const res = await fetch(`${process.env.API_URL}/category?${query}`, {
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        method: 'GET',
-    })
+    try {
+        const query = convertObjectToURLSearchParams(params)
+        const res = await fetch(`${process.env.API_URL}/category?${query}`, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            method: 'GET',
+        })
 
-    if (!res.ok) throw new ApiError(res)
+        if (!res.ok) throw new ApiError(res)
 
-    return await res.json()
+        return await res.json()
+    } catch (error) {
+        if (error instanceof ApiError) {
+            throw error
+        }
+        throw new Error('カテゴリ一覧の取得に失敗しました')
+    }
 }
