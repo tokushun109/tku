@@ -266,6 +266,30 @@ export type ButtonVariant = (typeof ButtonVariant)[keyof typeof ButtonVariant]
 
 ### React/Next.js規約
 
+#### 関数定義
+
+frontend配下では**アロー関数を使用して統一**してください。
+
+```tsx
+// ✅ 推奨 - アロー関数
+const MyComponent: React.FC<Props> = ({ prop1, prop2 }) => {
+  return <div>{prop1}</div>
+}
+
+const handleClick = (event: React.MouseEvent) => {
+  // 処理
+}
+
+// ❌ 非推奨 - function宣言
+function MyComponent({ prop1, prop2 }: Props) {
+  return <div>{prop1}</div>
+}
+
+function handleClick(event: React.MouseEvent) {
+  // 処理
+}
+```
+
 #### コンポーネント設計
 
 - **再利用性**: 既存のコンポーネントを優先的に使用
