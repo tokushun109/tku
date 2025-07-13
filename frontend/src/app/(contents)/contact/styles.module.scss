@@ -1,0 +1,177 @@
+@use '@/styles/variables.scss' as *;
+@use '@/styles/mixins.scss' as *;
+
+.page-contact {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+
+    @include media('sm') {
+        padding: 20px 15px;
+    }
+}
+
+.page-title-container {
+    text-align: center;
+    margin-bottom: 40px;
+
+    @include media('sm') {
+        display: none;
+    }
+}
+
+.page-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: $title-primary-color;
+    margin: 0;
+
+    @include media('sm') {
+        font-size: 2rem;
+    }
+}
+
+.contact-introduction {
+    text-align: center;
+    margin-bottom: 40px;
+    font-size: 1.1rem;
+    color: $text-color;
+
+    @include media('sm') {
+        margin-top: 25px;
+        margin-bottom: 30px;
+    }
+
+    .sm {
+        display: none;
+
+        @include media('sm') {
+            display: block;
+        }
+    }
+}
+
+.content-wrapper {
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.content-form-wrapper {
+    min-height: 400px;
+}
+
+.error-message {
+    background-color: $danger-bg-color;
+    color: $danger-color;
+    padding: 12px 16px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+}
+
+.require-form,
+.form-field {
+    position: relative;
+    margin-bottom: 24px;
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: $text-color;
+        font-size: 0.95rem;
+    }
+
+    input,
+    textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e1e5e9;
+        border-radius: 4px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+        box-sizing: border-box;
+
+        &:focus {
+            outline: none;
+            border-color: $primary;
+        }
+
+        &.error {
+            border-color: $danger-color;
+        }
+    }
+
+    textarea {
+        resize: vertical;
+        min-height: 120px;
+        font-family: inherit;
+    }
+}
+
+.chip-container {
+    position: absolute;
+    top: 34px;
+    right: 16px;
+    z-index: 1;
+}
+
+.require-chip {
+    background-color: $danger-bg-color;
+    color: $danger-color;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1;
+}
+
+.field-error {
+    display: block;
+    color: $danger-color;
+    font-size: 0.85rem;
+    margin-top: 4px;
+}
+
+.submit-container {
+    text-align: center;
+    margin-top: 32px;
+}
+
+.submit-button {
+    background-color: $primary;
+    color: white;
+    padding: 12px 32px;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    min-width: 120px;
+
+    &:hover:not(:disabled) {
+        background-color: darken($primary, 10%);
+    }
+
+    &:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+}
+
+.content-message-wrapper {
+    padding: 30vh 0;
+    height: 65vh;
+    color: $title-primary-color;
+    text-align: center;
+    font-size: $font-xlarge;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    strong {
+        font-weight: 600;
+    }
+}
