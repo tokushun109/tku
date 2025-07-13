@@ -1,0 +1,57 @@
+@use '@/styles/variables.scss' as *;
+@use '@/styles/mixins.scss' as *;
+
+.error-wrapper {
+    text-align: center;
+
+    .site-title-area {
+        position: relative;
+        padding-top: 35px;
+        text-align: center;
+
+        @include media('sm') {
+            display: none;
+        }
+
+        .site-title {
+            margin: 0 auto;
+            width: 370px;
+            height: 150px;
+            object-fit: cover;
+        }
+    }
+
+    .container {
+        .error-content {
+            height: 75vh;
+
+            .error-message {
+                padding: 20vh 0;
+                color: $title-primary-color;
+                font-size: $font-xxlarge;
+
+                @include media('sm') {
+                    font-size: $font-xlarge;
+                }
+
+                .sm {
+                    display: none;
+
+                    @include media('sm') {
+                        display: block;
+                    }
+                }
+
+                .error-code {
+                    font-size: 50px;
+                }
+
+                .home-button-wrapper {
+                    margin-top: 2rem;
+                    display: flex;
+                    justify-content: center;
+                }
+            }
+        }
+    }
+}

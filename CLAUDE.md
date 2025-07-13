@@ -158,3 +158,152 @@ cdktf synth
 - **移行先**: frontend/ ディレクトリの Next.js + TypeScript アプリケーション
 - **移行目標**: 元のアプリケーションの UI/UX を忠実に再現し、機能を完全に移植
 - **並行開発**: レガシーコードを参照しながら新規実装を進める
+
+## コーディング規約
+
+### Sass/SCSS規約
+
+#### @use を使用する
+
+Dart Sass 3.0.0 で `@import` が削除される予定のため、`@use` を使用してください。
+
+```scss
+// ❌ 非推奨（廃止予定）
+@import '@/styles/variables.scss';
+@import '@/styles/mixins.scss';
+
+// ✅ 推奨
+@use '@/styles/variables.scss' as *;
+@use '@/styles/mixins.scss' as *;
+```
+
+#### 変数・mixin の読み込み
+
+- **variables**: `@use '@/styles/variables.scss' as *;`
+- **mixins**: `@use '@/styles/mixins.scss' as *;`
+- `as *` を使用することで名前空間なしで変数やmixinを使用可能
+
+### CSS命名規約
+
+#### ケバブケース（kebab-case）を使用
+
+CSS クラス名はケバブケースで命名してください。
+
+```scss
+// ✅ 推奨
+.error-wrapper {
+  .site-title-area {
+    .site-title {
+      // スタイル
+    }
+  }
+}
+```
+
+#### CSS Modules での参照
+
+```tsx
+// ✅ ケバブケースの参照方法
+<div className={styles['error-wrapper']}>
+  <div className={styles['site-title-area']}>
+    <img className={styles['site-title']} />
+  </div>
+</div>
+```
+
+### TypeScript規約
+
+#### 厳格な型定義
+
+- `any` の使用を避け、適切な型定義を行う
+- interfaceで明確な型を定義する
+- プロパティの省略可能性を明示（`?:`）
+
+```tsx
+// ✅ 推奨
+interface ErrorPageProps {
+  errorMessage: React.ReactNode
+  statusCode?: number
+  showHomeButton?: boolean
+}
+```
+
+### React/Next.js規約
+
+#### コンポーネント設計
+
+- **再利用性**: 既存のコンポーネントを優先的に使用
+- **Props設計**: デフォルト値を適切に設定
+- **命名**: コンポーネント名はPascalCase
+
+```tsx
+// ✅ 推奨
+const ErrorPage: React.FC<ErrorPageProps> = ({ 
+  errorMessage, 
+  statusCode, 
+  showHomeButton = true 
+}) => {
+  // 実装
+}
+```
+
+#### インポート順序
+
+ESLintルールに従った順序でインポートを記述：
+
+```tsx
+// ✅ 推奨順序
+// 1. React関連
+import React from 'react'
+import { useState } from 'react'
+
+// 2. Next.js関連
+import Image from 'next/image'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+
+// 3. 外部ライブラリ
+import axios from 'axios'
+
+// 4. 内部モジュール（@/で始まる）
+import { Button } from '@/components/bases/Button'
+import { IClientError } from '@/utils/error'
+
+// 5. 相対パス
+import styles from './styles.module.scss'
+```
+
+### SEO対策
+
+#### インデックス制御
+
+エラーページ、メンテナンスページなどはインデックスさせない：
+
+```tsx
+// ✅ 推奨
+<Head>
+  <meta name="robots" content="noindex, nofollow" />
+</Head>
+```
+
+### エラーハンドリング
+
+#### API呼び出し
+
+全てのAPI関数にtry-catchエラーハンドリングを実装：
+
+```tsx
+// ✅ 推奨
+export const getProducts = async (): Promise<Product[]> => {
+  try {
+    const response = await fetch('/api/products')
+    if (!response.ok) throw new ApiError(response)
+    return await response.json()
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error
+    }
+    throw new Error('商品一覧の取得に失敗しました')
+  }
+}
+```
