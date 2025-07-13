@@ -23,6 +23,11 @@
         min-height: 120px;
         font-family: inherit;
 
+        &::placeholder {
+            color: #d0d0d0;
+            opacity: 1;
+        }
+
         &:focus {
             outline: none;
             border-color: $primary;
@@ -36,7 +41,7 @@
 
 .chip-container {
     position: absolute;
-    top: 34px;
+    top: 44px;
     right: 16px;
     z-index: 1;
 }

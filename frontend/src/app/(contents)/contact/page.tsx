@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useActionState, useEffect } from 'react'
 import React from 'react'
 
+import { Button } from '@/components/bases/Button'
 import { Input } from '@/components/bases/Input'
 import { TextArea } from '@/components/bases/TextArea'
 
@@ -56,6 +57,7 @@ const ContactPage: React.FC = () => {
                                     label="お名前"
                                     maxLength={20}
                                     name="name"
+                                    placeholder="山田太郎"
                                     required
                                     type="text"
                                 />
@@ -68,6 +70,7 @@ const ContactPage: React.FC = () => {
                                     label="会社名"
                                     maxLength={20}
                                     name="company"
+                                    placeholder="株式会社サンプル"
                                     type="text"
                                 />
 
@@ -78,6 +81,7 @@ const ContactPage: React.FC = () => {
                                     id="phoneNumber"
                                     label="電話番号(-を入れずに入力)"
                                     name="phoneNumber"
+                                    placeholder="09012345678"
                                     type="tel"
                                 />
 
@@ -89,6 +93,7 @@ const ContactPage: React.FC = () => {
                                     label="メールアドレス"
                                     maxLength={50}
                                     name="email"
+                                    placeholder="example@example.com"
                                     required
                                     type="email"
                                 />
@@ -100,14 +105,15 @@ const ContactPage: React.FC = () => {
                                     id="content"
                                     label="お問い合わせ内容"
                                     name="content"
+                                    placeholder="商品についてのご質問、ご要望などをお聞かせください"
                                     required
                                     rows={5}
                                 />
 
                                 <div className={styles['submit-container']}>
-                                    <button className={styles['submit-button']} disabled={pending} formAction={formAction} type="submit">
+                                    <Button disabled={pending} formAction={formAction} type="submit">
                                         {pending ? '送信中...' : '送信する'}
-                                    </button>
+                                    </Button>
                                 </div>
                             </form>
                         </div>

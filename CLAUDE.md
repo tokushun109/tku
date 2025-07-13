@@ -333,6 +333,49 @@ function handleClick(event: React.MouseEvent) {
 - **命名**: コンポーネント名はPascalCase
 - **スタイル上書き禁止**: 親コンポーネントから子コンポーネントのスタイルを`!important`で上書きしない
 
+#### Storybook作成・更新規約
+
+コンポーネントを**新規作成**または**プロパティを追加・修正**した場合は、必ずStorybookを作成・更新してください。
+
+```tsx
+// ✅ 推奨 - 新規コンポーネント作成時
+// components/bases/Button/index.stories.tsx を作成
+
+import { Button } from '.'
+import type { Meta, StoryObj } from '@storybook/nextjs'
+
+const meta: Meta<typeof Button> = {
+    component: Button,
+    args: {
+        children: 'ボタン',
+        disabled: false,
+    },
+    argTypes: {
+        disabled: {
+            control: { type: 'boolean' },
+        },
+    },
+}
+
+export default meta
+type Story = StoryObj<typeof Button>
+
+export const Default: Story = {}
+export const Disabled: Story = {
+    args: { disabled: true },
+}
+```
+
+**必須ストーリー:**
+- `Default`: 基本状態
+- **各プロパティのバリエーション**: disabled、error、required等の状態
+- **実用例**: FormExampleなど実際の使用例
+
+**更新タイミング:**
+- 新規コンポーネント作成時
+- プロパティ追加・修正時
+- インターフェース変更時
+
 ```tsx
 // ✅ 推奨
 const ErrorPage: React.FC<ErrorPageProps> = ({ 

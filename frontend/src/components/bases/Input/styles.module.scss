@@ -21,6 +21,11 @@
         transition: border-color 0.3s ease;
         box-sizing: border-box;
 
+        &::placeholder {
+            color: #d0d0d0;
+            opacity: 1;
+        }
+
         &:focus {
             outline: none;
             border-color: $primary;
@@ -40,7 +45,7 @@
 
 .chip-container {
     position: absolute;
-    top: 34px;
+    top: 44px;
     right: 16px;
     z-index: 1;
 }
