@@ -242,6 +242,7 @@ CSS クラス名はケバブケースで命名してください。
 - `any` の使用を避け、適切な型定義を行う
 - interfaceで明確な型を定義する
 - プロパティの省略可能性を明示（`?:`）
+- **ユニオンタイプはオブジェクトリテラルで定義**: 文字列リテラルのユニオンタイプではなく、オブジェクトリテラルを使用
 
 ```tsx
 // ✅ 推奨
@@ -250,6 +251,17 @@ interface ErrorPageProps {
   statusCode?: number
   showHomeButton?: boolean
 }
+
+// ❌ 非推奨 - ユニオンタイプ
+type ButtonVariant = 'primary' | 'secondary' | 'danger'
+
+// ✅ 推奨 - オブジェクトリテラル
+export const ButtonVariant = {
+  Primary: 'primary',
+  Secondary: 'secondary',
+  Danger: 'danger',
+} as const
+export type ButtonVariant = (typeof ButtonVariant)[keyof typeof ButtonVariant]
 ```
 
 ### React/Next.js規約

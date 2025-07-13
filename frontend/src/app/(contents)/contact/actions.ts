@@ -10,8 +10,10 @@ interface ContactFormData {
     phoneNumber?: string
 }
 
-interface FormState {
-    errors?: Record<string, string>
+type ContactFormErrors = Partial<Record<keyof ContactFormData, string>>
+
+export interface FormState {
+    errors?: ContactFormErrors
     message?: string
     success?: boolean
 }
@@ -28,7 +30,7 @@ export async function submitContact(prevState: FormState, formData: FormData): P
         }
 
         // バリデーション
-        const errors: Record<string, string> = {}
+        const errors: ContactFormErrors = {}
 
         if (!data.name || data.name.trim().length === 0) {
             errors.name = 'お名前は必須項目です'

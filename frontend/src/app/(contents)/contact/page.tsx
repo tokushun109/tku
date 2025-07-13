@@ -3,17 +3,11 @@
 import { useActionState } from 'react'
 import React from 'react'
 
-import { Chip, ChipSize } from '@/components/bases/Chip'
-import { ColorType, FontSizeType } from '@/types'
+import { Input } from '@/components/bases/Input'
+import { TextArea } from '@/components/bases/TextArea'
 
-import { submitContact } from './actions'
+import { submitContact, FormState } from './actions'
 import styles from './styles.module.scss'
-
-interface FormState {
-    errors?: Record<string, string>
-    message?: string
-    success?: boolean
-}
 
 const initialState: FormState = {
     message: '',
@@ -22,6 +16,12 @@ const initialState: FormState = {
 
 const ContactPage: React.FC = () => {
     const [state, formAction, pending] = useActionState(submitContact, initialState)
+
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault()
+        const formData = new FormData(event.currentTarget)
+        formAction(formData)
+    }
 
     return (
         <div className={styles['page-contact']}>
@@ -45,76 +45,35 @@ const ContactPage: React.FC = () => {
                                 </div>
                             )}
 
-                            <form action={formAction}>
+                            <form noValidate onSubmit={handleSubmit}>
                                 {/* お名前 */}
-                                <div className={styles['require-form']}>
-                                    <label htmlFor="name">お名前</label>
-                                    <div className={styles['chip-container']}>
-                                        <Chip color={ColorType.Danger} fontColor="#b84150" fontSize={FontSizeType.SmMd} size={ChipSize.Small}>
-                                            必須
-                                        </Chip>
-                                    </div>
-                                    <input
-                                        className={state?.errors?.name ? styles['error'] : ''}
-                                        id="name"
-                                        maxLength={20}
-                                        name="name"
-                                        required
-                                        type="text"
-                                    />
-                                    {state?.errors?.name && <span className={styles['field-error']}>{state.errors.name}</span>}
-                                </div>
+                                <Input error={state?.errors?.name} id="name" label="お名前" maxLength={20} name="name" required type="text" />
 
                                 {/* 会社名 */}
-                                <div className={styles['form-field']}>
-                                    <label htmlFor="company">会社名</label>
-                                    <input id="company" maxLength={20} name="company" type="text" />
-                                    {state?.errors?.company && <span className={styles['field-error']}>{state.errors.company}</span>}
-                                </div>
+                                <Input error={state?.errors?.company} id="company" label="会社名" maxLength={20} name="company" type="text" />
 
                                 {/* 電話番号 */}
-                                <div className={styles['form-field']}>
-                                    <label htmlFor="phoneNumber">電話番号(-を入れずに入力)</label>
-                                    <input id="phoneNumber" name="phoneNumber" type="tel" />
-                                    {state?.errors?.phoneNumber && <span className={styles['field-error']}>{state.errors.phoneNumber}</span>}
-                                </div>
+                                <Input
+                                    error={state?.errors?.phoneNumber}
+                                    id="phoneNumber"
+                                    label="電話番号(-を入れずに入力)"
+                                    name="phoneNumber"
+                                    type="tel"
+                                />
 
                                 {/* メールアドレス */}
-                                <div className={styles['require-form']}>
-                                    <label htmlFor="email">メールアドレス</label>
-                                    <div className={styles['chip-container']}>
-                                        <Chip color={ColorType.Danger} fontColor="#b84150" fontSize={FontSizeType.SmMd} size={ChipSize.Small}>
-                                            必須
-                                        </Chip>
-                                    </div>
-                                    <input
-                                        className={state?.errors?.email ? styles['error'] : ''}
-                                        id="email"
-                                        maxLength={50}
-                                        name="email"
-                                        required
-                                        type="email"
-                                    />
-                                    {state?.errors?.email && <span className={styles['field-error']}>{state.errors.email}</span>}
-                                </div>
+                                <Input
+                                    error={state?.errors?.email}
+                                    id="email"
+                                    label="メールアドレス"
+                                    maxLength={50}
+                                    name="email"
+                                    required
+                                    type="email"
+                                />
 
                                 {/* お問い合わせ内容 */}
-                                <div className={styles['require-form']}>
-                                    <label htmlFor="content">お問い合わせ内容</label>
-                                    <div className={styles['chip-container']}>
-                                        <Chip color={ColorType.Danger} fontColor="#b84150" fontSize={FontSizeType.SmMd} size={ChipSize.Small}>
-                                            必須
-                                        </Chip>
-                                    </div>
-                                    <textarea
-                                        className={state?.errors?.content ? styles['error'] : ''}
-                                        id="content"
-                                        name="content"
-                                        required
-                                        rows={5}
-                                    />
-                                    {state?.errors?.content && <span className={styles['field-error']}>{state.errors.content}</span>}
-                                </div>
+                                <TextArea error={state?.errors?.content} id="content" label="お問い合わせ内容" name="content" required rows={5} />
 
                                 <div className={styles['submit-container']}>
                                     <button className={styles['submit-button']} disabled={pending} type="submit">
