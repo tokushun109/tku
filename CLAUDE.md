@@ -177,6 +177,42 @@ Dart Sass 3.0.0 で `@import` が削除される予定のため、`@use` を使�
 @use '@/styles/mixins.scss' as *;
 ```
 
+#### 全体読み込み設定との重複を避ける
+
+`next.config.ts`の`prependData`で全体に読み込まれているモジュールは、各ファイルで重複して読み込まないでください。
+
+```typescript
+// next.config.ts での設定
+sassOptions: {
+  prependData: '@use "sass:color"; @use "@/styles/variables.scss" as *; @use "@/styles/mixins.scss" as *; @use "@/styles/layouts.scss" as *;',
+},
+```
+
+```scss
+// ❌ 非推奨 - next.config.tsで既に読み込まれている
+@use 'sass:color';
+@use '@/styles/variables.scss' as *;
+@use '@/styles/mixins.scss' as *;
+@use '@/styles/layouts.scss' as *;
+
+.my-component {
+  color: $primary;
+  @include media('sm') {
+    // スタイル
+  }
+}
+
+// ✅ 推奨 - 必要に応じて追加のモジュールのみ読み込み
+@use 'sass:math';
+
+.my-component {
+  color: $primary; // variables.scss から利用可能
+  @include media('sm') { // mixins.scss から利用可能
+    // スタイル
+  }
+}
+```
+
 #### 変数・mixin の読み込み
 
 - **variables**: `@use '@/styles/variables.scss' as *;`

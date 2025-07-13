@@ -1,6 +1,3 @@
-@use '/src/styles/variables';
-@use '/src/styles/mixins';
-
 $thumbnail-gap: 4px;
 
 @mixin thumbnail-width($columns, $gap-size) {

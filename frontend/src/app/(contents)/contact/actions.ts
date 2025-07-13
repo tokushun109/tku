@@ -1,19 +1,13 @@
 'use server'
 
-import { redirect } from 'next/navigation'
+import { postContact } from '@/apis/contact'
+import { IContact } from '@/features/contact/type'
 
-interface ContactFormData {
-    company?: string
-    content: string
-    email: string
-    name: string
-    phoneNumber?: string
-}
-
-type ContactFormErrors = Partial<Record<keyof ContactFormData, string>>
+type ContactFormErrors = Partial<Record<keyof IContact, string>>
 
 export interface FormState {
     errors?: ContactFormErrors
+    formData?: IContact
     message?: string
     success?: boolean
 }
@@ -21,7 +15,7 @@ export interface FormState {
 export async function submitContact(prevState: FormState, formData: FormData): Promise<FormState> {
     try {
         // フォームデータの取得
-        const data: ContactFormData = {
+        const data: IContact = {
             name: formData.get('name') as string,
             company: (formData.get('company') as string) || '',
             phoneNumber: (formData.get('phoneNumber') as string) || '',
@@ -62,26 +56,12 @@ export async function submitContact(prevState: FormState, formData: FormData): P
             return {
                 errors,
                 message: '入力内容を確認してください',
+                formData: data,
             }
         }
 
-        // APIへの送信（ここではバックエンドAPIを想定）
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/contact`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        })
-
-        if (!response.ok) {
-            throw new Error('送信に失敗しました')
-        }
-
-        // 成功時は3秒後にホームページへリダイレクト
-        setTimeout(() => {
-            redirect('/')
-        }, 3000)
+        // APIへの送信
+        await postContact({ form: data })
 
         return {
             success: true,

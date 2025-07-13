@@ -1,31 +1,33 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useActionState, useEffect } from 'react'
 import React from 'react'
 
 import { Input } from '@/components/bases/Input'
 import { TextArea } from '@/components/bases/TextArea'
 
-import { submitContact, FormState } from './actions'
+import { submitContact } from './actions'
 import styles from './styles.module.scss'
 
-const initialState: FormState = {
-    message: '',
-    errors: {},
-}
-
 const ContactPage: React.FC = () => {
-    const [state, formAction, pending] = useActionState(submitContact, initialState)
+    const [{ message, success, formData, errors }, formAction, pending] = useActionState(submitContact, {})
+    const router = useRouter()
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault()
-        const formData = new FormData(event.currentTarget)
-        formAction(formData)
-    }
+    useEffect(() => {
+        // 送信が成功した場合、3秒後にトップページへリダイレクト
+        if (success) {
+            const timer = setTimeout(() => {
+                router.push('/')
+            }, 3000)
+
+            return () => clearTimeout(timer)
+        }
+    }, [success, router])
 
     return (
         <div className={styles['page-contact']}>
-            {!state?.success && (
+            {!success && (
                 <div className={styles['contact-introduction']}>
                     <p>
                         お問い合わせ・
@@ -37,24 +39,42 @@ const ContactPage: React.FC = () => {
 
             <div className={styles['content-wrapper']}>
                 <div className={styles['content-form-wrapper']}>
-                    {!state?.success ? (
+                    {!success ? (
                         <div className={styles['form-container']}>
-                            {state?.message && (
+                            {message && (
                                 <div aria-live="polite" className={styles['error-message']}>
-                                    {state.message}
+                                    {message}
                                 </div>
                             )}
 
-                            <form noValidate onSubmit={handleSubmit}>
+                            <form action={formAction} noValidate>
                                 {/* お名前 */}
-                                <Input error={state?.errors?.name} id="name" label="お名前" maxLength={20} name="name" required type="text" />
+                                <Input
+                                    defaultValue={formData?.name || ''}
+                                    error={errors?.name}
+                                    id="name"
+                                    label="お名前"
+                                    maxLength={20}
+                                    name="name"
+                                    required
+                                    type="text"
+                                />
 
                                 {/* 会社名 */}
-                                <Input error={state?.errors?.company} id="company" label="会社名" maxLength={20} name="company" type="text" />
+                                <Input
+                                    defaultValue={formData?.company || ''}
+                                    error={errors?.company}
+                                    id="company"
+                                    label="会社名"
+                                    maxLength={20}
+                                    name="company"
+                                    type="text"
+                                />
 
                                 {/* 電話番号 */}
                                 <Input
-                                    error={state?.errors?.phoneNumber}
+                                    defaultValue={formData?.phoneNumber || ''}
+                                    error={errors?.phoneNumber}
                                     id="phoneNumber"
                                     label="電話番号(-を入れずに入力)"
                                     name="phoneNumber"
@@ -63,7 +83,8 @@ const ContactPage: React.FC = () => {
 
                                 {/* メールアドレス */}
                                 <Input
-                                    error={state?.errors?.email}
+                                    defaultValue={formData?.email || ''}
+                                    error={errors?.email}
                                     id="email"
                                     label="メールアドレス"
                                     maxLength={50}
@@ -73,10 +94,18 @@ const ContactPage: React.FC = () => {
                                 />
 
                                 {/* お問い合わせ内容 */}
-                                <TextArea error={state?.errors?.content} id="content" label="お問い合わせ内容" name="content" required rows={5} />
+                                <TextArea
+                                    defaultValue={formData?.content || ''}
+                                    error={errors?.content}
+                                    id="content"
+                                    label="お問い合わせ内容"
+                                    name="content"
+                                    required
+                                    rows={5}
+                                />
 
                                 <div className={styles['submit-container']}>
-                                    <button className={styles['submit-button']} disabled={pending} type="submit">
+                                    <button className={styles['submit-button']} disabled={pending} formAction={formAction} type="submit">
                                         {pending ? '送信中...' : '送信する'}
                                     </button>
                                 </div>

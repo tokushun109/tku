@@ -1,6 +1,3 @@
-@use '@/styles/variables.scss' as *;
-@use '@/styles/mixins.scss' as *;
-
 .page-contact {
     max-width: 800px;
     margin: 0 auto;
@@ -152,7 +149,7 @@
     min-width: 120px;
 
     &:hover:not(:disabled) {
-        background-color: darken($primary, 10%);
+        background-color: color.adjust($primary, $lightness: -10%);
     }
 
     &:disabled {
@@ -162,8 +159,7 @@
 }
 
 .content-message-wrapper {
-    padding: 30vh 0;
-    height: 65vh;
+    height: 50vh;
     color: $title-primary-color;
     text-align: center;
     font-size: $font-xlarge;
