@@ -3,10 +3,9 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import React from 'react'
 
-import { Button } from '@/components/bases/Button'
+import { Header } from '@/components/layouts/Header'
 
 import styles from './error.module.scss'
 
@@ -17,11 +16,6 @@ interface ErrorPageProps {
 }
 
 const ErrorPage: React.FC<ErrorPageProps> = ({ errorMessage, statusCode, showHomeButton = true }) => {
-    const router = useRouter()
-
-    const handleHomeClick = () => {
-        router.push('/')
-    }
     return (
         <>
             <Head>
@@ -39,6 +33,7 @@ const ErrorPage: React.FC<ErrorPageProps> = ({ errorMessage, statusCode, showHom
                         />
                     </Link>
                 </div>
+                <Header isDisabled />
                 <div className={styles.container}>
                     <div className={styles['error-content']}>
                         <div className={styles['error-message']}>
@@ -46,7 +41,9 @@ const ErrorPage: React.FC<ErrorPageProps> = ({ errorMessage, statusCode, showHom
                             <div>{errorMessage}</div>
                             {showHomeButton && (
                                 <div className={styles['home-button-wrapper']}>
-                                    <Button onClick={handleHomeClick}>トップページに戻る</Button>
+                                    <Link className={styles['home-link']} href="/">
+                                        トップページに戻る
+                                    </Link>
                                 </div>
                             )}
                         </div>

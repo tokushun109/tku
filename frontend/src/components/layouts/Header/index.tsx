@@ -14,7 +14,11 @@ import { slideAnimation } from './animations'
 import { MenuScreen } from './components/MenuScreen'
 import styles from './styles.module.scss'
 
-export const Header = () => {
+type Props = {
+    isDisabled?: boolean
+}
+
+export const Header = ({ isDisabled = false }: Props) => {
     const [isVisibleMenu, setIsVisibleMenu] = useState<boolean>(false)
     const router = useRouter()
 
@@ -39,7 +43,7 @@ export const Header = () => {
                     />
                 </h1>
             </header>
-            {!isVisibleMenu && (
+            {!isDisabled && !isVisibleMenu && (
                 <div className={classNames(styles['menu-icon'], styles['default'])}>
                     <Icon
                         color={ColorType.Primary}
