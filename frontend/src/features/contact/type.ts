@@ -1,8 +1,6 @@
+import z from 'zod'
+
+import { contactSchema } from './schema'
+
 /** お問い合わせフォームのデータ型 */
-export interface IContact {
-    company?: string
-    content: string
-    email: string
-    name: string
-    phoneNumber?: string
-}
+export type IContact = z.infer<typeof contactSchema>

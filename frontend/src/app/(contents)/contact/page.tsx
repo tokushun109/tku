@@ -1,30 +1,50 @@
 'use client'
 
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
-import { useActionState, useEffect } from 'react'
+import { useState } from 'react'
 import React from 'react'
+import { useForm, SubmitHandler } from 'react-hook-form'
 
+import { postContact } from '@/apis/contact'
 import { Button } from '@/components/bases/Button'
 import { Input } from '@/components/bases/Input'
 import { TextArea } from '@/components/bases/TextArea'
+import { contactSchema } from '@/features/contact/schema'
+import { IContact } from '@/features/contact/type'
 
-import { submitContact } from './actions'
 import styles from './styles.module.scss'
 
 const ContactPage: React.FC = () => {
-    const [{ message, success, formData, errors }, formAction, pending] = useActionState(submitContact, {})
+    const [success, setSuccess] = useState<boolean>(false)
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+    const [submitError, setSubmitError] = useState<string | null>(null)
     const router = useRouter()
 
-    useEffect(() => {
-        // 送信が成功した場合、3秒後にトップページへリダイレクト
-        if (success) {
-            const timer = setTimeout(() => {
+    const {
+        register,
+        handleSubmit,
+        formState: { errors, isValid },
+    } = useForm<IContact>({
+        mode: 'onChange',
+        resolver: zodResolver(contactSchema),
+    })
+
+    const onSubmit: SubmitHandler<IContact> = async (data) => {
+        try {
+            setIsSubmitting(true)
+            setSubmitError(null)
+            await postContact({ form: data })
+            setSuccess(true)
+            setTimeout(() => {
                 router.push('/')
             }, 3000)
-
-            return () => clearTimeout(timer)
+        } catch {
+            setSubmitError('送信中にエラーが発生しました。もう一度お試しください。')
+        } finally {
+            setIsSubmitting(false)
         }
-    }, [success, router])
+    }
 
     return (
         <div className={styles['page-contact']}>
@@ -42,21 +62,19 @@ const ContactPage: React.FC = () => {
                 <div className={styles['content-form-wrapper']}>
                     {!success ? (
                         <div className={styles['form-container']}>
-                            {message && (
+                            {submitError && (
                                 <div aria-live="polite" className={styles['error-message']}>
-                                    {message}
+                                    {submitError}
                                 </div>
                             )}
 
-                            <form action={formAction} noValidate>
+                            <form noValidate onSubmit={handleSubmit(onSubmit)}>
                                 {/* お名前 */}
                                 <Input
-                                    defaultValue={formData?.name || ''}
-                                    error={errors?.name}
+                                    {...register('name')}
+                                    error={errors.name?.message}
                                     id="name"
                                     label="お名前"
-                                    maxLength={20}
-                                    name="name"
                                     placeholder="山田太郎"
                                     required
                                     type="text"
@@ -64,35 +82,30 @@ const ContactPage: React.FC = () => {
 
                                 {/* 会社名 */}
                                 <Input
-                                    defaultValue={formData?.company || ''}
-                                    error={errors?.company}
+                                    {...register('company')}
+                                    error={errors.company?.message}
                                     id="company"
                                     label="会社名"
-                                    maxLength={20}
-                                    name="company"
                                     placeholder="株式会社サンプル"
                                     type="text"
                                 />
 
                                 {/* 電話番号 */}
                                 <Input
-                                    defaultValue={formData?.phoneNumber || ''}
-                                    error={errors?.phoneNumber}
+                                    {...register('phoneNumber')}
+                                    error={errors.phoneNumber?.message}
                                     id="phoneNumber"
                                     label="電話番号(-を入れずに入力)"
-                                    name="phoneNumber"
                                     placeholder="09012345678"
                                     type="tel"
                                 />
 
                                 {/* メールアドレス */}
                                 <Input
-                                    defaultValue={formData?.email || ''}
-                                    error={errors?.email}
+                                    {...register('email')}
+                                    error={errors.email?.message}
                                     id="email"
                                     label="メールアドレス"
-                                    maxLength={50}
-                                    name="email"
                                     placeholder="example@example.com"
                                     required
                                     type="email"
@@ -100,19 +113,18 @@ const ContactPage: React.FC = () => {
 
                                 {/* お問い合わせ内容 */}
                                 <TextArea
-                                    defaultValue={formData?.content || ''}
-                                    error={errors?.content}
+                                    {...register('content')}
+                                    error={errors.content?.message}
                                     id="content"
                                     label="お問い合わせ内容"
-                                    name="content"
                                     placeholder="商品についてのご質問、ご要望などをお聞かせください"
                                     required
                                     rows={5}
                                 />
 
                                 <div className={styles['submit-container']}>
-                                    <Button disabled={pending} formAction={formAction} type="submit">
-                                        {pending ? '送信中...' : '送信する'}
+                                    <Button disabled={isSubmitting || !isValid} type="submit">
+                                        {isSubmitting ? '送信中...' : '送信する'}
                                     </Button>
                                 </div>
                             </form>

@@ -278,6 +278,7 @@ CSS クラス名はケバブケースで命名してください。
 - `any` の使用を避け、適切な型定義を行う
 - interfaceで明確な型を定義する
 - プロパティの省略可能性を明示（`?:`）
+- **useState使用時は必ず型を明示**: `useState<型>(初期値)` の形式で型を記述する
 - **ユニオンタイプはオブジェクトリテラルで定義**: 文字列リテラルのユニオンタイプではなく、オブジェクトリテラルを使用
 
 ```tsx
@@ -287,6 +288,15 @@ interface ErrorPageProps {
   statusCode?: number
   showHomeButton?: boolean
 }
+
+// ✅ 推奨 - useState with types
+const [isLoading, setIsLoading] = useState<boolean>(false)
+const [data, setData] = useState<User | null>(null)
+const [items, setItems] = useState<string[]>([])
+
+// ❌ 非推奨 - useState without types
+const [isLoading, setIsLoading] = useState(false)
+const [data, setData] = useState(null)
 
 // ❌ 非推奨 - ユニオンタイプ
 type ButtonVariant = 'primary' | 'secondary' | 'danger'
