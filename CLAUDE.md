@@ -259,6 +259,7 @@ interface ErrorPageProps {
 - **再利用性**: 既存のコンポーネントを優先的に使用
 - **Props設計**: デフォルト値を適切に設定
 - **命名**: コンポーネント名はPascalCase
+- **スタイル上書き禁止**: 親コンポーネントから子コンポーネントのスタイルを`!important`で上書きしない
 
 ```tsx
 // ✅ 推奨
@@ -269,6 +270,16 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
 }) => {
   // 実装
 }
+
+// ❌ 非推奨 - 子コンポーネントのスタイル上書き
+.parent-component {
+  .child-component {
+    padding: 10px !important; // 禁止
+  }
+}
+
+// ✅ 推奨 - コンポーネント自体でプロパティを提供
+<ChildComponent size="small" />
 ```
 
 #### インポート順序

@@ -3,6 +3,9 @@
 import { useActionState } from 'react'
 import React from 'react'
 
+import { Chip, ChipSize } from '@/components/bases/Chip'
+import { ColorType, FontSizeType } from '@/types'
+
 import { submitContact } from './actions'
 import styles from './styles.module.scss'
 
@@ -47,7 +50,9 @@ const ContactPage: React.FC = () => {
                                 <div className={styles['require-form']}>
                                     <label htmlFor="name">お名前</label>
                                     <div className={styles['chip-container']}>
-                                        <span className={styles['require-chip']}>必須</span>
+                                        <Chip color={ColorType.Danger} fontColor="#b84150" fontSize={FontSizeType.SmMd} size={ChipSize.Small}>
+                                            必須
+                                        </Chip>
                                     </div>
                                     <input
                                         className={state?.errors?.name ? styles['error'] : ''}
@@ -78,7 +83,9 @@ const ContactPage: React.FC = () => {
                                 <div className={styles['require-form']}>
                                     <label htmlFor="email">メールアドレス</label>
                                     <div className={styles['chip-container']}>
-                                        <span className={styles['require-chip']}>必須</span>
+                                        <Chip color={ColorType.Danger} fontColor="#b84150" fontSize={FontSizeType.SmMd} size={ChipSize.Small}>
+                                            必須
+                                        </Chip>
                                     </div>
                                     <input
                                         className={state?.errors?.email ? styles['error'] : ''}
@@ -95,7 +102,9 @@ const ContactPage: React.FC = () => {
                                 <div className={styles['require-form']}>
                                     <label htmlFor="content">お問い合わせ内容</label>
                                     <div className={styles['chip-container']}>
-                                        <span className={styles['require-chip']}>必須</span>
+                                        <Chip color={ColorType.Danger} fontColor="#b84150" fontSize={FontSizeType.SmMd} size={ChipSize.Small}>
+                                            必須
+                                        </Chip>
                                     </div>
                                     <textarea
                                         className={state?.errors?.content ? styles['error'] : ''}
