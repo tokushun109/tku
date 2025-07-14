@@ -1,26 +1,16 @@
 import path from 'path'
 
-import type { StorybookConfig } from '@storybook/nextjs'
+import type { StorybookConfig } from '@storybook/nextjs-vite'
 
 const config: StorybookConfig = {
-    stories: ['./Configure.mdx', '../src/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
-    staticDirs: ['../public'],
-    addons: [
-        '@storybook/addon-links',
-        '@storybook/addon-essentials',
-        '@storybook/addon-interactions',
-        '@storybook/addon-styling-webpack',
-        '@storybook/addon-themes',
-        '@storybook/addon-controls',
-    ],
+    stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
+    addons: ['@chromatic-com/storybook', '@storybook/addon-docs', '@storybook/addon-a11y', '@storybook/addon-vitest'],
     framework: {
-        name: '@storybook/nextjs',
+        name: '@storybook/nextjs-vite',
         options: {},
     },
-    docs: {
-        autodocs: 'tag',
-    },
-    webpackFinal: async (config) => {
+    staticDirs: ['../public'],
+    viteFinal: async (config) => {
         // @を../srcのエイリアスとして設定
         if (config.resolve) {
             config.resolve.alias = {
@@ -28,21 +18,25 @@ const config: StorybookConfig = {
                 '@': path.resolve(__dirname, '../src'),
             }
         }
+
         // グローバルなscssファイルの読み込み
-        if (config.module && config.module.rules) {
-            config.module.rules.push({
-                test: /\.scss$/i,
-                use: [
-                    {
-                        loader: 'sass-loader',
-                        options: {
-                            additionalData:
-                                '@use "@/styles/variables.scss" as *; @use "@/styles/mixins.scss" as *; @use "@/styles/layouts.scss" as *;',
-                        },
+        if (config.css) {
+            config.css.preprocessorOptions = {
+                ...config.css.preprocessorOptions,
+                scss: {
+                    additionalData: '@use "@/styles/variables.scss" as *; @use "@/styles/mixins.scss" as *; @use "@/styles/layouts.scss" as *;',
+                },
+            }
+        } else {
+            config.css = {
+                preprocessorOptions: {
+                    scss: {
+                        additionalData: '@use "@/styles/variables.scss" as *; @use "@/styles/mixins.scss" as *; @use "@/styles/layouts.scss" as *;',
                     },
-                ],
-            })
+                },
+            }
         }
+
         return config
     },
 }

@@ -2,7 +2,7 @@ import { IProduct } from '@/features/product/type'
 
 import { ProductDetail } from '.'
 
-import type { Meta, StoryObj } from '@storybook/nextjs'
+import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 
 const mockProduct: IProduct = {
     uuid: '1',

@@ -2,7 +2,7 @@ import { IThumbnail } from '@/features/product/type'
 
 import { CarouselImage } from '.'
 
-import type { Meta, StoryObj } from '@storybook/nextjs'
+import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 
 const mockThumbnail: IThumbnail = {
     apiPath: '/image/about/concept1.jpg',
@@ -32,6 +32,13 @@ const meta: Meta<typeof CarouselImage> = {
             appDirectory: true,
         },
     },
+    decorators: [
+        (Story) => (
+            <div style={{ width: '480px', height: '480px' }}>
+                <Story />
+            </div>
+        ),
+    ],
 }
 
 export default meta

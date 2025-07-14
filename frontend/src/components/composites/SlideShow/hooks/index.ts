@@ -1,5 +1,3 @@
-import { setTimeout } from 'timers'
-
 import { useEffect, useRef, useState } from 'react'
 
 import { IThumbnail } from '@/features/product/type'
@@ -33,7 +31,7 @@ export const useSlideShow = (items: IThumbnail[], autoPlay: boolean) => {
                 break
         }
         setSwipeDirection(swipeDirection)
-        setTimeout(() => {
+        window.setTimeout(() => {
             // アニメーション終了後にスワイプ方向のリセットする
             setSwipeDirection(undefined)
         }, 300)
