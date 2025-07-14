@@ -1,6 +1,6 @@
 {
     "permissions": {
-        "allow": ["Bash(pnpm dev)"],
+        "allow": ["Bash(pnpm dev)", "Bash(gh pr:*)"],
         "deny": []
     }
 }
