@@ -15,7 +15,7 @@ type Props = {
 
 export const Slide = ({ children }: Props) => {
     const ref = useRef<HTMLDivElement>(null)
-    const isInView = useInView(ref, { once: false })
+    const isInView = useInView(ref, { once: true })
 
     return (
         <motion.div
