@@ -2,7 +2,7 @@ import { IThumbnail } from '@/features/product/type'
 
 import SlideShow from '.'
 
-import type { Meta, StoryObj } from '@storybook/nextjs'
+import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 
 const mockThumbnails: IThumbnail[] = [
     {

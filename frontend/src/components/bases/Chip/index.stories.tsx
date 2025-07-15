@@ -2,7 +2,7 @@ import { ColorType, FontSizeType } from '@/types'
 
 import { Chip } from '.'
 
-import type { Meta, StoryObj } from '@storybook/nextjs'
+import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 
 const meta: Meta<typeof Chip> = {
     component: Chip,

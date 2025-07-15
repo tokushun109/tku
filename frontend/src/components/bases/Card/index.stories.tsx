@@ -2,7 +2,7 @@ import { ColorType } from '@/types'
 
 import { Card } from '.'
 
-import type { Meta, StoryObj } from '@storybook/nextjs'
+import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 
 const meta: Meta<typeof Card> = {
     component: Card,

@@ -2,7 +2,7 @@ import { IThumbnail } from '@/features/product/type'
 
 import ProductThumbnail from '.'
 
-import type { Meta, StoryObj } from '@storybook/nextjs'
+import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 
 const mockThumbnail: IThumbnail = {
     apiPath: '/image/about/story.jpg',

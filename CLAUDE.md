@@ -181,11 +181,71 @@ Dart Sass 3.0.0 で `@import` が削除される予定のため、`@use` を使�
 @use '@/styles/mixins.scss' as *;
 ```
 
+#### 全体読み込み設定との重複を避ける
+
+`next.config.ts`の`prependData`で全体に読み込まれているモジュールは、各ファイルで重複して読み込まないでください。
+
+```typescript
+// next.config.ts での設定
+sassOptions: {
+  prependData: '@use "sass:color"; @use "@/styles/variables.scss" as *; @use "@/styles/mixins.scss" as *; @use "@/styles/layouts.scss" as *;',
+},
+```
+
+```scss
+// ❌ 非推奨 - next.config.tsで既に読み込まれている
+@use 'sass:color';
+@use '@/styles/variables.scss' as *;
+@use '@/styles/mixins.scss' as *;
+@use '@/styles/layouts.scss' as *;
+
+.my-component {
+  color: $primary;
+  @include media('sm') {
+    // スタイル
+  }
+}
+
+// ✅ 推奨 - 必要に応じて追加のモジュールのみ読み込み
+@use 'sass:math';
+
+.my-component {
+  color: $primary; // variables.scss から利用可能
+  @include media('sm') { // mixins.scss から利用可能
+    // スタイル
+  }
+}
+```
+
 #### 変数・mixin の読み込み
 
 - **variables**: `@use '@/styles/variables.scss' as *;`
 - **mixins**: `@use '@/styles/mixins.scss' as *;`
 - `as *` を使用することで名前空間なしで変数やmixinを使用可能
+
+#### メディアクエリ mixins の使用
+
+レスポンシブデザインには `@include media('breakpoint')` を使用してください。
+
+```scss
+// ✅ 推奨
+.component {
+  @include media('sm') {
+    // スマートフォン向けスタイル
+  }
+  
+  @include media('md') {
+    // タブレット向けスタイル
+  }
+}
+
+// ❌ 非推奨
+.component {
+  @include sm() {
+    // 古い記法
+  }
+}
+```
 
 ### CSS命名規約
 
@@ -222,6 +282,8 @@ CSS クラス名はケバブケースで命名してください。
 - `any` の使用を避け、適切な型定義を行う
 - interfaceで明確な型を定義する
 - プロパティの省略可能性を明示（`?:`）
+- **useState使用時は必ず型を明示**: `useState<型>(初期値)` の形式で型を記述する
+- **ユニオンタイプはオブジェクトリテラルで定義**: 文字列リテラルのユニオンタイプではなく、オブジェクトリテラルを使用
 
 ```tsx
 // ✅ 推奨
@@ -230,15 +292,103 @@ interface ErrorPageProps {
   statusCode?: number
   showHomeButton?: boolean
 }
+
+// ✅ 推奨 - useState with types
+const [isLoading, setIsLoading] = useState<boolean>(false)
+const [data, setData] = useState<User | null>(null)
+const [items, setItems] = useState<string[]>([])
+
+// ❌ 非推奨 - useState without types
+const [isLoading, setIsLoading] = useState(false)
+const [data, setData] = useState(null)
+
+// ❌ 非推奨 - ユニオンタイプ
+type ButtonVariant = 'primary' | 'secondary' | 'danger'
+
+// ✅ 推奨 - オブジェクトリテラル
+export const ButtonVariant = {
+  Primary: 'primary',
+  Secondary: 'secondary',
+  Danger: 'danger',
+} as const
+export type ButtonVariant = (typeof ButtonVariant)[keyof typeof ButtonVariant]
 ```
 
 ### React/Next.js規約
+
+#### 関数定義
+
+frontend配下では**アロー関数を使用して統一**してください。
+
+```tsx
+// ✅ 推奨 - アロー関数
+const MyComponent: React.FC<Props> = ({ prop1, prop2 }) => {
+  return <div>{prop1}</div>
+}
+
+const handleClick = (event: React.MouseEvent) => {
+  // 処理
+}
+
+// ❌ 非推奨 - function宣言
+function MyComponent({ prop1, prop2 }: Props) {
+  return <div>{prop1}</div>
+}
+
+function handleClick(event: React.MouseEvent) {
+  // 処理
+}
+```
 
 #### コンポーネント設計
 
 - **再利用性**: 既存のコンポーネントを優先的に使用
 - **Props設計**: デフォルト値を適切に設定
 - **命名**: コンポーネント名はPascalCase
+- **スタイル上書き禁止**: 親コンポーネントから子コンポーネントのスタイルを`!important`で上書きしない
+
+#### Storybook作成・更新規約
+
+コンポーネントを**新規作成**または**プロパティを追加・修正**した場合は、必ずStorybookを作成・更新してください。
+
+```tsx
+// ✅ 推奨 - 新規コンポーネント作成時
+// components/bases/Button/index.stories.tsx を作成
+
+import { Button } from '.'
+import type { Meta, StoryObj } from '@storybook/nextjs'
+
+const meta: Meta<typeof Button> = {
+    component: Button,
+    args: {
+        children: 'ボタン',
+        disabled: false,
+    },
+    argTypes: {
+        disabled: {
+            control: { type: 'boolean' },
+        },
+    },
+}
+
+export default meta
+type Story = StoryObj<typeof Button>
+
+export const Default: Story = {}
+export const Disabled: Story = {
+    args: { disabled: true },
+}
+```
+
+**必須ストーリー:**
+- `Default`: 基本状態
+- **各プロパティのバリエーション**: disabled、error、required等の状態
+- **実用例**: FormExampleなど実際の使用例
+
+**更新タイミング:**
+- 新規コンポーネント作成時
+- プロパティ追加・修正時
+- インターフェース変更時
 
 ```tsx
 // ✅ 推奨
@@ -249,6 +399,16 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
 }) => {
   // 実装
 }
+
+// ❌ 非推奨 - 子コンポーネントのスタイル上書き
+.parent-component {
+  .child-component {
+    padding: 10px !important; // 禁止
+  }
+}
+
+// ✅ 推奨 - コンポーネント自体でプロパティを提供
+<ChildComponent size="small" />
 ```
 
 #### インポート順序

@@ -2,7 +2,7 @@ import { IProductsByCategory } from '@/features/product/type'
 
 import { ProductsByCategoryDisplay } from '.'
 
-import type { Meta, StoryObj } from '@storybook/nextjs'
+import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 
 const mockProductsByCategory: IProductsByCategory = {
     category: { uuid: '1', name: 'ピアス' },

@@ -9,21 +9,23 @@ import { mainFontFace } from '@/utils/font'
 import styles from './styles.module.scss'
 import { IProductsByCategory } from '../../type'
 
-// 初期表示の商品の上限数
+// 初期表示の商品数
 const INIT_DISPLAY_LIMIT = 4
+// 「もっと見る」で追加表示する商品数
+const MORE_DISPLAY_LIMIT = 8
 
 type Props = {
     productsByCategory: IProductsByCategory
 }
 
 export const ProductsByCategoryDisplay = ({ productsByCategory }: Props) => {
-    const [isAllDisplayed, setIsAllDisplayed] = useState<boolean>(false)
+    const [displayCount, setDisplayCount] = useState<number>(INIT_DISPLAY_LIMIT)
 
-    /** 表示する商品のリスト(もっと見るを押す前は4件まで、押した後は全て表示) */
-    const displayProducts = isAllDisplayed ? productsByCategory.products : productsByCategory.products.slice(0, INIT_DISPLAY_LIMIT)
+    /** 表示する商品のリスト(設定された件数まで表示) */
+    const displayProducts = productsByCategory.products.slice(0, displayCount)
 
     const onClickMoreButton = () => {
-        setIsAllDisplayed(true)
+        setDisplayCount((prev) => prev + MORE_DISPLAY_LIMIT)
     }
 
     // 商品がなければ表示しない
@@ -43,7 +45,7 @@ export const ProductsByCategoryDisplay = ({ productsByCategory }: Props) => {
                     </div>
                 ))}
             </div>
-            {!isAllDisplayed && productsByCategory.products.length > 4 && (
+            {displayCount < productsByCategory.products.length && (
                 <div className={styles['more-button']}>
                     <AnimatedButton onClick={onClickMoreButton}>もっと見る</AnimatedButton>
                 </div>

@@ -2,7 +2,7 @@ import { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
     sassOptions: {
-        prependData: '@use "@/styles/variables.scss" as *; @use "@/styles/mixins.scss" as *; @use "@/styles/layouts.scss" as *;',
+        prependData: '@use "sass:color"; @use "@/styles/variables.scss" as *; @use "@/styles/mixins.scss" as *; @use "@/styles/layouts.scss" as *;',
     },
     images: {
         remotePatterns: [

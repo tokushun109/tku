@@ -1,6 +1,6 @@
 import { ExternalLink } from '.'
 
-import type { Meta, StoryObj } from '@storybook/nextjs'
+import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 
 const meta: Meta<typeof ExternalLink> = {
     component: ExternalLink,
