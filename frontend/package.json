@@ -17,7 +17,9 @@
         "tsc": "tsc --noEmit",
         "sb": "storybook dev -p 6006",
         "build-storybook": "storybook build",
+        "test": "vitest --project=unit",
         "test-storybook": "vitest --project=storybook",
+        "test-all": "vitest",
         "prepare": "cd .. && husky frontend/.husky"
     },
     "dependencies": {
@@ -55,6 +57,8 @@
         "@storybook/addon-vitest": "^9.0.16",
         "@storybook/nextjs-vite": "^9.0.16",
         "@storybook/react": "^9.0.16",
+        "@testing-library/jest-dom": "^6.6.3",
+        "@testing-library/react": "^16.3.0",
         "@types/node": "^24.0.14",
         "@types/react": "^19.1.8",
         "@types/react-dom": "^19.1.6",
@@ -72,7 +76,9 @@
         "eslint-plugin-storybook": "^9.0.16",
         "eslint-plugin-unused-imports": "^4.1.4",
         "husky": "^9.1.7",
+        "jsdom": "^26.1.0",
         "lint-staged": "^16.1.2",
+        "msw": "^2.10.4",
         "playwright": "^1.54.1",
         "prettier": "^3.6.2",
         "ress": "^5.0.2",
