@@ -27,6 +27,14 @@ const meta: Meta<typeof CarouselImage> = {
         item: mockThumbnail,
         shadow: true,
     },
+    argTypes: {
+        item: {
+            control: false,
+        },
+        shadow: {
+            control: { type: 'boolean' },
+        },
+    },
     parameters: {
         nextjs: {
             appDirectory: true,

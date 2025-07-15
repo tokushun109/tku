@@ -17,6 +17,7 @@
         "tsc": "tsc --noEmit",
         "sb": "storybook dev -p 6006",
         "build-storybook": "storybook build",
+        "test-storybook": "vitest --project=storybook",
         "prepare": "cd .. && husky frontend/.husky"
     },
     "dependencies": {
