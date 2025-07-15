@@ -24,14 +24,16 @@ const config: StorybookConfig = {
             config.css.preprocessorOptions = {
                 ...config.css.preprocessorOptions,
                 scss: {
-                    additionalData: '@use "@/styles/variables.scss" as *; @use "@/styles/mixins.scss" as *; @use "@/styles/layouts.scss" as *;',
+                    additionalData:
+                        '@use "sass:color"; @use "@/styles/variables.scss" as *; @use "@/styles/mixins.scss" as *; @use "@/styles/layouts.scss" as *;',
                 },
             }
         } else {
             config.css = {
                 preprocessorOptions: {
                     scss: {
-                        additionalData: '@use "@/styles/variables.scss" as *; @use "@/styles/mixins.scss" as *; @use "@/styles/layouts.scss" as *;',
+                        additionalData:
+                            '@use "sass:color"; @use "@/styles/variables.scss" as *; @use "@/styles/mixins.scss" as *; @use "@/styles/layouts.scss" as *;',
                     },
                 },
             }
