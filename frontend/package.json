@@ -19,6 +19,7 @@
         "build-storybook": "storybook build",
         "test": "vitest --project=unit",
         "test-storybook": "vitest --project=storybook",
+        "test-integration": "vitest --project=integration",
         "test-all": "vitest",
         "prepare": "cd .. && husky frontend/.husky"
     },

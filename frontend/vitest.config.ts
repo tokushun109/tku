@@ -46,6 +46,20 @@ export default defineConfig({
                     globals: true,
                 },
             },
+            {
+                resolve: {
+                    alias: {
+                        '@': path.resolve(dirname, './src'),
+                    },
+                },
+                test: {
+                    name: 'integration',
+                    environment: 'jsdom',
+                    setupFiles: ['./src/__tests__/setup.ts'],
+                    globals: true,
+                    include: ['src/__tests__/integration/**/*.test.{ts,tsx}'],
+                },
+            },
         ],
     },
 })
