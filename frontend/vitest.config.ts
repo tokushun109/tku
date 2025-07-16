@@ -59,6 +59,10 @@ export default defineConfig({
                     globals: true,
                     include: ['src/__tests__/integration/**/*.test.{ts,tsx}'],
                 },
+                esbuild: {
+                    jsxFactory: 'React.createElement',
+                    jsxFragment: 'React.Fragment',
+                },
             },
         ],
     },
