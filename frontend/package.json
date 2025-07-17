@@ -21,6 +21,7 @@
         "test-storybook": "vitest --project=storybook",
         "test-integration": "vitest --project=integration",
         "test-all": "vitest",
+        "test-coverage": "vitest --coverage",
         "prepare": "cd .. && husky frontend/.husky"
     },
     "dependencies": {

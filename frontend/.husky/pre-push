@@ -2,23 +2,31 @@
 cd frontend
 
 # 古い依存関係があるか確認
-echo "古い依存関係がないか確認しています..."
+echo "🔍 古い依存関係がないか確認しています..."
 OUTDATED=$(pnpm outdated || true)
 
 # 古い依存関係があればプッシュをキャンセル
 if [ -n "$OUTDATED" ]; then
-  echo "以下の依存関係が古くなっています:"
+  echo "⚠️  以下の依存関係が古くなっています:"
   echo "$OUTDATED"
-  echo "依存関係を 'pnpm update --latest' を使って更新し、変更をコミットしてから再度プッシュしてください。"
+  echo "📦 依存関係を 'pnpm update --latest' を使って更新し、変更をコミットしてから再度プッシュしてください。"
   exit 1
 fi
 
 # 問題がなければプッシュを続行
-echo "すべての依存関係が最新です。テストを実行します。"
+echo "✅ すべての依存関係が最新です。テストを実行します。"
 
 # 全てのテストを実行
-echo "全てのテストを実行しています..."
-pnpm test-all
+echo "🧪 全てのテストを実行しています..."
+if ! pnpm test-all --run --reporter=verbose; then
+  echo "❌ テストが失敗しました。以下を確認してください:"
+  echo "  - pnpm test        : ユニットテスト"
+  echo "  - pnpm test-integration : インテグレーションテスト"
+  echo "  - pnpm test-storybook   : Storybookテスト"
+  echo "  - pnpm test-coverage    : カバレッジ付きテスト"
+  echo "🔧 テストを修正してから再度プッシュしてください。"
+  exit 1
+fi
 
 # テストが成功したらプッシュを続行
-echo "すべてのテストが成功しました。プッシュを続行します。"
+echo "✅ すべてのテストが成功しました。プッシュを続行します。"

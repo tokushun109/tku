@@ -13,7 +13,33 @@ export default defineConfig({
             '@': path.resolve(dirname, './src'),
         },
     },
+    optimizeDeps: {
+        exclude: ['@mdx-js/react', 'markdown-to-jsx'],
+    },
     test: {
+        coverage: {
+            provider: 'v8',
+            reporter: ['text', 'html', 'json'],
+            exclude: [
+                'node_modules/',
+                'dist/',
+                'build/',
+                'storybook-static/',
+                'coverage/',
+                '**/*.stories.{js,ts,jsx,tsx}',
+                '**/*.config.{js,ts}',
+                '**/*.test.{js,ts,jsx,tsx}',
+                '**/__tests__/**',
+                '.storybook/**',
+                'public/**',
+            ],
+            thresholds: {
+                lines: 50,
+                functions: 50,
+                branches: 50,
+                statements: 50,
+            },
+        },
         projects: [
             {
                 extends: true,
@@ -22,6 +48,9 @@ export default defineConfig({
                     // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
                     storybookTest({ configDir: path.join(dirname, '.storybook') }),
                 ],
+                optimizeDeps: {
+                    exclude: ['@mdx-js/react', 'markdown-to-jsx'],
+                },
                 test: {
                     name: 'storybook',
                     browser: {
