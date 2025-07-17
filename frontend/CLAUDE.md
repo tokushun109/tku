@@ -187,6 +187,35 @@ sassOptions: {
 }
 ```
 
+#### JavaScript/TypeScriptでのレスポンシブ対応
+
+CSSで対応できないレスポンシブ対応（条件分岐、動的な値の切り替え等）の場合は、Material-UIの`useMediaQuery`フックを使用してください。
+
+```tsx
+// ✅ 推奨 - useMediaQueryフック使用
+import { useMediaQuery } from '@mui/material'
+
+const MyComponent = () => {
+    // スマホサイズ（600px以下）を検出
+    const isSmallScreen = useMediaQuery('(max-width:600px)')
+
+    return <div>{isSmallScreen ? <span>スマホ向けコンテンツ</span> : <span>デスクトップ向けコンテンツ</span>}</div>
+}
+```
+
+**使用例:**
+
+- 条件に応じたフォントサイズの変更
+- 画面サイズに応じた異なるコンポーネントの表示
+- レスポンシブな値の動的切り替え
+
+**ブレイクポイント:**
+
+- `sm`: 600px以下
+- `md`: 960px以下
+- `lg`: 1264px以下
+- `xl`: 1265px以上
+
 ### CSS命名規約
 
 #### ケバブケース（kebab-case）を使用

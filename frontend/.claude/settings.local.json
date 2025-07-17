@@ -1,6 +1,6 @@
 {
     "permissions": {
-        "allow": ["Bash(pnpm dev)", "Bash(gh pr:*)"],
+        "allow": ["Bash(pnpm dev)", "Bash(gh pr:*)", "mcp__context7__get-library-docs", "Bash(git add:*)"],
         "deny": []
     }
 }
