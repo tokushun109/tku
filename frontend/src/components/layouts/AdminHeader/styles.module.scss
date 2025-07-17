@@ -1,0 +1,56 @@
+.admin-header {
+    width: 100%;
+}
+
+.app-bar {
+    background-color: $primary !important;
+    color: white;
+    z-index: 1200;
+}
+
+.menu-button {
+    margin-right: 16px;
+}
+
+.title {
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+.drawer {
+    width: 280px;
+    flex-shrink: 0;
+}
+
+.drawer-paper {
+    width: 280px;
+    background-color: white;
+}
+
+.drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    min-height: 64px;
+}
+
+.drawer-title {
+    color: $title-primary-color;
+    font-weight: 600;
+}
+
+.list-item {
+    padding: 8px 16px;
+
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.04);
+    }
+}
+
+.dialog-actions {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    padding: 16px 24px;
+}
