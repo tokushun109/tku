@@ -1,5 +1,6 @@
 'use client'
 
+import { useMediaQuery } from '@mui/material'
 import { useRouter } from 'next/navigation'
 
 import { Chip } from '@/components/bases/Chip'
@@ -17,6 +18,9 @@ type Props = {
 const ProductThumbnail = ({ item }: Props) => {
     const router = useRouter()
 
+    // スマホサイズ（600px以下）を検出
+    const isSmallScreen = useMediaQuery('(max-width:600px)')
+
     const handleClick = () => {
         router.push(`/product/${item.product.uuid}`)
     }
@@ -26,7 +30,7 @@ const ProductThumbnail = ({ item }: Props) => {
             <div className={styles['image-container']}>
                 <Image alt={item.product.name} src={item.apiPath} />
                 <div className={styles['chip']}>
-                    <Chip color={ColorType.Secondary} fontSize={FontSizeType.SmMd}>
+                    <Chip color={ColorType.Secondary} fontSize={isSmallScreen ? FontSizeType.Small : FontSizeType.SmMd}>
                         {item.product.target.name}
                     </Chip>
                 </div>
