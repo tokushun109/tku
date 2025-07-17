@@ -2,9 +2,12 @@
 
 このファイルは、このリポジトリでコードを扱う際の Claude Code (claude.ai/code)向けのガイドラインです。
 
-## Claude Code設定
+## Claude Code 設定
 
-**重要**: Claude の回答は日本語で行ってください。
+**重要**
+
+- Claude の回答は日本語で行ってください。
+- /fix-issue のカスタムコマンドが実行されたときは../.claude/commands/fix-issue.md の中身を全て確認してください。
 
 ## プロジェクト概要
 
@@ -31,17 +34,19 @@ docker-compose up
 
 ### 各ディレクトリ固有の開発コマンド
 
-詳細は各ディレクトリのCLAUDE.mdファイルを参照：
-- **frontend/**: `/frontend/CLAUDE.md` - 新規開発用Next.js
-- **client/**: `/client/CLAUDE.md` - レガシーVue.js
+詳細は各ディレクトリの CLAUDE.md ファイルを参照：
+
+- **frontend/**: `/frontend/CLAUDE.md` - 新規開発用 Next.js
+- **client/**: `/client/CLAUDE.md` - レガシー Vue.js
 - **api/**: `/api/CLAUDE.md` - Go REST API
 - **infra/**: `/infra/CLAUDE.md` - CDK for Terraform
 
 ## プロジェクトアーキテクチャ
 
-詳細なプロジェクト構造は各ディレクトリのCLAUDE.mdファイルを参照：
+詳細なプロジェクト構造は各ディレクトリの CLAUDE.md ファイルを参照：
+
 - **frontend/**: `/frontend/CLAUDE.md` - Next.js + TypeScript 構造
-- **client/**: `/client/CLAUDE.md` - Vue.js + Nuxt.js 構造  
+- **client/**: `/client/CLAUDE.md` - Vue.js + Nuxt.js 構造
 - **api/**: `/api/CLAUDE.md` - Go REST API 構造
 - **infra/**: `/infra/CLAUDE.md` - AWS インフラ構造
 
@@ -58,7 +63,7 @@ docker-compose up
 
 - **CI/CD**: GitHub Actions（`.github/workflows/ci.yml`）
 - **インフラ**: CDK for Terraform が VPC、ECS、RDS などを管理
-- 詳細は各ディレクトリのCLAUDE.mdを参照
+- 詳細は各ディレクトリの CLAUDE.md を参照
 
 ## 重要な注意事項
 
@@ -77,9 +82,10 @@ docker-compose up
 - **移行先**: frontend/ ディレクトリの Next.js + TypeScript アプリケーション
 - **移行目標**: 元のアプリケーションの UI/UX を忠実に再現し、機能を完全に移植
 - **並行開発**: レガシーコードを参照しながら新規実装を進める
+
 ## 各ディレクトリ固有の詳細情報
 
-各ディレクトリでの開発における詳細なガイドラインは、それぞれのCLAUDE.mdファイルを参照してください：
+各ディレクトリでの開発における詳細なガイドラインは、それぞれの CLAUDE.md ファイルを参照してください：
 
 - **frontend/**: `/frontend/CLAUDE.md` - Next.js + TypeScript の開発規約とガイドライン
 - **client/**: `/client/CLAUDE.md` - Vue.js + Nuxt.js のレガシーアプリ情報

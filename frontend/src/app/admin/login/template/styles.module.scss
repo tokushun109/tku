@@ -1,0 +1,53 @@
+.page-admin-login {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 16px;
+
+    .admin-login-area {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 32px;
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+
+        .login-title {
+            margin-bottom: 32px;
+            font-size: 24px;
+            font-weight: 600;
+            color: $title-primary-color;
+        }
+
+        .form-field {
+            margin-bottom: 24px;
+        }
+
+        .submit-button {
+            margin-top: 32px;
+        }
+    }
+
+    @include media('sm') {
+        .admin-login-area {
+            padding: 24px;
+            max-width: 350px;
+
+            .login-title {
+                font-size: 20px;
+                margin-bottom: 24px;
+            }
+
+            .form-field {
+                margin-bottom: 20px;
+            }
+
+            .submit-button {
+                margin-top: 24px;
+            }
+        }
+    }
+}
