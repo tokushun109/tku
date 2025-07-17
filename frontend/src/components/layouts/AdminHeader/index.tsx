@@ -1,26 +1,9 @@
 'use client'
 
 import { Close, Email, Home, Inventory, Menu, Settings, Store, Tag } from '@mui/icons-material'
-import {
-    AppBar,
-    Box,
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    Divider,
-    Drawer,
-    IconButton,
-    List,
-    ListItem,
-    ListItemIcon,
-    ListItemText,
-    Toolbar,
-    Typography,
-} from '@mui/material'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+
 
 import styles from './styles.module.scss'
 
@@ -62,86 +45,99 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ isLoggedIn = true, onLogout }
 
     return (
         <div className={styles['admin-header']}>
-            <AppBar className={styles['app-bar']} position="fixed">
-                <Toolbar>
+            <header className={styles['app-bar']}>
+                <div className={styles['toolbar']}>
                     {isLoggedIn && (
-                        <IconButton
+                        <button
                             aria-label="open drawer"
                             className={styles['menu-button']}
-                            color="inherit"
-                            edge="start"
                             onClick={() => setSidebarVisible(!sidebarVisible)}
+                            type="button"
                         >
                             <Menu />
-                        </IconButton>
+                        </button>
                     )}
-                    <Typography className={styles['title']} component="div" noWrap variant="h6">
-                        tku
-                    </Typography>
-                    <Box sx={{ flexGrow: 1 }} />
+                    <h1 className={styles['title']}>tku</h1>
+                    <div className={styles['spacer']} />
                     {isLoggedIn && (
-                        <Button color="inherit" onClick={() => setDialogVisible(true)} variant="outlined">
+                        <button
+                            className={styles['logout-button']}
+                            onClick={() => setDialogVisible(true)}
+                            type="button"
+                        >
                             ログアウト
-                        </Button>
+                        </button>
                     )}
-                </Toolbar>
-            </AppBar>
+                </div>
+            </header>
 
             {isLoggedIn && (
-                <Drawer
-                    className={styles['drawer']}
-                    classes={{
-                        paper: styles['drawer-paper'],
-                    }}
-                    onClose={() => setSidebarVisible(false)}
-                    open={sidebarVisible}
-                    variant="temporary"
-                >
-                    <div className={styles['drawer-header']}>
-                        <Typography className={styles['drawer-title']} variant="h6">
-                            設定
-                        </Typography>
-                        <IconButton onClick={() => setSidebarVisible(false)}>
-                            <Close />
-                        </IconButton>
-                    </div>
-                    <Divider />
-                    <List>
-                        {navigationItems.map((item) => {
-                            const IconComponent = item.icon
-                            return (
-                                <ListItem
-                                    className={styles['list-item']}
-                                    component="div"
-                                    key={item.name}
-                                    onClick={() => handleNavigationClick(item.link)}
-                                    sx={{ cursor: 'pointer' }}
-                                >
-                                    <ListItemIcon>
-                                        <IconComponent />
-                                    </ListItemIcon>
-                                    <ListItemText primary={item.name} />
-                                </ListItem>
-                            )
-                        })}
-                    </List>
-                </Drawer>
+                <div className={`${styles['drawer']} ${sidebarVisible ? styles['drawer-open'] : ''}`}>
+                    <div className={styles['drawer-backdrop']} onClick={() => setSidebarVisible(false)} />
+                    <nav className={styles['drawer-content']}>
+                        <div className={styles['drawer-header']}>
+                            <h2 className={styles['drawer-title']}>設定</h2>
+                            <button
+                                className={styles['close-button']}
+                                onClick={() => setSidebarVisible(false)}
+                                type="button"
+                            >
+                                <Close />
+                            </button>
+                        </div>
+                        <div className={styles['divider']} />
+                        <ul className={styles['navigation-list']}>
+                            {navigationItems.map((item) => {
+                                const IconComponent = item.icon
+                                return (
+                                    <li key={item.name}>
+                                        <button
+                                            className={styles['nav-item']}
+                                            onClick={() => handleNavigationClick(item.link)}
+                                            type="button"
+                                        >
+                                            <span className={styles['nav-icon']}>
+                                                <IconComponent />
+                                            </span>
+                                            <span className={styles['nav-text']}>{item.name}</span>
+                                        </button>
+                                    </li>
+                                )
+                            })}
+                        </ul>
+                    </nav>
+                </div>
             )}
 
-            <Dialog fullWidth maxWidth="sm" onClose={() => setDialogVisible(false)} open={dialogVisible}>
-                <DialogTitle>ログアウト</DialogTitle>
-                <DialogContent>
-                    <Typography>ログアウトします。よろしいですか？</Typography>
-                </DialogContent>
-                <DialogActions className={styles['dialog-actions']}>
-                    <Button color="primary" onClick={() => setDialogVisible(false)} variant="outlined">
-                        いいえ
-                    </Button>
-                    <Button color="primary" onClick={handleLogout} variant="contained">
-                        はい
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            {dialogVisible && (
+                <div className={styles['dialog-overlay']}>
+                    <div className={styles['dialog-backdrop']} onClick={() => setDialogVisible(false)} />
+                    <div className={styles['dialog']}>
+                        <div className={styles['dialog-header']}>
+                            <h3 className={styles['dialog-title']}>ログアウト</h3>
+                        </div>
+                        <div className={styles['dialog-content']}>
+                            <p>ログアウトします。よろしいですか？</p>
+                        </div>
+                        <div className={styles['dialog-actions']}>
+                            <button
+                                className={styles['dialog-button-secondary']}
+                                onClick={() => setDialogVisible(false)}
+                                type="button"
+                            >
+                                いいえ
+                            </button>
+                            <button
+                                className={styles['dialog-button-primary']}
+                                onClick={handleLogout}
+                                type="button"
+                            >
+                                はい
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
