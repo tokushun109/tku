@@ -17,9 +17,6 @@ const meta: Meta<typeof AdminHeader> = {
         isLoggedIn: {
             control: { type: 'boolean' },
         },
-        onLogout: {
-            action: 'logout',
-        },
     },
 }
 
@@ -40,11 +37,8 @@ export const LoggedOut: Story = {
     },
 }
 
-export const WithLogoutAction: Story = {
+export const WithLogout: Story = {
     args: {
         isLoggedIn: true,
-        onLogout: () => {
-            alert('ログアウトしました')
-        },
     },
 }
