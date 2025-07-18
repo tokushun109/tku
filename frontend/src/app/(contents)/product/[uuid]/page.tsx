@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 
 import { getProduct } from '@/apis/product'
 import ProductDetailTemplate from '@/app/(contents)/product/[uuid]/template'
@@ -41,8 +42,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 const ProductDetail = async ({ params }: Props) => {
     const { uuid } = await params
-    const product = await getProduct(uuid)
-    return <ProductDetailTemplate product={product} />
+
+    try {
+        const product = await getProduct(uuid)
+        return <ProductDetailTemplate product={product} />
+    } catch {
+        notFound()
+    }
 }
 
 export default ProductDetail
