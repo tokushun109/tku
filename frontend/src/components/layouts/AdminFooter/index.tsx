@@ -9,7 +9,7 @@ interface AdminFooterProps {
 const AdminFooter: React.FC<AdminFooterProps> = ({ className }) => {
     return (
         <footer className={`${styles['admin-footer']} ${className || ''}`}>
-            <p className={styles['footer-text']}>tku</p>
+            <p className={styles['footer-text']}>とこりり</p>
         </footer>
     )
 }

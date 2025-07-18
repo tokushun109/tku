@@ -48,7 +48,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ isLoggedIn = true, onLogout }
                             <Menu />
                         </button>
                     )}
-                    <h1 className={styles['title']}>tku</h1>
+                    <h1 className={styles['title']}>管理画面</h1>
                     <div className={styles['spacer']} />
                     {isLoggedIn && (
                         <Button
