@@ -5,6 +5,29 @@ import { NavigationType } from '@/types/enum/navigation'
 
 import type { NextRequest } from 'next/server'
 
+// IP制限チェック関数
+function isAllowedIP(request: NextRequest) {
+    const allowedIP = process.env.MY_IP_ADDRESS
+
+    // 環境変数が設定されていない場合はアクセスを拒否
+    if (!allowedIP) {
+        return false
+    }
+
+    // リクエストのIPアドレスを取得
+    const clientIP = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip')
+
+    // IPアドレスが取得できない場合はアクセスを拒否
+    if (!clientIP) {
+        return false
+    }
+
+    // 複数のIPアドレスがある場合は最初のものを使用
+    const actualIP = clientIP.includes(',') ? clientIP.split(',')[0].trim() : clientIP
+
+    return actualIP === allowedIP
+}
+
 // 認証チェック関数
 async function checkAuth(request: NextRequest) {
     const sessionToken = request.cookies.get('__sess__')?.value
@@ -49,6 +72,11 @@ export async function middleware(request: NextRequest) {
 
         // admin配下のページで認証が必要なルートをチェック
         if (request.nextUrl.pathname.startsWith('/admin')) {
+            // IP制限チェック
+            if (!isAllowedIP(request)) {
+                return NextResponse.rewrite(new URL('/not-found', request.url))
+            }
+
             // ログインページの場合
             if (request.nextUrl.pathname === NavigationType.AdminLogin) {
                 // 既にログイン済みの場合は商品管理ページにリダイレクト
