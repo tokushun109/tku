@@ -18,6 +18,9 @@ export const Image = ({ src, alt }: Props) => {
         setIsLoading(true)
     }, [src])
 
+    // 一時的に開発環境ではグレースケール画像を表示
+    const isDevelopment = process.env.NODE_ENV === 'development'
+
     return (
         <div className={styles['container']}>
             <NextImage
@@ -32,7 +35,7 @@ export const Image = ({ src, alt }: Props) => {
                     setIsLoading(false)
                 }}
                 sizes="100%"
-                src={isLoading ? '/image/gray-image.png' : displaySrc}
+                src={isDevelopment || isLoading ? '/image/gray-image.png' : displaySrc}
             />
         </div>
     )
