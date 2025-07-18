@@ -6,6 +6,7 @@ import { useState } from 'react'
 
 import { Button } from '@/components/bases/Button'
 import { Dialog } from '@/components/bases/Dialog'
+import { logoutAction } from '@/features/auth/action'
 import { ColorCode, ColorType } from '@/types/enum/color'
 import { NavigationItems } from '@/types/enum/navigation'
 
@@ -13,20 +14,24 @@ import styles from './styles.module.scss'
 
 interface AdminHeaderProps {
     isLoggedIn?: boolean
-    onLogout?: () => void
 }
 
-const AdminHeader: React.FC<AdminHeaderProps> = ({ isLoggedIn = true, onLogout }) => {
+const AdminHeader: React.FC<AdminHeaderProps> = ({ isLoggedIn = true }) => {
     const router = useRouter()
     const [sidebarVisible, setSidebarVisible] = useState<boolean>(false)
     const [dialogVisible, setDialogVisible] = useState<boolean>(false)
 
     const navigationItems = NavigationItems
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         setDialogVisible(false)
-        onLogout?.()
-        router.push('/admin/user/login')
+        try {
+            await logoutAction()
+        } catch (error) {
+            console.error('Logout error:', error)
+            // エラーが発生してもログインページにリダイレクト
+            router.push('/admin/login')
+        }
     }
 
     const handleNavigationClick = (link: string) => {

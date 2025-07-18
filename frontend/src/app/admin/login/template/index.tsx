@@ -1,63 +1,88 @@
 'use client'
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+import { useRouter } from 'next/navigation'
+import { useActionState, useState, startTransition, useEffect } from 'react'
 
 import { Button } from '@/components/bases/Button'
 import { Input } from '@/components/bases/Input'
+import { Message, MessageType } from '@/components/bases/Message'
+import { loginAction } from '@/features/auth/action'
 import { ColorType } from '@/types'
+import { NavigationType } from '@/types/enum/navigation'
 
 import styles from './styles.module.scss'
 
-const LoginSchema = z.object({
-    email: z.string().min(1, 'emailを入力してください'),
-    password: z.string().min(1, 'パスワードを入力してください'),
-})
-
-type LoginForm = z.infer<typeof LoginSchema>
-
 export const AdminLoginTemplate = () => {
-    const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+    const router = useRouter()
+    const [emailError, setEmailError] = useState<string>('')
+    const [passwordError, setPasswordError] = useState<string>('')
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors, isValid },
-    } = useForm<LoginForm>({
-        resolver: zodResolver(LoginSchema),
-        mode: 'onChange',
-    })
+    const [state, formAction, pending] = useActionState(loginAction, { success: false })
 
-    const onSubmit = async (_data: LoginForm) => {
-        setIsSubmitting(true)
-        try {
-            // TODO: APIの呼び出し実装
-            // 本来はここでログイン処理を実装
-            // await loginApi(data)
-            // router.push('/admin/product')
-        } catch (error) {
-            console.error('Login error:', error)
-        } finally {
-            setIsSubmitting(false)
+    // Server Actionの結果に基づいてリダイレクト処理
+    useEffect(() => {
+        if (state.success) {
+            router.push(NavigationType.AdminProduct)
         }
+    }, [state.success, router])
+
+    // フォーム送信時の入力検証
+    const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault()
+
+        const formData = new FormData(event.currentTarget)
+        const email = formData.get('email') as string
+        const password = formData.get('password') as string
+
+        // クライアント側バリデーション
+        let hasError = false
+
+        if (!email || email.trim() === '') {
+            setEmailError('emailを入力してください')
+            hasError = true
+        } else {
+            setEmailError('')
+        }
+
+        if (!password || password.trim() === '') {
+            setPasswordError('パスワードを入力してください')
+            hasError = true
+        } else {
+            setPasswordError('')
+        }
+
+        if (hasError) {
+            return
+        }
+
+        // Server Actionを実行
+        startTransition(() => {
+            formAction(formData)
+        })
     }
 
     return (
         <div className={styles['page-admin-login']}>
             <div className={styles['admin-login-area']}>
-                <h1 className={styles['login-title']}>管理者ログイン</h1>
-                <form onSubmit={handleSubmit(onSubmit)}>
+                <h1 className={styles['login-title']}>ログイン</h1>
+                {state.error && <Message type={MessageType.Error}>{state.error}</Message>}
+                <form noValidate onSubmit={handleFormSubmit}>
                     <div className={styles['form-field']}>
-                        <Input {...register('email')} error={errors.email?.message} label="email(必須)" required type="email" />
+                        <Input error={emailError} label="email(必須)" name="email" onChange={() => setEmailError('')} required type="email" />
                     </div>
                     <div className={styles['form-field']}>
-                        <Input {...register('password')} error={errors.password?.message} label="パスワード(必須)" required type="password" />
+                        <Input
+                            error={passwordError}
+                            label="パスワード(必須)"
+                            name="password"
+                            onChange={() => setPasswordError('')}
+                            required
+                            type="password"
+                        />
                     </div>
                     <div className={styles['submit-button']}>
-                        <Button colorType={ColorType.Primary} disabled={!isValid || isSubmitting} type="submit">
-                            {isSubmitting ? '送信中...' : '確定'}
+                        <Button colorType={ColorType.Primary} disabled={pending} type="submit">
+                            {pending ? '送信中...' : '確定'}
                         </Button>
                     </div>
                 </form>
