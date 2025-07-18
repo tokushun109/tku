@@ -13,6 +13,7 @@
         "build": "next build",
         "start": "next start",
         "lint": "next lint --max-warnings=0",
+        "lint-fix": "next lint --fix",
         "fmt": "prettier --write .",
         "tsc": "tsc --noEmit",
         "sb": "storybook dev -p 6006",
