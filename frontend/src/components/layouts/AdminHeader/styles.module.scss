@@ -278,3 +278,10 @@
         background-color: color.adjust($primary, $lightness: -10%);
     }
 }
+
+.dialog-text {
+    text-align: center;
+    margin: 0;
+    color: $text-color;
+    line-height: 1.5;
+}

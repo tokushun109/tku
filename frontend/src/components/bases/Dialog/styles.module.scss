@@ -31,18 +31,20 @@
 }
 
 .dialog-header {
-    padding: 24px 24px 16px;
+    padding: 12px;
+    background-color: $primary;
+    text-align: center;
 }
 
 .dialog-title {
     margin: 0;
     font-size: 1.25rem;
     font-weight: 600;
-    color: rgba(0, 0, 0, 0.87);
+    color: white;
 }
 
 .dialog-content {
-    padding: 0 24px 24px;
+    padding: 24px;
 
     p {
         margin: 0;
@@ -55,5 +57,5 @@
     display: flex;
     justify-content: center;
     gap: 16px;
-    padding: 16px 24px 24px;
+    padding: 0 24px 24px;
 }

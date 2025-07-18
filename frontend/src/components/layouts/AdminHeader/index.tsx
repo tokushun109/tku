@@ -84,7 +84,6 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ isLoggedIn = true, onLogout }
                                             <span className={styles['nav-icon']}>
                                                 <IconComponent />
                                             </span>
-                                            ぼcz
                                             <span className={styles['nav-text']}>{item.name}</span>
                                         </button>
                                     </li>
@@ -108,7 +107,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ isLoggedIn = true, onLogout }
                 onClose={() => setDialogVisible(false)}
                 title="ログアウト"
             >
-                <p>ログアウトします。よろしいですか？</p>
+                <p className={styles['dialog-text']}>ログアウトします。よろしいですか？</p>
             </Dialog>
         </div>
     )

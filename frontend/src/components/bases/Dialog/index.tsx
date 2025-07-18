@@ -36,9 +36,11 @@ export const Dialog: React.FC<DialogProps> = ({ isOpen, onClose, title, children
         <div className={styles['dialog-overlay']} onClick={handleBackdropClick}>
             <div className={styles['dialog-backdrop']} />
             <div className={styles['dialog']} onClick={handleDialogClick}>
-                <div className={styles['dialog-header']}>
-                    <h3 className={styles['dialog-title']}>{title}</h3>
-                </div>
+                {title && (
+                    <div className={styles['dialog-header']}>
+                        <h3 className={styles['dialog-title']}>{title}</h3>
+                    </div>
+                )}
                 <div className={styles['dialog-content']}>{children}</div>
                 {showActions && (
                     <div className={styles['dialog-actions']}>
