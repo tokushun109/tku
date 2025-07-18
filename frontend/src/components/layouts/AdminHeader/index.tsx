@@ -1,6 +1,6 @@
 'use client'
 
-import { Close, Email, Home, Inventory, Menu, Settings, Store, Tag } from '@mui/icons-material'
+import { AccountCircle, Close, Description, Email, Menu, ShoppingCart, Tag, Web } from '@mui/icons-material'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
@@ -24,12 +24,12 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ isLoggedIn = true, onLogout }
     const [dialogVisible, setDialogVisible] = useState<boolean>(false)
 
     const navigationItems: NavigationItem[] = [
-        { icon: Settings, link: '/admin/seo', name: 'SEO' },
-        { icon: Inventory, link: '/admin/product', name: '商品' },
+        { icon: AccountCircle, link: '/admin/seo', name: 'SEO' },
+        { icon: ShoppingCart, link: '/admin/product', name: '商品' },
         { icon: Tag, link: '/admin/classification', name: '分類' },
-        { icon: Store, link: '/admin/site', name: 'サイト' },
+        { icon: Web, link: '/admin/site', name: 'サイト' },
         { icon: Email, link: '/admin/contact', name: 'お問い合わせ' },
-        { icon: Home, link: '/admin/csv', name: 'CSV' },
+        { icon: Description, link: '/admin/csv', name: 'CSV' },
     ]
 
     const handleLogout = () => {
