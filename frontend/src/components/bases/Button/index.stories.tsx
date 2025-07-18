@@ -9,7 +9,10 @@ const meta: Meta<typeof Button> = {
     args: {
         children: 'button',
         colorType: ColorType.Primary,
+        contrast: false,
         disabled: false,
+        noBoxShadow: false,
+        outlined: false,
         onClick: () => {
             console.log('clickしました')
         },
@@ -19,7 +22,16 @@ const meta: Meta<typeof Button> = {
             control: { type: 'select' },
             options: Object.values(ColorType),
         },
+        contrast: {
+            control: { type: 'boolean' },
+        },
         disabled: {
+            control: { type: 'boolean' },
+        },
+        noBoxShadow: {
+            control: { type: 'boolean' },
+        },
+        outlined: {
             control: { type: 'boolean' },
         },
     },
@@ -51,56 +63,48 @@ export const Accent: Story = {
     },
 }
 
-export const LongText: Story = {
+export const Contrast: Story = {
     args: {
-        children: '商品をカートに追加しました',
+        children: 'Contrast Button',
         colorType: ColorType.Primary,
-        onClick: () => {
-            console.log('商品をカートに追加しました')
-        },
+        contrast: true,
     },
 }
 
-export const ShortText: Story = {
+export const Outlined: Story = {
     args: {
-        children: '購入',
-        colorType: ColorType.Accent,
-        onClick: () => {
-            console.log('購入ボタンがクリックされました')
-        },
-    },
-}
-
-export const WithIcon: Story = {
-    args: {
-        children: (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span>♡</span>
-                <span>お気に入りに追加</span>
-            </div>
-        ),
-        colorType: ColorType.Secondary,
-        onClick: () => {
-            console.log('お気に入りに追加しました')
-        },
-    },
-}
-
-export const ActionButtons: Story = {
-    args: {
-        children: '管理者ログイン',
+        children: 'Outlined Button',
         colorType: ColorType.Primary,
-        onClick: () => {
-            console.log('管理者ログインボタンがクリックされました')
-        },
+        outlined: true,
     },
 }
 
-export const NoClickHandler: Story = {
+export const OutlinedContrast: Story = {
     args: {
-        children: 'クリック無効ボタン',
-        colorType: ColorType.Secondary,
+        children: 'Outlined Contrast',
+        colorType: ColorType.Primary,
+        contrast: true,
+        outlined: true,
     },
+}
+
+export const NoBoxShadow: Story = {
+    args: {
+        children: 'No Shadow Button',
+        colorType: ColorType.Primary,
+        noBoxShadow: true,
+    },
+}
+
+export const DialogButtons: Story = {
+    render: () => (
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <Button colorType={ColorType.Primary} contrast outlined>
+                いいえ
+            </Button>
+            <Button colorType={ColorType.Primary}>はい</Button>
+        </div>
+    ),
 }
 
 export const Disabled: Story = {
@@ -114,19 +118,55 @@ export const Disabled: Story = {
     },
 }
 
-export const DisabledSecondary: Story = {
+export const DisabledOutlined: Story = {
     args: {
-        children: '送信中...',
-        colorType: ColorType.Secondary,
+        children: '無効化されたアウトライン',
+        colorType: ColorType.Primary,
         disabled: true,
+        outlined: true,
     },
 }
 
-export const FormSubmit: Story = {
+export const FormExample: Story = {
+    render: () => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxWidth: '300px' }}>
+            <Button colorType={ColorType.Primary} type="submit">
+                送信する
+            </Button>
+            <Button colorType={ColorType.Secondary} contrast outlined>
+                キャンセル
+            </Button>
+        </div>
+    ),
+}
+
+export const ActionButtons: Story = {
+    render: () => (
+        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <Button colorType={ColorType.Primary}>管理者ログイン</Button>
+            <Button colorType={ColorType.Accent}>商品をカートに追加</Button>
+            <Button colorType={ColorType.Secondary} outlined>
+                お気に入りに追加
+            </Button>
+            <Button colorType={ColorType.Danger} contrast>
+                削除
+            </Button>
+        </div>
+    ),
+}
+
+export const WithIcon: Story = {
     args: {
-        children: '送信する',
-        colorType: ColorType.Primary,
-        type: 'submit',
-        disabled: false,
+        children: (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>♡</span>
+                <span>お気に入りに追加</span>
+            </div>
+        ),
+        colorType: ColorType.Secondary,
+        outlined: true,
+        onClick: () => {
+            console.log('お気に入りに追加しました')
+        },
     },
 }

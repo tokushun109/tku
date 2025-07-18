@@ -5,15 +5,16 @@
     padding: 10px 30px;
     outline: none;
     border: none;
-    background-color: $primary-bg-color;
-    color: $white-text-color;
     text-decoration: none;
     cursor: pointer;
     border-radius: 8px;
     box-shadow: $box-shadow;
 
+    &.no-box-shadow {
+        box-shadow: none;
+    }
+
     &:hover:not(:disabled) {
-        border-color: transparent;
         transition: $transition;
         opacity: 0.8;
     }

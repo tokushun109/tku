@@ -4,6 +4,7 @@ import { Close, Menu } from '@mui/icons-material'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
+import { Button } from '@/components/bases/Button'
 import { ColorCode, ColorType } from '@/types/enum/color'
 import { NavigationItems } from '@/types/enum/navigation'
 
@@ -49,11 +50,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ isLoggedIn = true, onLogout }
                     <h1 className={styles['title']}>tku</h1>
                     <div className={styles['spacer']} />
                     {isLoggedIn && (
-                        <button
-                            className={styles['logout-button']}
-                            onClick={() => setDialogVisible(true)}
-                            type="button"
-                        >
+                        <button className={styles['logout-button']} onClick={() => setDialogVisible(true)} type="button">
                             ログアウト
                         </button>
                     )}
@@ -66,11 +63,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ isLoggedIn = true, onLogout }
                     <nav className={styles['drawer-content']}>
                         <div className={styles['drawer-header']}>
                             <h2 className={styles['drawer-title']}>設定</h2>
-                            <button
-                                className={styles['close-button']}
-                                onClick={() => setSidebarVisible(false)}
-                                type="button"
-                            >
+                            <button className={styles['close-button']} onClick={() => setSidebarVisible(false)} type="button">
                                 <Close sx={{ color: ColorCode[ColorType.Primary] }} />
                             </button>
                         </div>
@@ -80,11 +73,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ isLoggedIn = true, onLogout }
                                 const IconComponent = item.icon
                                 return (
                                     <li key={item.name}>
-                                        <button
-                                            className={styles['nav-item']}
-                                            onClick={() => handleNavigationClick(item.link)}
-                                            type="button"
-                                        >
+                                        <button className={styles['nav-item']} onClick={() => handleNavigationClick(item.link)} type="button">
                                             <span className={styles['nav-icon']}>
                                                 <IconComponent />
                                             </span>
@@ -109,20 +98,12 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ isLoggedIn = true, onLogout }
                             <p>ログアウトします。よろしいですか？</p>
                         </div>
                         <div className={styles['dialog-actions']}>
-                            <button
-                                className={styles['dialog-button-secondary']}
-                                onClick={() => setDialogVisible(false)}
-                                type="button"
-                            >
+                            <Button colorType={ColorType.Primary} contrast onClick={() => setDialogVisible(false)} outlined>
                                 いいえ
-                            </button>
-                            <button
-                                className={styles['dialog-button-primary']}
-                                onClick={handleLogout}
-                                type="button"
-                            >
+                            </Button>
+                            <Button colorType={ColorType.Primary} onClick={handleLogout}>
                                 はい
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </div>
