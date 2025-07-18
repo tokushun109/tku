@@ -18,6 +18,9 @@ export const Image = ({ src, alt }: Props) => {
         setIsLoading(true)
     }, [src])
 
+    // 一時的にローカルの画像APIではグレースケール画像を表示
+    const isLocalApi = process.env.NODE_ENV === 'development' && src.includes('http://localhost:8080/api/product_image')
+
     return (
         <div className={styles['container']}>
             <NextImage
@@ -32,7 +35,7 @@ export const Image = ({ src, alt }: Props) => {
                     setIsLoading(false)
                 }}
                 sizes="100%"
-                src={isLoading ? '/image/gray-image.png' : displaySrc}
+                src={isLocalApi || isLoading ? '/image/gray-image.png' : displaySrc}
             />
         </div>
     )
