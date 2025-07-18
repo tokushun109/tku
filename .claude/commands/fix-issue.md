@@ -15,7 +15,7 @@ description: "Issue 番号を受け取り、修正 → commit → push → PR �
 2. issue 番号に合わせてブランチを作成(feature/#$ARGUMENTS)
 3. 修正を実行（プロジェクト状況に応じた変更）
 4. `git add .` → Claude Code の組み込み機能を使用してコミット・プッシュ
-5. コミットにエラーがあれば自動修正・再コミット
+5. コミットにエラーが出た時は`pnpm lint-fix`を実行して再コミットを行い、それでもダメならエラーに応じた修正を実施して再コミットを行う
 6. Claude Code の組み込み機能を使用してプッシュ(**git commit は使わずに claude -p で実行**")
 7. プッシュ後のテストでエラー発生 → 修正 → 再コミット・プッシュ(**git push は使わずに claude -p で実行**")
 8. Claude Code の組み込み機能を使用して PR 作成

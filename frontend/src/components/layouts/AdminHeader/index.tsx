@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import { Button } from '@/components/bases/Button'
+import { Dialog } from '@/components/bases/Dialog'
 import { ColorCode, ColorType } from '@/types/enum/color'
 import { NavigationItems } from '@/types/enum/navigation'
 
@@ -83,6 +84,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ isLoggedIn = true, onLogout }
                                             <span className={styles['nav-icon']}>
                                                 <IconComponent />
                                             </span>
+                                            ぼcz
                                             <span className={styles['nav-text']}>{item.name}</span>
                                         </button>
                                     </li>
@@ -93,27 +95,21 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ isLoggedIn = true, onLogout }
                 </div>
             )}
 
-            {dialogVisible && (
-                <div className={styles['dialog-overlay']}>
-                    <div className={styles['dialog-backdrop']} onClick={() => setDialogVisible(false)} />
-                    <div className={styles['dialog']}>
-                        <div className={styles['dialog-header']}>
-                            <h3 className={styles['dialog-title']}>ログアウト</h3>
-                        </div>
-                        <div className={styles['dialog-content']}>
-                            <p>ログアウトします。よろしいですか？</p>
-                        </div>
-                        <div className={styles['dialog-actions']}>
-                            <Button colorType={ColorType.Primary} contrast onClick={() => setDialogVisible(false)} outlined>
-                                いいえ
-                            </Button>
-                            <Button colorType={ColorType.Primary} onClick={handleLogout}>
-                                はい
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <Dialog
+                cancelOption={{
+                    label: 'いいえ',
+                    onClick: () => setDialogVisible(false),
+                }}
+                confirmOption={{
+                    label: 'はい',
+                    onClick: handleLogout,
+                }}
+                isOpen={dialogVisible}
+                onClose={() => setDialogVisible(false)}
+                title="ログアウト"
+            >
+                <p>ログアウトします。よろしいですか？</p>
+            </Dialog>
         </div>
     )
 }
