@@ -1,9 +1,10 @@
 'use client'
 
-import { AccountCircle, Close, Description, Email, Menu, ShoppingCart, Tag, Web } from '@mui/icons-material'
+import { Close, Menu } from '@mui/icons-material'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
+import { NavigationItems } from '@/types/enum/navigation'
 
 import styles from './styles.module.scss'
 
@@ -12,25 +13,12 @@ interface AdminHeaderProps {
     onLogout?: () => void
 }
 
-interface NavigationItem {
-    icon: React.ComponentType
-    link: string
-    name: string
-}
-
 const AdminHeader: React.FC<AdminHeaderProps> = ({ isLoggedIn = true, onLogout }) => {
     const router = useRouter()
     const [sidebarVisible, setSidebarVisible] = useState<boolean>(false)
     const [dialogVisible, setDialogVisible] = useState<boolean>(false)
 
-    const navigationItems: NavigationItem[] = [
-        { icon: AccountCircle, link: '/admin/seo', name: 'SEO' },
-        { icon: ShoppingCart, link: '/admin/product', name: '商品' },
-        { icon: Tag, link: '/admin/classification', name: '分類' },
-        { icon: Web, link: '/admin/site', name: 'サイト' },
-        { icon: Email, link: '/admin/contact', name: 'お問い合わせ' },
-        { icon: Description, link: '/admin/csv', name: 'CSV' },
-    ]
+    const navigationItems = NavigationItems
 
     const handleLogout = () => {
         setDialogVisible(false)
