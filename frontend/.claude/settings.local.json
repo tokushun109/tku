@@ -7,7 +7,8 @@
             "Bash(git add:*)",
             "Bash(gh issue view:*)",
             "Bash(mv:*)",
-            "Bash(rmdir:*)"
+            "Bash(rmdir:*)",
+            "Bash(git commit:*)"
         ],
         "deny": []
     }
