@@ -4,6 +4,7 @@ import { Close, Menu } from '@mui/icons-material'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
+import { ColorCode, ColorType } from '@/types/enum/color'
 import { NavigationItems } from '@/types/enum/navigation'
 
 import styles from './styles.module.scss'
@@ -70,7 +71,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ isLoggedIn = true, onLogout }
                                 onClick={() => setSidebarVisible(false)}
                                 type="button"
                             >
-                                <Close />
+                                <Close sx={{ color: ColorCode[ColorType.Primary] }} />
                             </button>
                         </div>
                         <div className={styles['divider']} />
