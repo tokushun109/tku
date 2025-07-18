@@ -16,7 +16,7 @@ interface DialogProps {
     confirmOption?: DialogButtonOption
     isOpen: boolean
     onClose: () => void
-    title: string
+    title?: string
 }
 
 export const Dialog: React.FC<DialogProps> = ({ isOpen, onClose, title, children, confirmOption, cancelOption }) => {

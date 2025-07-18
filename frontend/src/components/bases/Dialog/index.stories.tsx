@@ -35,7 +35,7 @@ export const Default: Story = {}
 export const WithConfirmCancel: Story = {
     args: {
         title: 'ログアウト',
-        children: <p>ログアウトします。よろしいですか？</p>,
+        children: <p style={{ textAlign: 'center' }}>ログアウトします。よろしいですか？</p>,
         confirmOption: {
             label: 'はい',
             onClick: () => console.log('確認ボタンがクリックされました'),
@@ -76,6 +76,17 @@ export const NoButtons: Story = {
     },
 }
 
+export const NoTitle: Story = {
+    args: {
+        children: <p>このダイアログにはタイトルがありません。ヘッダーは表示されません。</p>,
+        title: undefined, // タイトルを省略
+        confirmOption: {
+            label: 'OK',
+            onClick: () => console.log('確認ボタンがクリックされました'),
+        },
+    },
+}
+
 export const Interactive: Story = {
     render: () => {
         const [isOpen, setIsOpen] = useState<boolean>(false)
@@ -95,7 +106,7 @@ export const Interactive: Story = {
                 case 'confirm-cancel':
                     return {
                         title: 'ログアウト確認',
-                        children: <p>ログアウトします。よろしいですか？</p>,
+                        children: <p style={{ textAlign: 'center' }}>ログアウトします。よろしいですか？</p>,
                         confirmOption: { label: 'はい', onClick: closeDialog },
                         cancelOption: { label: 'いいえ', onClick: closeDialog },
                     }
@@ -109,6 +120,11 @@ export const Interactive: Story = {
                     return {
                         title: '読み込み中',
                         children: <p>データを読み込んでいます。しばらくお待ちください。</p>,
+                    }
+                case 'no-title':
+                    return {
+                        children: <p>タイトルなしのダイアログです。ヘッダーは表示されません。</p>,
+                        confirmOption: { label: 'OK', onClick: closeDialog },
                     }
                 default:
                     return {
@@ -128,6 +144,9 @@ export const Interactive: Story = {
                 </Button>
                 <Button colorType={ColorType.Secondary} onClick={() => openDialog('no-buttons')}>
                     ボタンなし
+                </Button>
+                <Button colorType={ColorType.Danger} onClick={() => openDialog('no-title')}>
+                    タイトルなし
                 </Button>
 
                 <Dialog isOpen={isOpen} onClose={closeDialog} {...getDialogProps()} />
