@@ -9,11 +9,23 @@ import { render, screen, waitFor } from '../helpers'
 vi.mock('@/apis/product')
 
 // next/navigationモック
-vi.mock('next/navigation', () => ({
-    notFound: vi.fn(() => {
-        throw new Error('NEXT_NOT_FOUND')
-    }),
-}))
+vi.mock('next/navigation', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('next/navigation')>()
+    return {
+        ...actual,
+        notFound: vi.fn(() => {
+            throw new Error('NEXT_NOT_FOUND')
+        }),
+        useRouter: vi.fn(() => ({
+            push: vi.fn(),
+            replace: vi.fn(),
+            back: vi.fn(),
+            forward: vi.fn(),
+            refresh: vi.fn(),
+            prefetch: vi.fn(),
+        })),
+    }
+})
 
 const mockGetProduct = vi.mocked(getProduct)
 
