@@ -50,9 +50,15 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ isLoggedIn = true, onLogout }
                     <h1 className={styles['title']}>tku</h1>
                     <div className={styles['spacer']} />
                     {isLoggedIn && (
-                        <button className={styles['logout-button']} onClick={() => setDialogVisible(true)} type="button">
+                        <Button
+                            className={styles['logout-button']}
+                            colorType={ColorType.Primary}
+                            noBoxShadow
+                            onClick={() => setDialogVisible(true)}
+                            outlined
+                        >
                             ログアウト
-                        </button>
+                        </Button>
                     )}
                 </div>
             </header>
