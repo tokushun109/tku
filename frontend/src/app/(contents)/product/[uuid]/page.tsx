@@ -45,9 +45,6 @@ const ProductDetail = async ({ params }: Props) => {
 
     try {
         const product = await getProduct(uuid)
-        if (!product) {
-            notFound()
-        }
         return <ProductDetailTemplate product={product} />
     } catch {
         notFound()

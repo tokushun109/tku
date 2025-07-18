@@ -8,6 +8,13 @@ import { render, screen, waitFor } from '../helpers'
 // APIモック
 vi.mock('@/apis/product')
 
+// next/navigationモック
+vi.mock('next/navigation', () => ({
+    notFound: vi.fn(() => {
+        throw new Error('NEXT_NOT_FOUND')
+    }),
+}))
+
 const mockGetProduct = vi.mocked(getProduct)
 
 describe('Product Detail Page Integration Test', () => {
@@ -92,9 +99,9 @@ describe('Product Detail Page Integration Test', () => {
         // モックで404エラーを発生させる
         mockGetProduct.mockRejectedValue(new Error('Product not found'))
 
-        // エラーが投げられることを確認
+        // notFound()が呼び出されることを確認
         const params = Promise.resolve({ uuid: 'non-existent-uuid' })
-        await expect(ProductDetail({ params })).rejects.toThrow('Product not found')
+        await expect(ProductDetail({ params })).rejects.toThrow('NEXT_NOT_FOUND')
     })
 
     it('画像がない商品の場合でも正常に表示される', async () => {
