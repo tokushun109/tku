@@ -12,11 +12,11 @@ import { NavigationItems } from '@/types/enum/navigation'
 
 import styles from './styles.module.scss'
 
-interface AdminHeaderProps {
+interface Props {
     isLoggedIn?: boolean
 }
 
-const AdminHeader: React.FC<AdminHeaderProps> = ({ isLoggedIn = true }) => {
+const AdminHeader = ({ isLoggedIn = true }: Props) => {
     const router = useRouter()
     const [sidebarVisible, setSidebarVisible] = useState<boolean>(false)
     const [dialogVisible, setDialogVisible] = useState<boolean>(false)

@@ -11,13 +11,13 @@ export const MessageType = {
 
 export type MessageType = (typeof MessageType)[keyof typeof MessageType]
 
-export interface MessageProps {
+interface Props {
     children: React.ReactNode
     className?: string
     type?: MessageType
 }
 
-export const Message: React.FC<MessageProps> = ({ children, type = MessageType.Error, className = '' }) => {
+export const Message = ({ children, type = MessageType.Error, className = '' }: Props) => {
     const messageClass = `${styles['message']} ${styles[`message--${type}`]} ${className}`.trim()
 
     return (

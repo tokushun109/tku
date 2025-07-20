@@ -15,7 +15,7 @@ import { IContact } from '@/features/contact/type'
 
 import styles from './styles.module.scss'
 
-const ContactPage: React.FC = () => {
+const ContactPage = () => {
     const [success, setSuccess] = useState<boolean>(false)
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
     const [submitError, setSubmitError] = useState<string | null>(null)

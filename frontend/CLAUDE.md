@@ -285,13 +285,13 @@ export type ButtonVariant = (typeof ButtonVariant)[keyof typeof ButtonVariant]
 
 ### React/Next.js規約
 
-#### 関数定義
+#### 関数定義とコンポーネント記法
 
 frontend配下では**アロー関数を使用して統一**してください。
 
 ```tsx
-// ✅ 推奨 - アロー関数
-const MyComponent: React.FC<Props> = ({ prop1, prop2 }) => {
+// ✅ 推奨 - アロー関数 + 型指定
+const MyComponent = ({ prop1, prop2 }: Props) => {
     return <div>{prop1}</div>
 }
 
@@ -299,9 +299,32 @@ const handleClick = (event: React.MouseEvent) => {
     // 処理
 }
 
+// ❌ 非推奨 - React.FC記法
+const MyComponent: React.FC<Props> = ({ prop1, prop2 }) => {
+    return <div>{prop1}</div>
+}
+
 // ❌ 非推奨 - function宣言
 function MyComponent({ prop1, prop2 }: Props) {
     return <div>{prop1}</div>
+}
+```
+
+#### コンポーネント型定義
+
+```tsx
+// ✅ 推奨 - 型名は「Props」に統一
+interface Props {
+    currentPage: number
+    delta?: number
+    onPageChange: (page: number) => void
+    totalPages: number
+}
+
+// ❌ 非推奨 - コンポーネント名を含む型名
+interface PaginationProps {
+    currentPage: number
+    totalPages: number
 }
 ```
 
@@ -311,6 +334,7 @@ function MyComponent({ prop1, prop2 }: Props) {
 - **Props設計**: デフォルト値を適切に設定
 - **命名**: コンポーネント名はPascalCase
 - **スタイル上書き禁止**: 親コンポーネントから子コンポーネントのスタイルを`!important`で上書きしない
+- **MUI使用制限**: 基本的にMUIについてはアイコンのみ使用可能、それ以外のMUIコンポーネントは使用せずに独自実装を行う
 
 #### App Router活用
 

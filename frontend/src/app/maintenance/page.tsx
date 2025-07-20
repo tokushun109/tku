@@ -6,7 +6,7 @@ import { useEffect } from 'react'
 import { healthCheck } from '@/apis/healthCheck'
 import ErrorPage from '@/app/error'
 
-const MaintenancePage: React.FC = () => {
+const MaintenancePage = () => {
     const router = useRouter()
 
     useEffect(() => {

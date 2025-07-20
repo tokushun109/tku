@@ -8,11 +8,11 @@ export const metadata: Metadata = {
     },
 }
 
-interface MaintenanceLayoutProps {
+interface Props {
     children: React.ReactNode
 }
 
-const MaintenanceLayout: React.FC<MaintenanceLayoutProps> = ({ children }) => {
+const MaintenanceLayout = ({ children }: Props) => {
     return children
 }
 
