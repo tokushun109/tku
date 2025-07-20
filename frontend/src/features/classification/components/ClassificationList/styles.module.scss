@@ -80,20 +80,14 @@
     }
 }
 
-.pagination-container {
+.add-button-container {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     align-items: center;
-    gap: 16px;
     padding-top: 16px;
     border-top: 1px solid #e0e0e0;
     margin-top: auto;
     flex-shrink: 0;
-}
-
-.add-button-container {
-    display: flex;
-    align-items: center;
 }
 
 .add-button-content {

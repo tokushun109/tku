@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 
+import { Tab, TabItem } from '@/components/bases/Tab'
 import { ClassificationList } from '@/features/classification/components/ClassificationList'
 import { IClassification } from '@/features/classification/type'
 import { ClassificationType, ClassificationLabel } from '@/types'
@@ -17,44 +18,39 @@ interface Props {
 export const ClassificationTemplate = ({ categories, targets, tags }: Props) => {
     const [activeTab, setActiveTab] = useState<string>(ClassificationType.Category)
 
-    const handleTabChange = (newTab: string) => {
-        setActiveTab(newTab)
+    const tabItems: TabItem[] = [
+        {
+            key: ClassificationType.Category,
+            label: ClassificationLabel[ClassificationType.Category],
+        },
+        {
+            key: ClassificationType.Target,
+            label: ClassificationLabel[ClassificationType.Target],
+        },
+        {
+            key: ClassificationType.Tag,
+            label: ClassificationLabel[ClassificationType.Tag],
+        },
+    ]
+
+    const getCurrentItems = () => {
+        switch (activeTab) {
+            case ClassificationType.Category:
+                return categories
+            case ClassificationType.Target:
+                return targets
+            case ClassificationType.Tag:
+                return tags
+            default:
+                return []
+        }
     }
 
     return (
         <div className={styles['classification-container']}>
-            <div className={styles['tab-header']}>
-                <div className={styles['tab-buttons']}>
-                    <button
-                        className={`${styles['tab-button']} ${activeTab === ClassificationType.Category ? styles['active'] : ''}`}
-                        onClick={() => handleTabChange(ClassificationType.Category)}
-                    >
-                        {ClassificationLabel[ClassificationType.Category]}
-                    </button>
-                    <button
-                        className={`${styles['tab-button']} ${activeTab === ClassificationType.Target ? styles['active'] : ''}`}
-                        onClick={() => handleTabChange(ClassificationType.Target)}
-                    >
-                        {ClassificationLabel[ClassificationType.Target]}
-                    </button>
-                    <button
-                        className={`${styles['tab-button']} ${activeTab === ClassificationType.Tag ? styles['active'] : ''}`}
-                        onClick={() => handleTabChange(ClassificationType.Tag)}
-                    >
-                        {ClassificationLabel[ClassificationType.Tag]}
-                    </button>
-                </div>
-            </div>
+            <Tab activeKey={activeTab} items={tabItems} onTabChange={setActiveTab} />
             <div className={styles['tab-content']}>
-                <div className={activeTab === ClassificationType.Category ? styles['tab-panel-active'] : styles['tab-panel-hidden']}>
-                    <ClassificationList items={categories} />
-                </div>
-                <div className={activeTab === ClassificationType.Target ? styles['tab-panel-active'] : styles['tab-panel-hidden']}>
-                    <ClassificationList items={targets} />
-                </div>
-                <div className={activeTab === ClassificationType.Tag ? styles['tab-panel-active'] : styles['tab-panel-hidden']}>
-                    <ClassificationList items={tags} />
-                </div>
+                <ClassificationList items={getCurrentItems()} />
             </div>
         </div>
     )
