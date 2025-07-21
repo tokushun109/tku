@@ -134,24 +134,22 @@ export const TargetList = ({ items, onUpdate }: Props) => {
                 {items.length === 0 ? (
                     <div className={styles['empty-message']}>登録されていません</div>
                 ) : (
-                    <div className={styles['item-list']}>
-                        {items.map((item) => (
-                            <div className={styles['list-item']} key={item.uuid} onClick={() => openDialog(ExecutionType.Edit, item)}>
-                                <div className={styles['item-content']}>
-                                    <span className={styles['item-name']}>{item.name}</span>
-                                    <div className={styles['item-actions']}>
-                                        <Delete
-                                            className={styles['icon-button']}
-                                            onClick={(e) => {
-                                                e.stopPropagation()
-                                                openDialog(ExecutionType.Delete, item)
-                                            }}
-                                        />
-                                    </div>
+                    items.map((item) => (
+                        <div className={styles['list-item']} key={item.uuid} onClick={() => openDialog(ExecutionType.Edit, item)}>
+                            <div className={styles['item-content']}>
+                                <span className={styles['item-name']}>{item.name}</span>
+                                <div className={styles['item-actions']}>
+                                    <Delete
+                                        className={styles['icon-button']}
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            openDialog(ExecutionType.Delete, item)
+                                        }}
+                                    />
                                 </div>
                             </div>
-                        ))}
-                    </div>
+                        </div>
+                    ))
                 )}
             </div>
             <div className={styles['add-button-container']}>

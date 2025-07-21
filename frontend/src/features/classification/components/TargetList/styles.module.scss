@@ -1,59 +1,48 @@
 .classification-list {
-    width: 100%;
-    height: 100%;
+    background: white;
+    border-radius: 8px;
+    padding: 16px;
     display: flex;
     flex-direction: column;
+    height: 100%;
 }
 
 .list-content {
-    flex: 1;
-    min-height: 300px;
-    border: 1px solid $border-color;
-    border-radius: 8px;
-    padding: 16px;
+    height: 640px;
     overflow-y: auto;
 }
 
 .empty-message {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    color: $text-color-secondary;
+    text-align: center;
+    color: #999;
+    padding: 32px 0;
     font-size: 14px;
 }
 
-.item-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
 .list-item {
-    display: flex;
-    align-items: center;
-    padding: 12px;
-    border: 1px solid $border-color;
-    border-radius: 6px;
+    padding: 16px 12px;
+    border-bottom: 1px solid #f0f0f0;
     cursor: pointer;
     transition: background-color 0.2s ease;
 
     &:hover {
-        background-color: $background-color-hover;
+        background-color: #f9f9f9;
+    }
+
+    &:last-child {
+        border-bottom: none;
     }
 }
 
 .item-content {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    width: 100%;
+    align-items: center;
 }
 
 .item-name {
-    flex: 1;
     font-size: 14px;
-    color: $text-color-primary;
+    color: #333;
 }
 
 .item-actions {
@@ -62,28 +51,31 @@
 }
 
 .icon-button {
-    width: 20px;
-    height: 20px;
     cursor: pointer;
-    color: $text-color-secondary;
+    color: $danger-color;
     transition: color 0.2s ease;
 
     &:hover {
-        color: $error-color;
+        color: color.adjust($danger-color, $lightness: -10%);
     }
 }
 
 .add-button-container {
-    margin-top: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 16px;
+    border-top: 1px solid #e0e0e0;
+    margin-top: auto;
+    flex-shrink: 0;
 }
 
 .add-button-content {
     display: flex;
     align-items: center;
-    gap: 8px;
 }
 
 .add-icon {
-    width: 20px;
-    height: 20px;
+    margin-right: 4px;
+    font-size: 16px;
 }
