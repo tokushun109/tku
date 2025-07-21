@@ -41,6 +41,7 @@ export const postTarget = async (params: IPostTargetParams): Promise<ITargetResp
         const res = await fetch(`${process.env.API_URL}/target`, {
             headers: {
                 'Content-Type': 'application/json',
+                withCredentials: 'include',
             },
             method: 'POST',
             body: JSON.stringify(params.form),
