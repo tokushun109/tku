@@ -17,11 +17,16 @@ interface Props {
     type: ClassificationType
 }
 
-type ExecutionType = 'create' | 'edit' | 'delete'
+const ExecutionType = {
+    Create: 'create',
+    Edit: 'edit',
+    Delete: 'delete',
+} as const
+type ExecutionType = (typeof ExecutionType)[keyof typeof ExecutionType]
 
 export const ClassificationList = ({ items, type, onUpdate }: Props) => {
     const [dialogOpen, setDialogOpen] = useState<boolean>(false)
-    const [executionType, setExecutionType] = useState<ExecutionType>('create')
+    const [executionType, setExecutionType] = useState<ExecutionType>(ExecutionType.Create)
     const [selectedItem, setSelectedItem] = useState<IClassification | null>(null)
     const [name, setName] = useState<string>('')
     const [nameError, setNameError] = useState<string>('')
@@ -37,7 +42,7 @@ export const ClassificationList = ({ items, type, onUpdate }: Props) => {
 
     const closeDialog = () => {
         setDialogOpen(false)
-        setExecutionType('create')
+        setExecutionType(ExecutionType.Create)
         setSelectedItem(null)
         setName('')
         setNameError('')
@@ -57,9 +62,9 @@ export const ClassificationList = ({ items, type, onUpdate }: Props) => {
     }
 
     const handleSubmit = async () => {
-        if (executionType === 'delete') {
+        if (executionType === ExecutionType.Delete) {
             await handleDelete()
-        } else if (executionType === 'edit') {
+        } else if (executionType === ExecutionType.Edit) {
             await handleEdit()
         } else {
             await handleCreate()
@@ -144,11 +149,11 @@ export const ClassificationList = ({ items, type, onUpdate }: Props) => {
     const getDialogTitle = () => {
         const typeName = type === 'category' ? 'カテゴリー' : type === 'target' ? 'ターゲット' : 'タグ'
         switch (executionType) {
-            case 'create':
+            case ExecutionType.Create:
                 return `${typeName}を追加`
-            case 'edit':
+            case ExecutionType.Edit:
                 return `${typeName}を編集`
-            case 'delete':
+            case ExecutionType.Delete:
                 return `${typeName}を削除`
             default:
                 return ''
@@ -163,7 +168,7 @@ export const ClassificationList = ({ items, type, onUpdate }: Props) => {
                 ) : (
                     <div className={styles['item-list']}>
                         {items.map((item) => (
-                            <div className={styles['list-item']} key={item.uuid} onClick={() => openDialog('edit', item)}>
+                            <div className={styles['list-item']} key={item.uuid} onClick={() => openDialog(ExecutionType.Edit, item)}>
                                 <div className={styles['item-content']}>
                                     <span className={styles['item-name']}>{item.name}</span>
                                     <div className={styles['item-actions']}>
@@ -171,7 +176,7 @@ export const ClassificationList = ({ items, type, onUpdate }: Props) => {
                                             className={styles['icon-button']}
                                             onClick={(e) => {
                                                 e.stopPropagation()
-                                                openDialog('delete', item)
+                                                openDialog(ExecutionType.Delete, item)
                                             }}
                                         />
                                     </div>
@@ -182,7 +187,7 @@ export const ClassificationList = ({ items, type, onUpdate }: Props) => {
                 )}
             </div>
             <div className={styles['add-button-container']}>
-                <Button onClick={() => openDialog('create')}>
+                <Button onClick={() => openDialog(ExecutionType.Create)}>
                     <div className={styles['add-button-content']}>
                         <Add className={styles['add-icon']} />
                         追加
@@ -196,14 +201,20 @@ export const ClassificationList = ({ items, type, onUpdate }: Props) => {
                     onClick: loading ? () => {} : closeDialog,
                 }}
                 confirmOption={{
-                    label: loading ? '処理中...' : executionType === 'delete' ? '削除' : executionType === 'edit' ? '更新' : '追加',
-                    onClick: loading || (executionType !== 'delete' && !name.trim()) ? () => {} : handleSubmit,
+                    label: loading
+                        ? '処理中...'
+                        : executionType === ExecutionType.Delete
+                          ? '削除'
+                          : executionType === ExecutionType.Edit
+                            ? '更新'
+                            : '追加',
+                    onClick: loading || (executionType !== ExecutionType.Delete && !name.trim()) ? () => {} : handleSubmit,
                 }}
                 isOpen={dialogOpen}
                 onClose={loading ? () => {} : closeDialog}
                 title={getDialogTitle()}
             >
-                {executionType === 'delete' ? (
+                {executionType === ExecutionType.Delete ? (
                     <p>「{selectedItem?.name}」を削除しますか？</p>
                 ) : (
                     <Input
