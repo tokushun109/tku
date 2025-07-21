@@ -1,3 +1,5 @@
+import { Category, Label, People } from '@mui/icons-material'
+
 import { Tab } from '.'
 
 import type { Meta, StoryObj } from '@storybook/nextjs-vite'
@@ -6,9 +8,9 @@ const meta: Meta<typeof Tab> = {
     component: Tab,
     args: {
         items: [
-            { key: 'tab1', label: 'タブ1' },
-            { key: 'tab2', label: 'タブ2' },
-            { key: 'tab3', label: 'タブ3' },
+            { key: 'tab1', label: 'タブ1', icon: <Category /> },
+            { key: 'tab2', label: 'タブ2', icon: <People /> },
+            { key: 'tab3', label: 'タブ3', icon: <Label /> },
         ],
         activeKey: 'tab1',
         onTabChange: (key: string) => console.log('Tab changed to:', key),
@@ -58,5 +60,16 @@ export const SingleTab: Story = {
     args: {
         items: [{ key: 'only', label: '唯一のタブ' }],
         activeKey: 'only',
+    },
+}
+
+export const WithoutIcons: Story = {
+    args: {
+        items: [
+            { key: 'tab1', label: 'アイコンなし1' },
+            { key: 'tab2', label: 'アイコンなし2' },
+            { key: 'tab3', label: 'アイコンなし3' },
+        ],
+        activeKey: 'tab1',
     },
 }

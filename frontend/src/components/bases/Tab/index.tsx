@@ -3,6 +3,7 @@ import React from 'react'
 import styles from './styles.module.scss'
 
 export interface TabItem {
+    icon?: React.ReactNode
     key: string
     label: string
 }
@@ -23,6 +24,7 @@ export const Tab = ({ items, activeKey, onTabChange }: Props) => {
                         key={item.key}
                         onClick={() => onTabChange(item.key)}
                     >
+                        {item.icon && <span className={styles['tab-icon']}>{item.icon}</span>}
                         {item.label}
                     </button>
                 ))}

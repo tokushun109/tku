@@ -17,6 +17,9 @@
     font-weight: 500;
     color: #666;
     transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 
     &:hover {
         color: #333;
@@ -28,4 +31,10 @@
         border-bottom-color: $primary;
         background-color: transparent;
     }
+}
+
+.tab-icon {
+    display: flex;
+    align-items: center;
+    font-size: 18px;
 }
