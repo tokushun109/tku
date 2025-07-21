@@ -12,6 +12,7 @@ import { getTargets, postTarget } from '@/apis/target'
 import { Button } from '@/components/bases/Button'
 import { Dialog } from '@/components/bases/Dialog'
 import { Input } from '@/components/bases/Input'
+import { Message, MessageType } from '@/components/bases/Message'
 import { IClassification } from '@/features/classification/type'
 import { ClassificationLabel, ClassificationType } from '@/types'
 
@@ -143,13 +144,10 @@ export const ClassificationList = ({ initialItems, type }: Props) => {
                 isOpen={isOpen}
                 onClose={handleCloseDialog}
                 title={`${ClassificationLabel[type]}を追加`}
+                wide
             >
                 <div className={styles['dialog-content']}>
-                    {submitError && (
-                        <div aria-live="polite" className={styles['error-message']}>
-                            {submitError}
-                        </div>
-                    )}
+                    {submitError && <Message type={MessageType.Error}>{submitError}</Message>}
                     <form noValidate onSubmit={handleSubmit(onSubmit)}>
                         <Input
                             {...register('name')}

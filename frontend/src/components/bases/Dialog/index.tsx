@@ -1,3 +1,4 @@
+import classNames from 'classnames'
 import React from 'react'
 
 import { Button } from '@/components/bases/Button'
@@ -18,9 +19,10 @@ interface Props {
     isOpen: boolean
     onClose: () => void
     title?: string
+    wide?: boolean
 }
 
-export const Dialog = ({ isOpen, onClose, title, children, confirmOption, cancelOption }: Props) => {
+export const Dialog = ({ isOpen, onClose, title, children, confirmOption, cancelOption, wide = false }: Props) => {
     if (!isOpen) return null
 
     const handleBackdropClick = () => {
@@ -33,7 +35,7 @@ export const Dialog = ({ isOpen, onClose, title, children, confirmOption, cancel
         <div className={styles['dialog-overlay']} onClick={handleBackdropClick}>
             <div className={styles['dialog-backdrop']} />
             <div
-                className={styles['dialog']}
+                className={classNames(`${styles['dialog']} ${wide ? styles['wide'] : ''}`)}
                 onClick={(e) => {
                     e.stopPropagation()
                 }}
