@@ -1,6 +1,7 @@
 'use client'
 
 import { Category, Label, People } from '@mui/icons-material'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import { Tab, TabItem } from '@/components/bases/Tab'
@@ -18,6 +19,7 @@ interface Props {
 
 export const ClassificationTemplate = ({ categories, targets, tags }: Props) => {
     const [activeTab, setActiveTab] = useState<ClassificationType>(ClassificationType.Category)
+    const router = useRouter()
 
     const tabItems: TabItem<ClassificationType>[] = [
         {
@@ -50,11 +52,15 @@ export const ClassificationTemplate = ({ categories, targets, tags }: Props) => 
         }
     }
 
+    const handleUpdate = () => {
+        router.refresh()
+    }
+
     return (
         <div className={styles['classification-container']}>
             <Tab activeKey={activeTab} items={tabItems} onTabChange={setActiveTab} />
             <div className={styles['tab-content']}>
-                <ClassificationList items={getCurrentItems()} />
+                <ClassificationList items={getCurrentItems()} onUpdate={handleUpdate} type={activeTab} />
             </div>
         </div>
     )

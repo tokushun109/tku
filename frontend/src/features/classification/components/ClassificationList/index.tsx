@@ -1,17 +1,162 @@
 'use client'
 
-import { Add, Delete } from '@mui/icons-material'
+import { Add, Delete, Edit } from '@mui/icons-material'
+import { useState } from 'react'
 
 import { Button } from '@/components/bases/Button'
+import { Dialog } from '@/components/bases/Dialog'
+import { Input } from '@/components/bases/Input'
 import { IClassification } from '@/features/classification/type'
+import { ClassificationType } from '@/types'
 
 import styles from './styles.module.scss'
 
 interface Props {
     items: IClassification[]
+    onUpdate: () => void
+    type: ClassificationType
 }
 
-export const ClassificationList = ({ items }: Props) => {
+type ExecutionType = 'create' | 'edit' | 'delete'
+
+export const ClassificationList = ({ items, type, onUpdate }: Props) => {
+    const [dialogOpen, setDialogOpen] = useState<boolean>(false)
+    const [executionType, setExecutionType] = useState<ExecutionType>('create')
+    const [selectedItem, setSelectedItem] = useState<IClassification | null>(null)
+    const [name, setName] = useState<string>('')
+    const [nameError, setNameError] = useState<string>('')
+    const [loading, setLoading] = useState<boolean>(false)
+
+    const openDialog = (type: ExecutionType, item?: IClassification) => {
+        setExecutionType(type)
+        setSelectedItem(item || null)
+        setName(item?.name || '')
+        setNameError('')
+        setDialogOpen(true)
+    }
+
+    const closeDialog = () => {
+        setDialogOpen(false)
+        setExecutionType('create')
+        setSelectedItem(null)
+        setName('')
+        setNameError('')
+    }
+
+    const validateName = (value: string): boolean => {
+        if (!value.trim()) {
+            setNameError('名前を入力してください')
+            return false
+        }
+        if (value.length > 20) {
+            setNameError('20文字以内で入力してください')
+            return false
+        }
+        setNameError('')
+        return true
+    }
+
+    const handleSubmit = async () => {
+        if (executionType === 'delete') {
+            await handleDelete()
+        } else if (executionType === 'edit') {
+            await handleEdit()
+        } else {
+            await handleCreate()
+        }
+    }
+
+    const handleCreate = async () => {
+        if (!validateName(name)) return
+
+        setLoading(true)
+        try {
+            const response = await fetch(`/api/${type}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name }),
+                credentials: 'include',
+            })
+
+            if (!response.ok) {
+                throw new Error('作成に失敗しました')
+            }
+
+            closeDialog()
+            onUpdate()
+        } catch (error) {
+            console.error('作成エラー:', error)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const handleEdit = async () => {
+        if (!selectedItem || !validateName(name)) return
+
+        setLoading(true)
+        try {
+            const response = await fetch(`/api/${type}/${selectedItem.uuid}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name }),
+                credentials: 'include',
+            })
+
+            if (!response.ok) {
+                throw new Error('編集に失敗しました')
+            }
+
+            closeDialog()
+            onUpdate()
+        } catch (error) {
+            console.error('編集エラー:', error)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const handleDelete = async () => {
+        if (!selectedItem) return
+
+        setLoading(true)
+        try {
+            const response = await fetch(`/api/${type}/${selectedItem.uuid}`, {
+                method: 'DELETE',
+                credentials: 'include',
+            })
+
+            if (!response.ok) {
+                throw new Error('削除に失敗しました')
+            }
+
+            closeDialog()
+            onUpdate()
+        } catch (error) {
+            console.error('削除エラー:', error)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const getDialogTitle = () => {
+        const typeName = type === 'category' ? 'カテゴリー' : type === 'target' ? 'ターゲット' : 'タグ'
+        switch (executionType) {
+            case 'create':
+                return `${typeName}を追加`
+            case 'edit':
+                return `${typeName}を編集`
+            case 'delete':
+                return `${typeName}を削除`
+            default:
+                return ''
+        }
+    }
+
     return (
         <div className={styles['classification-list']}>
             <div className={styles['list-content']}>
@@ -20,14 +165,22 @@ export const ClassificationList = ({ items }: Props) => {
                 ) : (
                     <div className={styles['item-list']}>
                         {items.map((item) => (
-                            <div className={styles['list-item']} key={item.uuid} onClick={() => {}}>
+                            <div className={styles['list-item']} key={item.uuid} onClick={() => openDialog('edit', item)}>
                                 <div className={styles['item-content']}>
                                     <span className={styles['item-name']}>{item.name}</span>
                                     <div className={styles['item-actions']}>
+                                        <Edit
+                                            className={styles['icon-button']}
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+                                                openDialog('edit', item)
+                                            }}
+                                        />
                                         <Delete
                                             className={styles['icon-button']}
                                             onClick={(e) => {
                                                 e.stopPropagation()
+                                                openDialog('delete', item)
                                             }}
                                         />
                                     </div>
@@ -38,13 +191,40 @@ export const ClassificationList = ({ items }: Props) => {
                 )}
             </div>
             <div className={styles['add-button-container']}>
-                <Button onClick={() => {}}>
+                <Button onClick={() => openDialog('create')}>
                     <div className={styles['add-button-content']}>
                         <Add className={styles['add-icon']} />
                         追加
                     </div>
                 </Button>
             </div>
+
+            <Dialog
+                cancelOption={{
+                    label: 'キャンセル',
+                    onClick: loading ? () => {} : closeDialog,
+                }}
+                confirmOption={{
+                    label: loading ? '処理中...' : executionType === 'delete' ? '削除' : executionType === 'edit' ? '更新' : '追加',
+                    onClick: loading || (executionType !== 'delete' && !name.trim()) ? () => {} : handleSubmit,
+                }}
+                isOpen={dialogOpen}
+                onClose={loading ? () => {} : closeDialog}
+                title={getDialogTitle()}
+            >
+                {executionType === 'delete' ? (
+                    <p>「{selectedItem?.name}」を削除しますか？</p>
+                ) : (
+                    <Input
+                        error={nameError}
+                        label="名前"
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="名前を入力してください"
+                        required
+                        value={name}
+                    />
+                )}
+            </Dialog>
         </div>
     )
 }
