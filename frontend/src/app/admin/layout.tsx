@@ -2,7 +2,6 @@
 
 import { usePathname } from 'next/navigation'
 
-import AdminFooter from '@/components/layouts/AdminFooter'
 import AdminHeader from '@/components/layouts/AdminHeader'
 import { NavigationType } from '@/types/enum/navigation'
 
@@ -16,7 +15,6 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
         <div className={styles['container']}>
             <AdminHeader isLoggedIn={isLoggedIn} />
             <main>{children}</main>
-            <AdminFooter />
         </div>
     )
 }

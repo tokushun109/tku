@@ -5,14 +5,14 @@ import { ColorType, FontSizeType } from '@/types'
 
 import styles from './styles.module.scss'
 
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
     error?: string
     helperText?: string
     label?: string
     required?: boolean
 }
 
-export const Input = React.forwardRef<HTMLInputElement, InputProps>(({ label, error, required, helperText, className, ...props }, ref) => {
+export const Input = React.forwardRef<HTMLInputElement, Props>(({ label, error, required, helperText, className, ...props }, ref) => {
     const inputId = props.id || props.name
 
     return (

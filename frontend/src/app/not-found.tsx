@@ -1,6 +1,6 @@
 import ErrorPage from './error'
 
-const NotFoundPage: React.FC = () => {
+const NotFoundPage = () => {
     return <ErrorPage errorMessage="お探しのページは見つかりませんでした" statusCode={404} />
 }
 

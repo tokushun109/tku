@@ -9,13 +9,13 @@ import { Header } from '@/components/layouts/Header'
 
 import styles from './error.module.scss'
 
-interface ErrorPageProps {
+interface Props {
     errorMessage: React.ReactNode
     showHomeButton?: boolean
     statusCode?: number
 }
 
-const ErrorPage: React.FC<ErrorPageProps> = ({ errorMessage, statusCode, showHomeButton = true }) => {
+const ErrorPage = ({ errorMessage, statusCode, showHomeButton = true }: Props) => {
     return (
         <>
             <Head>

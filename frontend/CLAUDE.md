@@ -253,6 +253,7 @@ CSS クラス名はケバブケースで命名してください。
 - プロパティの省略可能性を明示（`?:`）
 - **useState使用時は必ず型を明示**: `useState<型>(初期値)` の形式で型を記述する
 - **ユニオンタイプはオブジェクトリテラルで定義**: 文字列リテラルのユニオンタイプではなく、オブジェクトリテラルを使用
+- **Props内の関数引数にはアンダースコアを付与**: ESLintの`no-unused-vars`エラーを回避するため、使用しない引数には先頭に`_`を付ける
 
 ```tsx
 // ✅ 推奨
@@ -260,6 +261,7 @@ interface ErrorPageProps {
     errorMessage: React.ReactNode
     statusCode?: number
     showHomeButton?: boolean
+    onClose?: (_event: React.MouseEvent) => void // 使用しない引数には_を付与
 }
 
 // ✅ 推奨 - useState with types
@@ -281,17 +283,24 @@ export const ButtonVariant = {
     Danger: 'danger',
 } as const
 export type ButtonVariant = (typeof ButtonVariant)[keyof typeof ButtonVariant]
+
+// ✅ 推奨 - Props内関数引数のアンダースコア付与
+interface TabProps {
+    items: TabItem[]
+    activeKey: string
+    onTabChange: (_key: string) => void // ESLintエラー回避
+}
 ```
 
 ### React/Next.js規約
 
-#### 関数定義
+#### 関数定義とコンポーネント記法
 
 frontend配下では**アロー関数を使用して統一**してください。
 
 ```tsx
-// ✅ 推奨 - アロー関数
-const MyComponent: React.FC<Props> = ({ prop1, prop2 }) => {
+// ✅ 推奨 - アロー関数 + 型指定
+const MyComponent = ({ prop1, prop2 }: Props) => {
     return <div>{prop1}</div>
 }
 
@@ -299,9 +308,32 @@ const handleClick = (event: React.MouseEvent) => {
     // 処理
 }
 
+// ❌ 非推奨 - React.FC記法
+const MyComponent: React.FC<Props> = ({ prop1, prop2 }) => {
+    return <div>{prop1}</div>
+}
+
 // ❌ 非推奨 - function宣言
 function MyComponent({ prop1, prop2 }: Props) {
     return <div>{prop1}</div>
+}
+```
+
+#### コンポーネント型定義
+
+```tsx
+// ✅ 推奨 - 型名は「Props」に統一
+interface Props {
+    currentPage: number
+    delta?: number
+    onPageChange: (page: number) => void
+    totalPages: number
+}
+
+// ❌ 非推奨 - コンポーネント名を含む型名
+interface PaginationProps {
+    currentPage: number
+    totalPages: number
 }
 ```
 
@@ -311,6 +343,7 @@ function MyComponent({ prop1, prop2 }: Props) {
 - **Props設計**: デフォルト値を適切に設定
 - **命名**: コンポーネント名はPascalCase
 - **スタイル上書き禁止**: 親コンポーネントから子コンポーネントのスタイルを`!important`で上書きしない
+- **MUI使用制限**: 基本的にMUIについてはアイコンのみ使用可能、それ以外のMUIコンポーネントは使用せずに独自実装を行う
 
 #### App Router活用
 

@@ -10,7 +10,7 @@ interface DialogButtonOption {
     onClick: () => void
 }
 
-interface DialogProps {
+interface Props {
     cancelOption?: DialogButtonOption
     children: React.ReactNode
     confirmOption?: DialogButtonOption
@@ -19,7 +19,7 @@ interface DialogProps {
     title?: string
 }
 
-export const Dialog: React.FC<DialogProps> = ({ isOpen, onClose, title, children, confirmOption, cancelOption }) => {
+export const Dialog = ({ isOpen, onClose, title, children, confirmOption, cancelOption }: Props) => {
     if (!isOpen) return null
 
     const handleBackdropClick = () => {

@@ -5,14 +5,14 @@ import { ColorType, FontSizeType } from '@/types'
 
 import styles from './styles.module.scss'
 
-interface TextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+interface Props extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
     error?: string
     helperText?: string
     label?: string
     required?: boolean
 }
 
-export const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(({ label, error, required, helperText, className, ...props }, ref) => {
+export const TextArea = React.forwardRef<HTMLTextAreaElement, Props>(({ label, error, required, helperText, className, ...props }, ref) => {
     const textareaId = props.id || props.name
 
     return (
