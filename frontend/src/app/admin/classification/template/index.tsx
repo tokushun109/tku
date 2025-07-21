@@ -37,24 +37,22 @@ export const ClassificationTemplate = ({ categories, targets, tags }: Props) => 
         },
     ]
 
-    const getCurrentItems = () => {
-        switch (activeTab) {
-            case ClassificationType.Category:
-                return categories
-            case ClassificationType.Target:
-                return targets
-            case ClassificationType.Tag:
-                return tags
-            default:
-                return []
-        }
-    }
-
     return (
         <div className={styles['classification-container']}>
             <Tab activeKey={activeTab} items={tabItems} onTabChange={setActiveTab} />
             <div className={styles['tab-content']}>
-                <ClassificationList items={getCurrentItems()} />
+                {(() => {
+                    switch (activeTab) {
+                        case ClassificationType.Category:
+                            return <ClassificationList items={categories} />
+                        case ClassificationType.Target:
+                            return <ClassificationList items={targets} />
+                        case ClassificationType.Tag:
+                            return <ClassificationList items={tags} />
+                        default:
+                            return null
+                    }
+                })()}
             </div>
         </div>
     )
