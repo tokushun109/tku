@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Add, Delete } from '@mui/icons-material'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import { Virtuoso } from 'react-virtuoso'
 
 import { getCategories, postCategory } from '@/apis/category'
 import { getTags, postTag } from '@/apis/tag'
@@ -103,9 +104,11 @@ export const ClassificationList = ({ initialItems, type }: Props) => {
                 {items.length === 0 ? (
                     <div className={styles['empty-message']}>登録されていません</div>
                 ) : (
-                    <div className={styles['item-list']}>
-                        {items.map((item) => (
-                            <div className={styles['list-item']} key={item.uuid} onClick={() => {}}>
+                    <Virtuoso
+                        computeItemKey={(_index, item) => item.uuid}
+                        data={items}
+                        itemContent={(_index, item) => (
+                            <div className={styles['list-item']} onClick={() => {}}>
                                 <div className={styles['item-content']}>
                                     <span className={styles['item-name']}>{item.name}</span>
                                     <div className={styles['item-actions']}>
@@ -118,8 +121,9 @@ export const ClassificationList = ({ initialItems, type }: Props) => {
                                     </div>
                                 </div>
                             </div>
-                        ))}
-                    </div>
+                        )}
+                        style={{ height: '640px' }}
+                    />
                 )}
             </div>
             <div className={styles['add-button-container']}>
@@ -152,7 +156,7 @@ export const ClassificationList = ({ initialItems, type }: Props) => {
                             error={errors.name?.message}
                             id="name"
                             label={`${ClassificationLabel[type]}名`}
-                            placeholder={`テスト-${ClassificationLabel[type]}`}
+                            placeholder={`テスト${ClassificationLabel[type]}`}
                             required
                             type="text"
                         />
