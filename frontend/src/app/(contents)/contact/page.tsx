@@ -10,7 +10,7 @@ import { postContact } from '@/apis/contact'
 import { Button } from '@/components/bases/Button'
 import { Input } from '@/components/bases/Input'
 import { TextArea } from '@/components/bases/TextArea'
-import { contactSchema } from '@/features/contact/schema'
+import { ContactSchema } from '@/features/contact/schema'
 import { IContact } from '@/features/contact/type'
 
 import styles from './styles.module.scss'
@@ -27,7 +27,7 @@ const ContactPage = () => {
         formState: { errors, isValid },
     } = useForm<IContact>({
         mode: 'onChange',
-        resolver: zodResolver(contactSchema),
+        resolver: zodResolver(ContactSchema),
     })
 
     const onSubmit: SubmitHandler<IContact> = async (data) => {

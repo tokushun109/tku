@@ -1,7 +1,7 @@
 import * as z from 'zod'
 
 /** お問い合わせフォームのバリデーションスキーマ */
-export const contactSchema = z.object({
+export const ContactSchema = z.object({
     name: z.string().min(1, 'お名前は必須項目です').max(20, 'お名前は20文字以内で入力してください'),
     company: z.string().max(20, '会社名は20文字以内で入力してください').optional(),
     phoneNumber: z.string().regex(/^\d*$/, '電話番号は数字のみで入力してください').optional(),

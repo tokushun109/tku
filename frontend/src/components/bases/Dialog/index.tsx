@@ -6,6 +6,7 @@ import { ColorType } from '@/types/enum/color'
 import styles from './styles.module.scss'
 
 interface DialogButtonOption {
+    disabled?: boolean
     label: string
     onClick: () => void
 }
@@ -26,16 +27,17 @@ export const Dialog = ({ isOpen, onClose, title, children, confirmOption, cancel
         onClose()
     }
 
-    const handleDialogClick = (e: React.MouseEvent) => {
-        e.stopPropagation()
-    }
-
     const showActions = confirmOption || cancelOption
 
     return (
         <div className={styles['dialog-overlay']} onClick={handleBackdropClick}>
             <div className={styles['dialog-backdrop']} />
-            <div className={styles['dialog']} onClick={handleDialogClick}>
+            <div
+                className={styles['dialog']}
+                onClick={(e) => {
+                    e.stopPropagation()
+                }}
+            >
                 {title && (
                     <div className={styles['dialog-header']}>
                         <h3 className={styles['dialog-title']}>{title}</h3>
@@ -45,12 +47,12 @@ export const Dialog = ({ isOpen, onClose, title, children, confirmOption, cancel
                 {showActions && (
                     <div className={styles['dialog-actions']}>
                         {cancelOption && (
-                            <Button colorType={ColorType.Primary} contrast onClick={cancelOption.onClick} outlined>
+                            <Button colorType={ColorType.Primary} contrast disabled={cancelOption.disabled} onClick={cancelOption.onClick} outlined>
                                 {cancelOption.label}
                             </Button>
                         )}
                         {confirmOption && (
-                            <Button colorType={ColorType.Primary} onClick={confirmOption.onClick}>
+                            <Button colorType={ColorType.Primary} disabled={confirmOption.disabled} onClick={confirmOption.onClick} type="submit">
                                 {confirmOption.label}
                             </Button>
                         )}
