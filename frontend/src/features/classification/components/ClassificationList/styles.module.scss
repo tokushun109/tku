@@ -72,11 +72,11 @@
 
 .icon-button {
     cursor: pointer;
-    color: #666;
+    color: $danger-color;
     transition: color 0.2s ease;
 
     &:hover {
-        color: $primary;
+        color: color.adjust($danger-color, $lightness: -10%);
     }
 }
 

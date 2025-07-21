@@ -253,6 +253,7 @@ CSS クラス名はケバブケースで命名してください。
 - プロパティの省略可能性を明示（`?:`）
 - **useState使用時は必ず型を明示**: `useState<型>(初期値)` の形式で型を記述する
 - **ユニオンタイプはオブジェクトリテラルで定義**: 文字列リテラルのユニオンタイプではなく、オブジェクトリテラルを使用
+- **Props内の関数引数にはアンダースコアを付与**: ESLintの`no-unused-vars`エラーを回避するため、使用しない引数には先頭に`_`を付ける
 
 ```tsx
 // ✅ 推奨
@@ -260,6 +261,7 @@ interface ErrorPageProps {
     errorMessage: React.ReactNode
     statusCode?: number
     showHomeButton?: boolean
+    onClose?: (_event: React.MouseEvent) => void // 使用しない引数には_を付与
 }
 
 // ✅ 推奨 - useState with types
@@ -281,6 +283,13 @@ export const ButtonVariant = {
     Danger: 'danger',
 } as const
 export type ButtonVariant = (typeof ButtonVariant)[keyof typeof ButtonVariant]
+
+// ✅ 推奨 - Props内関数引数のアンダースコア付与
+interface TabProps {
+    items: TabItem[]
+    activeKey: string
+    onTabChange: (_key: string) => void // ESLintエラー回避
+}
 ```
 
 ### React/Next.js規約
