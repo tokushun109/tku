@@ -71,17 +71,15 @@ export const ClassificationList = ({ items, type, onUpdate }: Props) => {
 
         setLoading(true)
         try {
-            const response = await fetch(`/api/${type}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ name }),
-                credentials: 'include',
-            })
-
-            if (!response.ok) {
-                throw new Error('作成に失敗しました')
+            if (type === 'category') {
+                const { createCategory } = await import('@/apis/category')
+                await createCategory({ name })
+            } else if (type === 'target') {
+                const { createTarget } = await import('@/apis/target')
+                await createTarget({ name })
+            } else if (type === 'tag') {
+                const { createTag } = await import('@/apis/tag')
+                await createTag({ name })
             }
 
             closeDialog()
@@ -98,17 +96,15 @@ export const ClassificationList = ({ items, type, onUpdate }: Props) => {
 
         setLoading(true)
         try {
-            const response = await fetch(`/api/${type}/${selectedItem.uuid}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ name }),
-                credentials: 'include',
-            })
-
-            if (!response.ok) {
-                throw new Error('編集に失敗しました')
+            if (type === 'category') {
+                const { updateCategory } = await import('@/apis/category')
+                await updateCategory(selectedItem.uuid, { name })
+            } else if (type === 'target') {
+                const { updateTarget } = await import('@/apis/target')
+                await updateTarget(selectedItem.uuid, { name })
+            } else if (type === 'tag') {
+                const { updateTag } = await import('@/apis/tag')
+                await updateTag(selectedItem.uuid, { name })
             }
 
             closeDialog()
@@ -125,13 +121,15 @@ export const ClassificationList = ({ items, type, onUpdate }: Props) => {
 
         setLoading(true)
         try {
-            const response = await fetch(`/api/${type}/${selectedItem.uuid}`, {
-                method: 'DELETE',
-                credentials: 'include',
-            })
-
-            if (!response.ok) {
-                throw new Error('削除に失敗しました')
+            if (type === 'category') {
+                const { deleteCategory } = await import('@/apis/category')
+                await deleteCategory(selectedItem.uuid)
+            } else if (type === 'target') {
+                const { deleteTarget } = await import('@/apis/target')
+                await deleteTarget(selectedItem.uuid)
+            } else if (type === 'tag') {
+                const { deleteTag } = await import('@/apis/tag')
+                await deleteTag(selectedItem.uuid)
             }
 
             closeDialog()
