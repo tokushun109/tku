@@ -39,8 +39,8 @@ export const logout = async (sessionToken: string): Promise<void> => {
             headers: {
                 'Content-Type': 'application/json',
                 Cookie: `__sess__=${sessionToken}`,
-                withCredentials: 'include',
             },
+            credentials: 'include',
         })
 
         if (!res.ok) {
@@ -62,8 +62,8 @@ export const validateSession = async (sessionToken: string): Promise<boolean> =>
             headers: {
                 'Content-Type': 'application/json',
                 Cookie: `__sess__=${sessionToken}`,
-                withCredentials: 'include',
             },
+            credentials: 'include',
         })
         return res.ok
     } catch (error) {

@@ -41,8 +41,8 @@ export const postCategory = async (params: IPostCategoryParams): Promise<ICatego
         const res = await fetch(`${process.env.API_URL}/category`, {
             headers: {
                 'Content-Type': 'application/json',
-                withCredentials: 'include',
             },
+            credentials: 'include',
             method: 'POST',
             body: JSON.stringify(params.form),
         })

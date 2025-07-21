@@ -35,8 +35,8 @@ export const postTag = async (params: IPostTagParams): Promise<ITagResponse> => 
         const res = await fetch(`${process.env.API_URL}/tag`, {
             headers: {
                 'Content-Type': 'application/json',
-                withCredentials: 'include',
             },
+            credentials: 'include',
             method: 'POST',
             body: JSON.stringify(params.form),
         })
