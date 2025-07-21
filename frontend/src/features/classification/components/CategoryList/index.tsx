@@ -3,18 +3,17 @@
 import { Add, Delete } from '@mui/icons-material'
 import { useState } from 'react'
 
+import { createCategory, deleteCategory, updateCategory } from '@/apis/category'
 import { Button } from '@/components/bases/Button'
 import { Dialog } from '@/components/bases/Dialog'
 import { Input } from '@/components/bases/Input'
 import { IClassification } from '@/features/classification/type'
-import { ClassificationType } from '@/types'
 
 import styles from './styles.module.scss'
 
 interface Props {
     items: IClassification[]
     onUpdate: () => void
-    type: ClassificationType
 }
 
 const ExecutionType = {
@@ -24,7 +23,7 @@ const ExecutionType = {
 } as const
 type ExecutionType = (typeof ExecutionType)[keyof typeof ExecutionType]
 
-export const ClassificationList = ({ items, type, onUpdate }: Props) => {
+export const CategoryList = ({ items, onUpdate }: Props) => {
     const [dialogOpen, setDialogOpen] = useState<boolean>(false)
     const [executionType, setExecutionType] = useState<ExecutionType>(ExecutionType.Create)
     const [selectedItem, setSelectedItem] = useState<IClassification | null>(null)
@@ -76,21 +75,11 @@ export const ClassificationList = ({ items, type, onUpdate }: Props) => {
 
         setLoading(true)
         try {
-            if (type === 'category') {
-                const { createCategory } = await import('@/apis/category')
-                await createCategory({ name })
-            } else if (type === 'target') {
-                const { createTarget } = await import('@/apis/target')
-                await createTarget({ name })
-            } else if (type === 'tag') {
-                const { createTag } = await import('@/apis/tag')
-                await createTag({ name })
-            }
-
+            await createCategory({ name })
             closeDialog()
             onUpdate()
         } catch (error) {
-            console.error('作成エラー:', error)
+            console.error('カテゴリの作成エラー:', error)
         } finally {
             setLoading(false)
         }
@@ -101,21 +90,11 @@ export const ClassificationList = ({ items, type, onUpdate }: Props) => {
 
         setLoading(true)
         try {
-            if (type === 'category') {
-                const { updateCategory } = await import('@/apis/category')
-                await updateCategory(selectedItem.uuid, { name })
-            } else if (type === 'target') {
-                const { updateTarget } = await import('@/apis/target')
-                await updateTarget(selectedItem.uuid, { name })
-            } else if (type === 'tag') {
-                const { updateTag } = await import('@/apis/tag')
-                await updateTag(selectedItem.uuid, { name })
-            }
-
+            await updateCategory(selectedItem.uuid, { name })
             closeDialog()
             onUpdate()
         } catch (error) {
-            console.error('編集エラー:', error)
+            console.error('カテゴリの編集エラー:', error)
         } finally {
             setLoading(false)
         }
@@ -126,35 +105,24 @@ export const ClassificationList = ({ items, type, onUpdate }: Props) => {
 
         setLoading(true)
         try {
-            if (type === 'category') {
-                const { deleteCategory } = await import('@/apis/category')
-                await deleteCategory(selectedItem.uuid)
-            } else if (type === 'target') {
-                const { deleteTarget } = await import('@/apis/target')
-                await deleteTarget(selectedItem.uuid)
-            } else if (type === 'tag') {
-                const { deleteTag } = await import('@/apis/tag')
-                await deleteTag(selectedItem.uuid)
-            }
-
+            await deleteCategory(selectedItem.uuid)
             closeDialog()
             onUpdate()
         } catch (error) {
-            console.error('削除エラー:', error)
+            console.error('カテゴリの削除エラー:', error)
         } finally {
             setLoading(false)
         }
     }
 
     const getDialogTitle = () => {
-        const typeName = type === 'category' ? 'カテゴリー' : type === 'target' ? 'ターゲット' : 'タグ'
         switch (executionType) {
             case ExecutionType.Create:
-                return `${typeName}を追加`
+                return 'カテゴリーを追加'
             case ExecutionType.Edit:
-                return `${typeName}を編集`
+                return 'カテゴリーを編集'
             case ExecutionType.Delete:
-                return `${typeName}を削除`
+                return 'カテゴリーを削除'
             default:
                 return ''
         }

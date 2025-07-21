@@ -5,7 +5,9 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import { Tab, TabItem } from '@/components/bases/Tab'
-import { ClassificationList } from '@/features/classification/components/ClassificationList'
+import { CategoryList } from '@/features/classification/components/CategoryList'
+import { TagList } from '@/features/classification/components/TagList'
+import { TargetList } from '@/features/classification/components/TargetList'
 import { IClassification } from '@/features/classification/type'
 import { ClassificationType, ClassificationLabel } from '@/types'
 
@@ -39,29 +41,27 @@ export const ClassificationTemplate = ({ categories, targets, tags }: Props) => 
         },
     ]
 
-    const getCurrentItems = () => {
-        switch (activeTab) {
-            case ClassificationType.Category:
-                return categories
-            case ClassificationType.Target:
-                return targets
-            case ClassificationType.Tag:
-                return tags
-            default:
-                return []
-        }
-    }
-
     const handleUpdate = () => {
         router.refresh()
+    }
+
+    const renderContent = () => {
+        switch (activeTab) {
+            case ClassificationType.Category:
+                return <CategoryList items={categories} onUpdate={handleUpdate} />
+            case ClassificationType.Target:
+                return <TargetList items={targets} onUpdate={handleUpdate} />
+            case ClassificationType.Tag:
+                return <TagList items={tags} onUpdate={handleUpdate} />
+            default:
+                return null
+        }
     }
 
     return (
         <div className={styles['classification-container']}>
             <Tab activeKey={activeTab} items={tabItems} onTabChange={setActiveTab} />
-            <div className={styles['tab-content']}>
-                <ClassificationList items={getCurrentItems()} onUpdate={handleUpdate} type={activeTab} />
-            </div>
+            <div className={styles['tab-content']}>{renderContent()}</div>
         </div>
     )
 }

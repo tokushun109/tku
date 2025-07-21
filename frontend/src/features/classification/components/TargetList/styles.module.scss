@@ -1,0 +1,89 @@
+.classification-list {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.list-content {
+    flex: 1;
+    min-height: 300px;
+    border: 1px solid $border-color;
+    border-radius: 8px;
+    padding: 16px;
+    overflow-y: auto;
+}
+
+.empty-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: $text-color-secondary;
+    font-size: 14px;
+}
+
+.item-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.list-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border: 1px solid $border-color;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+        background-color: $background-color-hover;
+    }
+}
+
+.item-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.item-name {
+    flex: 1;
+    font-size: 14px;
+    color: $text-color-primary;
+}
+
+.item-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.icon-button {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    color: $text-color-secondary;
+    transition: color 0.2s ease;
+
+    &:hover {
+        color: $error-color;
+    }
+}
+
+.add-button-container {
+    margin-top: 16px;
+}
+
+.add-button-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.add-icon {
+    width: 20px;
+    height: 20px;
+}
