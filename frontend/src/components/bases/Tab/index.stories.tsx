@@ -13,7 +13,7 @@ const meta: Meta<typeof Tab> = {
             { key: 'tab3', label: 'タブ3', icon: <Label /> },
         ],
         activeKey: 'tab1',
-        onTabChange: (key: string) => console.log('Tab changed to:', key),
+        onTabChange: (key) => console.log('Tab changed to:', key),
     },
     argTypes: {
         items: {
@@ -71,5 +71,17 @@ export const WithoutIcons: Story = {
             { key: 'tab3', label: 'アイコンなし3' },
         ],
         activeKey: 'tab1',
+    },
+}
+
+export const WithNumberKeys: Story = {
+    args: {
+        items: [
+            { key: 1, label: 'タブ1' },
+            { key: 2, label: 'タブ2' },
+            { key: 3, label: 'タブ3' },
+        ],
+        activeKey: 1,
+        onTabChange: (key) => console.log('Number key changed to:', key),
     },
 }

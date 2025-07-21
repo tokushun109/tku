@@ -17,9 +17,9 @@ interface Props {
 }
 
 export const ClassificationTemplate = ({ categories, targets, tags }: Props) => {
-    const [activeTab, setActiveTab] = useState<string>(ClassificationType.Category)
+    const [activeTab, setActiveTab] = useState<ClassificationType>(ClassificationType.Category)
 
-    const tabItems: TabItem[] = [
+    const tabItems: TabItem<ClassificationType>[] = [
         {
             key: ClassificationType.Category,
             label: ClassificationLabel[ClassificationType.Category],
