@@ -1,6 +1,6 @@
 'use client'
 
-import { Add, Delete, Edit } from '@mui/icons-material'
+import { Add, Delete } from '@mui/icons-material'
 import { useState } from 'react'
 
 import { Button } from '@/components/bases/Button'
@@ -169,13 +169,6 @@ export const ClassificationList = ({ items, type, onUpdate }: Props) => {
                                 <div className={styles['item-content']}>
                                     <span className={styles['item-name']}>{item.name}</span>
                                     <div className={styles['item-actions']}>
-                                        <Edit
-                                            className={styles['icon-button']}
-                                            onClick={(e) => {
-                                                e.stopPropagation()
-                                                openDialog('edit', item)
-                                            }}
-                                        />
                                         <Delete
                                             className={styles['icon-button']}
                                             onClick={(e) => {
