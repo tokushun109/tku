@@ -11,6 +11,7 @@ import { getTags, postTag } from '@/apis/tag'
 import { getTargets, postTarget } from '@/apis/target'
 import { Button } from '@/components/bases/Button'
 import { Dialog } from '@/components/bases/Dialog'
+import { Form } from '@/components/bases/Form'
 import { Input } from '@/components/bases/Input'
 import { Message, MessageType } from '@/components/bases/Message'
 import { IClassification } from '@/features/classification/type'
@@ -146,20 +147,18 @@ export const ClassificationList = ({ initialItems, type }: Props) => {
                 title={`${ClassificationLabel[type]}を追加`}
                 wide
             >
-                <div className={styles['dialog-content']}>
-                    {submitError && <Message type={MessageType.Error}>{submitError}</Message>}
-                    <form noValidate onSubmit={handleSubmit(onSubmit)}>
-                        <Input
-                            {...register('name')}
-                            error={errors.name?.message}
-                            id="name"
-                            label={`${ClassificationLabel[type]}名`}
-                            placeholder={`テスト${ClassificationLabel[type]}`}
-                            required
-                            type="text"
-                        />
-                    </form>
-                </div>
+                {submitError && <Message type={MessageType.Error}>{submitError}</Message>}
+                <Form noValidate onSubmit={handleSubmit(onSubmit)}>
+                    <Input
+                        {...register('name')}
+                        error={errors.name?.message}
+                        id="name"
+                        label={`${ClassificationLabel[type]}名`}
+                        placeholder={`テスト${ClassificationLabel[type]}`}
+                        required
+                        type="text"
+                    />
+                </Form>
             </Dialog>
         </div>
     )

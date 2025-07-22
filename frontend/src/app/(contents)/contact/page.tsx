@@ -8,6 +8,7 @@ import { useForm, SubmitHandler } from 'react-hook-form'
 
 import { postContact } from '@/apis/contact'
 import { Button } from '@/components/bases/Button'
+import { Form } from '@/components/bases/Form'
 import { Input } from '@/components/bases/Input'
 import { TextArea } from '@/components/bases/TextArea'
 import { ContactSchema } from '@/features/contact/schema'
@@ -68,7 +69,7 @@ const ContactPage = () => {
                                 </div>
                             )}
 
-                            <form noValidate onSubmit={handleSubmit(onSubmit)}>
+                            <Form noValidate onSubmit={handleSubmit(onSubmit)}>
                                 {/* お名前 */}
                                 <Input
                                     {...register('name')}
@@ -127,7 +128,7 @@ const ContactPage = () => {
                                         {isSubmitting ? '送信中...' : '送信する'}
                                     </Button>
                                 </div>
-                            </form>
+                            </Form>
                         </div>
                     ) : (
                         <div className={styles['content-message-wrapper']}>

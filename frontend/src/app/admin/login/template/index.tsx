@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useActionState, useState, startTransition, useEffect } from 'react'
 
 import { Button } from '@/components/bases/Button'
+import { Form } from '@/components/bases/Form'
 import { Input } from '@/components/bases/Input'
 import { Message, MessageType } from '@/components/bases/Message'
 import { loginAction } from '@/features/auth/action'
@@ -66,26 +67,22 @@ export const AdminLoginTemplate = () => {
             <div className={styles['admin-login-area']}>
                 <h1 className={styles['login-title']}>ログイン</h1>
                 {state.error && <Message type={MessageType.Error}>{state.error}</Message>}
-                <form noValidate onSubmit={handleFormSubmit}>
-                    <div className={styles['form-field']}>
-                        <Input error={emailError} label="email(必須)" name="email" onChange={() => setEmailError('')} required type="email" />
-                    </div>
-                    <div className={styles['form-field']}>
-                        <Input
-                            error={passwordError}
-                            label="パスワード(必須)"
-                            name="password"
-                            onChange={() => setPasswordError('')}
-                            required
-                            type="password"
-                        />
-                    </div>
+                <Form noValidate onSubmit={handleFormSubmit}>
+                    <Input error={emailError} label="email(必須)" name="email" onChange={() => setEmailError('')} required type="email" />
+                    <Input
+                        error={passwordError}
+                        label="パスワード(必須)"
+                        name="password"
+                        onChange={() => setPasswordError('')}
+                        required
+                        type="password"
+                    />
                     <div className={styles['submit-button']}>
                         <Button colorType={ColorType.Primary} disabled={pending} type="submit">
                             {pending ? '送信中...' : '確定'}
                         </Button>
                     </div>
-                </form>
+                </Form>
             </div>
         </div>
     )
