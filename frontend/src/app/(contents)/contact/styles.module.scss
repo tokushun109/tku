@@ -67,46 +67,6 @@
     font-size: 0.9rem;
 }
 
-.require-form,
-.form-field {
-    position: relative;
-    margin-bottom: 24px;
-
-    label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 500;
-        color: $text-color;
-        font-size: 0.95rem;
-    }
-
-    input,
-    textarea {
-        width: 100%;
-        padding: 12px 16px;
-        border: 2px solid #e1e5e9;
-        border-radius: 4px;
-        font-size: 1rem;
-        transition: border-color 0.3s ease;
-        box-sizing: border-box;
-
-        &:focus {
-            outline: none;
-            border-color: $primary;
-        }
-
-        &.error {
-            border-color: $danger-color;
-        }
-    }
-
-    textarea {
-        resize: vertical;
-        min-height: 120px;
-        font-family: inherit;
-    }
-}
-
 .chip-container {
     position: absolute;
     top: 34px;

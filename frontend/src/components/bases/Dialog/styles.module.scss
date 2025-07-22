@@ -28,6 +28,10 @@
     width: 90%;
     max-height: 90%;
     overflow: hidden;
+
+    &.wide {
+        max-width: 800px;
+    }
 }
 
 .dialog-header {

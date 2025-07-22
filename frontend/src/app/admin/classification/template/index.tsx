@@ -44,11 +44,13 @@ export const ClassificationTemplate = ({ categories, targets, tags }: Props) => 
                 {(() => {
                     switch (activeTab) {
                         case ClassificationType.Category:
-                            return <ClassificationList items={categories} />
+                            return (
+                                <ClassificationList initialItems={categories} key={ClassificationType.Category} type={ClassificationType.Category} />
+                            )
                         case ClassificationType.Target:
-                            return <ClassificationList items={targets} />
+                            return <ClassificationList initialItems={targets} key={ClassificationType.Target} type={ClassificationType.Target} />
                         case ClassificationType.Tag:
-                            return <ClassificationList items={tags} />
+                            return <ClassificationList initialItems={tags} key={ClassificationType.Tag} type={ClassificationType.Tag} />
                         default:
                             return null
                     }
