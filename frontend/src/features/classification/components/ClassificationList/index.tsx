@@ -1,25 +1,20 @@
 'use client'
 
-import { zodResolver } from '@hookform/resolvers/zod'
 import { Add, Delete } from '@mui/icons-material'
 import { useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
 import { Virtuoso } from 'react-virtuoso'
 
 import { getCategories, postCategory } from '@/apis/category'
 import { getTags, postTag } from '@/apis/tag'
 import { getTargets, postTarget } from '@/apis/target'
 import { Button } from '@/components/bases/Button'
-import { Dialog } from '@/components/bases/Dialog'
-import { Form } from '@/components/bases/Form'
-import { Input } from '@/components/bases/Input'
-import { Message, MessageType } from '@/components/bases/Message'
 import { IClassification } from '@/features/classification/type'
-import { ClassificationLabel, ClassificationType } from '@/types'
+import { ClassificationType } from '@/types'
 
+import { ClassificationFormDialog } from '../ClassificationFormDialog'
 import styles from './styles.module.scss'
-import { ClassificationSchema } from '../../classification/schema'
-import { IClassificationForm } from '../../classification/type'
+
+import type { IClassificationForm } from '../../type'
 
 interface Props {
     initialItems: IClassification[]
@@ -32,25 +27,13 @@ export const ClassificationList = ({ initialItems, type }: Props) => {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
     const [submitError, setSubmitError] = useState<string | null>(null)
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-        reset,
-    } = useForm<IClassificationForm>({
-        mode: 'onChange',
-        resolver: zodResolver(ClassificationSchema),
-    })
-
     const handleOpenDialog = () => {
         setIsOpen(true)
-        reset()
         setSubmitError(null)
     }
 
     const handleCloseDialog = () => {
         setIsOpen(false)
-        reset()
         setSubmitError(null)
     }
 
@@ -81,7 +64,7 @@ export const ClassificationList = ({ initialItems, type }: Props) => {
         }
     }
 
-    const onSubmit: SubmitHandler<IClassificationForm> = async (data) => {
+    const handleFormSubmit = async (data: IClassificationForm) => {
         try {
             setIsSubmitting(true)
             setSubmitError(null)
@@ -136,30 +119,14 @@ export const ClassificationList = ({ initialItems, type }: Props) => {
                     </div>
                 </Button>
             </div>
-            <Dialog
-                confirmOption={{
-                    label: isSubmitting ? '送信中...' : '追加',
-                    onClick: handleSubmit(onSubmit),
-                    disabled: isSubmitting,
-                }}
+            <ClassificationFormDialog
                 isOpen={isOpen}
+                isSubmitting={isSubmitting}
                 onClose={handleCloseDialog}
-                title={`${ClassificationLabel[type]}を追加`}
-                wide
-            >
-                {submitError && <Message type={MessageType.Error}>{submitError}</Message>}
-                <Form noValidate onSubmit={handleSubmit(onSubmit)}>
-                    <Input
-                        {...register('name')}
-                        error={errors.name?.message}
-                        id="name"
-                        label={`${ClassificationLabel[type]}名`}
-                        placeholder={`テスト${ClassificationLabel[type]}`}
-                        required
-                        type="text"
-                    />
-                </Form>
-            </Dialog>
+                onSubmit={handleFormSubmit}
+                submitError={submitError}
+                type={type}
+            />
         </div>
     )
 }
