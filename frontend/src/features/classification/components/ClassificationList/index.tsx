@@ -107,7 +107,6 @@ export const ClassificationList = ({ initialItems, type }: Props) => {
                                 </div>
                             </div>
                         )}
-                        style={{ height: '640px' }}
                     />
                 )}
             </div>
