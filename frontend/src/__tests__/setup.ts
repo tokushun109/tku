@@ -1,3 +1,4 @@
+import React from 'react'
 import { beforeAll, afterEach, afterAll, vi } from 'vitest'
 import '@testing-library/jest-dom'
 
@@ -16,7 +17,7 @@ afterAll(() => server.close())
 process.env.API_URL = 'http://localhost:8080'
 
 // React の global 設定
-global.React = require('react')
+global.React = React
 
 // IntersectionObserver のモック
 global.IntersectionObserver = vi.fn().mockImplementation(() => ({
