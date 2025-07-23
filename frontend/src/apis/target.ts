@@ -10,6 +10,11 @@ export interface IPostTargetParams {
     form: IClassificationForm
 }
 
+export interface IPutTargetParams {
+    form: IClassificationForm
+    uuid: string
+}
+
 export interface ITargetResponse {
     message: string
 }
@@ -55,5 +60,28 @@ export const postTarget = async (params: IPostTargetParams): Promise<ITargetResp
             throw error
         }
         throw new Error('ターゲットの追加に失敗しました')
+    }
+}
+
+/** ターゲットを更新 */
+export const putTarget = async (params: IPutTargetParams): Promise<ITargetResponse> => {
+    try {
+        const res = await fetch(`${process.env.API_URL}/target/${params.uuid}`, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            method: 'PUT',
+            body: JSON.stringify(params.form),
+        })
+
+        if (!res.ok) throw new ApiError(res)
+
+        return await res.json()
+    } catch (error) {
+        if (error instanceof ApiError) {
+            throw error
+        }
+        throw new Error('ターゲットの更新に失敗しました')
     }
 }
