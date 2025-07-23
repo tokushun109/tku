@@ -32,7 +32,12 @@ export const ClassificationList = ({ initialItems, classificationType }: Props) 
                         computeItemKey={(_index, item) => item.uuid}
                         data={items}
                         itemContent={(_index, item) => (
-                            <div className={styles['list-item']} onClick={() => {}}>
+                            <div
+                                className={styles['list-item']}
+                                onClick={() => {
+                                    handleOpenDialog(item)
+                                }}
+                            >
                                 <div className={styles['item-content']}>
                                     <span className={styles['item-name']}>{item.name}</span>
                                     <div className={styles['item-actions']}>
@@ -50,7 +55,11 @@ export const ClassificationList = ({ initialItems, classificationType }: Props) 
                 )}
             </div>
             <div className={styles['add-button-container']}>
-                <Button onClick={handleOpenDialog}>
+                <Button
+                    onClick={() => {
+                        handleOpenDialog(null)
+                    }}
+                >
                     <div className={styles['add-button-content']}>
                         <Add className={styles['add-icon']} />
                         追加

@@ -18,10 +18,12 @@ export const useClassificationList = ({ initialItems, classificationType }: UseC
     const [isOpen, setIsOpen] = useState<boolean>(false)
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
     const [submitError, setSubmitError] = useState<string | null>(null)
+    const [updateItem, setUpdateItem] = useState<IClassification | null>(null)
 
-    const handleOpenDialog = () => {
+    const handleOpenDialog = (item: IClassification | null) => {
         setIsOpen(true)
         setSubmitError(null)
+        setUpdateItem(item)
     }
 
     const handleCloseDialog = () => {
@@ -80,6 +82,7 @@ export const useClassificationList = ({ initialItems, classificationType }: UseC
         isOpen,
         isSubmitting,
         submitError,
+        updateItem,
         handleOpenDialog,
         handleCloseDialog,
         handleFormSubmit,
