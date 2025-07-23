@@ -14,15 +14,15 @@ import { ClassificationSchema } from '../../classification/schema'
 import type { IClassificationForm } from '../../type'
 
 interface Props {
+    classificationType: ClassificationType
     isOpen: boolean
     isSubmitting: boolean
     onClose: () => void
     onSubmit: (_data: IClassificationForm) => Promise<void>
     submitError: string | null
-    type: ClassificationType
 }
 
-export const ClassificationFormDialog = ({ isOpen, isSubmitting, onClose, onSubmit, submitError, type }: Props) => {
+export const ClassificationFormDialog = ({ isOpen, isSubmitting, onClose, onSubmit, submitError, classificationType }: Props) => {
     const {
         register,
         handleSubmit,
@@ -51,7 +51,7 @@ export const ClassificationFormDialog = ({ isOpen, isSubmitting, onClose, onSubm
             }}
             isOpen={isOpen}
             onClose={handleClose}
-            title={`${ClassificationLabel[type]}を追加`}
+            title={`${ClassificationLabel[classificationType]}を追加`}
             wide
         >
             {submitError && <Message type={MessageType.Error}>{submitError}</Message>}
@@ -60,8 +60,8 @@ export const ClassificationFormDialog = ({ isOpen, isSubmitting, onClose, onSubm
                     {...register('name')}
                     error={errors.name?.message}
                     id="name"
-                    label={`${ClassificationLabel[type]}名`}
-                    placeholder={`テスト${ClassificationLabel[type]}`}
+                    label={`${ClassificationLabel[classificationType]}名`}
+                    placeholder={`テスト${ClassificationLabel[classificationType]}`}
                     required
                     type="text"
                 />

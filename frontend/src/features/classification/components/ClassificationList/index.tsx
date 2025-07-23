@@ -12,14 +12,14 @@ import { useClassificationList } from './hooks'
 import styles from './styles.module.scss'
 
 interface Props {
+    classificationType: ClassificationType
     initialItems: IClassification[]
-    type: ClassificationType
 }
 
-export const ClassificationList = ({ initialItems, type }: Props) => {
+export const ClassificationList = ({ initialItems, classificationType }: Props) => {
     const { items, isOpen, isSubmitting, submitError, handleOpenDialog, handleCloseDialog, handleFormSubmit } = useClassificationList({
         initialItems,
-        type,
+        classificationType,
     })
 
     return (
@@ -58,12 +58,12 @@ export const ClassificationList = ({ initialItems, type }: Props) => {
                 </Button>
             </div>
             <ClassificationFormDialog
+                classificationType={classificationType}
                 isOpen={isOpen}
                 isSubmitting={isSubmitting}
                 onClose={handleCloseDialog}
                 onSubmit={handleFormSubmit}
                 submitError={submitError}
-                type={type}
             />
         </div>
     )

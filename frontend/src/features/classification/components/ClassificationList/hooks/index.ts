@@ -9,11 +9,11 @@ import { ClassificationType } from '@/types'
 import type { IClassificationForm } from '../../../type'
 
 interface UseClassificationListProps {
+    classificationType: ClassificationType
     initialItems: IClassification[]
-    type: ClassificationType
 }
 
-export const useClassificationList = ({ initialItems, type }: UseClassificationListProps) => {
+export const useClassificationList = ({ initialItems, classificationType }: UseClassificationListProps) => {
     const [items, setItems] = useState<IClassification[]>(initialItems)
     const [isOpen, setIsOpen] = useState<boolean>(false)
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
@@ -31,7 +31,7 @@ export const useClassificationList = ({ initialItems, type }: UseClassificationL
 
     // typeに応じてAPIを切り替える関数
     const postClassification = async (data: IClassificationForm) => {
-        switch (type) {
+        switch (classificationType) {
             case ClassificationType.Category:
                 return await postCategory({ form: data })
             case ClassificationType.Target:
@@ -44,7 +44,7 @@ export const useClassificationList = ({ initialItems, type }: UseClassificationL
     }
 
     const fetchClassifications = async (): Promise<IClassification[]> => {
-        switch (type) {
+        switch (classificationType) {
             case ClassificationType.Category:
                 return await getCategories({ mode: 'all' })
             case ClassificationType.Target:
