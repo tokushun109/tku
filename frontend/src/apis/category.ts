@@ -12,7 +12,7 @@ export interface IPostCategoryParams {
 
 export interface IPutCategoryParams {
     form: IClassificationForm
-    id: number
+    uuid: string
 }
 
 export interface ICategoryResponse {
@@ -66,7 +66,7 @@ export const postCategory = async (params: IPostCategoryParams): Promise<ICatego
 /** カテゴリを更新 */
 export const putCategory = async (params: IPutCategoryParams): Promise<ICategoryResponse> => {
     try {
-        const res = await fetch(`${process.env.API_URL}/category/${params.id}`, {
+        const res = await fetch(`${process.env.API_URL}/category/${params.uuid}`, {
             headers: {
                 'Content-Type': 'application/json',
             },
