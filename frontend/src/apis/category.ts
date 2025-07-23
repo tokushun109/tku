@@ -10,6 +10,11 @@ export interface IPostCategoryParams {
     form: IClassificationForm
 }
 
+export interface IPutCategoryParams {
+    form: IClassificationForm
+    id: number
+}
+
 export interface ICategoryResponse {
     message: string
 }
@@ -55,5 +60,28 @@ export const postCategory = async (params: IPostCategoryParams): Promise<ICatego
             throw error
         }
         throw new Error('カテゴリの追加に失敗しました')
+    }
+}
+
+/** カテゴリを更新 */
+export const putCategory = async (params: IPutCategoryParams): Promise<ICategoryResponse> => {
+    try {
+        const res = await fetch(`${process.env.API_URL}/category/${params.id}`, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            method: 'PUT',
+            body: JSON.stringify(params.form),
+        })
+
+        if (!res.ok) throw new ApiError(res)
+
+        return await res.json()
+    } catch (error) {
+        if (error instanceof ApiError) {
+            throw error
+        }
+        throw new Error('カテゴリの更新に失敗しました')
     }
 }
