@@ -17,7 +17,7 @@ interface Props {
 }
 
 export const ClassificationList = ({ initialItems, classificationType }: Props) => {
-    const { items, isOpen, isSubmitting, submitError, handleOpenDialog, handleCloseDialog, handleFormSubmit } = useClassificationList({
+    const { items, isOpen, isSubmitting, submitError, updateItem, handleOpenDialog, handleCloseDialog, handleFormSubmit } = useClassificationList({
         initialItems,
         classificationType,
     })
@@ -73,6 +73,7 @@ export const ClassificationList = ({ initialItems, classificationType }: Props) 
                 onClose={handleCloseDialog}
                 onSubmit={handleFormSubmit}
                 submitError={submitError}
+                updateItem={updateItem}
             />
         </div>
     )

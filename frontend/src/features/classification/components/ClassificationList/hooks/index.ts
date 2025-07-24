@@ -1,8 +1,8 @@
 import { useState } from 'react'
 
-import { getCategories, postCategory } from '@/apis/category'
-import { getTags, postTag } from '@/apis/tag'
-import { getTargets, postTarget } from '@/apis/target'
+import { getCategories, postCategory, putCategory } from '@/apis/category'
+import { getTags, postTag, putTag } from '@/apis/tag'
+import { getTargets, postTarget, putTarget } from '@/apis/target'
 import { IClassification } from '@/features/classification/type'
 import { ClassificationType } from '@/types'
 
@@ -31,7 +31,7 @@ export const useClassificationList = ({ initialItems, classificationType }: UseC
         setSubmitError(null)
     }
 
-    // typeに応じてAPIを切り替える関数
+    // typeに応じてAPIを切り替える関数（追加）
     const postClassification = async (data: IClassificationForm) => {
         switch (classificationType) {
             case ClassificationType.Category:
@@ -40,6 +40,20 @@ export const useClassificationList = ({ initialItems, classificationType }: UseC
                 return await postTarget({ form: data })
             case ClassificationType.Tag:
                 return await postTag({ form: data })
+            default:
+                throw new Error('不正なタイプです')
+        }
+    }
+
+    // typeに応じてAPIを切り替える関数（更新）
+    const putClassification = async (data: IClassificationForm, uuid: string) => {
+        switch (classificationType) {
+            case ClassificationType.Category:
+                return await putCategory({ form: data, uuid })
+            case ClassificationType.Target:
+                return await putTarget({ form: data, uuid })
+            case ClassificationType.Tag:
+                return await putTag({ form: data, uuid })
             default:
                 throw new Error('不正なタイプです')
         }
@@ -63,9 +77,15 @@ export const useClassificationList = ({ initialItems, classificationType }: UseC
             setIsSubmitting(true)
             setSubmitError(null)
 
-            await postClassification(data)
+            if (updateItem) {
+                // 更新処理
+                await putClassification(data, updateItem.uuid)
+            } else {
+                // 追加処理
+                await postClassification(data)
+            }
 
-            // 追加成功後、一覧を再取得して状態を更新
+            // 成功後、一覧を再取得して状態を更新
             const updatedItems = await fetchClassifications()
             setItems(updatedItems)
 
