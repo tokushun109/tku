@@ -1,6 +1,5 @@
-import { IGetSiteParams, ISite, ISiteForm } from '@/features/site/type'
+import { ISite, ISiteForm } from '@/features/site/type'
 import { ApiError } from '@/utils/error'
-import { convertObjectToURLSearchParams } from '@/utils/request'
 
 export interface IPostSalesSiteParams {
     form: ISiteForm
@@ -22,27 +21,6 @@ export interface ISalesSiteResponse {
 export const getSalesSiteList = async (): Promise<ISite[]> => {
     try {
         const res = await fetch(`${process.env.API_URL}/sales_site/`, {
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            method: 'GET',
-        })
-
-        if (!res.ok) throw new ApiError(res)
-
-        return await res.json()
-    } catch (error) {
-        if (error instanceof ApiError) {
-            throw error
-        }
-        throw new Error('販売サイト一覧の取得に失敗しました')
-    }
-}
-
-export const getSalesSite = async (params: IGetSiteParams): Promise<ISite[]> => {
-    try {
-        const query = convertObjectToURLSearchParams(params)
-        const res = await fetch(`${process.env.API_URL}/sales_site?${query}`, {
             headers: {
                 'Content-Type': 'application/json',
             },

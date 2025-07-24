@@ -1,6 +1,5 @@
-import { IGetSiteParams, ISite, ISiteForm } from '@/features/site/type'
+import { ISite, ISiteForm } from '@/features/site/type'
 import { ApiError } from '@/utils/error'
-import { convertObjectToURLSearchParams } from '@/utils/request'
 
 export interface IPostSnsParams {
     form: ISiteForm
@@ -22,27 +21,6 @@ export interface ISnsResponse {
 export const getSnsList = async (): Promise<ISite[]> => {
     try {
         const res = await fetch(`${process.env.API_URL}/sns/`, {
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            method: 'GET',
-        })
-
-        if (!res.ok) throw new ApiError(res)
-
-        return await res.json()
-    } catch (error) {
-        if (error instanceof ApiError) {
-            throw error
-        }
-        throw new Error('SNS一覧の取得に失敗しました')
-    }
-}
-
-export const getSns = async (params: IGetSiteParams): Promise<ISite[]> => {
-    try {
-        const query = convertObjectToURLSearchParams(params)
-        const res = await fetch(`${process.env.API_URL}/sns?${query}`, {
             headers: {
                 'Content-Type': 'application/json',
             },
