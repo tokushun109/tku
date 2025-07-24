@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { getCategories, postCategory, putCategory } from '@/apis/category'
-import { getTags, postTag, putTag } from '@/apis/tag'
-import { getTargets, postTarget, putTarget } from '@/apis/target'
+import { deleteCategory, getCategories, postCategory, putCategory } from '@/apis/category'
+import { deleteTag, getTags, postTag, putTag } from '@/apis/tag'
+import { deleteTarget, getTargets, postTarget, putTarget } from '@/apis/target'
 import { IClassification } from '@/features/classification/type'
 import { ClassificationType, ClassificationLabel } from '@/types'
 
@@ -19,14 +19,15 @@ export const useClassificationList = ({ initialItems, classificationType }: UseC
     const [isOpen, setIsOpen] = useState<boolean>(false)
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
     const [submitError, setSubmitError] = useState<string | null>(null)
-    const [updateItem, setUpdateItem] = useState<IClassification | null>(null)
+    const [targetItem, setTargetItem] = useState<IClassification | null>(null)
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false)
 
     const classificationName = ClassificationLabel[classificationType]
 
     const handleOpenDialog = (item: IClassification | null) => {
         setIsOpen(true)
         setSubmitError(null)
-        setUpdateItem(item)
+        setTargetItem(item)
     }
 
     const handleCloseDialog = () => {
@@ -62,6 +63,20 @@ export const useClassificationList = ({ initialItems, classificationType }: UseC
         }
     }
 
+    // typeに応じてAPIを切り替える関数（削除）
+    const deleteClassification = async (uuid: string) => {
+        switch (classificationType) {
+            case ClassificationType.Category:
+                return await deleteCategory({ uuid })
+            case ClassificationType.Target:
+                return await deleteTarget({ uuid })
+            case ClassificationType.Tag:
+                return await deleteTag({ uuid })
+            default:
+                throw new Error('不正なタイプです')
+        }
+    }
+
     const fetchClassifications = async (): Promise<IClassification[]> => {
         switch (classificationType) {
             case ClassificationType.Category:
@@ -80,9 +95,9 @@ export const useClassificationList = ({ initialItems, classificationType }: UseC
             setIsSubmitting(true)
             setSubmitError(null)
 
-            if (updateItem) {
+            if (targetItem) {
                 // 更新処理
-                await putClassification(data, updateItem.uuid)
+                await putClassification(data, targetItem.uuid)
                 toast.success(`${classificationName}「${data.name}」を更新しました`)
             } else {
                 // 追加処理
@@ -96,7 +111,7 @@ export const useClassificationList = ({ initialItems, classificationType }: UseC
 
             handleCloseDialog()
         } catch {
-            const errorMessage = updateItem
+            const errorMessage = targetItem
                 ? `${classificationName}の更新に失敗しました。もう一度お試しください。`
                 : `${classificationName}の追加に失敗しました。もう一度お試しください。`
             setSubmitError(errorMessage)
@@ -106,14 +121,46 @@ export const useClassificationList = ({ initialItems, classificationType }: UseC
         }
     }
 
+    const handleOpenDeleteDialog = (item: IClassification) => {
+        setTargetItem(item)
+        setIsDeleteDialogOpen(true)
+    }
+
+    const handleCloseDeleteDialog = () => {
+        setIsDeleteDialogOpen(false)
+        setTargetItem(null)
+    }
+
+    const handleConfirmDelete = async () => {
+        if (!targetItem) return
+
+        try {
+            await deleteClassification(targetItem.uuid)
+            toast.success(`${classificationName}「${targetItem.name}」を削除しました`)
+
+            // 成功後、一覧を再取得して状態を更新
+            const updatedItems = await fetchClassifications()
+            setItems(updatedItems)
+
+            handleCloseDeleteDialog()
+        } catch {
+            const errorMessage = `${classificationName}の削除に失敗しました。もう一度お試しください。`
+            toast.error(errorMessage)
+        }
+    }
+
     return {
         items,
         isOpen,
         isSubmitting,
         submitError,
-        updateItem,
+        targetItem,
+        isDeleteDialogOpen,
         handleOpenDialog,
         handleCloseDialog,
         handleFormSubmit,
+        handleOpenDeleteDialog,
+        handleCloseDeleteDialog,
+        handleConfirmDelete,
     }
 }

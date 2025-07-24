@@ -15,6 +15,10 @@ export interface IPutCategoryParams {
     uuid: string
 }
 
+export interface IDeleteCategoryParams {
+    uuid: string
+}
+
 export interface ICategoryResponse {
     message: string
 }
@@ -83,5 +87,27 @@ export const putCategory = async (params: IPutCategoryParams): Promise<ICategory
             throw error
         }
         throw new Error('カテゴリの更新に失敗しました')
+    }
+}
+
+/** カテゴリを削除 */
+export const deleteCategory = async (params: IDeleteCategoryParams): Promise<ICategoryResponse> => {
+    try {
+        const res = await fetch(`${process.env.API_URL}/category/${params.uuid}`, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            method: 'DELETE',
+        })
+
+        if (!res.ok) throw new ApiError(res)
+
+        return await res.json()
+    } catch (error) {
+        if (error instanceof ApiError) {
+            throw error
+        }
+        throw new Error('カテゴリの削除に失敗しました')
     }
 }

@@ -10,6 +10,10 @@ export interface IPutTagParams {
     uuid: string
 }
 
+export interface IDeleteTagParams {
+    uuid: string
+}
+
 export interface ITagResponse {
     message: string
 }
@@ -77,5 +81,27 @@ export const putTag = async (params: IPutTagParams): Promise<ITagResponse> => {
             throw error
         }
         throw new Error('タグの更新に失敗しました')
+    }
+}
+
+/** タグを削除 */
+export const deleteTag = async (params: IDeleteTagParams): Promise<ITagResponse> => {
+    try {
+        const res = await fetch(`${process.env.API_URL}/tag/${params.uuid}`, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            method: 'DELETE',
+        })
+
+        if (!res.ok) throw new ApiError(res)
+
+        return await res.json()
+    } catch (error) {
+        if (error instanceof ApiError) {
+            throw error
+        }
+        throw new Error('タグの削除に失敗しました')
     }
 }
