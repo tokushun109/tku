@@ -18,7 +18,22 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         <html lang="ja">
             <body className={mainFontFace.className}>
                 <PageFadeTransition>{children}</PageFadeTransition>
-                <Toaster duration={5000} position="bottom-right" />
+                <Toaster
+                    duration={5000}
+                    icons={{
+                        error: null,
+                        info: null,
+                        loading: null,
+                        success: null,
+                        warning: null,
+                    }}
+                    position="bottom-right"
+                    toastOptions={{
+                        style: {
+                            fontFamily: mainFontFace.style.fontFamily,
+                        },
+                    }}
+                />
             </body>
         </html>
     )
