@@ -14,13 +14,13 @@ const meta: Meta<typeof ClassificationList> = {
             { uuid: '4', name: 'ブレスレット' },
             { uuid: '5', name: 'イヤリング' },
         ],
-        type: ClassificationType.Category,
+        classificationType: ClassificationType.Category,
     },
     argTypes: {
         initialItems: {
             description: '分類アイテムの配列',
         },
-        type: {
+        classificationType: {
             description: '分類の種類',
         },
     },

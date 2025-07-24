@@ -1,6 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 
 import { Dialog } from '@/components/bases/Dialog'
@@ -11,18 +12,19 @@ import { ClassificationLabel, ClassificationType } from '@/types'
 
 import { ClassificationSchema } from '../../classification/schema'
 
-import type { IClassificationForm } from '../../type'
+import type { IClassification, IClassificationForm } from '../../type'
 
 interface Props {
+    classificationType: ClassificationType
     isOpen: boolean
     isSubmitting: boolean
     onClose: () => void
     onSubmit: (_data: IClassificationForm) => Promise<void>
     submitError: string | null
-    type: ClassificationType
+    updateItem: IClassification | null
 }
 
-export const ClassificationFormDialog = ({ isOpen, isSubmitting, onClose, onSubmit, submitError, type }: Props) => {
+export const ClassificationFormDialog = ({ isOpen, isSubmitting, onClose, onSubmit, submitError, classificationType, updateItem }: Props) => {
     const {
         register,
         handleSubmit,
@@ -30,7 +32,19 @@ export const ClassificationFormDialog = ({ isOpen, isSubmitting, onClose, onSubm
         reset,
     } = useForm<IClassificationForm>({
         resolver: zodResolver(ClassificationSchema),
+        defaultValues: {
+            name: '',
+        },
     })
+
+    // updateItemが変更されたときにフォームをリセット
+    useEffect(() => {
+        if (isOpen) {
+            reset({
+                name: updateItem?.name || '',
+            })
+        }
+    }, [updateItem, isOpen, reset])
 
     const handleClose = () => {
         reset()
@@ -42,16 +56,18 @@ export const ClassificationFormDialog = ({ isOpen, isSubmitting, onClose, onSubm
         reset()
     }
 
+    const isEdit = updateItem !== null
+
     return (
         <Dialog
             confirmOption={{
-                label: isSubmitting ? '送信中...' : '追加',
+                label: isSubmitting ? '送信中...' : isEdit ? '更新' : '追加',
                 onClick: handleSubmit(handleFormSubmit),
                 disabled: isSubmitting,
             }}
             isOpen={isOpen}
             onClose={handleClose}
-            title={`${ClassificationLabel[type]}を追加`}
+            title={`${ClassificationLabel[classificationType]}を${isEdit ? '編集' : '追加'}`}
             wide
         >
             {submitError && <Message type={MessageType.Error}>{submitError}</Message>}
@@ -60,8 +76,8 @@ export const ClassificationFormDialog = ({ isOpen, isSubmitting, onClose, onSubm
                     {...register('name')}
                     error={errors.name?.message}
                     id="name"
-                    label={`${ClassificationLabel[type]}名`}
-                    placeholder={`テスト${ClassificationLabel[type]}`}
+                    label={`${ClassificationLabel[classificationType]}名`}
+                    placeholder={`テスト${ClassificationLabel[classificationType]}`}
                     required
                     type="text"
                 />

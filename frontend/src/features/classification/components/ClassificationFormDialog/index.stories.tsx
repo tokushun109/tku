@@ -17,7 +17,7 @@ const meta: Meta<typeof ClassificationFormDialog> = {
             await new Promise((resolve) => setTimeout(resolve, 1000))
         },
         submitError: null,
-        type: ClassificationType.Category,
+        classificationType: ClassificationType.Category,
     },
     argTypes: {
         isOpen: {
@@ -26,7 +26,7 @@ const meta: Meta<typeof ClassificationFormDialog> = {
         isSubmitting: {
             control: { type: 'boolean' },
         },
-        type: {
+        classificationType: {
             control: { type: 'select' },
             options: Object.values(ClassificationType),
         },
@@ -38,39 +38,39 @@ type Story = StoryObj<typeof ClassificationFormDialog>
 
 export const Category: Story = {
     args: {
-        type: ClassificationType.Category,
+        classificationType: ClassificationType.Category,
     },
 }
 
 export const Tag: Story = {
     args: {
-        type: ClassificationType.Tag,
+        classificationType: ClassificationType.Tag,
     },
 }
 
 export const Target: Story = {
     args: {
-        type: ClassificationType.Target,
+        classificationType: ClassificationType.Target,
     },
 }
 
 export const WithError: Story = {
     args: {
-        type: ClassificationType.Category,
+        classificationType: ClassificationType.Category,
         submitError: '送信中にエラーが発生しました。もう一度お試しください。',
     },
 }
 
 export const Submitting: Story = {
     args: {
-        type: ClassificationType.Category,
+        classificationType: ClassificationType.Category,
         isSubmitting: true,
     },
 }
 
 export const Closed: Story = {
     args: {
-        type: ClassificationType.Category,
+        classificationType: ClassificationType.Category,
         isOpen: false,
     },
 }

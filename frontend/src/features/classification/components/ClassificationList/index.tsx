@@ -12,14 +12,14 @@ import { useClassificationList } from './hooks'
 import styles from './styles.module.scss'
 
 interface Props {
+    classificationType: ClassificationType
     initialItems: IClassification[]
-    type: ClassificationType
 }
 
-export const ClassificationList = ({ initialItems, type }: Props) => {
-    const { items, isOpen, isSubmitting, submitError, handleOpenDialog, handleCloseDialog, handleFormSubmit } = useClassificationList({
+export const ClassificationList = ({ initialItems, classificationType }: Props) => {
+    const { items, isOpen, isSubmitting, submitError, updateItem, handleOpenDialog, handleCloseDialog, handleFormSubmit } = useClassificationList({
         initialItems,
-        type,
+        classificationType,
     })
 
     return (
@@ -32,7 +32,12 @@ export const ClassificationList = ({ initialItems, type }: Props) => {
                         computeItemKey={(_index, item) => item.uuid}
                         data={items}
                         itemContent={(_index, item) => (
-                            <div className={styles['list-item']} onClick={() => {}}>
+                            <div
+                                className={styles['list-item']}
+                                onClick={() => {
+                                    handleOpenDialog(item)
+                                }}
+                            >
                                 <div className={styles['item-content']}>
                                     <span className={styles['item-name']}>{item.name}</span>
                                     <div className={styles['item-actions']}>
@@ -50,7 +55,11 @@ export const ClassificationList = ({ initialItems, type }: Props) => {
                 )}
             </div>
             <div className={styles['add-button-container']}>
-                <Button onClick={handleOpenDialog}>
+                <Button
+                    onClick={() => {
+                        handleOpenDialog(null)
+                    }}
+                >
                     <div className={styles['add-button-content']}>
                         <Add className={styles['add-icon']} />
                         追加
@@ -58,12 +67,13 @@ export const ClassificationList = ({ initialItems, type }: Props) => {
                 </Button>
             </div>
             <ClassificationFormDialog
+                classificationType={classificationType}
                 isOpen={isOpen}
                 isSubmitting={isSubmitting}
                 onClose={handleCloseDialog}
                 onSubmit={handleFormSubmit}
                 submitError={submitError}
-                type={type}
+                updateItem={updateItem}
             />
         </div>
     )

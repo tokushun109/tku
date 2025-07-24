@@ -1,27 +1,29 @@
 import { useState } from 'react'
 
-import { getCategories, postCategory } from '@/apis/category'
-import { getTags, postTag } from '@/apis/tag'
-import { getTargets, postTarget } from '@/apis/target'
+import { getCategories, postCategory, putCategory } from '@/apis/category'
+import { getTags, postTag, putTag } from '@/apis/tag'
+import { getTargets, postTarget, putTarget } from '@/apis/target'
 import { IClassification } from '@/features/classification/type'
 import { ClassificationType } from '@/types'
 
 import type { IClassificationForm } from '../../../type'
 
 interface UseClassificationListProps {
+    classificationType: ClassificationType
     initialItems: IClassification[]
-    type: ClassificationType
 }
 
-export const useClassificationList = ({ initialItems, type }: UseClassificationListProps) => {
+export const useClassificationList = ({ initialItems, classificationType }: UseClassificationListProps) => {
     const [items, setItems] = useState<IClassification[]>(initialItems)
     const [isOpen, setIsOpen] = useState<boolean>(false)
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
     const [submitError, setSubmitError] = useState<string | null>(null)
+    const [updateItem, setUpdateItem] = useState<IClassification | null>(null)
 
-    const handleOpenDialog = () => {
+    const handleOpenDialog = (item: IClassification | null) => {
         setIsOpen(true)
         setSubmitError(null)
+        setUpdateItem(item)
     }
 
     const handleCloseDialog = () => {
@@ -29,9 +31,9 @@ export const useClassificationList = ({ initialItems, type }: UseClassificationL
         setSubmitError(null)
     }
 
-    // typeに応じてAPIを切り替える関数
+    // typeに応じてAPIを切り替える関数（追加）
     const postClassification = async (data: IClassificationForm) => {
-        switch (type) {
+        switch (classificationType) {
             case ClassificationType.Category:
                 return await postCategory({ form: data })
             case ClassificationType.Target:
@@ -43,8 +45,22 @@ export const useClassificationList = ({ initialItems, type }: UseClassificationL
         }
     }
 
+    // typeに応じてAPIを切り替える関数（更新）
+    const putClassification = async (data: IClassificationForm, uuid: string) => {
+        switch (classificationType) {
+            case ClassificationType.Category:
+                return await putCategory({ form: data, uuid })
+            case ClassificationType.Target:
+                return await putTarget({ form: data, uuid })
+            case ClassificationType.Tag:
+                return await putTag({ form: data, uuid })
+            default:
+                throw new Error('不正なタイプです')
+        }
+    }
+
     const fetchClassifications = async (): Promise<IClassification[]> => {
-        switch (type) {
+        switch (classificationType) {
             case ClassificationType.Category:
                 return await getCategories({ mode: 'all' })
             case ClassificationType.Target:
@@ -61,9 +77,15 @@ export const useClassificationList = ({ initialItems, type }: UseClassificationL
             setIsSubmitting(true)
             setSubmitError(null)
 
-            await postClassification(data)
+            if (updateItem) {
+                // 更新処理
+                await putClassification(data, updateItem.uuid)
+            } else {
+                // 追加処理
+                await postClassification(data)
+            }
 
-            // 追加成功後、一覧を再取得して状態を更新
+            // 成功後、一覧を再取得して状態を更新
             const updatedItems = await fetchClassifications()
             setItems(updatedItems)
 
@@ -80,6 +102,7 @@ export const useClassificationList = ({ initialItems, type }: UseClassificationL
         isOpen,
         isSubmitting,
         submitError,
+        updateItem,
         handleOpenDialog,
         handleCloseDialog,
         handleFormSubmit,

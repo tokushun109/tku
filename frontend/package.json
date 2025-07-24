@@ -36,16 +36,16 @@
         "@storybook/addon-themes": "^9.0.18",
         "@types/react-transition-group": "^4.4.12",
         "classnames": "^2.5.1",
-        "framer-motion": "^12.23.6",
+        "framer-motion": "^12.23.9",
         "http-status-codes": "^2.3.0",
         "next": "15.4.3",
         "react": "^19.1.0",
         "react-confetti": "^6.4.0",
         "react-dom": "^19.1.0",
-        "react-hook-form": "^7.60.0",
+        "react-hook-form": "^7.61.0",
         "react-transition-group": "^4.4.5",
         "react-virtuoso": "^4.13.0",
-        "zod": "^4.0.5"
+        "zod": "^4.0.8"
     },
     "devDependencies": {
         "@chromatic-com/storybook": "^4.0.1",
