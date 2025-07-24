@@ -2,6 +2,7 @@ import 'ress'
 
 import '@/styles/globals.scss'
 import { Metadata } from 'next'
+import { Toaster } from 'sonner'
 
 import { PageFadeTransition } from '@/components/layouts/PageFadeTransition'
 import { mainFontFace } from '@/utils/font'
@@ -17,6 +18,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         <html lang="ja">
             <body className={mainFontFace.className}>
                 <PageFadeTransition>{children}</PageFadeTransition>
+                <Toaster position="top-center" />
             </body>
         </html>
     )
