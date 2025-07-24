@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { getCategories, postCategory, putCategory } from '@/apis/category'
-import { getTags, postTag, putTag } from '@/apis/tag'
-import { getTargets, postTarget, putTarget } from '@/apis/target'
+import { deleteCategory, getCategories, postCategory, putCategory } from '@/apis/category'
+import { deleteTag, getTags, postTag, putTag } from '@/apis/tag'
+import { deleteTarget, getTargets, postTarget, putTarget } from '@/apis/target'
 import { IClassification } from '@/features/classification/type'
 import { ClassificationType, ClassificationLabel } from '@/types'
 
@@ -20,6 +20,7 @@ export const useClassificationList = ({ initialItems, classificationType }: UseC
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
     const [submitError, setSubmitError] = useState<string | null>(null)
     const [updateItem, setUpdateItem] = useState<IClassification | null>(null)
+    const [isDeleting, setIsDeleting] = useState<boolean>(false)
 
     const classificationName = ClassificationLabel[classificationType]
 
@@ -57,6 +58,20 @@ export const useClassificationList = ({ initialItems, classificationType }: UseC
                 return await putTarget({ form: data, uuid })
             case ClassificationType.Tag:
                 return await putTag({ form: data, uuid })
+            default:
+                throw new Error('不正なタイプです')
+        }
+    }
+
+    // typeに応じてAPIを切り替える関数（削除）
+    const deleteClassification = async (uuid: string) => {
+        switch (classificationType) {
+            case ClassificationType.Category:
+                return await deleteCategory({ uuid })
+            case ClassificationType.Target:
+                return await deleteTarget({ uuid })
+            case ClassificationType.Tag:
+                return await deleteTag({ uuid })
             default:
                 throw new Error('不正なタイプです')
         }
@@ -106,14 +121,37 @@ export const useClassificationList = ({ initialItems, classificationType }: UseC
         }
     }
 
+    const handleDelete = async (item: IClassification) => {
+        if (!window.confirm(`${classificationName}「${item.name}」を削除しますか？\nこの操作は取り消せません。`)) {
+            return
+        }
+
+        try {
+            setIsDeleting(true)
+            await deleteClassification(item.uuid)
+            toast.success(`${classificationName}「${item.name}」を削除しました`)
+
+            // 成功後、一覧を再取得して状態を更新
+            const updatedItems = await fetchClassifications()
+            setItems(updatedItems)
+        } catch {
+            const errorMessage = `${classificationName}の削除に失敗しました。もう一度お試しください。`
+            toast.error(errorMessage)
+        } finally {
+            setIsDeleting(false)
+        }
+    }
+
     return {
         items,
         isOpen,
         isSubmitting,
         submitError,
         updateItem,
+        isDeleting,
         handleOpenDialog,
         handleCloseDialog,
         handleFormSubmit,
+        handleDelete,
     }
 }

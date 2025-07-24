@@ -17,10 +17,11 @@ interface Props {
 }
 
 export const ClassificationList = ({ initialItems, classificationType }: Props) => {
-    const { items, isOpen, isSubmitting, submitError, updateItem, handleOpenDialog, handleCloseDialog, handleFormSubmit } = useClassificationList({
-        initialItems,
-        classificationType,
-    })
+    const { items, isOpen, isSubmitting, submitError, updateItem, isDeleting, handleOpenDialog, handleCloseDialog, handleFormSubmit, handleDelete } =
+        useClassificationList({
+            initialItems,
+            classificationType,
+        })
 
     return (
         <div className={styles['classification-list']}>
@@ -45,6 +46,11 @@ export const ClassificationList = ({ initialItems, classificationType }: Props) 
                                             className={styles['icon-button']}
                                             onClick={(e) => {
                                                 e.stopPropagation()
+                                                handleDelete(item)
+                                            }}
+                                            style={{
+                                                opacity: isDeleting ? 0.5 : 1,
+                                                pointerEvents: isDeleting ? 'none' : 'auto',
                                             }}
                                         />
                                     </div>
