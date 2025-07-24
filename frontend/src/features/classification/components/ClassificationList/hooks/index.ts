@@ -1,10 +1,11 @@
 import { useState } from 'react'
+import { toast } from 'sonner'
 
 import { getCategories, postCategory, putCategory } from '@/apis/category'
 import { getTags, postTag, putTag } from '@/apis/tag'
 import { getTargets, postTarget, putTarget } from '@/apis/target'
 import { IClassification } from '@/features/classification/type'
-import { ClassificationType } from '@/types'
+import { ClassificationType, ClassificationLabel } from '@/types'
 
 import type { IClassificationForm } from '../../../type'
 
@@ -19,6 +20,8 @@ export const useClassificationList = ({ initialItems, classificationType }: UseC
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
     const [submitError, setSubmitError] = useState<string | null>(null)
     const [updateItem, setUpdateItem] = useState<IClassification | null>(null)
+
+    const classificationName = ClassificationLabel[classificationType]
 
     const handleOpenDialog = (item: IClassification | null) => {
         setIsOpen(true)
@@ -80,9 +83,11 @@ export const useClassificationList = ({ initialItems, classificationType }: UseC
             if (updateItem) {
                 // 更新処理
                 await putClassification(data, updateItem.uuid)
+                toast.success(`${classificationName}「${data.name}」を更新しました`)
             } else {
                 // 追加処理
                 await postClassification(data)
+                toast.success(`${classificationName}「${data.name}」を追加しました`)
             }
 
             // 成功後、一覧を再取得して状態を更新
@@ -91,7 +96,11 @@ export const useClassificationList = ({ initialItems, classificationType }: UseC
 
             handleCloseDialog()
         } catch {
-            setSubmitError('送信中にエラーが発生しました。もう一度お試しください。')
+            const errorMessage = updateItem
+                ? `${classificationName}の更新に失敗しました。もう一度お試しください。`
+                : `${classificationName}の追加に失敗しました。もう一度お試しください。`
+            setSubmitError(errorMessage)
+            toast.error(errorMessage)
         } finally {
             setIsSubmitting(false)
         }
