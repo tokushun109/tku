@@ -4,8 +4,9 @@ import { Add, Delete } from '@mui/icons-material'
 import { Virtuoso } from 'react-virtuoso'
 
 import { Button } from '@/components/bases/Button'
+import { Dialog } from '@/components/bases/Dialog'
 import { IClassification } from '@/features/classification/type'
-import { ClassificationType } from '@/types'
+import { ClassificationLabel, ClassificationType } from '@/types'
 
 import { ClassificationFormDialog } from '../ClassificationFormDialog'
 import { useClassificationList } from './hooks'
@@ -17,11 +18,25 @@ interface Props {
 }
 
 export const ClassificationList = ({ initialItems, classificationType }: Props) => {
-    const { items, isOpen, isSubmitting, submitError, updateItem, isDeleting, handleOpenDialog, handleCloseDialog, handleFormSubmit, handleDelete } =
-        useClassificationList({
-            initialItems,
-            classificationType,
-        })
+    const {
+        items,
+        isOpen,
+        isSubmitting,
+        submitError,
+        targetItem,
+        isDeleteDialogOpen,
+        handleOpenDialog,
+        handleCloseDialog,
+        handleFormSubmit,
+        handleOpenDeleteDialog,
+        handleCloseDeleteDialog,
+        handleConfirmDelete,
+    } = useClassificationList({
+        initialItems,
+        classificationType,
+    })
+
+    const classificationName = ClassificationLabel[classificationType]
 
     return (
         <div className={styles['classification-list']}>
@@ -46,11 +61,7 @@ export const ClassificationList = ({ initialItems, classificationType }: Props) 
                                             className={styles['icon-button']}
                                             onClick={(e) => {
                                                 e.stopPropagation()
-                                                handleDelete(item)
-                                            }}
-                                            style={{
-                                                opacity: isDeleting ? 0.5 : 1,
-                                                pointerEvents: isDeleting ? 'none' : 'auto',
+                                                handleOpenDeleteDialog(item)
                                             }}
                                         />
                                     </div>
@@ -79,8 +90,30 @@ export const ClassificationList = ({ initialItems, classificationType }: Props) 
                 onClose={handleCloseDialog}
                 onSubmit={handleFormSubmit}
                 submitError={submitError}
-                updateItem={updateItem}
+                updateItem={targetItem}
             />
+            <Dialog
+                cancelOption={{
+                    label: 'キャンセル',
+                    onClick: handleCloseDeleteDialog,
+                }}
+                confirmOption={{
+                    label: '削除',
+                    onClick: handleConfirmDelete,
+                }}
+                isOpen={isDeleteDialogOpen}
+                onClose={handleCloseDeleteDialog}
+                title="削除確認"
+            >
+                {targetItem && (
+                    <>
+                        <p>
+                            {classificationName}「{targetItem.name}」を削除しますか？
+                        </p>
+                        <p>この操作は取り消せません。</p>
+                    </>
+                )}
+            </Dialog>
         </div>
     )
 }

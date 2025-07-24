@@ -19,15 +19,15 @@ export const useClassificationList = ({ initialItems, classificationType }: UseC
     const [isOpen, setIsOpen] = useState<boolean>(false)
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
     const [submitError, setSubmitError] = useState<string | null>(null)
-    const [updateItem, setUpdateItem] = useState<IClassification | null>(null)
-    const [isDeleting, setIsDeleting] = useState<boolean>(false)
+    const [targetItem, setTargetItem] = useState<IClassification | null>(null)
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false)
 
     const classificationName = ClassificationLabel[classificationType]
 
     const handleOpenDialog = (item: IClassification | null) => {
         setIsOpen(true)
         setSubmitError(null)
-        setUpdateItem(item)
+        setTargetItem(item)
     }
 
     const handleCloseDialog = () => {
@@ -95,9 +95,9 @@ export const useClassificationList = ({ initialItems, classificationType }: UseC
             setIsSubmitting(true)
             setSubmitError(null)
 
-            if (updateItem) {
+            if (targetItem) {
                 // 更新処理
-                await putClassification(data, updateItem.uuid)
+                await putClassification(data, targetItem.uuid)
                 toast.success(`${classificationName}「${data.name}」を更新しました`)
             } else {
                 // 追加処理
@@ -111,7 +111,7 @@ export const useClassificationList = ({ initialItems, classificationType }: UseC
 
             handleCloseDialog()
         } catch {
-            const errorMessage = updateItem
+            const errorMessage = targetItem
                 ? `${classificationName}の更新に失敗しました。もう一度お試しください。`
                 : `${classificationName}の追加に失敗しました。もう一度お試しください。`
             setSubmitError(errorMessage)
@@ -121,24 +121,31 @@ export const useClassificationList = ({ initialItems, classificationType }: UseC
         }
     }
 
-    const handleDelete = async (item: IClassification) => {
-        if (!window.confirm(`${classificationName}「${item.name}」を削除しますか？\nこの操作は取り消せません。`)) {
-            return
-        }
+    const handleOpenDeleteDialog = (item: IClassification) => {
+        setTargetItem(item)
+        setIsDeleteDialogOpen(true)
+    }
+
+    const handleCloseDeleteDialog = () => {
+        setIsDeleteDialogOpen(false)
+        setTargetItem(null)
+    }
+
+    const handleConfirmDelete = async () => {
+        if (!targetItem) return
 
         try {
-            setIsDeleting(true)
-            await deleteClassification(item.uuid)
-            toast.success(`${classificationName}「${item.name}」を削除しました`)
+            await deleteClassification(targetItem.uuid)
+            toast.success(`${classificationName}「${targetItem.name}」を削除しました`)
 
             // 成功後、一覧を再取得して状態を更新
             const updatedItems = await fetchClassifications()
             setItems(updatedItems)
+
+            handleCloseDeleteDialog()
         } catch {
             const errorMessage = `${classificationName}の削除に失敗しました。もう一度お試しください。`
             toast.error(errorMessage)
-        } finally {
-            setIsDeleting(false)
         }
     }
 
@@ -147,11 +154,13 @@ export const useClassificationList = ({ initialItems, classificationType }: UseC
         isOpen,
         isSubmitting,
         submitError,
-        updateItem,
-        isDeleting,
+        targetItem,
+        isDeleteDialogOpen,
         handleOpenDialog,
         handleCloseDialog,
         handleFormSubmit,
-        handleDelete,
+        handleOpenDeleteDialog,
+        handleCloseDeleteDialog,
+        handleConfirmDelete,
     }
 }
