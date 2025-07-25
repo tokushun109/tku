@@ -46,7 +46,7 @@
         "react-transition-group": "^4.4.5",
         "react-virtuoso": "^4.13.0",
         "sonner": "^2.0.6",
-        "zod": "^4.0.9"
+        "zod": "^4.0.10"
     },
     "devDependencies": {
         "@chromatic-com/storybook": "^4.0.1",
