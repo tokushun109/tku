@@ -22,6 +22,13 @@ const config: StorybookConfig = {
             }
         }
 
+        // 依存関係最適化の設定
+        config.optimizeDeps = {
+            ...config.optimizeDeps,
+            exclude: ['@mdx-js/react', 'markdown-to-jsx', '@storybook/blocks', '@storybook/addon-docs', '@storybook/addon-vitest'],
+            include: ['react', 'react-dom', '@storybook/react', 'storybook'],
+        }
+
         // グローバルなscssファイルの読み込み
         if (config.css) {
             config.css.preprocessorOptions = {
