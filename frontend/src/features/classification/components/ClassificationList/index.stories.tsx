@@ -6,6 +6,13 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 
 const meta: Meta<typeof ClassificationList> = {
     component: ClassificationList,
+    decorators: [
+        (Story) => (
+            <div style={{ height: '500px', background: '#f5f5f5', padding: '20px' }}>
+                <Story />
+            </div>
+        ),
+    ],
     args: {
         initialItems: [
             { uuid: '1', name: 'ネックレス' },
@@ -13,6 +20,9 @@ const meta: Meta<typeof ClassificationList> = {
             { uuid: '3', name: 'リング' },
             { uuid: '4', name: 'ブレスレット' },
             { uuid: '5', name: 'イヤリング' },
+            { uuid: '6', name: 'ヘアアクセサリー' },
+            { uuid: '7', name: 'バッグチャーム' },
+            { uuid: '8', name: 'ブローチ' },
         ],
         classificationType: ClassificationType.Category,
     },

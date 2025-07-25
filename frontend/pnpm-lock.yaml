@@ -69,8 +69,8 @@ importers:
         specifier: ^2.0.6
         version: 2.0.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       zod:
-        specifier: ^4.0.9
-        version: 4.0.9
+        specifier: ^4.0.10
+        version: 4.0.10
     devDependencies:
       '@chromatic-com/storybook':
         specifier: ^4.0.1
@@ -84,6 +84,9 @@ importers:
       '@eslint/js':
         specifier: ^9.31.0
         version: 9.31.0
+      '@mdx-js/react':
+        specifier: ^3.1.0
+        version: 3.1.0(@types/react@19.1.8)(react@19.1.0)
       '@next/eslint-plugin-next':
         specifier: ^15.4.4
         version: 15.4.4
@@ -174,6 +177,9 @@ importers:
       lint-staged:
         specifier: ^16.1.2
         version: 16.1.2
+      markdown-to-jsx:
+        specifier: ^7.7.12
+        version: 7.7.12(react@19.1.0)
       msw:
         specifier: ^2.10.4
         version: 2.10.4(@types/node@24.1.0)(typescript@5.8.3)
@@ -2944,6 +2950,12 @@ packages:
     resolution: {integrity: sha512-hXdUTZYIVOt1Ex//jAQi+wTZZpUpwBj/0QsOzqegb3rGMMeJiSEu5xLHnYfBrRV4RH2+OCSOO95Is/7x1WJ4bw==}
     engines: {node: '>=10'}
 
+  markdown-to-jsx@7.7.12:
+    resolution: {integrity: sha512-Y5xNBqoaTooSLkmlg2P0fdbh53gp4MqW7zhvcweGCPUWvWI5BecWRYI8vPlzT8D7OULxsQg2qoRW9EsJlBWasQ==}
+    engines: {node: '>= 10'}
+    peerDependencies:
+      react: '>= 0.14.0'
+
   math-intrinsics@1.1.0:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
@@ -4078,8 +4090,8 @@ packages:
     resolution: {integrity: sha512-cYVsTjKl8b+FrnidjibDWskAv7UKOfcwaVZdp/it9n1s9fU3IkgDbhdIRKCW4JDsAlECJY0ytoVPT3sK6kideA==}
     engines: {node: '>=18'}
 
-  zod@4.0.9:
-    resolution: {integrity: sha512-PAqUh1FW4Irxcs6/sWfnhJGV/8F0eLNd1FryydBfbA9Qvz1LaJk0TDrSC+hIKlArS/xVISuX/yjlS1bzg2D3Zw==}
+  zod@4.0.10:
+    resolution: {integrity: sha512-3vB+UU3/VmLL2lvwcY/4RV2i9z/YU0DTV/tDuYjrwmx5WeJ7hwy+rGEEx8glHp6Yxw7ibRbKSaIFBgReRPe5KA==}
 
 snapshots:
 
@@ -6932,6 +6944,10 @@ snapshots:
     dependencies:
       semver: 7.7.2
 
+  markdown-to-jsx@7.7.12(react@19.1.0):
+    dependencies:
+      react: 19.1.0
+
   math-intrinsics@1.1.0: {}
 
   merge-stream@2.0.0: {}
@@ -8200,4 +8216,4 @@ snapshots:
 
   yoctocolors-cjs@2.1.2: {}
 
-  zod@4.0.9: {}
+  zod@4.0.10: {}
