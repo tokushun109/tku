@@ -14,8 +14,8 @@ export default defineConfig({
         },
     },
     optimizeDeps: {
-        exclude: ['@mdx-js/react', 'markdown-to-jsx', '@storybook/blocks', '@storybook/addon-docs', '@storybook/addon-vitest'],
-        include: ['react', 'react-dom', '@storybook/react', 'storybook'],
+        exclude: ['@mdx-js/react', '@storybook/blocks', '@storybook/addon-docs', '@storybook/addon-vitest'],
+        include: ['react', 'react-dom', '@storybook/react', 'storybook', 'markdown-to-jsx'],
     },
     test: {
         coverage: {
@@ -51,8 +51,8 @@ export default defineConfig({
                     storybookTest({ configDir: path.join(dirname, '.storybook') }),
                 ],
                 optimizeDeps: {
-                    exclude: ['@mdx-js/react', 'markdown-to-jsx', '@storybook/blocks', '@storybook/addon-docs', '@storybook/addon-vitest'],
-                    include: ['react', 'react-dom', '@storybook/react', 'storybook'],
+                    exclude: ['@mdx-js/react', '@storybook/blocks', '@storybook/addon-docs', '@storybook/addon-vitest'],
+                    include: ['react', 'react-dom', '@storybook/react', 'storybook', 'markdown-to-jsx'],
                 },
                 test: {
                     name: 'storybook',

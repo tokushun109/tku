@@ -25,8 +25,8 @@ const config: StorybookConfig = {
         // 依存関係最適化の設定
         config.optimizeDeps = {
             ...config.optimizeDeps,
-            exclude: ['@mdx-js/react', 'markdown-to-jsx', '@storybook/blocks', '@storybook/addon-docs', '@storybook/addon-vitest'],
-            include: ['react', 'react-dom', '@storybook/react', 'storybook'],
+            exclude: ['@mdx-js/react', '@storybook/blocks', '@storybook/addon-docs', '@storybook/addon-vitest'],
+            include: ['react', 'react-dom', '@storybook/react', 'storybook', 'markdown-to-jsx'],
         }
 
         // グローバルなscssファイルの読み込み
