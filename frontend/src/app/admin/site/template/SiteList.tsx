@@ -1,3 +1,4 @@
+import { ExternalLink } from '@/components/bases/ExternalLink'
 import { ISite } from '@/features/site/type'
 import { SiteType, SiteLabel } from '@/types'
 
@@ -31,9 +32,13 @@ export const SiteList = ({ sites, siteType }: Props) => (
                             <div className={styles['site-details']}>
                                 <div className={styles['site-url']}>
                                     <strong>URL:</strong>
-                                    <a className={styles['site-link']} href={site.url} rel="noopener noreferrer" target="_blank">
-                                        {site.url}
-                                    </a>
+                                    {site.url ? (
+                                        <ExternalLink className={styles['site-link']} href={site.url}>
+                                            {site.url}
+                                        </ExternalLink>
+                                    ) : (
+                                        <span className={styles['site-url-empty']}>URLが設定されていません</span>
+                                    )}
                                 </div>
                             </div>
                         </div>
