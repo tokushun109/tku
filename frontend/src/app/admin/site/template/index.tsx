@@ -7,6 +7,7 @@ import { Tab, TabItem } from '@/components/bases/Tab'
 import { ISite } from '@/features/site/type'
 import { SiteType, SiteLabel } from '@/types'
 
+import { SiteList } from './SiteList'
 import styles from './styles.module.scss'
 
 interface Props {
@@ -30,42 +31,6 @@ export const SiteTemplate = ({ salesSiteList, snsList }: Props) => {
         },
     ]
 
-    const renderSiteList = (sites: ISite[], siteType: SiteType) => (
-        <div className={styles['site-list-container']}>
-            <div className={styles['site-list-header']}>
-                <h2 className={styles['site-list-title']}>{SiteLabel[siteType]}一覧</h2>
-                <div className={styles['site-count']}>
-                    <span>総件数: {sites.length}件</span>
-                </div>
-            </div>
-            <div className={styles['site-list']}>
-                {sites.length === 0 ? (
-                    <div className={styles['empty-state']}>
-                        <p>データがありません</p>
-                    </div>
-                ) : (
-                    sites.map((site) => (
-                        <div className={styles['site-item']} key={site.uuid}>
-                            <div className={styles['site-info']}>
-                                <div className={styles['site-header']}>
-                                    <h3 className={styles['site-name']}>{site.name}</h3>
-                                </div>
-                                <div className={styles['site-details']}>
-                                    <div className={styles['site-url']}>
-                                        <strong>URL:</strong>
-                                        <a className={styles['site-link']} href={site.url} rel="noopener noreferrer" target="_blank">
-                                            {site.url}
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    ))
-                )}
-            </div>
-        </div>
-    )
-
     return (
         <div className={styles['site-container']}>
             <Tab activeKey={activeTab} items={tabItems} onTabChange={setActiveTab} />
@@ -73,9 +38,9 @@ export const SiteTemplate = ({ salesSiteList, snsList }: Props) => {
                 {(() => {
                     switch (activeTab) {
                         case SiteType.Sns:
-                            return renderSiteList(snsList, SiteType.Sns)
+                            return <SiteList siteType={SiteType.Sns} sites={snsList} />
                         case SiteType.SalesSite:
-                            return renderSiteList(salesSiteList, SiteType.SalesSite)
+                            return <SiteList siteType={SiteType.SalesSite} sites={salesSiteList} />
                         default:
                             return null
                     }
