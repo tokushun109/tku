@@ -31,7 +31,6 @@ export const SiteList = ({ sites, siteType }: Props) => (
                             </div>
                             <div className={styles['site-details']}>
                                 <div className={styles['site-url']}>
-                                    <strong>URL:</strong>
                                     {site.url ? (
                                         <ExternalLink className={styles['site-link']} href={site.url}>
                                             {site.url}

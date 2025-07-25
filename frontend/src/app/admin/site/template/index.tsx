@@ -4,10 +4,10 @@ import { Link, Store } from '@mui/icons-material'
 import { useState } from 'react'
 
 import { Tab, TabItem } from '@/components/bases/Tab'
+import { SiteList } from '@/features/site/components/SiteList'
 import { ISite } from '@/features/site/type'
 import { SiteType, SiteLabel } from '@/types'
 
-import { SiteList } from './SiteList'
 import styles from './styles.module.scss'
 
 interface Props {

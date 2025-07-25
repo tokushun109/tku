@@ -1,7 +1,7 @@
 import { ISite } from '@/features/site/type'
 import { SiteType } from '@/types'
 
-import { SiteList } from './SiteList'
+import { SiteList } from '.'
 
 import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 
