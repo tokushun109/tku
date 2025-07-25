@@ -19,36 +19,75 @@ Next.js 15.4.1 + TypeScript による最新のフロントエンドアプリケ�
 
 ## 開発コマンド
 
+### 基本開発コマンド
+
 ```bash
 # 依存関係インストール
 pnpm install
 
-# 開発サーバー
+# 開発サーバー起動
 pnpm dev
 
 # 開発サーバー（ポート3001で起動）
 pnpm dev:3001
 
-# ビルド
+# プロダクションビルド
 pnpm build
 
-# リント（警告ゼロで実行）
+# プロダクションサーバー起動
+pnpm start
+```
+
+### コード品質・フォーマット
+
+```bash
+# リント実行（警告ゼロで実行）
 pnpm lint
 
-# テスト（Unit）
+# リント自動修正
+pnpm lint-fix
+
+# TypeScript型チェック
+pnpm tsc
+
+# コードフォーマット（Prettier）
+pnpm fmt
+```
+
+### テスト
+
+```bash
+# ユニットテスト実行
 pnpm test
 
-# テスト（Integration）
+# 統合テスト実行
 pnpm test-integration
 
-# テスト（Storybook）
+# Storybookテスト実行
 pnpm test-storybook
 
-# Storybook起動
+# 全テスト実行
+pnpm test-all
+
+# カバレッジ付きテスト実行
+pnpm test-coverage
+```
+
+### Storybook
+
+```bash
+# Storybook開発サーバー起動（http://localhost:6006）
 pnpm sb
 
-# コードフォーマット
-pnpm fmt
+# Storybookビルド
+pnpm build-storybook
+```
+
+### その他
+
+```bash
+# Huskyセットアップ（Git Hooks）
+pnpm prepare
 ```
 
 ## プロジェクト構造
