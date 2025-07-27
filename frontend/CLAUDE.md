@@ -408,7 +408,7 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
 ```tsx
 // ✅ 推奨 - 新規コンポーネント作成時
 import { Button } from '.'
-import type { Meta, StoryObj } from '@storybook/nextjs'
+import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 
 const meta: Meta<typeof Button> = {
     component: Button,

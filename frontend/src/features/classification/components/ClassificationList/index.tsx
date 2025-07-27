@@ -5,6 +5,7 @@ import { Virtuoso } from 'react-virtuoso'
 
 import { Button } from '@/components/bases/Button'
 import { Dialog } from '@/components/bases/Dialog'
+import { ListItem } from '@/components/bases/ListItem'
 import { IClassification } from '@/features/classification/type'
 import { ClassificationLabel, ClassificationType } from '@/types'
 
@@ -48,25 +49,23 @@ export const ClassificationList = ({ initialItems, classificationType }: Props) 
                         computeItemKey={(_index, item) => item.uuid}
                         data={items}
                         itemContent={(_index, item) => (
-                            <div
-                                className={styles['list-item']}
+                            <ListItem
+                                actions={
+                                    <Delete
+                                        className={styles['icon-button']}
+                                        fontSize="medium"
+                                        onClick={(e: React.MouseEvent) => {
+                                            e.stopPropagation()
+                                            handleOpenDeleteDialog(item)
+                                        }}
+                                    />
+                                }
                                 onClick={() => {
                                     handleOpenDialog(item)
                                 }}
                             >
-                                <div className={styles['item-content']}>
-                                    <span className={styles['item-name']}>{item.name}</span>
-                                    <div className={styles['item-actions']}>
-                                        <Delete
-                                            className={styles['icon-button']}
-                                            onClick={(e) => {
-                                                e.stopPropagation()
-                                                handleOpenDeleteDialog(item)
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
+                                <span className={styles['item-name']}>{item.name}</span>
+                            </ListItem>
                         )}
                     />
                 )}
@@ -78,7 +77,7 @@ export const ClassificationList = ({ initialItems, classificationType }: Props) 
                     }}
                 >
                     <div className={styles['add-button-content']}>
-                        <Add className={styles['add-icon']} />
+                        <Add className={styles['add-icon']} fontSize="large" />
                         追加
                     </div>
                 </Button>

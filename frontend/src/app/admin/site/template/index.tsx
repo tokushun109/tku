@@ -38,9 +38,9 @@ export const SiteTemplate = ({ salesSiteList, snsList }: Props) => {
                 {(() => {
                     switch (activeTab) {
                         case SiteType.Sns:
-                            return <SiteList siteType={SiteType.Sns} sites={snsList} />
+                            return <SiteList key={SiteType.Sns} siteType={SiteType.Sns} sites={snsList} />
                         case SiteType.SalesSite:
-                            return <SiteList siteType={SiteType.SalesSite} sites={salesSiteList} />
+                            return <SiteList key={SiteType.SalesSite} siteType={SiteType.SalesSite} sites={salesSiteList} />
                         default:
                             return null
                     }
