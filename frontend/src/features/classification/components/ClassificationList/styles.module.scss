@@ -39,35 +39,9 @@
     font-size: 14px;
 }
 
-.list-item {
-    padding: 16px 12px;
-    border-bottom: 1px solid #f0f0f0;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-
-    &:hover {
-        background-color: #f9f9f9;
-    }
-
-    &:last-child {
-        border-bottom: none;
-    }
-}
-
-.item-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
 .item-name {
-    font-size: 14px;
+    font-size: $font-normal;
     color: #333;
-}
-
-.item-actions {
-    display: flex;
-    gap: 8px;
 }
 
 .icon-button {

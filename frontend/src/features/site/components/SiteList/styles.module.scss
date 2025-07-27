@@ -1,86 +1,29 @@
-.site-list-container {
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    margin-top: 16px;
-}
-
-.site-list-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #e0e0e0;
-}
-
-.site-list-title {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #333;
-    margin: 0;
-}
-
-.site-count {
-    color: #666;
-    font-size: 0.9rem;
-}
-
 .site-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-    gap: 16px;
-
-    @include media('md') {
-        grid-template-columns: 1fr;
-    }
-}
-
-.site-item {
-    background-color: white;
-    border: 1px solid #e0e0e0;
+    background: white;
     border-radius: 8px;
     padding: 16px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.2s ease;
-
-    &:hover {
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    }
-}
-
-.site-info {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    height: 100%;
 }
 
-.site-header {
-    margin-bottom: 12px;
+.list-content {
+    height: 100%;
+    overflow-y: auto;
+}
+
+.empty-message {
+    text-align: center;
+    color: #999;
+    padding: 32px 0;
+    font-size: 14px;
 }
 
 .site-name {
-    font-size: 1.2rem;
-    font-weight: bold;
+    font-size: $font-normal;
     color: #333;
+    font-weight: 600;
     margin: 0;
-}
-
-.site-details {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.site-url {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-
-    strong {
-        color: #555;
-        font-size: 0.9rem;
-    }
 }
 
 .site-link {
@@ -99,10 +42,32 @@
     font-size: 0.9rem;
 }
 
-.empty-state {
-    text-align: center;
-    padding: 40px;
-    color: #666;
-    font-size: 1.1rem;
-    grid-column: 1 / -1;
+.icon-button {
+    cursor: pointer;
+    color: $danger-color;
+    transition: color 0.2s ease;
+
+    &:hover {
+        color: color.adjust($danger-color, $lightness: -10%);
+    }
+}
+
+.add-button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 16px;
+    border-top: 1px solid #e0e0e0;
+    margin-top: auto;
+    flex-shrink: 0;
+}
+
+.add-button-content {
+    display: flex;
+    align-items: center;
+}
+
+.add-icon {
+    margin-right: 4px;
+    font-size: 16px;
 }

@@ -1,0 +1,32 @@
+.list-item {
+    padding: 16px 12px;
+    border-bottom: 1px solid $accent-light-color;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    font-size: $font-large;
+
+    &:hover {
+        background-color: #f9f9f9;
+    }
+}
+
+.item-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.item-main {
+    flex: 1;
+}
+
+.item-sub {
+    margin-top: 4px;
+    font-size: $font-medium;
+    color: #666;
+}
+
+.item-actions {
+    display: flex;
+    gap: 8px;
+}
