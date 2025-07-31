@@ -94,6 +94,8 @@
     .detail-value {
         font-size: 14px;
         color: #333;
+        word-break: break-all;
+        word-wrap: break-word;
     }
 
     .detail-content {
@@ -101,6 +103,8 @@
         color: #333;
         line-height: 1.6;
         white-space: pre-wrap;
+        word-break: break-all;
+        word-wrap: break-word;
         background-color: #f8f9fa;
         padding: 12px;
         border-radius: 4px;
