@@ -1,4 +1,5 @@
 import { IContact, IContactListItem } from '@/features/contact/type'
+import { createAPIHeaders } from '@/utils/cookie'
 import { ApiError } from '@/utils/error'
 
 export interface IPostContactParams {
@@ -12,16 +13,10 @@ export interface IContactResponse {
 /** お問い合わせ一覧を取得 */
 export const getContacts = async (): Promise<IContactListItem[]> => {
     try {
-        // Server Componentsでは手動でCookieヘッダーを設定する必要がある
-        const { cookies } = await import('next/headers')
-        const cookieStore = await cookies()
-        const cookieHeader = cookieStore.toString()
+        const headers = await createAPIHeaders()
 
         const res = await fetch(`${process.env.API_URL}/contact`, {
-            headers: {
-                'Content-Type': 'application/json',
-                ...(cookieHeader && { Cookie: cookieHeader }),
-            },
+            headers,
             method: 'GET',
         })
 
