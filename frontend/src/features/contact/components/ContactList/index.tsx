@@ -80,6 +80,7 @@ export const ContactList = ({ contacts }: Props) => {
                 isOpen={isDetailDialogOpen}
                 onClose={handleCloseDetailDialog}
                 title="お問い合わせ詳細"
+                wide
             >
                 {selectedContact && (
                     <div className={styles['contact-detail']}>

@@ -3,13 +3,16 @@
 }
 
 .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
     margin-bottom: 16px;
 }
 
 .page-title {
     font-size: 24px;
     font-weight: 600;
-    margin: 0 0 8px 0;
+    margin: 0;
     color: #333;
 }
 
