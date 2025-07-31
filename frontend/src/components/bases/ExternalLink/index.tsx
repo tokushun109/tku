@@ -5,8 +5,12 @@ type Props = {
 }
 
 export const ExternalLink = ({ children, className, href }: Props) => {
+    const handleClick = (e: React.MouseEvent) => {
+        e.stopPropagation()
+    }
+
     return (
-        <a className={className} href={href} rel="noopener noreferrer" target="_blank">
+        <a className={className} href={href} onClick={handleClick} rel="noopener noreferrer" target="_blank">
             {children}
         </a>
     )
