@@ -10,7 +10,8 @@
             "Bash(rmdir:*)",
             "Bash(git commit:*)",
             "Bash(pnpm lint:*)",
-            "Bash(pnpm tsc:*)"
+            "Bash(pnpm tsc:*)",
+            "mcp__sequential-thinking__sequentialthinking"
         ],
         "deny": []
     }

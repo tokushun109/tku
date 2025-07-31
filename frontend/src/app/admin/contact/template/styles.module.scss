@@ -1,0 +1,26 @@
+.contact-container {
+    padding: 16px;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 16px;
+}
+
+.page-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0;
+    color: #333;
+}
+
+.contact-count {
+    font-size: 14px;
+    color: #666;
+}
+
+.contact-content {
+    height: calc(100vh - 180px);
+}
