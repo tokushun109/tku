@@ -405,6 +405,8 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
 
 コンポーネントを**新規作成**または**プロパティを追加・修正**した場合は、必ずStorybookを作成・更新してください。
 
+**例外**: 各ルーティングディレクトリ内の`template/index.tsx`は除外します。
+
 ```tsx
 // ✅ 推奨 - 新規コンポーネント作成時
 import { Button } from '.'
