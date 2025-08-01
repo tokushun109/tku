@@ -82,6 +82,7 @@ export const AdminCsvTemplate = () => {
                 isOpen={isDialogVisible}
                 onClose={handleClose}
                 title="CSVのアップロード"
+                wide
             >
                 <div className={styles['upload-content']}>
                     {errorMessage && (

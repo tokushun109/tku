@@ -1,7 +1,6 @@
 import { FileUpload } from '@mui/icons-material'
 import React, { useRef } from 'react'
 
-import { Button } from '@/components/bases/Button'
 import { Chip, ChipSize } from '@/components/bases/Chip'
 import { ColorType, FontSizeType } from '@/types'
 
@@ -21,7 +20,7 @@ export const FileInput = React.forwardRef<HTMLInputElement, Props>(
         const fileInputRef = useRef<HTMLInputElement>(null)
         const inputId = props.id || props.name
 
-        const handleButtonClick = () => {
+        const handleContainerClick = () => {
             fileInputRef.current?.click()
         }
 
@@ -40,15 +39,7 @@ export const FileInput = React.forwardRef<HTMLInputElement, Props>(
                     </label>
                 )}
 
-                {required && (
-                    <div className={styles['chip-container']}>
-                        <Chip color={ColorType.Danger} fontColor="#b84150" fontSize={FontSizeType.SmMd} size={ChipSize.Small}>
-                            必須
-                        </Chip>
-                    </div>
-                )}
-
-                <div className={`${styles['file-input-container']} ${error ? styles.error : ''} ${className || ''}`}>
+                <div className={`${styles['file-input-container']} ${error ? styles.error : ''} ${className || ''}`} onClick={handleContainerClick}>
                     <input
                         accept={accept}
                         className={styles['hidden-input']}
@@ -59,14 +50,19 @@ export const FileInput = React.forwardRef<HTMLInputElement, Props>(
                         {...props}
                     />
 
+                    {required && (
+                        <div className={styles['chip-container']}>
+                            <Chip color={ColorType.Danger} fontColor="#b84150" fontSize={FontSizeType.SmMd} size={ChipSize.Small}>
+                                必須
+                            </Chip>
+                        </div>
+                    )}
+
                     <div className={styles['file-display']}>
                         <div className={styles['file-info']}>
                             <FileUpload className={styles['file-icon']} />
                             <span className={`${styles['file-name']} ${!value ? styles['placeholder'] : ''}`}>{fileName}</span>
                         </div>
-                        <Button className={styles['select-button']} onClick={handleButtonClick} type="button">
-                            ファイル選択
-                        </Button>
                     </div>
                 </div>
 

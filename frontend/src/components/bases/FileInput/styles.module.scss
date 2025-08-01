@@ -19,19 +19,22 @@
 
 .chip-container {
     position: absolute;
-    top: 0;
-    right: 0;
+    top: 12px;
+    right: 16px;
     z-index: 1;
 }
 
 .file-input-container {
+    position: relative;
     border: 2px solid $light-dark-color;
     border-radius: 8px;
     background-color: $primary-bg-color;
     transition: $transition;
+    cursor: pointer;
 
     &:hover {
         border-color: $primary;
+        background-color: rgba($primary, 0.02);
     }
 
     &:focus-within {
@@ -59,7 +62,6 @@
 .file-display {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     padding: 12px 16px;
     gap: 12px;
 }
@@ -90,11 +92,6 @@
     }
 }
 
-.select-button {
-    flex-shrink: 0;
-    min-width: 80px;
-}
-
 .field-error {
     display: block;
     margin-top: 4px;
@@ -107,21 +104,4 @@
     margin-top: 4px;
     font-size: $font-sm-md;
     color: $text-color;
-}
-
-@include media('sm') {
-    .file-display {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
-    }
-
-    .file-info {
-        order: 2;
-    }
-
-    .select-button {
-        order: 1;
-        width: 100%;
-    }
 }
