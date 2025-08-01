@@ -561,6 +561,10 @@ export const getProducts = async (): Promise<Product[]> => {
 - **静的エクスポート**: 必要に応じて設定
 - **CI/CD**: GitHub Actions連携
 
+### Push時の注意事項
+
+- **依存関係チェック**: push時にpre-pushフックで依存関係の更新が必要と表示された場合は、`pnpm update --latest`を実行してから再度pushする
+
 ## 移行方針
 
 ### client/からの移行
