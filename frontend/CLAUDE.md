@@ -14,7 +14,7 @@ Next.js 15.4.1 + TypeScript による最新のフロントエンドアプリケ�
 - **UI ライブラリ**: Material-UI 7.2.0、Emotion
 - **アニメーション**: Framer Motion 12.23.6、React Transition Group
 - **フォーム**: React Hook Form 7.60.0 + Zod 4.0.5
-- **テスト**: Vitest 3.2.4、Testing Library、Playwright、MSW 2.10.4
+- **テスト**: Vitest 3.2.4、Testing Library、MSW 2.10.4
 - **開発ツール**: Storybook 9.0.17、ESLint 9.31.0、Prettier 3.6.2
 
 ## 開発コマンド
@@ -405,6 +405,8 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
 
 コンポーネントを**新規作成**または**プロパティを追加・修正**した場合は、必ずStorybookを作成・更新してください。
 
+**例外**: 各ルーティングディレクトリ内の`template/index.tsx`は除外します。
+
 ```tsx
 // ✅ 推奨 - 新規コンポーネント作成時
 import { Button } from '.'
@@ -558,6 +560,10 @@ export const getProducts = async (): Promise<Product[]> => {
 - **ビルド**: `pnpm build`
 - **静的エクスポート**: 必要に応じて設定
 - **CI/CD**: GitHub Actions連携
+
+### Push時の注意事項
+
+- **依存関係チェック**: push時にpre-pushフックで依存関係の更新が必要と表示された場合は、`pnpm update --latest`を実行してから再度pushする
 
 ## 移行方針
 
