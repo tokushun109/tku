@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 
+import { downloadProductCsv, uploadProductCsv } from '@/apis/csv'
 import { Button } from '@/components/bases/Button'
 import { Dialog } from '@/components/bases/Dialog'
 import { FileInput } from '@/components/bases/FileInput'
@@ -17,23 +18,9 @@ export const AdminCsvTemplate = () => {
 
     const handleDownload = async () => {
         try {
-            const response = await fetch('/api/csv/product', {
-                credentials: 'include',
-            })
-
-            if (!response.ok) {
-                throw new Error('CSVダウンロードに失敗しました')
-            }
-
-            const csvText = await response.text()
-            const blob = new Blob([csvText], { type: 'text/csv' })
-            const link = document.createElement('a')
-            link.href = URL.createObjectURL(blob)
-            link.download = '商品レコード.csv'
-            link.click()
+            await downloadProductCsv()
         } catch (error) {
-            console.error('CSV download error:', error)
-            setErrorMessage('CSVダウンロードに失敗しました')
+            setErrorMessage(error instanceof Error ? error.message : 'CSVダウンロードに失敗しました')
         }
     }
 
@@ -49,26 +36,14 @@ export const AdminCsvTemplate = () => {
         }
 
         try {
-            const formData = new FormData()
-            formData.append('csv', uploadFile)
-
-            const response = await fetch('/api/csv/product', {
-                method: 'POST',
-                body: formData,
-                credentials: 'include',
-            })
-
-            if (!response.ok) {
-                throw new Error('CSVアップロードに失敗しました')
-            }
+            await uploadProductCsv(uploadFile)
 
             setSuccessMessage('アップロードを完了しました')
             setIsDialogVisible(false)
             setUploadFile(null)
             setErrorMessage('')
         } catch (error) {
-            console.error('CSV upload error:', error)
-            setErrorMessage('CSVアップロードに失敗しました')
+            setErrorMessage(error instanceof Error ? error.message : 'CSVアップロードに失敗しました')
         }
     }
 
