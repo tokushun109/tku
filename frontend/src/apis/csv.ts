@@ -1,5 +1,3 @@
-import { createAPIHeaders } from '@/utils/cookie'
-
 /**
  * CSV関連のAPI呼び出し
  */
@@ -9,10 +7,7 @@ import { createAPIHeaders } from '@/utils/cookie'
  */
 export const downloadProductCsv = async (): Promise<void> => {
     try {
-        const headers = await createAPIHeaders()
-
         const response = await fetch(`${process.env.API_URL}/csv/product`, {
-            headers,
             method: 'GET',
         })
 
@@ -38,14 +33,11 @@ export const downloadProductCsv = async (): Promise<void> => {
  */
 export const uploadProductCsv = async (file: File): Promise<void> => {
     try {
-        const headers = await createAPIHeaders()
-
         const formData = new FormData()
         formData.append('csv', file)
 
         const response = await fetch(`${process.env.API_URL}/csv/product`, {
             method: 'POST',
-            headers,
             body: formData,
         })
 
