@@ -14,7 +14,7 @@ Next.js 15.4.1 + TypeScript による最新のフロントエンドアプリケ�
 - **UI ライブラリ**: Material-UI 7.2.0、Emotion
 - **アニメーション**: Framer Motion 12.23.6、React Transition Group
 - **フォーム**: React Hook Form 7.60.0 + Zod 4.0.5
-- **テスト**: Vitest 3.2.4、Testing Library、Playwright、MSW 2.10.4
+- **テスト**: Vitest 3.2.4、Testing Library、MSW 2.10.4
 - **開発ツール**: Storybook 9.0.17、ESLint 9.31.0、Prettier 3.6.2
 
 ## 開発コマンド

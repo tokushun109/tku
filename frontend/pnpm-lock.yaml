@@ -183,9 +183,6 @@ importers:
       msw:
         specifier: ^2.10.4
         version: 2.10.4(@types/node@24.1.0)(typescript@5.8.3)
-      playwright:
-        specifier: ^1.54.1
-        version: 1.54.1
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
@@ -7191,13 +7188,15 @@ snapshots:
 
   pidtree@0.6.0: {}
 
-  playwright-core@1.54.1: {}
+  playwright-core@1.54.1:
+    optional: true
 
   playwright@1.54.1:
     dependencies:
       playwright-core: 1.54.1
     optionalDependencies:
       fsevents: 2.3.2
+    optional: true
 
   possible-typed-array-names@1.1.0: {}
 
