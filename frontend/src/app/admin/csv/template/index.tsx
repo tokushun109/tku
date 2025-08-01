@@ -3,7 +3,6 @@
 import { useState } from 'react'
 
 import { Button } from '@/components/bases/Button'
-import { Card } from '@/components/bases/Card'
 import { Dialog } from '@/components/bases/Dialog'
 import { FileInput } from '@/components/bases/FileInput'
 import { Message, MessageType } from '@/components/bases/Message'
@@ -84,18 +83,17 @@ export const AdminCsvTemplate = () => {
             <div className={styles['page-header']}>
                 <h1 className={styles['page-title']}>商品レコード</h1>
             </div>
-            <Card>
-                <div className={styles['csv-content']}>
-                    <div className={styles['csv-buttons']}>
-                        <Button className={styles['button']} onClick={handleDownload}>
-                            ダウンロード
-                        </Button>
-                        <Button className={styles['button']} onClick={handleUploadDialog}>
-                            アップロード
-                        </Button>
-                    </div>
+            <div className={styles['divider']} />
+            <div className={styles['csv-content']}>
+                <div className={styles['csv-buttons']}>
+                    <Button className={styles['button']} onClick={handleDownload}>
+                        ダウンロード
+                    </Button>
+                    <Button className={styles['button']} onClick={handleUploadDialog}>
+                        アップロード
+                    </Button>
                 </div>
-            </Card>
+            </div>
 
             <Dialog
                 cancelOption={{

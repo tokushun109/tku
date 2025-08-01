@@ -16,8 +16,13 @@
     color: #333;
 }
 
+.divider {
+    height: 1px;
+    background-color: $light-dark-color;
+    margin: 16px 0;
+}
+
 .csv-content {
-    padding: 16px;
     width: 100%;
 }
 
@@ -50,11 +55,7 @@
 
 @include media('sm') {
     .csv-container {
-        padding: 8px;
-    }
-
-    .csv-content {
-        padding: 12px;
+        padding: 16px;
     }
 
     .csv-buttons {
