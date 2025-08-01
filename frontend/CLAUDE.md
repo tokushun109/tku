@@ -176,6 +176,8 @@ Dart Sass 3.0.0 で `@import` が削除される予定のため、`@use` を使�
 
 `next.config.ts`の`prependData`で全体に読み込まれているモジュールは、各ファイルで重複して読み込まないでください。
 
+**重要**: SCSS変数を確認する際は、`frontend/next.config.ts`の`prependData`に記載されているモジュールから利用可能な変数を確認してください。
+
 ```typescript
 // next.config.ts での設定
 sassOptions: {
