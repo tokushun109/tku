@@ -9,6 +9,7 @@ export const downloadProductCsv = async (): Promise<void> => {
     try {
         const response = await fetch(`${process.env.API_URL}/csv/product`, {
             method: 'GET',
+            credentials: 'include',
         })
 
         if (!response.ok) {
@@ -38,6 +39,7 @@ export const uploadProductCsv = async (file: File): Promise<void> => {
 
         const response = await fetch(`${process.env.API_URL}/csv/product`, {
             method: 'POST',
+            credentials: 'include',
             body: formData,
         })
 
