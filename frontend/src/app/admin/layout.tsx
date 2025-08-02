@@ -1,6 +1,5 @@
 'use client'
 
-import Head from 'next/head'
 import { usePathname } from 'next/navigation'
 
 import AdminHeader from '@/components/layouts/AdminHeader'
@@ -13,15 +12,10 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
     const isLoggedIn = pathname !== NavigationType.AdminLogin
 
     return (
-        <>
-            <Head>
-                <meta content="noindex, nofollow" name="robots" />
-            </Head>
-            <div className={styles['container']}>
-                <AdminHeader isLoggedIn={isLoggedIn} />
-                <main>{children}</main>
-            </div>
-        </>
+        <div className={styles['container']}>
+            <AdminHeader isLoggedIn={isLoggedIn} />
+            <main>{children}</main>
+        </div>
     )
 }
 
