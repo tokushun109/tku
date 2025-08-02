@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { getCategories } from '@/apis/category'
 import { getTags } from '@/apis/tag'
 import { getTargets } from '@/apis/target'
-import ClassificationPage from '@/app/admin/classification/page'
+import ClassificationPage, { metadata } from '@/app/admin/classification/page'
 
 import { render, screen, waitFor } from '../helpers'
 
@@ -164,6 +164,15 @@ describe('Admin Classification Page Integration Test', () => {
         // テンプレートが正常に表示されることを確認
         await waitFor(() => {
             expect(screen.getByText('カテゴリー')).toBeInTheDocument()
+        })
+    })
+
+    it('ページメタデータでnoindex, nofollowが設定されている', () => {
+        // メタデータの確認
+        expect(metadata.title).toBe('分類管理 | admin')
+        expect(metadata.robots).toEqual({
+            index: false,
+            follow: false,
         })
     })
 })

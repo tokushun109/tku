@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getContacts } from '@/apis/contact'
-import AdminContactPage from '@/app/admin/contact/page'
+import AdminContactPage, { metadata } from '@/app/admin/contact/page'
 import { IContactListItem } from '@/features/contact/type'
 
 import { render, screen, waitFor } from '../helpers'
@@ -140,6 +140,15 @@ describe('Admin Contact Page Integration Test', () => {
         await waitFor(() => {
             expect(screen.getByText('お問い合わせ一覧')).toBeInTheDocument()
             expect(screen.getByText('1件のお問い合わせ')).toBeInTheDocument()
+        })
+    })
+
+    it('ページメタデータでnoindex, nofollowが設定されている', () => {
+        // メタデータの確認
+        expect(metadata.title).toBe('お問い合わせ管理 | admin')
+        expect(metadata.robots).toEqual({
+            index: false,
+            follow: false,
         })
     })
 })
