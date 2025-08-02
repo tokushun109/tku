@@ -2,14 +2,14 @@ import { IProduct, IProductsByCategory, IThumbnail } from '@/features/product/ty
 import { ApiError } from '@/utils/error'
 import { convertObjectToURLSearchParams } from '@/utils/request'
 
-export interface IGetProductsByCategoryParams {
+export interface IGetProductsParams {
     category: 'all' | string
     mode: 'all' | 'active'
     target: 'all' | string
 }
 
 /** カテゴリーごとの商品リストを取得 */
-export const getProductsByCategory = async (params: IGetProductsByCategoryParams): Promise<IProductsByCategory[]> => {
+export const getProductsByCategory = async (params: IGetProductsParams): Promise<IProductsByCategory[]> => {
     try {
         const query = convertObjectToURLSearchParams(params)
         const res = await fetch(`${process.env.API_URL}/category/product?${query}`, {
@@ -74,16 +74,6 @@ export const getCarouselImages = async (): Promise<IThumbnail[]> => {
 export interface IProductImageParams {
     isChanged: boolean
     order: { [key: number]: number }
-}
-
-export interface IGetProductsParams {
-    category: 'all' | string
-    mode: 'all' | 'active'
-    target: 'all' | string
-}
-
-export interface ICreemaDuplicateParams {
-    url: string
 }
 
 /** 商品リストを取得（管理画面用） */
@@ -197,6 +187,10 @@ export const uploadProductImages = async (productUuid: string, files: File[], or
         }
         throw new Error('商品画像のアップロードに失敗しました')
     }
+}
+
+export interface ICreemaDuplicateParams {
+    url: string
 }
 
 /** Creemaから商品を複製 */
