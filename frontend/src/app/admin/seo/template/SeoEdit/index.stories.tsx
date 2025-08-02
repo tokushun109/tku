@@ -13,7 +13,7 @@ const meta: Meta<typeof SeoEdit> = {
             logo: 'sample-logo.jpg',
             name: 'tocoriri',
         } as ICreator,
-        onUpdate: () => {},
+        onUpdate: async () => {},
     },
     parameters: {
         layout: 'padded',

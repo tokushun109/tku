@@ -1,24 +1,29 @@
 .seo-page {
-    padding: 2rem;
+    padding: 16px;
+}
 
-    @include media('sm') {
-        padding: 1rem;
-    }
+.page-header {
+    align-items: flex-end;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 16px;
 }
 
 .page-title {
-    color: $title-primary-color;
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 2rem;
+    color: #333;
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0;
+}
 
-    @include media('sm') {
-        font-size: 1.5rem;
-        margin-bottom: 1.5rem;
-    }
+.divider {
+    background-color: $light-dark-color;
+    height: 1px;
+    margin: 16px 0;
 }
 
 .content {
+    margin: 0 auto;
     max-width: 800px;
 }
 

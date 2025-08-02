@@ -21,13 +21,14 @@ export const getCreator = async (): Promise<ICreator> => {
     }
 }
 
-export const updateCreator = async (creator: Omit<ICreator, 'apiPath' | 'logo'>): Promise<ICreator> => {
+export const updateCreator = async (creator: Omit<ICreator, 'apiPath' | 'logo'>) => {
     try {
         const res = await fetch(`${process.env.API_URL}/creator/`, {
             body: JSON.stringify(creator),
             headers: {
                 'Content-Type': 'application/json',
             },
+            credentials: 'include',
             method: 'PUT',
         })
 
@@ -42,14 +43,15 @@ export const updateCreator = async (creator: Omit<ICreator, 'apiPath' | 'logo'>)
     }
 }
 
-export const updateCreatorLogo = async (file: File): Promise<ICreator> => {
+export const updateCreatorLogo = async (file: File) => {
     try {
         const formData = new FormData()
-        formData.append('file', file)
+        formData.append('logo', file)
 
         const res = await fetch(`${process.env.API_URL}/creator/logo/`, {
             body: formData,
             method: 'PUT',
+            credentials: 'include',
         })
 
         if (!res.ok) throw new ApiError(res)

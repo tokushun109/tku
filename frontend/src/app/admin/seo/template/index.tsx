@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 
+import { getCreator } from '@/apis/creator'
 import { ICreator } from '@/features/creator/type'
 
 import { SeoEdit } from './SeoEdit'
@@ -14,13 +15,17 @@ interface Props {
 export const AdminSeoTemplate = ({ creator: initialCreator }: Props) => {
     const [creator, setCreator] = useState<ICreator | null>(initialCreator)
 
-    const handleCreatorUpdate = (updatedCreator: ICreator) => {
-        setCreator(updatedCreator)
+    const handleCreatorUpdate = async () => {
+        const creator = await getCreator()
+        setCreator(creator)
     }
 
     return (
         <div className={styles['seo-page']}>
-            <h1 className={styles['page-title']}>SEO設定</h1>
+            <div className={styles['page-header']}>
+                <h1 className={styles['page-title']}>SEO設定</h1>
+            </div>
+            <div className={styles['divider']} />
             <div className={styles['content']}>
                 {creator ? (
                     <SeoEdit creator={creator} onUpdate={handleCreatorUpdate} />
