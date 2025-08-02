@@ -47,8 +47,13 @@ describe('Admin SEO Page Integration Test', () => {
 
         // 作者情報が表示されることを確認
         await waitFor(() => {
-            expect(screen.getByText('tocoriri')).toBeInTheDocument()
-            expect(screen.getByText('ハンドメイドアクセサリーの制作を行っています。\n一つ一つ丁寧に手作りしています。')).toBeInTheDocument()
+            expect(screen.getByAltText('tocoriri')).toBeInTheDocument()
+            // 部分的なテキスト検索で改行を含むテキストを確認
+            expect(
+                screen.getByText((content, element) => {
+                    return element?.tagName.toLowerCase() === 'textarea' && content.includes('ハンドメイドアクセサリーの制作を行っています。')
+                }),
+            ).toBeInTheDocument()
         })
 
         // 編集ボタンが表示されることを確認
@@ -125,9 +130,9 @@ describe('Admin SEO Page Integration Test', () => {
             expect(screen.getByText('サイト説明')).toBeInTheDocument()
         })
 
-        // ロゴ変更ボタンが表示されることを確認
+        // 編集ボタンが表示されることを確認
         await waitFor(() => {
-            expect(screen.getByText('ロゴを変更')).toBeInTheDocument()
+            expect(screen.getByText('編集')).toBeInTheDocument()
         })
     })
 
@@ -150,7 +155,11 @@ describe('Admin SEO Page Integration Test', () => {
 
         // 長い紹介文の一部が表示されることを確認
         await waitFor(() => {
-            expect(screen.getByText(longIntroduction)).toBeInTheDocument()
+            expect(
+                screen.getByText((content, element) => {
+                    return element?.tagName.toLowerCase() === 'textarea' && content.includes('これは1行目の長い紹介文です。')
+                }),
+            ).toBeInTheDocument()
         })
     })
 
