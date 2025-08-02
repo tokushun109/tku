@@ -521,6 +521,24 @@ export const metadata: Metadata = {
 }
 ```
 
+#### Admin配下のページ規約
+
+**重要**: `app/admin/` 配下の全てのページには必ず `noindex, nofollow` を設定してください。
+
+```tsx
+// ✅ 必須 - admin配下の全ページ
+export const metadata: Metadata = {
+    title: 'ページタイトル | admin',
+    robots: {
+        index: false,
+        follow: false,
+    },
+}
+```
+
+- layout.tsx でのnoindex設定に加えて、個別ページでも必ずrobotsメタタグを設定する
+- 検索エンジンに管理画面がインデックスされることを防ぐため、例外なく適用する
+
 ### エラーハンドリング
 
 #### API呼び出し

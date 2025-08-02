@@ -1,8 +1,18 @@
+import { Metadata } from 'next'
+
 import { getCategories } from '@/apis/category'
 import { getTags } from '@/apis/tag'
 import { getTargets } from '@/apis/target'
 
 import { ClassificationTemplate } from './template'
+
+export const metadata: Metadata = {
+    title: '分類管理 | admin',
+    robots: {
+        index: false,
+        follow: false,
+    },
+}
 
 const ClassificationPage = async () => {
     try {
