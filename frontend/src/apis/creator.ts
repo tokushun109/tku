@@ -20,3 +20,45 @@ export const getCreator = async (): Promise<ICreator> => {
         throw new Error('作者情報の取得に失敗しました')
     }
 }
+
+export const updateCreator = async (creator: Omit<ICreator, 'apiPath' | 'logo'>): Promise<ICreator> => {
+    try {
+        const res = await fetch(`${process.env.API_URL}/creator/`, {
+            body: JSON.stringify(creator),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            method: 'PUT',
+        })
+
+        if (!res.ok) throw new ApiError(res)
+
+        return await res.json()
+    } catch (error) {
+        if (error instanceof ApiError) {
+            throw error
+        }
+        throw new Error('作者情報の更新に失敗しました')
+    }
+}
+
+export const updateCreatorLogo = async (file: File): Promise<ICreator> => {
+    try {
+        const formData = new FormData()
+        formData.append('file', file)
+
+        const res = await fetch(`${process.env.API_URL}/creator/logo/`, {
+            body: formData,
+            method: 'PUT',
+        })
+
+        if (!res.ok) throw new ApiError(res)
+
+        return await res.json()
+    } catch (error) {
+        if (error instanceof ApiError) {
+            throw error
+        }
+        throw new Error('作者ロゴの更新に失敗しました')
+    }
+}
