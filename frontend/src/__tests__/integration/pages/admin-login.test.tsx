@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import AdminLoginPage from '@/app/admin/login/page'
+import AdminLoginPage, { metadata } from '@/app/admin/login/page'
 
 import { render, screen } from '../helpers'
 
@@ -36,5 +36,14 @@ describe('Admin Login Page Integration Test', () => {
         // ページの基本要素が存在することを確認（メタデータが正しく設定された結果のページ表示）
         expect(screen.getByRole('heading', { level: 1, name: 'ログイン' })).toBeInTheDocument()
         expect(screen.getByRole('button', { name: '確定' })).toBeInTheDocument()
+    })
+
+    it('ページメタデータでnoindex, nofollowが設定されている', () => {
+        // メタデータの確認
+        expect(metadata.title).toBe('ログイン | admin')
+        expect(metadata.robots).toEqual({
+            index: false,
+            follow: false,
+        })
     })
 })

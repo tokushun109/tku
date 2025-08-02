@@ -176,6 +176,8 @@ Dart Sass 3.0.0 で `@import` が削除される予定のため、`@use` を使�
 
 `next.config.ts`の`prependData`で全体に読み込まれているモジュールは、各ファイルで重複して読み込まないでください。
 
+**重要**: SCSS変数を確認する際は、`frontend/next.config.ts`の`prependData`に記載されているモジュールから利用可能な変数を確認してください。
+
 ```typescript
 // next.config.ts での設定
 sassOptions: {
@@ -518,6 +520,24 @@ export const metadata: Metadata = {
     robots: 'noindex, nofollow',
 }
 ```
+
+#### Admin配下のページ規約
+
+**重要**: `app/admin/` 配下の全てのページには必ず `noindex, nofollow` を設定してください。
+
+```tsx
+// ✅ 必須 - admin配下の全ページ
+export const metadata: Metadata = {
+    title: 'ページタイトル | admin',
+    robots: {
+        index: false,
+        follow: false,
+    },
+}
+```
+
+- layout.tsx でのnoindex設定に加えて、個別ページでも必ずrobotsメタタグを設定する
+- 検索エンジンに管理画面がインデックスされることを防ぐため、例外なく適用する
 
 ### エラーハンドリング
 

@@ -1,0 +1,72 @@
+.csv-container {
+    padding: 16px;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 16px;
+}
+
+.page-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0;
+    color: #333;
+}
+
+.divider {
+    height: 1px;
+    background-color: $light-dark-color;
+    margin: 16px 0;
+}
+
+.csv-content {
+    width: 100%;
+}
+
+.csv-buttons {
+    display: flex;
+    margin: 0 auto;
+    width: fit-content;
+    gap: 20px;
+
+    .button {
+        margin: 20px 0;
+        min-width: 120px;
+    }
+}
+
+.upload-content {
+    padding: 16px 0;
+}
+
+.error-message {
+    margin-bottom: 16px;
+}
+
+.success-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+@include media('sm') {
+    .csv-container {
+        padding: 16px;
+    }
+
+    .csv-buttons {
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+
+        .button {
+            width: 100%;
+            max-width: 200px;
+            margin: 10px 0;
+        }
+    }
+}

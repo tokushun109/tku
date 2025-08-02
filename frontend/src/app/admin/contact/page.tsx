@@ -1,6 +1,16 @@
+import { Metadata } from 'next'
+
 import { getContacts } from '@/apis/contact'
 
 import { AdminContactTemplate } from './template'
+
+export const metadata: Metadata = {
+    title: 'お問い合わせ管理 | admin',
+    robots: {
+        index: false,
+        follow: false,
+    },
+}
 
 const AdminContactPage = async () => {
     try {

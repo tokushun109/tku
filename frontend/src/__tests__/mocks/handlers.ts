@@ -231,4 +231,38 @@ export const handlers = [
     http.get('http://localhost:8080/error/network', () => {
         return HttpResponse.error()
     }),
+
+    // CSV関連のAPI
+    http.get('http://localhost:8080/csv/product', () => {
+        const csvContent = `name,price,description,isActive,isRecommend
+女性向けイヤリング1,1500,女性向けイヤリング1の詳細,true,true
+女性向けイヤリング2,2000,女性向けイヤリング2の詳細,false,false
+男性向けリング1,3000,男性向けリング1の詳細,true,false
+ユニセックスネックレス1,2500,ユニセックスネックレス1の詳細,true,true`
+
+        return new HttpResponse(csvContent, {
+            headers: {
+                'Content-Type': 'text/csv',
+                'Content-Disposition': 'attachment; filename="商品レコード.csv"',
+            },
+        })
+    }),
+
+    http.post('http://localhost:8080/csv/product', async ({ request }) => {
+        const formData = await request.formData()
+        const csvFile = formData.get('csv') as File
+
+        // バリデーション（ファイルが存在するかチェック）
+        if (!csvFile) {
+            return new HttpResponse(null, { status: 400 })
+        }
+
+        // ファイルの内容を読み取り（簡単なバリデーション）
+        const csvContent = await csvFile.text()
+        if (!csvContent.includes('name') || !csvContent.includes('price')) {
+            return new HttpResponse(null, { status: 400 })
+        }
+
+        return HttpResponse.json({ message: 'CSVアップロードが完了しました' })
+    }),
 ]

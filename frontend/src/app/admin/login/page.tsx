@@ -4,7 +4,10 @@ import { AdminLoginTemplate } from './template'
 
 export const metadata: Metadata = {
     title: 'ログイン | admin',
-    robots: 'noindex, nofollow',
+    robots: {
+        index: false,
+        follow: false,
+    },
 }
 
 const AdminLoginPage = () => {
