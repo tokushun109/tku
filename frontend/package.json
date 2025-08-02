@@ -45,7 +45,7 @@
         "react-hook-form": "^7.62.0",
         "react-transition-group": "^4.4.5",
         "react-virtuoso": "^4.13.0",
-        "sonner": "^2.0.6",
+        "sonner": "^2.0.7",
         "zod": "^4.0.14"
     },
     "devDependencies": {
