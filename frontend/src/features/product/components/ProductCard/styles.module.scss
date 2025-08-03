@@ -94,7 +94,7 @@
                         justify-content: center;
 
                         &:hover {
-                            background-color: darken($primary, 10%);
+                            background-color: color.adjust($primary, $lightness: -10%);
                         }
                     }
 
@@ -112,7 +112,7 @@
                         justify-content: center;
 
                         &:hover {
-                            background-color: darken($danger-color, 10%);
+                            background-color: color.adjust($danger-color, $lightness: -10%);
                         }
                     }
                 }
