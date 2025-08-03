@@ -7,14 +7,6 @@
     color: $text-color;
 }
 
-.form-row {
-    margin-bottom: 1.5rem;
-
-    &:last-child {
-        margin-bottom: 0;
-    }
-}
-
 .form-field {
     display: flex;
     flex-direction: column;
@@ -25,31 +17,6 @@
     font-weight: 600;
     margin-bottom: 0.5rem;
     color: $title-primary-color;
-}
-
-.textarea {
-    padding: 0.75rem;
-    border: 1px solid $light-dark-color;
-    border-radius: 0.375rem;
-    font-size: $font-medium;
-    resize: vertical;
-    min-height: 100px;
-
-    &:focus {
-        outline: none;
-        border-color: $primary;
-        box-shadow: 0 0 0 2px color.adjust($primary, $alpha: -0.8);
-    }
-
-    &::placeholder {
-        color: $text-color;
-    }
-}
-
-.field-error {
-    margin-top: 0.25rem;
-    font-size: $font-sm-md;
-    color: $danger-color;
 }
 
 .price-row {
@@ -134,46 +101,6 @@
 }
 
 .checkbox-text {
-    font-weight: 500;
-    color: $title-primary-color;
-    user-select: none;
-}
-
-.tag-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    margin-top: 0.5rem;
-
-    @include media('sm') {
-        gap: 0.5rem;
-    }
-}
-
-.tag-label {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    cursor: pointer;
-    font-size: $font-medium;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid $light-dark-color;
-    border-radius: 0.375rem;
-    background-color: $primary-bg-color;
-    transition: $transition;
-
-    &:hover {
-        background-color: $secondary-bg-color;
-    }
-}
-
-.tag-checkbox {
-    width: 0.875rem;
-    height: 0.875rem;
-    cursor: pointer;
-}
-
-.tag-text {
     font-weight: 500;
     color: $title-primary-color;
     user-select: none;

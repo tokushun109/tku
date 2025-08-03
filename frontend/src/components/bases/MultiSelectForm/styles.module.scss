@@ -1,5 +1,5 @@
 .require-form,
-.select-form {
+.multi-select-form {
     position: relative;
 }
 
@@ -68,12 +68,6 @@
         display: inline-flex;
         align-items: center;
     }
-}
-
-.selected-item {
-    display: flex;
-    align-items: center;
-    width: 100%;
 }
 
 .chip-close-button {
@@ -165,6 +159,9 @@
 }
 
 .option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     padding: 0.75rem;
     font-size: 1rem;
     color: $title-primary-color;
@@ -182,6 +179,35 @@
 
         &:hover {
             background-color: color.adjust($accent-light-color, $lightness: -5%);
+        }
+    }
+}
+
+.option-checkbox {
+    width: 1rem;
+    height: 1rem;
+    cursor: pointer;
+    pointer-events: none;
+    appearance: none;
+    border: 2px solid $light-dark-color;
+    border-radius: 2px;
+    background-color: transparent;
+    position: relative;
+    transition: all 0.3s ease;
+
+    &:checked {
+        background-color: $primary;
+        border-color: $primary;
+
+        &::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: bold;
         }
     }
 }

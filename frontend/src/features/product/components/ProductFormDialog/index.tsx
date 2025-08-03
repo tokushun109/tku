@@ -12,7 +12,9 @@ import { Dialog } from '@/components/bases/Dialog'
 import { Form } from '@/components/bases/Form'
 import { Input } from '@/components/bases/Input'
 import { Message, MessageType } from '@/components/bases/Message'
+import { MultiSelectForm, MultiSelectFormOption } from '@/components/bases/MultiSelectForm'
 import { SelectForm, SelectFormOption } from '@/components/bases/SelectForm'
+import { TextArea } from '@/components/bases/TextArea'
 import { IClassification } from '@/features/classification/type'
 import { ISite } from '@/features/site/type'
 
@@ -74,6 +76,11 @@ export const ProductFormDialog = ({ isOpen, isSubmitting, onClose, onSubmit, sub
     const targetOptions: SelectFormOption[] = targets.map((target) => ({
         label: target.name,
         value: target.uuid,
+    }))
+
+    const tagOptions: MultiSelectFormOption[] = tags.map((tag) => ({
+        label: tag.name,
+        value: tag.uuid,
     }))
 
     // データの取得
@@ -146,11 +153,6 @@ export const ProductFormDialog = ({ isOpen, isSubmitting, onClose, onSubmit, sub
         onClose()
     }
 
-    const handleTagChange = (tagUuid: string) => {
-        const newSelectedTags = selectedTags.includes(tagUuid) ? selectedTags.filter((id) => id !== tagUuid) : [...selectedTags, tagUuid]
-        setSelectedTags(newSelectedTags)
-    }
-
     const handleAddSiteDetail = () => {
         if (selectedSalesSite && siteDetailUrl) {
             const salesSite = salesSites.find((site) => site.uuid === selectedSalesSite)
@@ -218,19 +220,14 @@ export const ProductFormDialog = ({ isOpen, isSubmitting, onClose, onSubmit, sub
                     </div>
 
                     <div className={styles['form-row']}>
-                        <div className={styles['form-field']}>
-                            <label className={styles['label']} htmlFor="description">
-                                商品説明
-                            </label>
-                            <textarea
-                                {...register('description')}
-                                className={styles['textarea']}
-                                id="description"
-                                placeholder="商品説明を入力してください（任意）"
-                                rows={4}
-                            />
-                            {errors.description && <span className={styles['field-error']}>{errors.description.message}</span>}
-                        </div>
+                        <TextArea
+                            {...register('description')}
+                            error={errors.description?.message}
+                            id="description"
+                            label="商品説明"
+                            placeholder="商品説明を入力してください（任意）"
+                            rows={4}
+                        />
                     </div>
 
                     <div className={styles['form-row']}>
@@ -279,22 +276,14 @@ export const ProductFormDialog = ({ isOpen, isSubmitting, onClose, onSubmit, sub
                     </div>
 
                     <div className={styles['form-row']}>
-                        <div className={styles['form-field']}>
-                            <label className={styles['label']}>タグ</label>
-                            <div className={styles['tag-list']}>
-                                {tags.map((tag) => (
-                                    <label className={styles['tag-label']} key={tag.uuid}>
-                                        <input
-                                            checked={selectedTags.includes(tag.uuid)}
-                                            className={styles['tag-checkbox']}
-                                            onChange={() => handleTagChange(tag.uuid)}
-                                            type="checkbox"
-                                        />
-                                        <span className={styles['tag-text']}>{tag.name}</span>
-                                    </label>
-                                ))}
-                            </div>
-                        </div>
+                        <MultiSelectForm
+                            id="tagUuids"
+                            label="タグ"
+                            onChange={setSelectedTags}
+                            options={tagOptions}
+                            placeholder="タグを選択してください"
+                            value={selectedTags}
+                        />
                     </div>
 
                     <div className={styles['form-row']}>
