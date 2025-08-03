@@ -168,6 +168,35 @@ export const handlers = [
         return HttpResponse.json(mockProductsByCategory)
     }),
 
+    // 全商品一覧取得API（管理画面用）
+    http.get('http://localhost:8080/product', ({ request }) => {
+        const url = new URL(request.url)
+        const mode = url.searchParams.get('mode')
+        const category = url.searchParams.get('category')
+        const target = url.searchParams.get('target')
+
+        // 管理画面用（mode=all）の場合、全商品を返す
+        if (mode === 'all') {
+            let filteredProducts = [...mockProducts]
+
+            // カテゴリフィルタ
+            if (category && category !== 'all') {
+                filteredProducts = filteredProducts.filter((p) => p.category.uuid === category)
+            }
+
+            // ターゲットフィルタ
+            if (target && target !== 'all') {
+                filteredProducts = filteredProducts.filter((p) => p.target.uuid === target)
+            }
+
+            return HttpResponse.json(filteredProducts)
+        }
+
+        // 通常の商品一覧（公開中のみ）
+        const activeProducts = mockProducts.filter((p) => p.isActive)
+        return HttpResponse.json(activeProducts)
+    }),
+
     http.get('http://localhost:8080/product/:uuid', ({ params }) => {
         const { uuid } = params
         const product = mockProducts.find((p) => p.uuid === uuid)
