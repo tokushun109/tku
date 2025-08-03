@@ -1,8 +1,10 @@
 'use client'
 
+import { Add } from '@mui/icons-material'
 import { useEffect, useState } from 'react'
 
 import { getProducts } from '@/apis/product'
+import { Button } from '@/components/bases/Button'
 import { ProductCard } from '@/features/product/components/ProductCard'
 import { IProduct } from '@/features/product/type'
 
@@ -36,9 +38,18 @@ export const AdminProductTemplate = () => {
         <div className={styles['product-container']}>
             <div className={styles['page-header']}>
                 <h1 className={styles['page-title']}>商品一覧</h1>
-                <div className={styles['product-info']}>
+                <div className={styles['header-actions']}>
                     <div className={styles['product-count']}>{products.length}件の商品</div>
-                    <button className={styles['create-button']}>新規作成</button>
+                    <Button
+                        onClick={() => {
+                            // TODO: 新規作成機能を実装
+                        }}
+                    >
+                        <div className={styles['add-button-content']}>
+                            <Add className={styles['add-icon']} fontSize="small" />
+                            追加
+                        </div>
+                    </Button>
                 </div>
             </div>
             <div className={styles['divider']} />

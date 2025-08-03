@@ -1,12 +1,16 @@
 .product-container {
     padding: 16px;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: #f5f5f5;
 }
 
 .page-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
-    margin-bottom: 16px;
+    align-items: center;
+    margin-bottom: 8px;
 }
 
 .page-title {
@@ -16,13 +20,7 @@
     color: $title-primary-color;
 }
 
-.divider {
-    height: 1px;
-    background-color: $light-dark-color;
-    margin: 16px 0;
-}
-
-.product-info {
+.header-actions {
     display: flex;
     align-items: center;
     gap: 16px;
@@ -33,24 +31,15 @@
     color: $text-color;
 }
 
-.create-button {
-    background-color: $primary;
-    color: $white-text-color;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    font-size: $font-medium;
-    font-weight: 500;
-    cursor: pointer;
-    transition: $transition;
-
-    &:hover {
-        background-color: darken($primary, 10%);
-    }
+.divider {
+    height: 1px;
+    background-color: $light-dark-color;
+    margin: 8px 0 16px 0;
 }
 
 .product-content {
-    height: calc(100vh - 180px);
+    flex: 1;
+    overflow-y: auto;
 }
 
 .loading {
@@ -69,33 +58,32 @@
 
 .product-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 20px;
 }
 
-@include media('sm') {
-    .page-header {
-        flex-direction: column;
-        gap: 16px;
-        align-items: stretch;
-
-        .page-title {
-            font-size: $font-xlarge;
-            text-align: center;
-        }
-
-        .product-info {
-            justify-content: center;
-            flex-direction: column;
-            gap: 8px;
-            align-items: center;
-
-            .create-button {
-                width: 100%;
-            }
-        }
+@include media('lg') {
+    .product-grid {
+        grid-template-columns: repeat(3, 1fr);
     }
+}
 
+@include media('md') {
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.add-button-content {
+    display: flex;
+    align-items: center;
+}
+
+.add-icon {
+    margin-right: 4px;
+}
+
+@include media('sm') {
     .product-grid {
         grid-template-columns: 1fr;
         gap: 16px;

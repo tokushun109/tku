@@ -5,9 +5,14 @@
     overflow: hidden;
     transition: $transition;
     cursor: pointer;
+    box-shadow: $box-shadow;
 
     &:hover {
-        box-shadow: $box-shadow;
+        transform: translateY(-2px);
+        box-shadow:
+            0px 8px 16px -2px rgba(0, 0, 0, 0.3),
+            0px 12px 24px 0px rgba(0, 0, 0, 0.2),
+            0px 2px 32px 0px rgba(0, 0, 0, 0.15);
     }
 
     &.is-active {
@@ -40,58 +45,26 @@
                 align-items: center;
                 gap: 8px;
                 justify-content: flex-end;
-
-                .chip-recommend {
-                    background-color: $accent;
-                    color: $white-text-color;
-                    padding: 2px 8px;
-                    border-radius: 12px;
-                    font-size: $font-tiny;
-                    font-weight: 500;
-                }
-
-                .chip-inactive {
-                    background-color: $gray;
-                    color: $white-text-color;
-                    padding: 2px 8px;
-                    border-radius: 12px;
-                    font-size: $font-tiny;
-                    font-weight: 500;
-                }
             }
         }
 
         .product-card-image-container {
             position: relative;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            border-radius: 8px;
+            overflow: hidden;
 
             .product-category {
                 position: absolute;
                 top: 5px;
                 left: 10px;
-
-                .chip-category {
-                    background-color: $accent;
-                    color: $white-text-color;
-                    padding: 2px 8px;
-                    border-radius: 12px;
-                    font-size: $font-tiny;
-                    font-weight: 500;
-                }
             }
 
             .product-target {
                 position: absolute;
                 right: 10px;
                 bottom: 5px;
-
-                .chip-target {
-                    background-color: $accent;
-                    color: $white-text-color;
-                    padding: 2px 8px;
-                    border-radius: 12px;
-                    font-size: $font-tiny;
-                    font-weight: 500;
-                }
             }
         }
 
@@ -116,6 +89,9 @@
                         font-size: $font-small;
                         cursor: pointer;
                         transition: $transition;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
 
                         &:hover {
                             background-color: darken($primary, 10%);
@@ -131,6 +107,9 @@
                         font-size: $font-small;
                         cursor: pointer;
                         transition: $transition;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
 
                         &:hover {
                             background-color: darken($danger-color, 10%);

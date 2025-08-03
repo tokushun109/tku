@@ -1,5 +1,9 @@
+import { Delete, Edit } from '@mui/icons-material'
+
+import { Chip, ChipSize } from '@/components/bases/Chip'
 import { Image } from '@/components/bases/Image'
 import { IProduct } from '@/features/product/type'
+import { ColorType, FontSizeType } from '@/types'
 
 import styles from './styles.module.scss'
 
@@ -29,8 +33,16 @@ export const ProductCard = ({ product, onEdit, onDelete, admin = false }: Props)
                 <div className={styles['product-card-header']}>
                     <div className={styles['product-name']}>{product.name}</div>
                     <div className={styles['product-status']}>
-                        {admin && product.isRecommend && <span className={styles['chip-recommend']}>おすすめ</span>}
-                        {admin && !product.isActive && <span className={styles['chip-inactive']}>展示</span>}
+                        {admin && product.isRecommend && (
+                            <Chip color={ColorType.Accent} fontSize={FontSizeType.Small} size={ChipSize.Small}>
+                                おすすめ
+                            </Chip>
+                        )}
+                        {admin && !product.isActive && (
+                            <Chip color={ColorType.Secondary} fontSize={FontSizeType.Small} size={ChipSize.Small}>
+                                展示
+                            </Chip>
+                        )}
                     </div>
                 </div>
                 <div className={styles['product-card-image-container']}>
@@ -41,12 +53,16 @@ export const ProductCard = ({ product, onEdit, onDelete, admin = false }: Props)
                     )}
                     {product.category.uuid && (
                         <div className={styles['product-category']}>
-                            <span className={styles['chip-category']}>{product.category.name}</span>
+                            <Chip color={ColorType.Accent} fontSize={FontSizeType.Small} size={ChipSize.Small}>
+                                {product.category.name}
+                            </Chip>
                         </div>
                     )}
                     {product.target.uuid && (
                         <div className={styles['product-target']}>
-                            <span className={styles['chip-target']}>{product.target.name}</span>
+                            <Chip color={ColorType.Accent} fontSize={FontSizeType.Small} size={ChipSize.Small}>
+                                {product.target.name}
+                            </Chip>
                         </div>
                     )}
                 </div>
@@ -55,10 +71,10 @@ export const ProductCard = ({ product, onEdit, onDelete, admin = false }: Props)
                         {admin && (
                             <div className={styles['admin-actions']}>
                                 <button className={styles['edit-button']} onClick={handleEdit}>
-                                    編集
+                                    <Edit sx={{ fontSize: 16 }} />
                                 </button>
                                 <button className={styles['delete-button']} onClick={handleDelete}>
-                                    削除
+                                    <Delete sx={{ fontSize: 16 }} />
                                 </button>
                             </div>
                         )}
