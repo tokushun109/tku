@@ -12,6 +12,7 @@ import { Dialog } from '@/components/bases/Dialog'
 import { Form } from '@/components/bases/Form'
 import { Input } from '@/components/bases/Input'
 import { Message, MessageType } from '@/components/bases/Message'
+import { SelectForm, SelectFormOption } from '@/components/bases/SelectForm'
 import { IClassification } from '@/features/classification/type'
 import { ISite } from '@/features/site/type'
 
@@ -46,6 +47,7 @@ export const ProductFormDialog = ({ isOpen, isSubmitting, onClose, onSubmit, sub
         formState: { errors },
         reset,
         watch,
+        setValue,
     } = useForm<IProductForm>({
         resolver: zodResolver(ProductSchema),
         defaultValues: {
@@ -62,6 +64,17 @@ export const ProductFormDialog = ({ isOpen, isSubmitting, onClose, onSubmit, sub
     })
 
     const watchedPrice = watch('price')
+
+    // SelectForm用のオプション配列を作成
+    const categoryOptions: SelectFormOption[] = categories.map((category) => ({
+        label: category.name,
+        value: category.uuid,
+    }))
+
+    const targetOptions: SelectFormOption[] = targets.map((target) => ({
+        label: target.name,
+        value: target.uuid,
+    }))
 
     // データの取得
     useEffect(() => {
@@ -242,35 +255,27 @@ export const ProductFormDialog = ({ isOpen, isSubmitting, onClose, onSubmit, sub
                     </div>
 
                     <div className={styles['form-row']}>
-                        <div className={styles['form-field']}>
-                            <label className={styles['label']} htmlFor="categoryUuid">
-                                カテゴリー
-                            </label>
-                            <select {...register('categoryUuid')} className={styles['select']} id="categoryUuid">
-                                <option value="">選択してください</option>
-                                {categories.map((category) => (
-                                    <option key={category.uuid} value={category.uuid}>
-                                        {category.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+                        <SelectForm
+                            error={errors.categoryUuid?.message}
+                            id="categoryUuid"
+                            label="カテゴリー"
+                            onChange={(value) => setValue('categoryUuid', value)}
+                            options={categoryOptions}
+                            placeholder="カテゴリーを選択してください"
+                            value={watch('categoryUuid')}
+                        />
                     </div>
 
                     <div className={styles['form-row']}>
-                        <div className={styles['form-field']}>
-                            <label className={styles['label']} htmlFor="targetUuid">
-                                ターゲット
-                            </label>
-                            <select {...register('targetUuid')} className={styles['select']} id="targetUuid">
-                                <option value="">選択してください</option>
-                                {targets.map((target) => (
-                                    <option key={target.uuid} value={target.uuid}>
-                                        {target.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+                        <SelectForm
+                            error={errors.targetUuid?.message}
+                            id="targetUuid"
+                            label="ターゲット"
+                            onChange={(value) => setValue('targetUuid', value)}
+                            options={targetOptions}
+                            placeholder="ターゲットを選択してください"
+                            value={watch('targetUuid')}
+                        />
                     </div>
 
                     <div className={styles['form-row']}>
