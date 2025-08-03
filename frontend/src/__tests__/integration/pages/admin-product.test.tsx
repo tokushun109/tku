@@ -13,13 +13,13 @@ describe('Admin Product Page Integration Test', () => {
         // コンポーネントをレンダリング
         render(<AdminProductPage />)
 
-        // 商品管理画面の表示を確認
-        expect(screen.getByText('商品管理')).toBeInTheDocument()
+        // 商品一覧画面の表示を確認
+        expect(screen.getByText('商品一覧')).toBeInTheDocument()
     })
 
     it('ページメタデータでnoindex, nofollowが設定されている', () => {
         // メタデータの確認
-        expect(metadata.title).toBe('商品管理 | admin')
+        expect(metadata.title).toBe('商品一覧 | admin')
         expect(metadata.robots).toEqual({
             index: false,
             follow: false,
