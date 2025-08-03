@@ -9,7 +9,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
+    margin-bottom: 16px;
 }
 
 .page-title {
@@ -28,12 +28,6 @@
 .product-count {
     font-size: $font-medium;
     color: $text-color;
-}
-
-.divider {
-    height: 1px;
-    background-color: $light-dark-color;
-    margin: 8px 0 16px 0;
 }
 
 .product-content {
@@ -56,6 +50,7 @@
 }
 
 .product-grid {
+    padding: 16px;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 20px;

@@ -52,7 +52,6 @@ export const AdminProductTemplate = () => {
                     </Button>
                 </div>
             </div>
-            <div className={styles['divider']} />
             <div className={styles['product-content']}>
                 {isLoading ? (
                     <div className={styles['loading']}>読み込み中...</div>
