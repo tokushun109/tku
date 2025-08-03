@@ -1,0 +1,156 @@
+.product-card {
+    width: 100%;
+    background-color: $light-dark-color;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: $transition;
+    cursor: pointer;
+
+    &:hover {
+        box-shadow: $box-shadow;
+    }
+
+    &.is-active {
+        background-color: $accent-light-color;
+    }
+
+    &.is-recommend {
+        background-color: $light-bg-color;
+    }
+
+    .product-card-wrapper {
+        padding: 16px;
+
+        .product-card-header {
+            margin: 5px 0;
+
+            .product-name {
+                overflow: hidden;
+                padding-bottom: 10px;
+                color: $title-primary-color;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                font-weight: $title-font-weight;
+                font-size: $font-xlarge;
+            }
+
+            .product-status {
+                height: 24px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                justify-content: flex-end;
+
+                .chip-recommend {
+                    background-color: $accent;
+                    color: $white-text-color;
+                    padding: 2px 8px;
+                    border-radius: 12px;
+                    font-size: $font-tiny;
+                    font-weight: 500;
+                }
+
+                .chip-inactive {
+                    background-color: $gray;
+                    color: $white-text-color;
+                    padding: 2px 8px;
+                    border-radius: 12px;
+                    font-size: $font-tiny;
+                    font-weight: 500;
+                }
+            }
+        }
+
+        .product-card-image-container {
+            position: relative;
+
+            .product-category {
+                position: absolute;
+                top: 5px;
+                left: 10px;
+
+                .chip-category {
+                    background-color: $accent;
+                    color: $white-text-color;
+                    padding: 2px 8px;
+                    border-radius: 12px;
+                    font-size: $font-tiny;
+                    font-weight: 500;
+                }
+            }
+
+            .product-target {
+                position: absolute;
+                right: 10px;
+                bottom: 5px;
+
+                .chip-target {
+                    background-color: $accent;
+                    color: $white-text-color;
+                    padding: 2px 8px;
+                    border-radius: 12px;
+                    font-size: $font-tiny;
+                    font-weight: 500;
+                }
+            }
+        }
+
+        .product-card-footer {
+            margin-top: 15px;
+            text-align: right;
+
+            .product-card-footer-content {
+                display: flex;
+                align-items: center;
+
+                .admin-actions {
+                    display: flex;
+                    gap: 8px;
+
+                    .edit-button {
+                        background-color: $primary;
+                        color: $white-text-color;
+                        border: none;
+                        padding: 4px 8px;
+                        border-radius: 4px;
+                        font-size: $font-small;
+                        cursor: pointer;
+                        transition: $transition;
+
+                        &:hover {
+                            background-color: darken($primary, 10%);
+                        }
+                    }
+
+                    .delete-button {
+                        background-color: $danger-color;
+                        color: $white-text-color;
+                        border: none;
+                        padding: 4px 8px;
+                        border-radius: 4px;
+                        font-size: $font-small;
+                        cursor: pointer;
+                        transition: $transition;
+
+                        &:hover {
+                            background-color: darken($danger-color, 10%);
+                        }
+                    }
+                }
+
+                .price {
+                    margin-left: auto;
+                    color: $title-primary-color;
+                    font-weight: 600;
+                    font-size: $font-xlarge;
+
+                    .tax-label {
+                        font-size: $font-sm-md;
+                        font-weight: normal;
+                        margin-left: 4px;
+                    }
+                }
+            }
+        }
+    }
+}

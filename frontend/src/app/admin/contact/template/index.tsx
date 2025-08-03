@@ -16,6 +16,7 @@ export const AdminContactTemplate = ({ contacts }: Props) => {
                 <h1 className={styles['page-title']}>お問い合わせ一覧</h1>
                 <div className={styles['contact-count']}>{contacts.length}件のお問い合わせ</div>
             </div>
+            <div className={styles['divider']} />
             <div className={styles['contact-content']}>
                 <ContactList contacts={contacts} />
             </div>

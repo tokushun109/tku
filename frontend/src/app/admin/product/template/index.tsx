@@ -1,30 +1,73 @@
 'use client'
 
-import { logoutAction } from '@/features/auth/action'
+import { useEffect, useState } from 'react'
+
+import { getProducts } from '@/apis/product'
+import { ProductCard } from '@/features/product/components/ProductCard'
+import { IProduct } from '@/features/product/type'
 
 import styles from './styles.module.scss'
 
 export const AdminProductTemplate = () => {
-    const handleLogout = async () => {
-        if (confirm('ログアウトしますか？')) {
-            await logoutAction()
+    const [products, setProducts] = useState<IProduct[]>([])
+    const [isLoading, setIsLoading] = useState<boolean>(true)
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                setIsLoading(true)
+                const fetchedProducts = await getProducts({
+                    mode: 'all',
+                    category: 'all',
+                    target: 'all',
+                })
+                setProducts(fetchedProducts)
+            } catch (error) {
+                console.error('商品の取得に失敗しました:', error)
+            } finally {
+                setIsLoading(false)
+            }
         }
-    }
+
+        fetchProducts()
+    }, [])
 
     return (
-        <div className={styles['page-admin-product']}>
-            <div className={styles['content-area']}>
-                <h1 className={styles['page-title']}>商品管理</h1>
-                <div className={styles['test-content']}>
-                    <p>これは商品管理のテストページです。</p>
-                    <p>ログイン時の挙動を確認するためのページです。</p>
-
-                    <div className={styles['test-actions']}>
-                        <button className={styles['logout-test-button']} onClick={handleLogout}>
-                            テスト用ログアウト
-                        </button>
-                    </div>
+        <div className={styles['product-container']}>
+            <div className={styles['page-header']}>
+                <h1 className={styles['page-title']}>商品一覧</h1>
+                <div className={styles['product-info']}>
+                    <div className={styles['product-count']}>{products.length}件の商品</div>
+                    <button className={styles['create-button']}>新規作成</button>
                 </div>
+            </div>
+            <div className={styles['divider']} />
+            <div className={styles['product-content']}>
+                {isLoading ? (
+                    <div className={styles['loading']}>読み込み中...</div>
+                ) : (
+                    <div className={styles['product-list']}>
+                        {products.length === 0 ? (
+                            <div className={styles['empty-message']}>登録されていません</div>
+                        ) : (
+                            <div className={styles['product-grid']}>
+                                {products.map((product) => (
+                                    <ProductCard
+                                        admin
+                                        key={product.uuid}
+                                        onDelete={(_product) => {
+                                            // TODO: 削除機能を実装
+                                        }}
+                                        onEdit={(_product) => {
+                                            // TODO: 編集機能を実装
+                                        }}
+                                        product={product}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
         </div>
     )
