@@ -21,6 +21,12 @@
     color: #666;
 }
 
+.divider {
+    height: 1px;
+    background-color: $light-dark-color;
+    margin: 16px 0;
+}
+
 .contact-content {
     height: calc(100vh - 180px);
 }

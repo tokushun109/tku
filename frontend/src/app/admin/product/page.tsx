@@ -3,7 +3,7 @@ import { Metadata } from 'next'
 import { AdminProductTemplate } from './template'
 
 export const metadata: Metadata = {
-    title: '商品管理 | admin',
+    title: '商品一覧 | admin',
     robots: {
         index: false,
         follow: false,
