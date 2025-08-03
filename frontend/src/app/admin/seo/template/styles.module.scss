@@ -35,3 +35,103 @@
     padding: 1rem;
     text-align: center;
 }
+
+// SeoEdit styles
+.seo-edit {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.section-title {
+    color: $title-primary-color;
+    font-size: 1.5rem;
+    font-weight: bold;
+
+    @include media('sm') {
+        font-size: 1.25rem;
+    }
+}
+
+.logo-section {
+    align-items: center;
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+
+    @include media('sm') {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
+
+.logo-preview {
+    flex-shrink: 0;
+}
+
+.logo-image {
+    border: 2px solid $light-dark-color;
+    border-radius: 50%;
+    height: 240px;
+    overflow: hidden;
+    position: relative;
+    width: 240px;
+}
+
+.description-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.edit-button {
+    align-self: center;
+    max-width: 120px;
+}
+
+// SeoEditDialog styles
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    min-width: 400px;
+
+    @include media('sm') {
+        min-width: auto;
+    }
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.label {
+    color: $text-color;
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.dialog-logo-preview {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.dialog-logo-image {
+    border: 2px solid $light-dark-color;
+    border-radius: 50%;
+    height: 240px;
+    overflow: hidden;
+    position: relative;
+    width: 240px;
+}
