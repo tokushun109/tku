@@ -17,7 +17,10 @@
 }
 
 .chip-container {
-    margin-bottom: 0.5rem;
+    position: absolute;
+    top: 44px;
+    right: 16px;
+    z-index: 1;
 }
 
 .select-container {
@@ -103,10 +106,15 @@
     height: 1.25rem;
     color: $text-color;
     transition: $transition;
+    margin-right: 0.5rem;
 
     &.chevron-open {
         transform: rotate(180deg);
     }
+}
+
+.require-form .chevron {
+    margin-right: 3rem;
 }
 
 .dropdown {
