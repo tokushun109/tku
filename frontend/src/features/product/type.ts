@@ -39,3 +39,6 @@ export interface IThumbnail {
     apiPath: string
     product: IProduct
 }
+
+// フォーム用の型を再エクスポート
+export type { IProductForm } from './product/type'
