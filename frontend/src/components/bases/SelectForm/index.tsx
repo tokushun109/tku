@@ -127,7 +127,7 @@ export const SelectForm = <T,>({ label, options, value, onChange, placeholder, r
                     <div className={styles['trigger-content']}>
                         {selectedOption && (
                             <div className={styles['selected-chip-container']}>
-                                <Chip color={ColorType.Primary} fontColor="#ffffff" fontSize={FontSizeType.SmMd} size={ChipSize.Small}>
+                                <Chip color={ColorType.Secondary} fontColor="#ffffff" fontSize={FontSizeType.SmMd} size={ChipSize.Small}>
                                     {selectedOption.label}
                                     <button
                                         className={styles['chip-close-button']}

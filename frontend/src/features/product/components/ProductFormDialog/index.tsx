@@ -4,10 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 
-import { getCategories } from '@/apis/category'
-import { getSalesSiteList } from '@/apis/salesSite'
-import { getTags } from '@/apis/tag'
-import { getTargets } from '@/apis/target'
 import { Dialog } from '@/components/bases/Dialog'
 import { Form } from '@/components/bases/Form'
 import { Input } from '@/components/bases/Input'
@@ -24,20 +20,30 @@ import { ProductSchema } from '../../product/schema'
 import type { IProduct, IProductForm } from '../../type'
 
 interface Props {
+    categories: IClassification[]
     isOpen: boolean
     isSubmitting: boolean
     onClose: () => void
     onSubmit: (_data: IProductForm) => Promise<void>
+    salesSites: ISite[]
     submitError: string | null
+    tags: IClassification[]
+    targets: IClassification[]
     updateItem: IProduct | null
 }
 
-export const ProductFormDialog = ({ isOpen, isSubmitting, onClose, onSubmit, submitError, updateItem }: Props) => {
-    const [categories, setCategories] = useState<IClassification[]>([])
-    const [targets, setTargets] = useState<IClassification[]>([])
-    const [tags, setTags] = useState<IClassification[]>([])
-    const [salesSites, setSalesSites] = useState<ISite[]>([])
-    const [isLoadingData, setIsLoadingData] = useState<boolean>(false)
+export const ProductFormDialog = ({
+    categories,
+    isOpen,
+    isSubmitting,
+    onClose,
+    onSubmit,
+    salesSites,
+    submitError,
+    tags,
+    targets,
+    updateItem,
+}: Props) => {
     const [selectedSalesSite, setSelectedSalesSite] = useState<string>('')
     const [siteDetailUrl, setSiteDetailUrl] = useState<string>('')
     const [selectedTags, setSelectedTags] = useState<string[]>([])
@@ -82,33 +88,6 @@ export const ProductFormDialog = ({ isOpen, isSubmitting, onClose, onSubmit, sub
         label: tag.name,
         value: tag.uuid,
     }))
-
-    // データの取得
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                setIsLoadingData(true)
-                const [categoriesData, targetsData, tagsData, salesSitesData] = await Promise.all([
-                    getCategories({ mode: 'all' }),
-                    getTargets({ mode: 'all' }),
-                    getTags(),
-                    getSalesSiteList(),
-                ])
-                setCategories(categoriesData)
-                setTargets(targetsData)
-                setTags(tagsData)
-                setSalesSites(salesSitesData)
-            } catch (error) {
-                console.error('データの取得に失敗しました:', error)
-            } finally {
-                setIsLoadingData(false)
-            }
-        }
-
-        if (isOpen) {
-            fetchData()
-        }
-    }, [isOpen])
 
     // updateItemが変更されたときにフォームをリセット
     useEffect(() => {
@@ -195,7 +174,7 @@ export const ProductFormDialog = ({ isOpen, isSubmitting, onClose, onSubmit, sub
             confirmOption={{
                 label: isSubmitting ? '送信中...' : isEdit ? '更新' : '追加',
                 onClick: handleSubmit(handleFormSubmit),
-                disabled: isSubmitting || isLoadingData,
+                disabled: isSubmitting,
             }}
             isOpen={isOpen}
             onClose={handleClose}
@@ -203,152 +182,143 @@ export const ProductFormDialog = ({ isOpen, isSubmitting, onClose, onSubmit, sub
             wide
         >
             {submitError && <Message type={MessageType.Error}>{submitError}</Message>}
-            {isLoadingData ? (
-                <div className={styles['loading']}>読み込み中...</div>
-            ) : (
-                <Form noValidate onSubmit={handleSubmit(handleFormSubmit)}>
-                    <div className={styles['form-row']}>
-                        <Input
-                            {...register('name')}
-                            error={errors.name?.message}
-                            id="name"
-                            label="商品名"
-                            placeholder="商品名を入力してください"
-                            required
-                            type="text"
-                        />
-                    </div>
+            <Form noValidate onSubmit={handleSubmit(handleFormSubmit)}>
+                <div className={styles['form-row']}>
+                    <Input
+                        {...register('name')}
+                        error={errors.name?.message}
+                        id="name"
+                        label="商品名"
+                        placeholder="商品名を入力してください"
+                        required
+                        type="text"
+                    />
+                </div>
 
-                    <div className={styles['form-row']}>
-                        <TextArea
-                            {...register('description')}
-                            error={errors.description?.message}
-                            id="description"
-                            label="商品説明"
-                            placeholder="商品説明を入力してください（任意）"
-                            rows={4}
-                        />
-                    </div>
+                <div className={styles['form-row']}>
+                    <TextArea
+                        {...register('description')}
+                        error={errors.description?.message}
+                        id="description"
+                        label="商品説明"
+                        placeholder="商品説明を入力してください（任意）"
+                        rows={4}
+                    />
+                </div>
 
-                    <div className={styles['form-row']}>
-                        <div className={styles['price-row']}>
-                            <div className={styles['price-input']}>
-                                <Input
-                                    {...register('price', { valueAsNumber: true })}
-                                    error={errors.price?.message}
-                                    id="price"
-                                    label="税込価格"
-                                    max={1000000}
-                                    min={1}
-                                    placeholder="0"
-                                    required
-                                    type="number"
-                                />
-                            </div>
-                            <div className={styles['price-display']}>
-                                <span className={styles['price-text']}>¥{watchedPrice ? watchedPrice.toLocaleString() : '0'}円</span>
-                            </div>
+                <div className={styles['form-row']}>
+                    <div className={styles['price-row']}>
+                        <div className={styles['price-input']}>
+                            <Input
+                                {...register('price', { valueAsNumber: true })}
+                                error={errors.price?.message}
+                                id="price"
+                                label="税込価格"
+                                max={1000000}
+                                min={1}
+                                placeholder="0"
+                                required
+                                type="number"
+                            />
+                        </div>
+                        <div className={styles['price-display']}>
+                            <span className={styles['price-text']}>¥{watchedPrice ? watchedPrice.toLocaleString() : '0'}円</span>
                         </div>
                     </div>
+                </div>
 
-                    <div className={styles['form-row']}>
-                        <SelectForm
-                            error={errors.categoryUuid?.message}
-                            id="categoryUuid"
-                            label="カテゴリー"
-                            onChange={(value) => setValue('categoryUuid', value)}
-                            options={categoryOptions}
-                            placeholder="カテゴリーを選択してください"
-                            value={watch('categoryUuid')}
-                        />
-                    </div>
+                <div className={styles['form-row']}>
+                    <SelectForm
+                        error={errors.categoryUuid?.message}
+                        id="categoryUuid"
+                        label="カテゴリー"
+                        onChange={(value) => setValue('categoryUuid', value)}
+                        options={categoryOptions}
+                        placeholder="カテゴリーを選択してください"
+                        value={watch('categoryUuid')}
+                    />
+                </div>
 
-                    <div className={styles['form-row']}>
-                        <SelectForm
-                            error={errors.targetUuid?.message}
-                            id="targetUuid"
-                            label="ターゲット"
-                            onChange={(value) => setValue('targetUuid', value)}
-                            options={targetOptions}
-                            placeholder="ターゲットを選択してください"
-                            value={watch('targetUuid')}
-                        />
-                    </div>
+                <div className={styles['form-row']}>
+                    <SelectForm
+                        error={errors.targetUuid?.message}
+                        id="targetUuid"
+                        label="ターゲット"
+                        onChange={(value) => setValue('targetUuid', value)}
+                        options={targetOptions}
+                        placeholder="ターゲットを選択してください"
+                        value={watch('targetUuid')}
+                    />
+                </div>
 
-                    <div className={styles['form-row']}>
-                        <MultiSelectForm
-                            id="tagUuids"
-                            label="タグ"
-                            onChange={setSelectedTags}
-                            options={tagOptions}
-                            placeholder="タグを選択してください"
-                            value={selectedTags}
-                        />
-                    </div>
+                <div className={styles['form-row']}>
+                    <MultiSelectForm
+                        id="tagUuids"
+                        label="タグ"
+                        onChange={setSelectedTags}
+                        options={tagOptions}
+                        placeholder="タグを選択してください"
+                        value={selectedTags}
+                    />
+                </div>
 
-                    <div className={styles['form-row']}>
-                        <div className={styles['form-field']}>
-                            <label className={styles['label']}>販売サイト</label>
-                            <div className={styles['site-detail-input']}>
-                                <select className={styles['select']} onChange={(e) => setSelectedSalesSite(e.target.value)} value={selectedSalesSite}>
-                                    <option value="">選択してください</option>
-                                    {salesSites.map((site) => (
-                                        <option key={site.uuid} value={site.uuid}>
-                                            {site.name}
-                                        </option>
-                                    ))}
-                                </select>
-                                <input
-                                    className={styles['url-input']}
-                                    disabled={!selectedSalesSite}
-                                    onChange={(e) => setSiteDetailUrl(e.target.value)}
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter') {
-                                            e.preventDefault()
-                                            handleAddSiteDetail()
-                                        }
-                                    }}
-                                    placeholder="URLを入力してEnterで追加"
-                                    type="url"
-                                    value={siteDetailUrl}
-                                />
+                <div className={styles['form-row']}>
+                    <div className={styles['form-field']}>
+                        <label className={styles['label']}>販売サイト</label>
+                        <div className={styles['site-detail-input']}>
+                            <select className={styles['select']} onChange={(e) => setSelectedSalesSite(e.target.value)} value={selectedSalesSite}>
+                                <option value="">選択してください</option>
+                                {salesSites.map((site) => (
+                                    <option key={site.uuid} value={site.uuid}>
+                                        {site.name}
+                                    </option>
+                                ))}
+                            </select>
+                            <input
+                                className={styles['url-input']}
+                                disabled={!selectedSalesSite}
+                                onChange={(e) => setSiteDetailUrl(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault()
+                                        handleAddSiteDetail()
+                                    }
+                                }}
+                                placeholder="URLを入力してEnterで追加"
+                                type="url"
+                                value={siteDetailUrl}
+                            />
+                        </div>
+                        {formSiteDetails.length > 0 && (
+                            <div className={styles['site-detail-list']}>
+                                {formSiteDetails.map((detail, index) => (
+                                    <div className={styles['site-detail-item']} key={index}>
+                                        <a className={styles['site-detail-link']} href={detail.detailUrl} rel="noopener noreferrer" target="_blank">
+                                            {detail.salesSiteName}
+                                        </a>
+                                        <button className={styles['remove-button']} onClick={() => handleRemoveSiteDetail(index)} type="button">
+                                            ×
+                                        </button>
+                                    </div>
+                                ))}
                             </div>
-                            {formSiteDetails.length > 0 && (
-                                <div className={styles['site-detail-list']}>
-                                    {formSiteDetails.map((detail, index) => (
-                                        <div className={styles['site-detail-item']} key={index}>
-                                            <a
-                                                className={styles['site-detail-link']}
-                                                href={detail.detailUrl}
-                                                rel="noopener noreferrer"
-                                                target="_blank"
-                                            >
-                                                {detail.salesSiteName}
-                                            </a>
-                                            <button className={styles['remove-button']} onClick={() => handleRemoveSiteDetail(index)} type="button">
-                                                ×
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
+                        )}
                     </div>
+                </div>
 
-                    <div className={styles['form-row']}>
-                        <div className={styles['checkbox-group']}>
-                            <label className={styles['checkbox-label']}>
-                                <input {...register('isActive')} className={styles['checkbox']} type="checkbox" />
-                                <span className={styles['checkbox-text']}>販売中</span>
-                            </label>
-                            <label className={styles['checkbox-label']}>
-                                <input {...register('isRecommend')} className={styles['checkbox']} type="checkbox" />
-                                <span className={styles['checkbox-text']}>おすすめに設定</span>
-                            </label>
-                        </div>
+                <div className={styles['form-row']}>
+                    <div className={styles['checkbox-group']}>
+                        <label className={styles['checkbox-label']}>
+                            <input {...register('isActive')} className={styles['checkbox']} type="checkbox" />
+                            <span className={styles['checkbox-text']}>販売中</span>
+                        </label>
+                        <label className={styles['checkbox-label']}>
+                            <input {...register('isRecommend')} className={styles['checkbox']} type="checkbox" />
+                            <span className={styles['checkbox-text']}>おすすめに設定</span>
+                        </label>
                     </div>
-                </Form>
-            )}
+                </div>
+            </Form>
         </Dialog>
     )
 }

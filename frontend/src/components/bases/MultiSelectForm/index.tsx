@@ -123,7 +123,7 @@ export const MultiSelectForm = <T,>({ label, options, value = [], onChange, plac
                     <div className={styles['trigger-content']}>
                         {selectedOptions.map((option) => (
                             <div className={styles['selected-chip-container']} key={String(option.value)}>
-                                <Chip color={ColorType.Primary} fontColor="#ffffff" fontSize={FontSizeType.SmMd} size={ChipSize.Small}>
+                                <Chip color={ColorType.Secondary} fontColor="#ffffff" fontSize={FontSizeType.SmMd} size={ChipSize.Small}>
                                     {option.label}
                                     <button
                                         className={styles['chip-close-button']}

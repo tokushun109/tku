@@ -3,41 +3,60 @@
 import { Add } from '@mui/icons-material'
 import { useEffect, useState } from 'react'
 
+import { getCategories } from '@/apis/category'
 import { createProduct, deleteProduct, getProducts, updateProduct } from '@/apis/product'
+import { getSalesSiteList } from '@/apis/salesSite'
+import { getTags } from '@/apis/tag'
+import { getTargets } from '@/apis/target'
 import { Button } from '@/components/bases/Button'
 import { IClassification } from '@/features/classification/type'
 import { ProductCard } from '@/features/product/components/ProductCard'
 import { ProductFormDialog } from '@/features/product/components/ProductFormDialog'
 import { IProduct, IProductForm } from '@/features/product/type'
+import { ISite } from '@/features/site/type'
 
 import styles from './styles.module.scss'
 
 export const AdminProductTemplate = () => {
     const [products, setProducts] = useState<IProduct[]>([])
+    const [categories, setCategories] = useState<IClassification[]>([])
+    const [targets, setTargets] = useState<IClassification[]>([])
+    const [tags, setTags] = useState<IClassification[]>([])
+    const [salesSites, setSalesSites] = useState<ISite[]>([])
     const [isLoading, setIsLoading] = useState<boolean>(true)
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
     const [submitError, setSubmitError] = useState<string | null>(null)
     const [updateItem, setUpdateItem] = useState<IProduct | null>(null)
 
-    const fetchProducts = async () => {
+    const fetchData = async () => {
         try {
             setIsLoading(true)
-            const fetchedProducts = await getProducts({
-                mode: 'all',
-                category: 'all',
-                target: 'all',
-            })
+            const [fetchedProducts, categoriesData, targetsData, tagsData, salesSitesData] = await Promise.all([
+                getProducts({
+                    mode: 'all',
+                    category: 'all',
+                    target: 'all',
+                }),
+                getCategories({ mode: 'all' }),
+                getTargets({ mode: 'all' }),
+                getTags(),
+                getSalesSiteList(),
+            ])
             setProducts(fetchedProducts)
+            setCategories(categoriesData)
+            setTargets(targetsData)
+            setTags(tagsData)
+            setSalesSites(salesSitesData)
         } catch (error) {
-            console.error('商品の取得に失敗しました:', error)
+            console.error('データの取得に失敗しました:', error)
         } finally {
             setIsLoading(false)
         }
     }
 
     useEffect(() => {
-        fetchProducts()
+        fetchData()
     }, [])
 
     const handleCreate = () => {
@@ -59,7 +78,7 @@ export const AdminProductTemplate = () => {
 
         try {
             await deleteProduct(product.uuid)
-            await fetchProducts()
+            await fetchData()
         } catch (error) {
             console.error('商品の削除に失敗しました:', error)
         }
@@ -108,7 +127,7 @@ export const AdminProductTemplate = () => {
 
             setIsDialogOpen(false)
             setUpdateItem(null)
-            await fetchProducts()
+            await fetchData()
         } catch (error) {
             console.error('商品の保存に失敗しました:', error)
             setSubmitError('商品の保存に失敗しました。もう一度お試しください。')
@@ -150,11 +169,15 @@ export const AdminProductTemplate = () => {
             </div>
 
             <ProductFormDialog
+                categories={categories}
                 isOpen={isDialogOpen}
                 isSubmitting={isSubmitting}
                 onClose={handleCloseDialog}
                 onSubmit={handleSubmit}
+                salesSites={salesSites}
                 submitError={submitError}
+                tags={tags}
+                targets={targets}
                 updateItem={updateItem}
             />
         </div>
