@@ -13,7 +13,8 @@
 
 .chip-container {
     position: absolute;
-    bottom: 13px;
+    top: 50%;
+    transform: translateY(-50%);
     right: 16px;
     z-index: 1;
 }
@@ -134,7 +135,7 @@
     }
 }
 
-.require-form .chevron {
+.select-container:has(.chip-container) .chevron {
     margin-right: 3rem;
 }
 

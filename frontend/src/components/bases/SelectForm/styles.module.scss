@@ -140,7 +140,7 @@
     }
 }
 
-.require-form .chevron {
+.select-container:has(.chip-container) .chevron {
     margin-right: 3rem;
 }
 

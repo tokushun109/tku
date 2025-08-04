@@ -111,15 +111,14 @@ export const MultiSelectForm = <T,>({ label, options, value = [], onChange, plac
                 </label>
             )}
 
-            {required && (
-                <div className={styles['chip-container']}>
-                    <Chip color={ColorType.Danger} fontColor="#b84150" fontSize={FontSizeType.SmMd} size={ChipSize.Small}>
-                        必須
-                    </Chip>
-                </div>
-            )}
-
             <div className={styles['select-container']} ref={dropdownRef}>
+                {required && value.length === 0 && (
+                    <div className={styles['chip-container']}>
+                        <Chip color={ColorType.Danger} fontColor="#b84150" fontSize={FontSizeType.SmMd} size={ChipSize.Small}>
+                            必須
+                        </Chip>
+                    </div>
+                )}
                 <div className={`${styles['select-trigger']} ${error ? styles['error'] : ''} ${isOpen ? styles['open'] : ''}`} onClick={handleToggle}>
                     <div className={styles['trigger-content']}>
                         {selectedOptions.map((option) => (
