@@ -185,32 +185,11 @@
 }
 
 .option-checkbox {
-    width: 1rem;
-    height: 1rem;
-    cursor: pointer;
     pointer-events: none;
-    appearance: none;
-    border: 2px solid $light-dark-color;
-    border-radius: 2px;
-    background-color: transparent;
-    position: relative;
-    transition: all 0.3s ease;
+}
 
-    &:checked {
-        background-color: $primary;
-        border-color: $primary;
-
-        &::after {
-            content: '✓';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            font-size: 0.75rem;
-            font-weight: bold;
-        }
-    }
+.option-label {
+    flex: 1;
 }
 
 .no-options {

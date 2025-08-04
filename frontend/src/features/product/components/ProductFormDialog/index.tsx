@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 
+import { Checkbox } from '@/components/bases/Checkbox'
 import { Dialog } from '@/components/bases/Dialog'
 import { Form } from '@/components/bases/Form'
 import { Input } from '@/components/bases/Input'
@@ -308,14 +309,8 @@ export const ProductFormDialog = ({
 
                 <div className={styles['form-row']}>
                     <div className={styles['checkbox-group']}>
-                        <label className={styles['checkbox-label']}>
-                            <input {...register('isActive')} className={styles['checkbox']} type="checkbox" />
-                            <span className={styles['checkbox-text']}>販売中</span>
-                        </label>
-                        <label className={styles['checkbox-label']}>
-                            <input {...register('isRecommend')} className={styles['checkbox']} type="checkbox" />
-                            <span className={styles['checkbox-text']}>おすすめに設定</span>
-                        </label>
+                        <Checkbox {...register('isActive')} label="販売中" />
+                        <Checkbox {...register('isRecommend')} label="おすすめに設定" />
                     </div>
                 </div>
             </Form>

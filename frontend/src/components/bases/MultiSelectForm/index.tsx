@@ -3,6 +3,7 @@
 import { Close, ExpandMore } from '@mui/icons-material'
 import { useEffect, useRef, useState } from 'react'
 
+import { Checkbox } from '@/components/bases/Checkbox'
 import { Chip, ChipSize } from '@/components/bases/Chip'
 import { ColorType, FontSizeType } from '@/types'
 
@@ -169,8 +170,8 @@ export const MultiSelectForm = <T,>({ label, options, value = [], onChange, plac
                                             key={String(option.value)}
                                             onClick={() => handleOptionClick(option)}
                                         >
-                                            <input checked={isSelected} className={styles['option-checkbox']} onChange={() => {}} type="checkbox" />
-                                            {option.label}
+                                            <Checkbox checked={isSelected} className={styles['option-checkbox']} onChange={() => {}} />
+                                            <span className={styles['option-label']}>{option.label}</span>
                                         </div>
                                     )
                                 })

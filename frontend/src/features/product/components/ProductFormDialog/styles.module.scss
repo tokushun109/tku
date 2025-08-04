@@ -78,11 +78,13 @@
 
 .checkbox-group {
     display: flex;
+    justify-content: center;
     gap: 1.5rem;
 
     @include media('sm') {
         flex-direction: column;
         gap: 1rem;
+        align-items: center;
     }
 }
 
