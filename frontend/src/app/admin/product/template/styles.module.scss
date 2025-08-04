@@ -54,6 +54,8 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 20px;
+    max-width: $xl;
+    margin: 0 auto;
 }
 
 @include media('lg') {
