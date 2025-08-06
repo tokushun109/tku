@@ -9,6 +9,10 @@
         color: $text-color;
         font-size: 0.95rem;
     }
+}
+
+.textarea-container {
+    position: relative;
 
     .textarea {
         width: 100%;
@@ -36,13 +40,13 @@
             border-color: $danger-color;
         }
     }
-}
 
-.chip-container {
-    position: absolute;
-    top: 44px;
-    right: 16px;
-    z-index: 1;
+    .chip-container {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        z-index: 1;
+    }
 }
 
 .field-error {

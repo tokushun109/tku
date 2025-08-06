@@ -156,6 +156,17 @@ const mockCreator: ICreator = {
     apiPath: '/image/creator.jpg',
 }
 
+const mockTags = [
+    { uuid: 'tag-1', name: 'シンプル' },
+    { uuid: 'tag-2', name: 'カジュアル' },
+    { uuid: 'tag-3', name: 'エレガント' },
+]
+
+const mockSalesSites = [
+    { uuid: 'site-1', name: 'Creema' },
+    { uuid: 'site-2', name: 'minne' },
+]
+
 const mockSalesTarget: ISite = {
     name: 'テスト対象',
     uuid: 'test-target-uuid',
@@ -220,6 +231,16 @@ export const handlers = [
     // ターゲット関連のAPI
     http.get('http://localhost:8080/target', () => {
         return HttpResponse.json(Object.values(mockTargets))
+    }),
+
+    // タグ関連のAPI
+    http.get('http://localhost:8080/tag', () => {
+        return HttpResponse.json(mockTags)
+    }),
+
+    // 販売サイト関連のAPI
+    http.get('http://localhost:8080/sales_site/', () => {
+        return HttpResponse.json(mockSalesSites)
     }),
 
     // その他のAPI

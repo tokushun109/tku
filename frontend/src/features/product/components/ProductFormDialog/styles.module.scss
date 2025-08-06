@@ -1,0 +1,203 @@
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    font-size: 1rem;
+    color: $text-color;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.label {
+    font-size: $font-medium;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: $title-primary-color;
+}
+
+.price-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 1rem;
+
+    @include media('sm') {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+}
+
+.price-input {
+    flex: 1;
+}
+
+.price-display {
+    display: flex;
+    align-items: center;
+    height: 56px;
+    padding: 0 0.75rem;
+    background-color: $secondary-bg-color;
+    border: 1px solid $light-dark-color;
+    border-radius: 0.375rem;
+    min-width: 120px;
+
+    @include media('sm') {
+        height: 48px;
+        justify-content: center;
+    }
+}
+
+.price-text {
+    font-size: $font-medium;
+    font-weight: 600;
+    color: $title-primary-color;
+}
+
+.select {
+    padding: 0.75rem;
+    border: 1px solid $light-dark-color;
+    border-radius: 0.375rem;
+    font-size: $font-medium;
+    background-color: $primary-bg-color;
+    cursor: pointer;
+
+    &:focus {
+        outline: none;
+        border-color: $primary;
+        box-shadow: 0 0 0 2px color.adjust($primary, $alpha: -0.8);
+    }
+
+    option {
+        padding: 0.5rem;
+    }
+}
+
+.checkbox-group {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+
+    @include media('sm') {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: center;
+    }
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: $font-medium;
+}
+
+.checkbox {
+    width: 1rem;
+    height: 1rem;
+    cursor: pointer;
+}
+
+.checkbox-text {
+    font-weight: 500;
+    color: $title-primary-color;
+    user-select: none;
+}
+
+.site-detail-input {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+
+    @include media('sm') {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+.url-input {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid $light-dark-color;
+    border-radius: 0.375rem;
+    font-size: $font-medium;
+
+    &:focus {
+        outline: none;
+        border-color: $primary;
+        box-shadow: 0 0 0 2px color.adjust($primary, $alpha: -0.8);
+    }
+
+    &:disabled {
+        background-color: $secondary-bg-color;
+        cursor: not-allowed;
+    }
+
+    &::placeholder {
+        color: $text-color;
+    }
+}
+
+.site-detail-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    border: 1px dashed $light-dark-color;
+    border-radius: 0.375rem;
+    background-color: $secondary-bg-color;
+}
+
+.site-detail-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background-color: $primary-bg-color;
+    border: 1px solid $light-dark-color;
+    border-radius: 0.375rem;
+}
+
+.site-detail-link {
+    color: $primary;
+    text-decoration: none;
+    font-size: $font-medium;
+    font-weight: 500;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.remove-button {
+    background: none;
+    border: none;
+    color: $danger-color;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    padding: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: $transition;
+
+    &:hover {
+        background-color: $danger-bg-color;
+    }
+}
+
+.price-value {
+    text-align: right;
+    font-size: $font-medium;
+    font-weight: 600;
+    color: $title-primary-color;
+    padding: 0.5rem 0;
+}
