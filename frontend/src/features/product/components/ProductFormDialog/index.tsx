@@ -90,6 +90,13 @@ export const ProductFormDialog = ({
         value: tag.uuid,
     }))
 
+    const salesSiteOptions: SelectFormOption[] = salesSites
+        .filter((site) => site.uuid)
+        .map((site) => ({
+            label: site.name,
+            value: site.uuid as string,
+        }))
+
     // updateItemが変更されたときにフォームをリセット
     useEffect(() => {
         if (isOpen) {
@@ -208,24 +215,18 @@ export const ProductFormDialog = ({
                 </div>
 
                 <div className={styles['form-row']}>
-                    <div className={styles['price-row']}>
-                        <div className={styles['price-input']}>
-                            <Input
-                                {...register('price', { valueAsNumber: true })}
-                                error={errors.price?.message}
-                                id="price"
-                                label="税込価格"
-                                max={1000000}
-                                min={1}
-                                placeholder="0"
-                                required
-                                type="number"
-                            />
-                        </div>
-                        <div className={styles['price-display']}>
-                            <span className={styles['price-text']}>¥{watchedPrice ? watchedPrice.toLocaleString() : '0'}円</span>
-                        </div>
-                    </div>
+                    <Input
+                        {...register('price', { valueAsNumber: true })}
+                        error={errors.price?.message}
+                        id="price"
+                        label="税込価格"
+                        max={1000000}
+                        min={1}
+                        placeholder="0"
+                        required
+                        type="number"
+                    />
+                    <p className={styles['price-value']}>¥{watchedPrice ? watchedPrice.toLocaleString() : '0'}</p>
                 </div>
 
                 <div className={styles['form-row']}>
@@ -267,14 +268,13 @@ export const ProductFormDialog = ({
                     <div className={styles['form-field']}>
                         <label className={styles['label']}>販売サイト</label>
                         <div className={styles['site-detail-input']}>
-                            <select className={styles['select']} onChange={(e) => setSelectedSalesSite(e.target.value)} value={selectedSalesSite}>
-                                <option value="">選択してください</option>
-                                {salesSites.map((site) => (
-                                    <option key={site.uuid} value={site.uuid}>
-                                        {site.name}
-                                    </option>
-                                ))}
-                            </select>
+                            <SelectForm
+                                id="salesSite"
+                                onChange={(value) => setSelectedSalesSite(value)}
+                                options={salesSiteOptions}
+                                placeholder="販売サイトを選択してください"
+                                value={selectedSalesSite}
+                            />
                             <input
                                 className={styles['url-input']}
                                 disabled={!selectedSalesSite}

@@ -126,25 +126,13 @@ export const SelectForm = <T,>({ label, options, value, onChange, placeholder, r
                 <div className={`${styles['select-trigger']} ${error ? styles['error'] : ''} ${isOpen ? styles['open'] : ''}`} onClick={handleToggle}>
                     <div className={styles['trigger-content']}>
                         {selectedOption && (
-                            <div className={styles['selected-chip-container']}>
-                                <Chip color={ColorType.Secondary} fontColor="#ffffff" fontSize={FontSizeType.SmMd} size={ChipSize.Small}>
-                                    {selectedOption.label}
-                                    <button
-                                        className={styles['chip-close-button']}
-                                        onClick={(e) => {
-                                            e.stopPropagation()
-                                            handleClear()
-                                        }}
-                                        type="button"
-                                    >
-                                        <Close />
-                                    </button>
-                                </Chip>
+                            <div className={styles['selected-value']}>
+                                <span className={styles['selected-text']}>{selectedOption.label}</span>
                             </div>
                         )}
                         {isFocused || isOpen ? (
                             <input
-                                className={`${styles['search-trigger-input']} ${selectedOption ? styles['with-chip'] : ''}`}
+                                className={`${styles['search-trigger-input']} ${selectedOption ? styles['with-text'] : ''}`}
                                 onChange={handleInputChange}
                                 onFocus={handleInputFocus}
                                 placeholder="検索..."
@@ -156,6 +144,18 @@ export const SelectForm = <T,>({ label, options, value, onChange, placeholder, r
                             !selectedOption && <span className={styles['placeholder']}>{placeholder || '選択してください'}</span>
                         )}
                     </div>
+                    {selectedOption && (
+                        <button
+                            className={styles['clear-button']}
+                            onClick={(e) => {
+                                e.stopPropagation()
+                                handleClear()
+                            }}
+                            type="button"
+                        >
+                            <Close />
+                        </button>
+                    )}
                     <ExpandMore className={`${styles['chevron']} ${isOpen ? styles['chevron-open'] : ''}`} />
                 </div>
 

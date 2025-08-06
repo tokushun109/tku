@@ -102,6 +102,13 @@ export const MultiSelectForm = <T,>({ label, options, value = [], onChange, plac
         onChange?.(newValues)
     }
 
+    const handleClearAll = () => {
+        onChange?.([])
+        setIsOpen(false)
+        setSearchText('')
+        setIsFocused(false)
+    }
+
     const inputId = id || `multi-select-form-${Math.random().toString(36).substr(2, 9)}`
 
     return (
@@ -153,6 +160,18 @@ export const MultiSelectForm = <T,>({ label, options, value = [], onChange, plac
                             selectedOptions.length === 0 && <span className={styles['placeholder']}>{placeholder || '選択してください'}</span>
                         )}
                     </div>
+                    {selectedOptions.length > 0 && (
+                        <button
+                            className={styles['clear-all-button']}
+                            onClick={(e) => {
+                                e.stopPropagation()
+                                handleClearAll()
+                            }}
+                            type="button"
+                        >
+                            <Close />
+                        </button>
+                    )}
                     <ExpandMore className={`${styles['chevron']} ${isOpen ? styles['chevron-open'] : ''}`} />
                 </div>
 

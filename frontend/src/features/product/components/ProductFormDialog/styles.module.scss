@@ -193,3 +193,11 @@
         background-color: $danger-bg-color;
     }
 }
+
+.price-value {
+    text-align: right;
+    font-size: $font-medium;
+    font-weight: 600;
+    color: $title-primary-color;
+    padding: 0.5rem 0;
+}

@@ -49,6 +49,22 @@ export const WithValue: Story = {
     },
 }
 
+export const WithMultipleSelections: Story = {
+    render: () => {
+        const [value, setValue] = useState<string[]>(['earrings', 'necklace', 'bracelet', 'ring'])
+        return (
+            <MultiSelectForm
+                helperText="全クリアボタン（×）でまとめて削除、または個別のChipのクローズボタンで削除可能"
+                label="タグ"
+                onChange={setValue}
+                options={stringOptions}
+                placeholder="タグを選択してください"
+                value={value}
+            />
+        )
+    },
+}
+
 export const Required: Story = {
     render: () => {
         const [value, setValue] = useState<string[]>([])

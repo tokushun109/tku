@@ -56,6 +56,22 @@ export const WithValue: Story = {
     },
 }
 
+export const WithClearButton: Story = {
+    render: () => {
+        const [value, setValue] = useState<string>('necklace')
+        return (
+            <SelectForm
+                helperText="選択済みの値の右側にクリアボタン（×）が表示されます"
+                label="カテゴリー"
+                onChange={setValue}
+                options={stringOptions}
+                placeholder="選択してください"
+                value={value}
+            />
+        )
+    },
+}
+
 export const WithError: Story = {
     render: () => {
         const [value, setValue] = useState<string>('')
