@@ -5,6 +5,25 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 const meta: Meta<typeof ProductFormDialog> = {
     component: ProductFormDialog,
     args: {
+        categories: [
+            { uuid: 'category-1', name: 'ピアス' },
+            { uuid: 'category-2', name: 'ネックレス' },
+            { uuid: 'category-3', name: 'ブレスレット' },
+        ],
+        targets: [
+            { uuid: 'target-1', name: '大人女性' },
+            { uuid: 'target-2', name: '若い女性' },
+            { uuid: 'target-3', name: '男性' },
+        ],
+        tags: [
+            { uuid: 'tag-1', name: 'シンプル' },
+            { uuid: 'tag-2', name: 'カジュアル' },
+            { uuid: 'tag-3', name: 'エレガント' },
+        ],
+        salesSites: [
+            { uuid: 'site-1', name: 'Creema' },
+            { uuid: 'site-2', name: 'minne' },
+        ],
         isOpen: true,
         isSubmitting: false,
         onClose: () => {
