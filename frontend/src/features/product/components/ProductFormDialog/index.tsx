@@ -140,7 +140,7 @@ export const ProductFormDialog = ({
                 updateItem?.productImages?.map((image, _index) => ({
                     id: `existing-${image.uuid}`,
                     src: image.apiPath,
-                    type: 'existing' as const,
+                    isNewUpload: false,
                     order: image.order,
                 })) || []
             setImageItems(existingImages)
@@ -186,11 +186,11 @@ export const ProductFormDialog = ({
         const newImageItems: ImageItem[] = files.map((file, index) => ({
             id: `new-${Date.now()}-${index}`,
             src: URL.createObjectURL(file),
-            type: 'new' as const,
+            isNewUpload: true,
         }))
 
         // 既存画像と新規画像を統合
-        const existingImages = imageItems.filter((item) => item.type === 'existing')
+        const existingImages = imageItems.filter((item) => !item.isNewUpload)
         setImageItems([...existingImages, ...newImageItems])
     }
 
@@ -203,7 +203,7 @@ export const ProductFormDialog = ({
             const imageIndex = imageItems.findIndex((item) => item.id === id)
             if (imageIndex !== -1) {
                 const newUploadImages = uploadImages.filter((_, _index) => {
-                    const newImageStartIndex = imageItems.filter((item) => item.type === 'existing').length
+                    const newImageStartIndex = imageItems.filter((item) => !item.isNewUpload).length
                     return _index !== imageIndex - newImageStartIndex
                 })
                 setUploadImages(newUploadImages)
@@ -232,9 +232,9 @@ export const ProductFormDialog = ({
         setImageItems(updatedItems)
     }
 
-    const handleFormSubmit: SubmitHandler<IProductForm> = async (_data) => {
+    const handleFormSubmit: SubmitHandler<IProductForm> = async (data) => {
         const formData = {
-            ..._data,
+            ...data,
             tagUuids: selectedTags,
             siteDetails: formSiteDetails.map((detail) => ({
                 salesSiteUuid: detail.salesSiteUuid,

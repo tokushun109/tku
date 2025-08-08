@@ -1,17 +1,14 @@
-import { Close, DragIndicator } from '@mui/icons-material'
+import { Close } from '@mui/icons-material'
 import React from 'react'
 
-import { ColorType, FontSizeType } from '@/types'
-
-import { Chip, ChipSize } from '../Chip'
 import { Image } from '../Image'
 import styles from './styles.module.scss'
 
 export interface ImageItem {
     id: string
+    isNewUpload: boolean
     order?: number
     src: string
-    type: 'existing' | 'new'
 }
 
 interface Props {

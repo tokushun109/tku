@@ -584,6 +584,7 @@ export const getProducts = async (): Promise<Product[]> => {
 ### Push時の注意事項
 
 - **依存関係チェック**: push時にpre-pushフックで依存関係の更新が必要と表示された場合は、`pnpm update --latest`を実行してから再度pushする
+- **gitignoreの遵守**: `.gitignore`で除外されているファイル（`.vscode/settings.json`、`node_modules`、`build`成果物等）を**絶対にコミットしない**。`git add -f`による強制追加も禁止
 
 ## 移行方針
 

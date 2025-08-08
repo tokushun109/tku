@@ -33,8 +33,6 @@ export const MultipleImageInput = React.forwardRef<HTMLInputElement, Props>(
         const fileCount = value.length
         const displayText = fileCount > 0 ? `${fileCount}個の画像が選択されています` : '画像を選択してください'
 
-        console.log(value, 'アップロードファイル')
-
         return (
             <div className={`${styles['form-field']} ${required ? styles['require-form'] : ''}`}>
                 {label && (
@@ -45,10 +43,10 @@ export const MultipleImageInput = React.forwardRef<HTMLInputElement, Props>(
 
                 <div className={`${styles['file-input-container']} ${error ? styles.error : ''} ${className || ''}`} onClick={handleContainerClick}>
                     <input
-                        key={value.map((file) => file.name).join(', ')}
                         accept="image/*"
                         className={styles['hidden-input']}
                         id={inputId}
+                        key={value.map((file) => file.name).join(', ')}
                         multiple
                         onChange={handleFileChange}
                         ref={fileInputRef}
