@@ -18,4 +18,5 @@ export const ProductSchema = z.object({
             }),
         )
         .optional(),
+    uploadImages: z.array(z.instanceof(File)).optional(),
 })
