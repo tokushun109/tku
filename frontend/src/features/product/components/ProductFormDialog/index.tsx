@@ -1,10 +1,13 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Close } from '@mui/icons-material'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 
+import { Button } from '@/components/bases/Button'
 import { Checkbox } from '@/components/bases/Checkbox'
+import { Chip, ChipSize } from '@/components/bases/Chip'
 import { Dialog } from '@/components/bases/Dialog'
 import { Form } from '@/components/bases/Form'
 import { ImagePreviewList, ImageItem } from '@/components/bases/ImagePreviewList'
@@ -16,6 +19,7 @@ import { SelectForm, SelectFormOption } from '@/components/bases/SelectForm'
 import { TextArea } from '@/components/bases/TextArea'
 import { IClassification } from '@/features/classification/type'
 import { ISite } from '@/features/site/type'
+import { ColorType, FontSizeType } from '@/types'
 
 import styles from './styles.module.scss'
 import { ProductSchema } from '../../product/schema'
@@ -49,6 +53,7 @@ export const ProductFormDialog = ({
 }: Props) => {
     const [selectedSalesSite, setSelectedSalesSite] = useState<string>('')
     const [siteDetailUrl, setSiteDetailUrl] = useState<string>('')
+    const [siteDetailUrlError, setSiteDetailUrlError] = useState<string>('')
     const [selectedTags, setSelectedTags] = useState<string[]>([])
     const [formSiteDetails, setFormSiteDetails] = useState<Array<{ detailUrl: string; salesSiteName: string; salesSiteUuid: string }>>([])
     const [uploadImages, setUploadImages] = useState<File[]>([])
@@ -154,14 +159,51 @@ export const ProductFormDialog = ({
         setFormSiteDetails([])
         setSelectedSalesSite('')
         setSiteDetailUrl('')
+        setSiteDetailUrlError('')
         setUploadImages([])
         setImageItems([])
         setIsImageOrderChanged(false)
         onClose()
     }
 
+    const validateSiteDetailUrl = (url: string): string => {
+        if (!url) {
+            return 'URLを入力してください'
+        }
+
+        try {
+            new URL(url)
+        } catch {
+            return '正しいURLを入力してください'
+        }
+
+        // 同じサイトで既に登録済みかチェック
+        const isDuplicate = formSiteDetails.some((detail) => detail.salesSiteUuid === selectedSalesSite && detail.detailUrl === url)
+        if (isDuplicate) {
+            return '同じサイトで既に登録済みのURLです'
+        }
+
+        return ''
+    }
+
+    const handleSiteDetailUrlChange = (value: string) => {
+        setSiteDetailUrl(value)
+        if (value && selectedSalesSite) {
+            const error = validateSiteDetailUrl(value)
+            setSiteDetailUrlError(error)
+        } else {
+            setSiteDetailUrlError('')
+        }
+    }
+
     const handleAddSiteDetail = () => {
         if (selectedSalesSite && siteDetailUrl) {
+            const error = validateSiteDetailUrl(siteDetailUrl)
+            if (error) {
+                setSiteDetailUrlError(error)
+                return
+            }
+
             const salesSite = salesSites.find((site) => site.uuid === selectedSalesSite)
             if (salesSite) {
                 const newSiteDetail = {
@@ -172,6 +214,7 @@ export const ProductFormDialog = ({
                 setFormSiteDetails([...formSiteDetails, newSiteDetail])
                 setSelectedSalesSite('')
                 setSiteDetailUrl('')
+                setSiteDetailUrlError('')
             }
         }
     }
@@ -358,43 +401,72 @@ export const ProductFormDialog = ({
 
                 <div className={styles['form-row']}>
                     <div className={styles['form-field']}>
-                        <label className={styles['label']}>販売サイト</label>
+                        <label className={styles['label']}>販売ページ</label>
                         <div className={styles['site-detail-input']}>
                             <SelectForm
                                 id="salesSite"
-                                onChange={(value) => setSelectedSalesSite(value)}
+                                onChange={(value) => {
+                                    setSelectedSalesSite(value)
+                                    setSiteDetailUrlError('')
+                                }}
                                 options={salesSiteOptions}
                                 placeholder="販売サイトを選択してください"
                                 value={selectedSalesSite}
                             />
-                            <input
-                                className={styles['url-input']}
-                                disabled={!selectedSalesSite}
-                                onChange={(e) => setSiteDetailUrl(e.target.value)}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
-                                        e.preventDefault()
-                                        handleAddSiteDetail()
-                                    }
-                                }}
-                                placeholder="URLを入力してEnterで追加"
-                                type="url"
-                                value={siteDetailUrl}
-                            />
                         </div>
-                        {formSiteDetails.length > 0 && (
-                            <div className={styles['site-detail-list']}>
-                                {formSiteDetails.map((detail, index) => (
-                                    <div className={styles['site-detail-item']} key={index}>
-                                        <a className={styles['site-detail-link']} href={detail.detailUrl} rel="noopener noreferrer" target="_blank">
-                                            {detail.salesSiteName}
-                                        </a>
-                                        <button className={styles['remove-button']} onClick={() => handleRemoveSiteDetail(index)} type="button">
-                                            ×
-                                        </button>
-                                    </div>
-                                ))}
+                        {selectedSalesSite && (
+                            <div className={styles['url-input-row']}>
+                                <div className={styles['url-input-wrapper']}>
+                                    <input
+                                        className={`${styles['url-input']} ${siteDetailUrlError ? styles['error'] : ''}`}
+                                        onChange={(e) => handleSiteDetailUrlChange(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault()
+                                                handleAddSiteDetail()
+                                            }
+                                        }}
+                                        placeholder="URLを入力してください"
+                                        type="url"
+                                        value={siteDetailUrl}
+                                    />
+                                    {siteDetailUrlError && <span className={styles['field-error']}>{siteDetailUrlError}</span>}
+                                </div>
+                                <Button
+                                    colorType={ColorType.Primary}
+                                    disabled={!siteDetailUrl || !!siteDetailUrlError}
+                                    onClick={handleAddSiteDetail}
+                                    type="button"
+                                >
+                                    URLを追加
+                                </Button>
                             </div>
+                        )}
+                        {formSiteDetails.length > 0 && (
+                            <>
+                                <label className={styles['registered-sites-label']}>現在の登録</label>
+                                <div className={styles['site-detail-list']}>
+                                    {formSiteDetails.map((detail, index) => (
+                                        <div className={styles['selected-chip-container']} key={index}>
+                                            <Chip color={ColorType.Secondary} fontColor="#ffffff" fontSize={FontSizeType.SmMd} size={ChipSize.Small}>
+                                                <a className={styles['chip-link']} href={detail.detailUrl} rel="noopener noreferrer" target="_blank">
+                                                    {detail.salesSiteName}
+                                                </a>
+                                                <button
+                                                    className={styles['chip-close-button']}
+                                                    onClick={(e) => {
+                                                        e.preventDefault()
+                                                        handleRemoveSiteDetail(index)
+                                                    }}
+                                                    type="button"
+                                                >
+                                                    <Close />
+                                                </button>
+                                            </Chip>
+                                        </div>
+                                    ))}
+                                </div>
+                            </>
                         )}
                     </div>
                 </div>
