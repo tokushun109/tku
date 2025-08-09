@@ -291,7 +291,7 @@ export const ProductFormDialog = ({
                         id="description"
                         label="商品説明"
                         placeholder="商品説明を入力してください（任意）"
-                        rows={4}
+                        rows={8}
                     />
                 </div>
 
