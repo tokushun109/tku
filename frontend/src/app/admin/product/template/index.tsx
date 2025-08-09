@@ -2,6 +2,7 @@
 
 import { Add } from '@mui/icons-material'
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
 import { getCategories } from '@/apis/category'
 import { createProduct, deleteProduct, getProducts, updateProduct, uploadProductImage } from '@/apis/product'
@@ -9,6 +10,7 @@ import { getSalesSiteList } from '@/apis/salesSite'
 import { getTags } from '@/apis/tag'
 import { getTargets } from '@/apis/target'
 import { Button } from '@/components/bases/Button'
+import { Dialog } from '@/components/bases/Dialog'
 import { IClassification } from '@/features/classification/type'
 import { ProductCard } from '@/features/product/components/ProductCard'
 import { ProductFormDialog } from '@/features/product/components/ProductFormDialog'
@@ -28,6 +30,8 @@ export const AdminProductTemplate = () => {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
     const [submitError, setSubmitError] = useState<string | null>(null)
     const [updateItem, setUpdateItem] = useState<IProduct | null>(null)
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false)
+    const [deleteTargetItem, setDeleteTargetItem] = useState<IProduct | null>(null)
 
     const fetchData = async () => {
         try {
@@ -71,16 +75,27 @@ export const AdminProductTemplate = () => {
         setIsDialogOpen(true)
     }
 
-    const handleDelete = async (product: IProduct) => {
-        if (!confirm(`${product.name}を削除します。よろしいですか？`)) {
-            return
-        }
+    const handleDelete = (product: IProduct) => {
+        setDeleteTargetItem(product)
+        setIsDeleteDialogOpen(true)
+    }
+
+    const handleCloseDeleteDialog = () => {
+        setIsDeleteDialogOpen(false)
+        setDeleteTargetItem(null)
+    }
+
+    const handleConfirmDelete = async () => {
+        if (!deleteTargetItem) return
 
         try {
-            await deleteProduct(product.uuid)
+            await deleteProduct(deleteTargetItem.uuid)
+            toast.success(`商品「${deleteTargetItem.name}」を削除しました`)
             await fetchData()
+            handleCloseDeleteDialog()
         } catch (error) {
             console.error('商品の削除に失敗しました:', error)
+            toast.error('商品の削除に失敗しました。もう一度お試しください。')
         }
     }
 
@@ -199,10 +214,20 @@ export const AdminProductTemplate = () => {
 
             setIsDialogOpen(false)
             setUpdateItem(null)
+
+            // 成功通知
+            if (updateItem) {
+                toast.success(`商品「${data.name}」を更新しました`)
+            } else {
+                toast.success(`商品「${data.name}」を追加しました`)
+            }
+
             await fetchData()
         } catch (error) {
             console.error('商品の保存に失敗しました:', error)
-            setSubmitError('商品の保存に失敗しました。もう一度お試しください。')
+            const errorMessage = '商品の保存に失敗しました。もう一度お試しください。'
+            setSubmitError(errorMessage)
+            toast.error(errorMessage)
         } finally {
             setIsSubmitting(false)
         }
@@ -252,6 +277,27 @@ export const AdminProductTemplate = () => {
                 targets={targets}
                 updateItem={updateItem}
             />
+
+            <Dialog
+                cancelOption={{
+                    label: 'キャンセル',
+                    onClick: handleCloseDeleteDialog,
+                }}
+                confirmOption={{
+                    label: '削除',
+                    onClick: handleConfirmDelete,
+                }}
+                isOpen={isDeleteDialogOpen}
+                onClose={handleCloseDeleteDialog}
+                title="削除確認"
+            >
+                {deleteTargetItem && (
+                    <>
+                        <p>商品「{deleteTargetItem.name}」を削除しますか？</p>
+                        <p>この操作は取り消せません。</p>
+                    </>
+                )}
+            </Dialog>
         </div>
     )
 }
