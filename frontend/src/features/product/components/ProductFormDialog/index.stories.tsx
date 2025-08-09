@@ -33,6 +33,10 @@ const meta: Meta<typeof ProductFormDialog> = {
             console.log('フォーム送信:', data)
             await new Promise((resolve) => setTimeout(resolve, 1000))
         },
+        onCreemaDuplicate: async (data) => {
+            console.log('Creema複製:', data)
+            await new Promise((resolve) => setTimeout(resolve, 1000))
+        },
         submitError: null,
         updateItem: null,
     },

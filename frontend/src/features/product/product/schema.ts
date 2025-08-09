@@ -14,11 +14,41 @@ export const ProductSchema = z.object({
         .array(
             z.object({
                 salesSiteUuid: z.string(),
-                detailUrl: z.string().url('正しいURLを入力してください'),
+                detailUrl: z.string().refine(
+                    (url) => {
+                        try {
+                            new URL(url)
+                            return true
+                        } catch {
+                            return false
+                        }
+                    },
+                    { message: '正しいURLを入力してください' },
+                ),
             }),
         )
         .optional(),
     uploadImages: z.array(z.instanceof(File)).optional(),
     imageItems: z.array(z.any()).optional(), // ImageItem型 - zodでは複雑な型の検証を簡略化
     isImageOrderChanged: z.boolean().optional(),
+})
+
+/** Creema複製フォームのバリデーションスキーマ */
+export const CreemaDuplicateSchema = z.object({
+    creemaUrl: z
+        .string()
+        .min(1, 'URLは必須項目です')
+        .refine(
+            (url) => {
+                try {
+                    new URL(url)
+                    return url.includes('creema')
+                } catch {
+                    return false
+                }
+            },
+            {
+                message: 'CreemaのURLを入力してください',
+            },
+        ),
 })
