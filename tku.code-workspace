@@ -1,0 +1,36 @@
+{
+  "folders": [
+    {
+      "name": "tku (root)",
+      "path": "."
+    },
+    {
+      "name": "frontend",
+      "path": "./frontend"
+    },
+    {
+      "name": "api",
+      "path": "./api"
+    },
+    {
+      "name": "client",
+      "path": "./client"
+    },
+    {
+      "name": "infra",
+      "path": "./infra"
+    }
+  ],
+  "settings": {
+    "eslint.workingDirectories": [
+      "frontend"
+    ]
+  },
+  "extensions": {
+    "recommendations": [
+      "dbaeumer.vscode-eslint",
+      "esbenp.prettier-vscode",
+      "ms-vscode.vscode-typescript-next"
+    ]
+  }
+}

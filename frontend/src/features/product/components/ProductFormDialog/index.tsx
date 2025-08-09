@@ -7,9 +7,11 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { Checkbox } from '@/components/bases/Checkbox'
 import { Dialog } from '@/components/bases/Dialog'
 import { Form } from '@/components/bases/Form'
+import { ImagePreviewList, ImageItem } from '@/components/bases/ImagePreviewList'
 import { Input } from '@/components/bases/Input'
 import { Message, MessageType } from '@/components/bases/Message'
 import { MultiSelectForm, MultiSelectFormOption } from '@/components/bases/MultiSelectForm'
+import { MultipleImageInput } from '@/components/bases/MultipleImageInput'
 import { SelectForm, SelectFormOption } from '@/components/bases/SelectForm'
 import { TextArea } from '@/components/bases/TextArea'
 import { IClassification } from '@/features/classification/type'
@@ -49,6 +51,9 @@ export const ProductFormDialog = ({
     const [siteDetailUrl, setSiteDetailUrl] = useState<string>('')
     const [selectedTags, setSelectedTags] = useState<string[]>([])
     const [formSiteDetails, setFormSiteDetails] = useState<Array<{ detailUrl: string; salesSiteName: string; salesSiteUuid: string }>>([])
+    const [uploadImages, setUploadImages] = useState<File[]>([])
+    const [imageItems, setImageItems] = useState<ImageItem[]>([])
+    const [isImageOrderChanged, setIsImageOrderChanged] = useState<boolean>(false)
 
     const {
         register,
@@ -69,6 +74,7 @@ export const ProductFormDialog = ({
             targetUuid: '',
             tagUuids: [],
             siteDetails: [],
+            uploadImages: [],
         },
     })
 
@@ -117,6 +123,7 @@ export const ProductFormDialog = ({
                 targetUuid: updateItem?.target?.uuid || '',
                 tagUuids,
                 siteDetails,
+                uploadImages: [],
             })
 
             // ローカル状態も更新
@@ -128,6 +135,16 @@ export const ProductFormDialog = ({
                     salesSiteName: detail.salesSite.name,
                 })) || [],
             )
+
+            // 既存画像をImageItemsに変換
+            const existingImages: ImageItem[] =
+                updateItem?.productImages?.map((image, _index) => ({
+                    id: `existing-${image.uuid}`,
+                    src: image.apiPath,
+                    isNewUpload: false,
+                    order: image.order,
+                })) || []
+            setImageItems(existingImages)
         }
     }, [updateItem, isOpen, reset])
 
@@ -137,6 +154,9 @@ export const ProductFormDialog = ({
         setFormSiteDetails([])
         setSelectedSalesSite('')
         setSiteDetailUrl('')
+        setUploadImages([])
+        setImageItems([])
+        setIsImageOrderChanged(false)
         onClose()
     }
 
@@ -160,19 +180,80 @@ export const ProductFormDialog = ({
         setFormSiteDetails(formSiteDetails.filter((_, i) => i !== index))
     }
 
-    const handleFormSubmit: SubmitHandler<IProductForm> = async (_data) => {
+    const handleImageUpload = (files: File[]) => {
+        setUploadImages(files)
+        setValue('uploadImages', files)
+
+        // 新規画像をImageItemsに追加
+        const newImageItems: ImageItem[] = files.map((file, index) => ({
+            id: `new-${Date.now()}-${index}`,
+            src: URL.createObjectURL(file),
+            isNewUpload: true,
+        }))
+
+        // 既存画像と新規画像を統合
+        const existingImages = imageItems.filter((item) => !item.isNewUpload)
+        setImageItems([...existingImages, ...newImageItems])
+    }
+
+    const handleImageDelete = (id: string) => {
+        const updatedItems = imageItems.filter((item) => item.id !== id)
+        setImageItems(updatedItems)
+
+        // 新規画像の場合はuploadImagesからも削除
+        if (id.startsWith('new-')) {
+            const imageIndex = imageItems.findIndex((item) => item.id === id)
+            if (imageIndex !== -1) {
+                const newUploadImages = uploadImages.filter((_, _index) => {
+                    const newImageStartIndex = imageItems.filter((item) => !item.isNewUpload).length
+                    return _index !== imageIndex - newImageStartIndex
+                })
+                setUploadImages(newUploadImages)
+                setValue('uploadImages', newUploadImages)
+            }
+        }
+    }
+
+    const handleImageReorder = (dragId: string, hoverId: string) => {
+        const dragIndex = imageItems.findIndex((item) => item.id === dragId)
+        const hoverIndex = imageItems.findIndex((item) => item.id === hoverId)
+
+        if (dragIndex === -1 || hoverIndex === -1) return
+
+        const newItems = [...imageItems]
+        const draggedItem = newItems[dragIndex]
+        newItems.splice(dragIndex, 1)
+        newItems.splice(hoverIndex, 0, draggedItem)
+
+        // 順序を更新
+        const updatedItems = newItems.map((item, index) => ({
+            ...item,
+            order: index + 1,
+        }))
+
+        setImageItems(updatedItems)
+        setIsImageOrderChanged(true) // 並び替えが発生したフラグを立てる
+    }
+
+    const handleFormSubmit: SubmitHandler<IProductForm> = async (data) => {
         const formData = {
-            ..._data,
+            ...data,
             tagUuids: selectedTags,
             siteDetails: formSiteDetails.map((detail) => ({
                 salesSiteUuid: detail.salesSiteUuid,
                 detailUrl: detail.detailUrl,
             })),
+            uploadImages,
+            imageItems, // 並び替え後の画像リスト
+            isImageOrderChanged, // 並び替えフラグ
         }
         await onSubmit(formData)
         reset()
         setSelectedTags([])
         setFormSiteDetails([])
+        setUploadImages([])
+        setImageItems([])
+        setIsImageOrderChanged(false)
     }
 
     const isEdit = updateItem !== null
@@ -262,6 +343,17 @@ export const ProductFormDialog = ({
                         placeholder="タグを選択してください"
                         value={selectedTags}
                     />
+                </div>
+
+                <div className={styles['form-row']}>
+                    <MultipleImageInput
+                        helperText="画像ファイルを選択してください（複数選択可能）"
+                        id="uploadImages"
+                        label="商品画像"
+                        onChange={handleImageUpload}
+                        value={uploadImages}
+                    />
+                    <ImagePreviewList images={imageItems} onDelete={handleImageDelete} onReorder={handleImageReorder} title="現在の登録" />
                 </div>
 
                 <div className={styles['form-row']}>

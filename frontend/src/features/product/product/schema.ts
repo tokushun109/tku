@@ -18,4 +18,7 @@ export const ProductSchema = z.object({
             }),
         )
         .optional(),
+    uploadImages: z.array(z.instanceof(File)).optional(),
+    imageItems: z.array(z.any()).optional(), // ImageItem型 - zodでは複雑な型の検証を簡略化
+    isImageOrderChanged: z.boolean().optional(),
 })

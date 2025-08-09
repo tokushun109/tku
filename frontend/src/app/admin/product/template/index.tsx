@@ -4,7 +4,7 @@ import { Add } from '@mui/icons-material'
 import { useEffect, useState } from 'react'
 
 import { getCategories } from '@/apis/category'
-import { createProduct, deleteProduct, getProducts, updateProduct } from '@/apis/product'
+import { createProduct, deleteProduct, getProducts, updateProduct, uploadProductImage } from '@/apis/product'
 import { getSalesSiteList } from '@/apis/salesSite'
 import { getTags } from '@/apis/tag'
 import { getTargets } from '@/apis/target'
@@ -117,12 +117,84 @@ export const AdminProductTemplate = () => {
                     : [],
             }
 
+            let productUuid: string = ''
+
             if (updateItem) {
-                // 編集
-                await updateProduct(updateItem.uuid, { ...productData, uuid: updateItem.uuid })
+                // 編集時：まず基本データを更新、その後画像順序更新（必要な場合）
+                let productDataToUpdate = { ...productData, uuid: updateItem.uuid }
+
+                // 既存画像の順序更新処理（並び替えが行われた場合）
+                if (data.isImageOrderChanged && data.imageItems) {
+                    const existingItems = data.imageItems.filter((item) => !item.isNewUpload)
+                    const updatedProductImages = updateItem.productImages.map((image) => {
+                        const reorderedItem = existingItems.find((item) => item.src === image.apiPath)
+                        if (reorderedItem && reorderedItem.order) {
+                            // 並び替え後の位置に基づいて100から降順で計算
+                            return {
+                                ...image,
+                                order: 100 - (reorderedItem.order - 1),
+                            }
+                        }
+                        return {
+                            ...image,
+                            order: image.order, // 並び替えされていない場合は既存の値を維持
+                        }
+                    })
+
+                    // 順序更新されたproductImagesを含める
+                    productDataToUpdate.productImages = updatedProductImages
+                }
+
+                await updateProduct(updateItem.uuid, productDataToUpdate)
+                productUuid = updateItem.uuid
             } else {
                 // 新規作成
-                await createProduct(productData)
+                const result = await createProduct(productData)
+                productUuid = result.uuid
+            }
+
+            // 画像をアップロードする場合の処理
+            if (data.uploadImages && data.uploadImages.length > 0) {
+                const existingImagesCount = updateItem?.productImages?.length || 0
+                const hasOrderChanged = data.isImageOrderChanged || false
+
+                // 新規画像の優先順位を計算
+                let uploadFileOrder: { [key: number]: number } = {}
+
+                if (hasOrderChanged && data.imageItems) {
+                    // 並び替えが行われた場合、全体の順序から新規画像の順序を計算
+                    const newUploadItems = data.imageItems.filter((item) => item.isNewUpload)
+
+                    // data.uploadImagesの順序に合わせてuploadFileOrderを作成
+                    data.uploadImages.forEach((file, uploadIndex) => {
+                        // ファイル名でマッチングして対応するimageItemを見つける
+                        const matchingItem = newUploadItems.find((item) => {
+                            // ObjectURLの場合はファイル名で比較できないため、順序で推定
+                            const expectedIndex = newUploadItems.indexOf(item)
+                            return expectedIndex === uploadIndex
+                        })
+
+                        if (matchingItem && matchingItem.order) {
+                            // 並び替え後の位置（1から始まる）を100から降順に変換
+                            uploadFileOrder[uploadIndex] = 100 - (matchingItem.order - 1)
+                        } else {
+                            // フォールバック: 既存画像数を考慮した順序
+                            uploadFileOrder[uploadIndex] = 100 - existingImagesCount - uploadIndex
+                        }
+                    })
+                } else {
+                    // 通常の場合、既存画像より低い優先順位を設定
+                    data.uploadImages.forEach((_, index) => {
+                        uploadFileOrder[index] = 100 - existingImagesCount - index
+                    })
+                }
+
+                const orderParams = {
+                    isChanged: hasOrderChanged,
+                    order: uploadFileOrder,
+                }
+
+                await uploadProductImage(productUuid, data.uploadImages, orderParams)
             }
 
             setIsDialogOpen(false)

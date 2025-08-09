@@ -29,7 +29,7 @@
     border: 2px solid #e1e5e9;
     border-radius: 4px;
     background-color: $primary-bg-color;
-    transition: $transition;
+    transition: border-color 0.3s ease;
     cursor: pointer;
 
     &:hover {

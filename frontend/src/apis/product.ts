@@ -164,8 +164,33 @@ export const deleteProduct = async (uuid: string): Promise<void> => {
     }
 }
 
-/** 商品画像をアップロード */
+/** 商品画像をアップロード（順序指定付き） */
 export const uploadProductImages = async (productUuid: string, files: File[], orderParams: IProductImageParams): Promise<void> => {
+    try {
+        const formData = new FormData()
+        formData.append('order', JSON.stringify(orderParams))
+
+        files.forEach((file, index) => {
+            formData.append(`file${index}`, file)
+        })
+
+        const res = await fetch(`${process.env.API_URL}/product/${productUuid}/product_image`, {
+            method: 'POST',
+            body: formData,
+            credentials: 'include',
+        })
+
+        if (!res.ok) throw new ApiError(res)
+    } catch (error) {
+        if (error instanceof ApiError) {
+            throw error
+        }
+        throw new Error('商品画像のアップロードに失敗しました')
+    }
+}
+
+/** 商品画像をアップロード */
+export const uploadProductImage = async (productUuid: string, files: File[], orderParams: IProductImageParams): Promise<void> => {
     try {
         const formData = new FormData()
         formData.append('order', JSON.stringify(orderParams))
