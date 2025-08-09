@@ -4,7 +4,7 @@ import { Add } from '@mui/icons-material'
 import { useEffect, useState } from 'react'
 
 import { getCategories } from '@/apis/category'
-import { createProduct, deleteProduct, getProducts, updateProduct } from '@/apis/product'
+import { createProduct, deleteProduct, getProducts, updateProduct, uploadProductImage } from '@/apis/product'
 import { getSalesSiteList } from '@/apis/salesSite'
 import { getTags } from '@/apis/tag'
 import { getTargets } from '@/apis/target'
@@ -117,12 +117,27 @@ export const AdminProductTemplate = () => {
                     : [],
             }
 
+            let createdOrUpdatedProduct: IProduct
+
             if (updateItem) {
                 // 編集
-                await updateProduct(updateItem.uuid, { ...productData, uuid: updateItem.uuid })
+                createdOrUpdatedProduct = await updateProduct(updateItem.uuid, { ...productData, uuid: updateItem.uuid })
             } else {
                 // 新規作成
-                await createProduct(productData)
+                createdOrUpdatedProduct = await createProduct(productData)
+            }
+
+            // 画像をアップロードする場合の処理
+            if (data.uploadImages && data.uploadImages.length > 0) {
+                // デフォルトのorderパラメータを作成（順序変更なし、順番通りのorder）
+                const orderParams = {
+                    isChanged: false,
+                    order: data.uploadImages.reduce<{ [key: number]: number }>((acc, _, index) => {
+                        acc[index] = index + 1
+                        return acc
+                    }, {}),
+                }
+                await uploadProductImage(createdOrUpdatedProduct.uuid, data.uploadImages, orderParams)
             }
 
             setIsDialogOpen(false)
