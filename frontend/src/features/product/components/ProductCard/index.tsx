@@ -1,4 +1,4 @@
-import { Delete, Edit } from '@mui/icons-material'
+import { Delete } from '@mui/icons-material'
 
 import { Chip, ChipSize } from '@/components/bases/Chip'
 import { Image } from '@/components/bases/Image'
@@ -28,6 +28,7 @@ export const ProductCard = ({ product, onEdit, onDelete, admin = false }: Props)
             className={`${styles['product-card']} ${product.isActive ? styles['is-active'] : ''} ${
                 product.isActive && product.isRecommend ? styles['is-recommend'] : ''
             }`}
+            onClick={admin ? handleEdit : undefined}
         >
             <div className={styles['product-card-wrapper']}>
                 <div className={styles['product-card-header']}>
@@ -70,10 +71,13 @@ export const ProductCard = ({ product, onEdit, onDelete, admin = false }: Props)
                     <div className={styles['product-card-footer-content']}>
                         {admin && (
                             <div className={styles['admin-actions']}>
-                                <button className={styles['edit-button']} onClick={handleEdit}>
-                                    <Edit sx={{ fontSize: 16 }} />
-                                </button>
-                                <button className={styles['delete-button']} onClick={handleDelete}>
+                                <button
+                                    className={styles['delete-button']}
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        handleDelete()
+                                    }}
+                                >
                                     <Delete sx={{ fontSize: 16 }} />
                                 </button>
                             </div>
