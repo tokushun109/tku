@@ -22,15 +22,23 @@ import { ISite } from '@/features/site/type'
 import { ColorType, FontSizeType } from '@/types'
 
 import styles from './styles.module.scss'
-import { ProductSchema } from '../../product/schema'
+import { CreemaDuplicateSchema, ProductSchema } from '../../product/schema'
 
+import type { ICreemaDuplicateForm } from '../../product/type'
 import type { IProduct, IProductForm } from '../../type'
+
+const CreateProductType = {
+    Input: 'input',
+    Duplicate: 'duplicate',
+} as const
+type CreateProductType = (typeof CreateProductType)[keyof typeof CreateProductType]
 
 interface Props {
     categories: IClassification[]
     isOpen: boolean
     isSubmitting: boolean
     onClose: () => void
+    onCreemaDuplicate: (_data: ICreemaDuplicateForm) => Promise<void>
     onSubmit: (_data: IProductForm) => Promise<void>
     salesSites: ISite[]
     submitError: string | null
@@ -45,6 +53,7 @@ export const ProductFormDialog = ({
     isSubmitting,
     onClose,
     onSubmit,
+    onCreemaDuplicate,
     salesSites,
     submitError,
     tags,
@@ -59,6 +68,7 @@ export const ProductFormDialog = ({
     const [uploadImages, setUploadImages] = useState<File[]>([])
     const [imageItems, setImageItems] = useState<ImageItem[]>([])
     const [isImageOrderChanged, setIsImageOrderChanged] = useState<boolean>(false)
+    const [createProductType, setCreateProductType] = useState<CreateProductType>(CreateProductType.Duplicate)
 
     const {
         register,
@@ -80,6 +90,19 @@ export const ProductFormDialog = ({
             tagUuids: [],
             siteDetails: [],
             uploadImages: [],
+        },
+    })
+
+    // 複製フォーム用のuseForm
+    const {
+        register: registerCreema,
+        handleSubmit: handleSubmitCreema,
+        formState: { errors: errorsCreema },
+        reset: resetCreema,
+    } = useForm<ICreemaDuplicateForm>({
+        resolver: zodResolver(CreemaDuplicateSchema),
+        defaultValues: {
+            creemaUrl: '',
         },
     })
 
@@ -163,6 +186,8 @@ export const ProductFormDialog = ({
         setUploadImages([])
         setImageItems([])
         setIsImageOrderChanged(false)
+        setCreateProductType(CreateProductType.Duplicate)
+        resetCreema()
         onClose()
     }
 
@@ -299,13 +324,21 @@ export const ProductFormDialog = ({
         setIsImageOrderChanged(false)
     }
 
+    const handleCreemaDuplicateSubmit: SubmitHandler<ICreemaDuplicateForm> = async (data) => {
+        await onCreemaDuplicate(data)
+        resetCreema()
+    }
+
     const isEdit = updateItem !== null
 
     return (
         <Dialog
             confirmOption={{
-                label: isSubmitting ? '送信中...' : isEdit ? '更新' : '追加',
-                onClick: handleSubmit(handleFormSubmit),
+                label: isSubmitting ? '送信中...' : isEdit ? '更新' : createProductType === CreateProductType.Duplicate ? '複製' : '追加',
+                onClick:
+                    createProductType === CreateProductType.Duplicate && !isEdit
+                        ? handleSubmitCreema(handleCreemaDuplicateSubmit)
+                        : handleSubmit(handleFormSubmit),
                 disabled: isSubmitting,
             }}
             isOpen={isOpen}
@@ -314,170 +347,218 @@ export const ProductFormDialog = ({
             wide
         >
             {submitError && <Message type={MessageType.Error}>{submitError}</Message>}
-            <Form noValidate onSubmit={handleSubmit(handleFormSubmit)}>
-                <div className={styles['form-row']}>
-                    <Input
-                        {...register('name')}
-                        error={errors.name?.message}
-                        id="name"
-                        label="商品名"
-                        placeholder="商品名を入力してください"
-                        required
-                        type="text"
-                    />
-                </div>
 
-                <div className={styles['form-row']}>
-                    <TextArea
-                        {...register('description')}
-                        error={errors.description?.message}
-                        id="description"
-                        label="商品説明"
-                        placeholder="商品説明を入力してください（任意）"
-                        rows={8}
-                    />
-                </div>
-
-                <div className={styles['form-row']}>
-                    <Input
-                        {...register('price', { valueAsNumber: true })}
-                        error={errors.price?.message}
-                        id="price"
-                        label="税込価格"
-                        max={1000000}
-                        min={1}
-                        placeholder="0"
-                        required
-                        type="number"
-                    />
-                    <p className={styles['price-value']}>¥{watchedPrice ? watchedPrice.toLocaleString() : '0'}</p>
-                </div>
-
-                <div className={styles['form-row']}>
-                    <SelectForm
-                        error={errors.categoryUuid?.message}
-                        id="categoryUuid"
-                        label="カテゴリー"
-                        onChange={(value) => setValue('categoryUuid', value)}
-                        options={categoryOptions}
-                        placeholder="カテゴリーを選択してください"
-                        value={watch('categoryUuid')}
-                    />
-                </div>
-
-                <div className={styles['form-row']}>
-                    <SelectForm
-                        error={errors.targetUuid?.message}
-                        id="targetUuid"
-                        label="ターゲット"
-                        onChange={(value) => setValue('targetUuid', value)}
-                        options={targetOptions}
-                        placeholder="ターゲットを選択してください"
-                        value={watch('targetUuid')}
-                    />
-                </div>
-
-                <div className={styles['form-row']}>
-                    <MultiSelectForm
-                        id="tagUuids"
-                        label="タグ"
-                        onChange={setSelectedTags}
-                        options={tagOptions}
-                        placeholder="タグを選択してください"
-                        value={selectedTags}
-                    />
-                </div>
-
-                <div className={styles['form-row']}>
-                    <MultipleImageInput
-                        helperText="画像ファイルを選択してください（複数選択可能）"
-                        id="uploadImages"
-                        label="商品画像"
-                        onChange={handleImageUpload}
-                        value={uploadImages}
-                    />
-                    <ImagePreviewList images={imageItems} onDelete={handleImageDelete} onReorder={handleImageReorder} title="現在の登録" />
-                </div>
-
-                <div className={styles['form-row']}>
-                    <div className={styles['form-field']}>
-                        <label className={styles['label']}>販売ページ</label>
-                        <div className={styles['site-detail-input']}>
-                            <SelectForm
-                                id="salesSite"
-                                onChange={(value) => {
-                                    setSelectedSalesSite(value)
-                                    setSiteDetailUrlError('')
-                                }}
-                                options={salesSiteOptions}
-                                placeholder="販売サイトを選択してください"
-                                value={selectedSalesSite}
-                            />
-                        </div>
-                        {selectedSalesSite && (
-                            <div className={styles['url-input-row']}>
-                                <div className={styles['url-input-wrapper']}>
-                                    <input
-                                        className={`${styles['url-input']} ${siteDetailUrlError ? styles['error'] : ''}`}
-                                        onChange={(e) => handleSiteDetailUrlChange(e.target.value)}
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') {
-                                                e.preventDefault()
-                                                handleAddSiteDetail()
-                                            }
-                                        }}
-                                        placeholder="URLを入力してください"
-                                        type="url"
-                                        value={siteDetailUrl}
-                                    />
-                                    {siteDetailUrlError && <span className={styles['field-error']}>{siteDetailUrlError}</span>}
-                                </div>
-                                <Button
-                                    colorType={ColorType.Primary}
-                                    disabled={!siteDetailUrl || !!siteDetailUrlError}
-                                    onClick={handleAddSiteDetail}
-                                    type="button"
-                                >
-                                    URLを追加
-                                </Button>
-                            </div>
-                        )}
-                        {formSiteDetails.length > 0 && (
-                            <>
-                                <label className={styles['registered-sites-label']}>現在の登録</label>
-                                <div className={styles['site-detail-list']}>
-                                    {formSiteDetails.map((detail, index) => (
-                                        <div className={styles['selected-chip-container']} key={index}>
-                                            <Chip color={ColorType.Secondary} fontColor="#ffffff" fontSize={FontSizeType.SmMd} size={ChipSize.Small}>
-                                                <a className={styles['chip-link']} href={detail.detailUrl} rel="noopener noreferrer" target="_blank">
-                                                    {detail.salesSiteName}
-                                                </a>
-                                                <button
-                                                    className={styles['chip-close-button']}
-                                                    onClick={(e) => {
-                                                        e.preventDefault()
-                                                        handleRemoveSiteDetail(index)
-                                                    }}
-                                                    type="button"
-                                                >
-                                                    <Close />
-                                                </button>
-                                            </Chip>
-                                        </div>
-                                    ))}
-                                </div>
-                            </>
-                        )}
-                    </div>
-                </div>
-
+            {/* 新規作成時のみ表示される選択フォーム */}
+            {!isEdit && (
                 <div className={styles['form-row']}>
                     <div className={styles['checkbox-group']}>
-                        <Checkbox {...register('isActive')} label="販売中" />
-                        <Checkbox {...register('isRecommend')} label="おすすめに設定" />
+                        <Checkbox
+                            checked={createProductType === CreateProductType.Duplicate}
+                            label="Creemaから複製"
+                            onChange={(checked) => setCreateProductType(checked ? CreateProductType.Duplicate : CreateProductType.Input)}
+                        />
+                        <Checkbox
+                            checked={createProductType === CreateProductType.Input}
+                            label="手動で入力"
+                            onChange={(checked) => setCreateProductType(checked ? CreateProductType.Input : CreateProductType.Duplicate)}
+                        />
                     </div>
                 </div>
-            </Form>
+            )}
+
+            {/* 複製フォーム */}
+            {createProductType === CreateProductType.Duplicate && !isEdit ? (
+                <Form noValidate onSubmit={handleSubmitCreema(handleCreemaDuplicateSubmit)}>
+                    <div className={styles['form-row']}>
+                        <Input
+                            {...registerCreema('creemaUrl')}
+                            error={errorsCreema.creemaUrl?.message}
+                            id="creemaUrl"
+                            label="Creema URL"
+                            placeholder="CreemaのURLを入力してください"
+                            required
+                            type="url"
+                        />
+                    </div>
+                </Form>
+            ) : (
+                /* 通常の商品フォーム */
+                <Form noValidate onSubmit={handleSubmit(handleFormSubmit)}>
+                    <div className={styles['form-row']}>
+                        <Input
+                            {...register('name')}
+                            error={errors.name?.message}
+                            id="name"
+                            label="商品名"
+                            maxLength={255}
+                            placeholder="商品名を入力してください"
+                            required
+                            type="text"
+                        />
+                    </div>
+
+                    <div className={styles['form-row']}>
+                        <TextArea
+                            {...register('description')}
+                            error={errors.description?.message}
+                            id="description"
+                            label="商品説明"
+                            placeholder="商品説明を入力してください（任意）"
+                            rows={8}
+                        />
+                    </div>
+
+                    <div className={styles['form-row']}>
+                        <Input
+                            {...register('price', { valueAsNumber: true })}
+                            error={errors.price?.message}
+                            id="price"
+                            label="税込価格"
+                            max={1000000}
+                            min={1}
+                            placeholder="0"
+                            required
+                            type="number"
+                        />
+                        <p className={styles['price-value']}>¥{watchedPrice ? watchedPrice.toLocaleString() : '0'}</p>
+                    </div>
+
+                    <div className={styles['form-row']}>
+                        <SelectForm
+                            error={errors.categoryUuid?.message}
+                            id="categoryUuid"
+                            label="カテゴリー"
+                            onChange={(value) => setValue('categoryUuid', value)}
+                            options={categoryOptions}
+                            placeholder="カテゴリーを選択してください"
+                            value={watch('categoryUuid')}
+                        />
+                    </div>
+
+                    <div className={styles['form-row']}>
+                        <SelectForm
+                            error={errors.targetUuid?.message}
+                            id="targetUuid"
+                            label="ターゲット"
+                            onChange={(value) => setValue('targetUuid', value)}
+                            options={targetOptions}
+                            placeholder="ターゲットを選択してください"
+                            value={watch('targetUuid')}
+                        />
+                    </div>
+
+                    <div className={styles['form-row']}>
+                        <MultiSelectForm
+                            id="tagUuids"
+                            label="タグ"
+                            onChange={setSelectedTags}
+                            options={tagOptions}
+                            placeholder="タグを選択してください"
+                            value={selectedTags}
+                        />
+                    </div>
+
+                    <div className={styles['form-row']}>
+                        <MultipleImageInput
+                            helperText="画像ファイルを選択してください（複数選択可能）"
+                            id="uploadImages"
+                            label="商品画像"
+                            onChange={handleImageUpload}
+                            value={uploadImages}
+                        />
+                        <ImagePreviewList images={imageItems} onDelete={handleImageDelete} onReorder={handleImageReorder} title="現在の登録" />
+                    </div>
+
+                    <div className={styles['form-row']}>
+                        <div className={styles['form-field']}>
+                            <label className={styles['label']}>販売ページ</label>
+                            <div className={styles['site-detail-input']}>
+                                <SelectForm
+                                    id="salesSite"
+                                    onChange={(value) => {
+                                        setSelectedSalesSite(value)
+                                        setSiteDetailUrlError('')
+                                    }}
+                                    options={salesSiteOptions}
+                                    placeholder="販売サイトを選択してください"
+                                    value={selectedSalesSite}
+                                />
+                            </div>
+                            {selectedSalesSite && (
+                                <div className={styles['url-input-row']}>
+                                    <div className={styles['url-input-wrapper']}>
+                                        <input
+                                            className={`${styles['url-input']} ${siteDetailUrlError ? styles['error'] : ''}`}
+                                            onChange={(e) => handleSiteDetailUrlChange(e.target.value)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    e.preventDefault()
+                                                    handleAddSiteDetail()
+                                                }
+                                            }}
+                                            placeholder="URLを入力してください"
+                                            type="url"
+                                            value={siteDetailUrl}
+                                        />
+                                        {siteDetailUrlError && <span className={styles['field-error']}>{siteDetailUrlError}</span>}
+                                    </div>
+                                    <Button
+                                        colorType={ColorType.Primary}
+                                        disabled={!siteDetailUrl || !!siteDetailUrlError}
+                                        onClick={handleAddSiteDetail}
+                                        type="button"
+                                    >
+                                        URLを追加
+                                    </Button>
+                                </div>
+                            )}
+                            {formSiteDetails.length > 0 && (
+                                <>
+                                    <label className={styles['registered-sites-label']}>現在の登録</label>
+                                    <div className={styles['site-detail-list']}>
+                                        {formSiteDetails.map((detail, index) => (
+                                            <div className={styles['selected-chip-container']} key={index}>
+                                                <Chip
+                                                    color={ColorType.Secondary}
+                                                    fontColor="#ffffff"
+                                                    fontSize={FontSizeType.SmMd}
+                                                    size={ChipSize.Small}
+                                                >
+                                                    <a
+                                                        className={styles['chip-link']}
+                                                        href={detail.detailUrl}
+                                                        rel="noopener noreferrer"
+                                                        target="_blank"
+                                                    >
+                                                        {detail.salesSiteName}
+                                                    </a>
+                                                    <button
+                                                        className={styles['chip-close-button']}
+                                                        onClick={(e) => {
+                                                            e.preventDefault()
+                                                            handleRemoveSiteDetail(index)
+                                                        }}
+                                                        type="button"
+                                                    >
+                                                        <Close />
+                                                    </button>
+                                                </Chip>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className={styles['form-row']}>
+                        <div className={styles['checkbox-group']}>
+                            <Checkbox {...register('isActive')} label="販売中" />
+                            <Checkbox {...register('isRecommend')} label="おすすめに設定" />
+                        </div>
+                    </div>
+                </Form>
+            )}
         </Dialog>
     )
 }

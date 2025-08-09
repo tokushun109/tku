@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { getCategories } from '@/apis/category'
-import { createProduct, deleteProduct, getProducts, updateProduct, uploadProductImage } from '@/apis/product'
+import { createProduct, deleteProduct, duplicateProductFromCreema, getProducts, updateProduct, uploadProductImage } from '@/apis/product'
 import { getSalesSiteList } from '@/apis/salesSite'
 import { getTags } from '@/apis/tag'
 import { getTargets } from '@/apis/target'
@@ -14,6 +14,7 @@ import { Dialog } from '@/components/bases/Dialog'
 import { IClassification } from '@/features/classification/type'
 import { ProductCard } from '@/features/product/components/ProductCard'
 import { ProductFormDialog } from '@/features/product/components/ProductFormDialog'
+import { ICreemaDuplicateForm } from '@/features/product/product/type'
 import { IProduct, IProductForm } from '@/features/product/type'
 import { ISite } from '@/features/site/type'
 
@@ -233,6 +234,26 @@ export const AdminProductTemplate = () => {
         }
     }
 
+    const handleCreemaDuplicate = async (data: ICreemaDuplicateForm) => {
+        try {
+            setIsSubmitting(true)
+            setSubmitError(null)
+
+            await duplicateProductFromCreema({ url: data.creemaUrl })
+
+            setIsDialogOpen(false)
+            toast.success('Creemaから商品を複製しました')
+            await fetchData()
+        } catch (error) {
+            console.error('Creemaからの商品複製に失敗しました:', error)
+            const errorMessage = 'Creemaからの商品複製に失敗しました。もう一度お試しください。'
+            setSubmitError(errorMessage)
+            toast.error(errorMessage)
+        } finally {
+            setIsSubmitting(false)
+        }
+    }
+
     return (
         <div className={styles['product-container']}>
             <div className={styles['page-header']}>
@@ -270,6 +291,7 @@ export const AdminProductTemplate = () => {
                 isOpen={isDialogOpen}
                 isSubmitting={isSubmitting}
                 onClose={handleCloseDialog}
+                onCreemaDuplicate={handleCreemaDuplicate}
                 onSubmit={handleSubmit}
                 salesSites={salesSites}
                 submitError={submitError}
