@@ -10,13 +10,14 @@ interface Props extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onCha
     error?: string
     helperText?: string
     label?: string
+    maxFiles?: number
     onChange?: (_files: File[]) => void
     required?: boolean
     value?: File[]
 }
 
 export const MultipleImageInput = React.forwardRef<HTMLInputElement, Props>(
-    ({ label, error, required, helperText, className, onChange, value = [], ...props }, _ref) => {
+    ({ label, error, required, helperText, className, maxFiles, onChange, value = [], ...props }, _ref) => {
         const fileInputRef = useRef<HTMLInputElement>(null)
         const inputId = props.id || props.name
 
@@ -27,11 +28,20 @@ export const MultipleImageInput = React.forwardRef<HTMLInputElement, Props>(
         const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
             const selectedFiles = Array.from(event.target.files || [])
             const imageFiles = selectedFiles.filter((file) => file.type.startsWith('image/'))
+
+            // アップロード数制限チェック
+            if (maxFiles && imageFiles.length > maxFiles) {
+                const limitedFiles = imageFiles.slice(0, maxFiles)
+                onChange?.(limitedFiles)
+                return
+            }
+
             onChange?.(imageFiles)
         }
 
         const fileCount = value.length
         const displayText = fileCount > 0 ? `${fileCount}個の画像が選択されています` : '画像を選択してください'
+        const limitText = maxFiles ? ` (最大${maxFiles}個まで)` : ''
 
         return (
             <div className={`${styles['form-field']} ${required ? styles['require-form'] : ''}`}>
@@ -65,7 +75,10 @@ export const MultipleImageInput = React.forwardRef<HTMLInputElement, Props>(
                     <div className={styles['file-display']}>
                         <div className={styles['file-info']}>
                             <FileUpload className={styles['file-icon']} />
-                            <span className={`${styles['file-name']} ${fileCount === 0 ? styles['placeholder'] : ''}`}>{displayText}</span>
+                            <span className={`${styles['file-name']} ${fileCount === 0 ? styles['placeholder'] : ''}`}>
+                                {displayText}
+                                {limitText}
+                            </span>
                         </div>
                     </div>
                 </div>

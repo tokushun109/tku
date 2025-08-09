@@ -53,6 +53,7 @@ export const ProductFormDialog = ({
     const [formSiteDetails, setFormSiteDetails] = useState<Array<{ detailUrl: string; salesSiteName: string; salesSiteUuid: string }>>([])
     const [uploadImages, setUploadImages] = useState<File[]>([])
     const [imageItems, setImageItems] = useState<ImageItem[]>([])
+    const [isImageOrderChanged, setIsImageOrderChanged] = useState<boolean>(false)
 
     const {
         register,
@@ -155,6 +156,7 @@ export const ProductFormDialog = ({
         setSiteDetailUrl('')
         setUploadImages([])
         setImageItems([])
+        setIsImageOrderChanged(false)
         onClose()
     }
 
@@ -230,6 +232,7 @@ export const ProductFormDialog = ({
         }))
 
         setImageItems(updatedItems)
+        setIsImageOrderChanged(true) // 並び替えが発生したフラグを立てる
     }
 
     const handleFormSubmit: SubmitHandler<IProductForm> = async (data) => {
@@ -241,6 +244,8 @@ export const ProductFormDialog = ({
                 detailUrl: detail.detailUrl,
             })),
             uploadImages,
+            imageItems, // 並び替え後の画像リスト
+            isImageOrderChanged, // 並び替えフラグ
         }
         await onSubmit(formData)
         reset()
@@ -248,6 +253,7 @@ export const ProductFormDialog = ({
         setFormSiteDetails([])
         setUploadImages([])
         setImageItems([])
+        setIsImageOrderChanged(false)
     }
 
     const isEdit = updateItem !== null
