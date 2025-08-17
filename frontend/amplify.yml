@@ -5,6 +5,7 @@ applications:
           phases:
               preBuild:
                   commands:
+                      - corepack enable
                       - pnpm install
               build:
                   commands:
