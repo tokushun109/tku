@@ -1,10 +1,6 @@
 .container {
     margin: 0 auto;
     max-width: $lg;
-
-    @include media(sm) {
-        padding: 16px;
-    }
 }
 
 .product-detail-area {

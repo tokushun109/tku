@@ -70,8 +70,8 @@ const AboutTemplate = ({ snsList, salesSiteList }: Props) => {
                                     <p style={{ marginBottom: 20 }}>仕上がりの印象が大きく変化するマクラメ。</p>
                                     <p>作品に合わせて材質・艶感・質感・太さなど</p>
                                     <p style={{ marginBottom: 20 }}>を選定しています。</p>
-                                    <p>ハンドメイドだからこそ生み出せる繊細な模様を</p>
-                                    <p>ぜひお楽しみください♪</p>
+                                    <p>ハンドメイドだからこそ生み出せる繊細な</p>
+                                    <p>模様をぜひお楽しみください♪</p>
                                 </div>
                             </div>
                         </div>
