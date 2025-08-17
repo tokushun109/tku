@@ -16,6 +16,10 @@ $breadcrumb-gap: 12px;
             font-size: $font-medium;
             color: $primary;
             cursor: auto;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
 
             &.link {
                 cursor: pointer;
