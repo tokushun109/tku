@@ -14,12 +14,12 @@ type Props = {
 export const ProductImageGallery = ({ product }: Props) => {
     const [selectedImageIndex, setSelectedImageIndex] = useState(0)
 
-    // 商品画像を順序でソート（productImagesが存在しない場合は空配列を使用）
-    const sortedImages = [...(product.productImages || [])].sort((a, b) => a.order - b.order)
+    // 管理画面で設定済みの順序で取得されるため、ソートは不要
+    const images = product.productImages || []
 
-    const hasImages = sortedImages.length > 0
+    const hasImages = images.length > 0
 
-    const currentImage = hasImages ? sortedImages[selectedImageIndex] : null
+    const currentImage = hasImages ? images[selectedImageIndex] : null
 
     return (
         <div className={styles['container']}>
@@ -27,9 +27,9 @@ export const ProductImageGallery = ({ product }: Props) => {
                 <Image alt={product.name} src={currentImage?.apiPath || ''} />
             </div>
 
-            {hasImages && sortedImages.length > 1 && (
+            {hasImages && images.length > 1 && (
                 <div className={styles['thumbnail-area']}>
-                    {sortedImages.map((image, index) => (
+                    {images.map((image, index) => (
                         <div
                             className={`${styles['thumbnail']} ${index === selectedImageIndex ? styles['thumbnail--active'] : ''}`}
                             key={image.uuid}
