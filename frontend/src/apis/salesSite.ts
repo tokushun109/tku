@@ -20,7 +20,7 @@ export interface ISalesSiteResponse {
 
 export const getSalesSiteList = async (): Promise<ISite[]> => {
     try {
-        const res = await fetch(`${process.env.API_URL}/sales_site/`, {
+        const res = await fetch(`${process.env.API_BASE_URL}/sales_site/`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -41,7 +41,7 @@ export const getSalesSiteList = async (): Promise<ISite[]> => {
 /** 販売サイトを追加 */
 export const postSalesSite = async (params: IPostSalesSiteParams): Promise<ISalesSiteResponse> => {
     try {
-        const res = await fetch(`${process.env.API_URL}/sales_site`, {
+        const res = await fetch(`${process.env.API_BASE_URL}/sales_site`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -64,7 +64,7 @@ export const postSalesSite = async (params: IPostSalesSiteParams): Promise<ISale
 /** 販売サイトを更新 */
 export const putSalesSite = async (params: IPutSalesSiteParams): Promise<ISalesSiteResponse> => {
     try {
-        const res = await fetch(`${process.env.API_URL}/sales_site/${params.uuid}`, {
+        const res = await fetch(`${process.env.API_BASE_URL}/sales_site/${params.uuid}`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -87,7 +87,7 @@ export const putSalesSite = async (params: IPutSalesSiteParams): Promise<ISalesS
 /** 販売サイトを削除 */
 export const deleteSalesSite = async (params: IDeleteSalesSiteParams): Promise<ISalesSiteResponse> => {
     try {
-        const res = await fetch(`${process.env.API_URL}/sales_site/${params.uuid}`, {
+        const res = await fetch(`${process.env.API_BASE_URL}/sales_site/${params.uuid}`, {
             headers: {
                 'Content-Type': 'application/json',
             },

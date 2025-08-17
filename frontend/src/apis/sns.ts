@@ -20,7 +20,7 @@ export interface ISnsResponse {
 
 export const getSnsList = async (): Promise<ISite[]> => {
     try {
-        const res = await fetch(`${process.env.API_URL}/sns/`, {
+        const res = await fetch(`${process.env.API_BASE_URL}/sns/`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -41,7 +41,7 @@ export const getSnsList = async (): Promise<ISite[]> => {
 /** SNSを追加 */
 export const postSns = async (params: IPostSnsParams): Promise<ISnsResponse> => {
     try {
-        const res = await fetch(`${process.env.API_URL}/sns`, {
+        const res = await fetch(`${process.env.API_BASE_URL}/sns`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -64,7 +64,7 @@ export const postSns = async (params: IPostSnsParams): Promise<ISnsResponse> => 
 /** SNSを更新 */
 export const putSns = async (params: IPutSnsParams): Promise<ISnsResponse> => {
     try {
-        const res = await fetch(`${process.env.API_URL}/sns/${params.uuid}`, {
+        const res = await fetch(`${process.env.API_BASE_URL}/sns/${params.uuid}`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -87,7 +87,7 @@ export const putSns = async (params: IPutSnsParams): Promise<ISnsResponse> => {
 /** SNSを削除 */
 export const deleteSns = async (params: IDeleteSnsParams): Promise<ISnsResponse> => {
     try {
-        const res = await fetch(`${process.env.API_URL}/sns/${params.uuid}`, {
+        const res = await fetch(`${process.env.API_BASE_URL}/sns/${params.uuid}`, {
             headers: {
                 'Content-Type': 'application/json',
             },

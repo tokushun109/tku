@@ -20,7 +20,7 @@ export interface ITagResponse {
 
 export const getTags = async (): Promise<IClassification[]> => {
     try {
-        const res = await fetch(`${process.env.API_URL}/tag`, {
+        const res = await fetch(`${process.env.API_BASE_URL}/tag`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -41,7 +41,7 @@ export const getTags = async (): Promise<IClassification[]> => {
 /** タグを追加 */
 export const postTag = async (params: IPostTagParams): Promise<ITagResponse> => {
     try {
-        const res = await fetch(`${process.env.API_URL}/tag`, {
+        const res = await fetch(`${process.env.API_BASE_URL}/tag`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -64,7 +64,7 @@ export const postTag = async (params: IPostTagParams): Promise<ITagResponse> => 
 /** タグを更新 */
 export const putTag = async (params: IPutTagParams): Promise<ITagResponse> => {
     try {
-        const res = await fetch(`${process.env.API_URL}/tag/${params.uuid}`, {
+        const res = await fetch(`${process.env.API_BASE_URL}/tag/${params.uuid}`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -87,7 +87,7 @@ export const putTag = async (params: IPutTagParams): Promise<ITagResponse> => {
 /** タグを削除 */
 export const deleteTag = async (params: IDeleteTagParams): Promise<ITagResponse> => {
     try {
-        const res = await fetch(`${process.env.API_URL}/tag/${params.uuid}`, {
+        const res = await fetch(`${process.env.API_BASE_URL}/tag/${params.uuid}`, {
             headers: {
                 'Content-Type': 'application/json',
             },

@@ -3,7 +3,7 @@ import { ApiError } from '@/utils/error'
 
 export const getCreator = async (): Promise<ICreator> => {
     try {
-        const res = await fetch(`${process.env.API_URL}/creator/`, {
+        const res = await fetch(`${process.env.API_BASE_URL}/creator/`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -23,7 +23,7 @@ export const getCreator = async (): Promise<ICreator> => {
 
 export const updateCreator = async (creator: Omit<ICreator, 'apiPath' | 'logo'>) => {
     try {
-        const res = await fetch(`${process.env.API_URL}/creator/`, {
+        const res = await fetch(`${process.env.API_BASE_URL}/creator/`, {
             body: JSON.stringify(creator),
             headers: {
                 'Content-Type': 'application/json',
@@ -48,7 +48,7 @@ export const updateCreatorLogo = async (file: File) => {
         const formData = new FormData()
         formData.append('logo', file)
 
-        const res = await fetch(`${process.env.API_URL}/creator/logo/`, {
+        const res = await fetch(`${process.env.API_BASE_URL}/creator/logo/`, {
             body: formData,
             method: 'PUT',
             credentials: 'include',

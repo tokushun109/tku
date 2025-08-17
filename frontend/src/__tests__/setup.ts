@@ -14,7 +14,7 @@ afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 // process.env の設定
-process.env.API_URL = 'http://localhost:8080'
+process.env.API_BASE_URL = 'http://localhost:8080'
 
 // React の global 設定
 global.React = React

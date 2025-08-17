@@ -26,7 +26,7 @@ export interface ICategoryResponse {
 export const getCategories = async (params: IGetCategoriesParams): Promise<IClassification[]> => {
     try {
         const query = convertObjectToURLSearchParams(params)
-        const res = await fetch(`${process.env.API_URL}/category?${query}`, {
+        const res = await fetch(`${process.env.API_BASE_URL}/category?${query}`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -47,7 +47,7 @@ export const getCategories = async (params: IGetCategoriesParams): Promise<IClas
 /** カテゴリを追加 */
 export const postCategory = async (params: IPostCategoryParams): Promise<ICategoryResponse> => {
     try {
-        const res = await fetch(`${process.env.API_URL}/category`, {
+        const res = await fetch(`${process.env.API_BASE_URL}/category`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -70,7 +70,7 @@ export const postCategory = async (params: IPostCategoryParams): Promise<ICatego
 /** カテゴリを更新 */
 export const putCategory = async (params: IPutCategoryParams): Promise<ICategoryResponse> => {
     try {
-        const res = await fetch(`${process.env.API_URL}/category/${params.uuid}`, {
+        const res = await fetch(`${process.env.API_BASE_URL}/category/${params.uuid}`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -93,7 +93,7 @@ export const putCategory = async (params: IPutCategoryParams): Promise<ICategory
 /** カテゴリを削除 */
 export const deleteCategory = async (params: IDeleteCategoryParams): Promise<ICategoryResponse> => {
     try {
-        const res = await fetch(`${process.env.API_URL}/category/${params.uuid}`, {
+        const res = await fetch(`${process.env.API_BASE_URL}/category/${params.uuid}`, {
             headers: {
                 'Content-Type': 'application/json',
             },
