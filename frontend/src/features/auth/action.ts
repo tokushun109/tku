@@ -40,6 +40,8 @@ export async function loginAction(prevState: LoginActionResult, formData: FormDa
             path: '/',
             // セッションの有効期限を設定（例：7日間）
             maxAge: 60 * 60 * 24 * 7,
+            // サブドメイン間でのcookie共有のためにdomainを設定
+            ...(process.env.COOKIE_DOMAIN_URL && { domain: process.env.COOKIE_DOMAIN_URL }),
         })
 
         return { success: true }

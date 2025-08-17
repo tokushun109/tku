@@ -27,6 +27,7 @@ const nextConfig: NextConfig = {
     env: {
         API_BASE_URL: process.env.API_BASE_URL ? process.env.API_BASE_URL : 'http://localhost:8080/api',
         DOMAIN_URL: process.env.DOMAIN_URL ? process.env.DOMAIN_URL : `http://localhost:${process.env.PORT ? process.env.PORT : '3000'}`,
+        COOKIE_DOMAIN_URL: process.env.COOKIE_DOMAIN_URL,
         GOOGLE_TAG: process.env.GOOGLE_TAG,
     },
 }
