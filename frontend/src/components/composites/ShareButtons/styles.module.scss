@@ -22,4 +22,22 @@
         align-items: center;
         gap: 24px;
     }
+
+    .share-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        transition: transform 0.2s ease;
+
+        &:hover {
+            transform: scale(1.1);
+        }
+
+        &:focus {
+            outline: 2px solid $primary;
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+    }
 }
