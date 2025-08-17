@@ -1,6 +1,7 @@
 import { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
+    output: 'standalone',
     sassOptions: {
         prependData: '@use "sass:color"; @use "@/styles/variables.scss" as *; @use "@/styles/mixins.scss" as *; @use "@/styles/layouts.scss" as *;',
     },
@@ -12,8 +13,13 @@ const nextConfig: NextConfig = {
                 pathname: '**',
             },
             {
-                protocol: 'http',
+                protocol: 'https',
                 hostname: 'tocoriri.com',
+                pathname: '**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'tku-api-ck57lb-prod.s3.ap-northeast-1.amazonaws.com',
                 pathname: '**',
             },
         ],

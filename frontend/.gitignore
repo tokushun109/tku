@@ -44,3 +44,10 @@ debug-storybook.log
 build-storybook.log
 
 *storybook.log
+
+# amplify
+.amplify
+.amplifyrc
+amplify-build-config.json
+amplify-provider-config.json
+awsconfiguration.json
