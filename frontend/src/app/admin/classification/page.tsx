@@ -6,6 +6,8 @@ import { getTargets } from '@/apis/target'
 
 import { ClassificationTemplate } from './template'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
     title: '分類管理 | admin',
     robots: {

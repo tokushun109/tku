@@ -4,6 +4,8 @@ import { notFound } from 'next/navigation'
 import { getProduct } from '@/apis/product'
 import ProductDetailTemplate from '@/app/(contents)/product/[uuid]/template'
 
+export const dynamic = 'force-dynamic'
+
 interface Props {
     params: Promise<{ uuid: string }>
 }

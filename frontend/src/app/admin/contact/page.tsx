@@ -4,6 +4,8 @@ import { getContacts } from '@/apis/contact'
 
 import { AdminContactTemplate } from './template'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
     title: 'お問い合わせ管理 | admin',
     robots: {

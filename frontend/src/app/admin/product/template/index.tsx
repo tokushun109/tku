@@ -1,7 +1,7 @@
 'use client'
 
 import { Add } from '@mui/icons-material'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { getCategories } from '@/apis/category'
@@ -20,13 +20,27 @@ import { ISite } from '@/features/site/type'
 
 import styles from './styles.module.scss'
 
-export const AdminProductTemplate = () => {
-    const [products, setProducts] = useState<IProduct[]>([])
-    const [categories, setCategories] = useState<IClassification[]>([])
-    const [targets, setTargets] = useState<IClassification[]>([])
-    const [tags, setTags] = useState<IClassification[]>([])
-    const [salesSites, setSalesSites] = useState<ISite[]>([])
-    const [isLoading, setIsLoading] = useState<boolean>(true)
+interface Props {
+    categories: IClassification[]
+    initialProducts: IProduct[]
+    salesSites: ISite[]
+    tags: IClassification[]
+    targets: IClassification[]
+}
+
+export const AdminProductTemplate = ({
+    categories: initialCategories,
+    initialProducts,
+    salesSites: initialSalesSites,
+    tags: initialTags,
+    targets: initialTargets,
+}: Props) => {
+    const [products, setProducts] = useState<IProduct[]>(initialProducts)
+    const [categories, setCategories] = useState<IClassification[]>(initialCategories)
+    const [targets, setTargets] = useState<IClassification[]>(initialTargets)
+    const [tags, setTags] = useState<IClassification[]>(initialTags)
+    const [salesSites, setSalesSites] = useState<ISite[]>(initialSalesSites)
+    const [isLoading, setIsLoading] = useState<boolean>(false)
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
     const [submitError, setSubmitError] = useState<string | null>(null)
@@ -59,10 +73,6 @@ export const AdminProductTemplate = () => {
             setIsLoading(false)
         }
     }
-
-    useEffect(() => {
-        fetchData()
-    }, [])
 
     const handleCreate = () => {
         setUpdateItem(null)
