@@ -1,5 +1,6 @@
 'use client'
 
+import { GoogleAnalytics } from '@next/third-parties/google'
 import classNames from 'classnames'
 import { usePathname } from 'next/navigation'
 
@@ -28,6 +29,7 @@ const DetailsLayout = ({ children }: { children: React.ReactNode }) => {
                 </PageFadeTransition>
             </main>
             <Footer />
+            {process.env.GOOGLE_TAG && <GoogleAnalytics gaId={process.env.GOOGLE_TAG} />}
         </div>
     )
 }
