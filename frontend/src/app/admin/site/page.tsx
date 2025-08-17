@@ -5,6 +5,8 @@ import { getSnsList } from '@/apis/sns'
 
 import { SiteTemplate } from './template'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
     title: 'サイト管理 | admin',
     robots: {

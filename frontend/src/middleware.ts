@@ -35,7 +35,7 @@ export async function middleware(request: NextRequest) {
 
     try {
         // ヘルスチェックAPIを呼び出し
-        const response = await fetch(`${process.env.API_URL}/health_check`, {
+        const response = await fetch(`${process.env.API_BASE_URL}/health_check`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

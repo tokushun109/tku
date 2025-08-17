@@ -5,6 +5,8 @@ import { getProductsByCategory } from '@/apis/product'
 import { getTargets } from '@/apis/target'
 import ProductTemplate from '@/app/(contents)/product/template'
 
+export const dynamic = 'force-dynamic'
+
 export async function generateMetadata(): Promise<Metadata> {
     const title = '商品一覧 | とこりり'
     const description = 'とこりりの商品一覧ページです。'

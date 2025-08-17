@@ -4,6 +4,8 @@ import { getCreator } from '@/apis/creator'
 
 import { AdminSeoTemplate } from './template'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
     title: 'SEO設定 | admin',
     robots: {

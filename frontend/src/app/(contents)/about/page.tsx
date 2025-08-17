@@ -5,6 +5,8 @@ import { getSalesSiteList } from '@/apis/salesSite'
 import { getSnsList } from '@/apis/sns'
 import AboutTemplate from '@/app/(contents)/about/template'
 
+export const dynamic = 'force-dynamic'
+
 export async function generateMetadata(): Promise<Metadata> {
     const title = 'とこりりについて | とこりり'
     const creator = await getCreator()

@@ -15,7 +15,7 @@ export const getContacts = async (): Promise<IContactListItem[]> => {
     try {
         const headers = await createAPIHeaders()
 
-        const res = await fetch(`${process.env.API_URL}/contact`, {
+        const res = await fetch(`${process.env.API_BASE_URL}/contact`, {
             headers,
             method: 'GET',
         })
@@ -34,7 +34,7 @@ export const getContacts = async (): Promise<IContactListItem[]> => {
 /** お問い合わせを送信 */
 export const postContact = async (params: IPostContactParams): Promise<IContactResponse> => {
     try {
-        const res = await fetch(`${process.env.API_URL}/contact`, {
+        const res = await fetch(`${process.env.API_BASE_URL}/contact`, {
             headers: {
                 'Content-Type': 'application/json',
             },

@@ -4,6 +4,8 @@ import { getCreator } from '@/apis/creator'
 import { getCarouselImages } from '@/apis/product'
 import HomeTemplate from '@/app/(home)/template'
 
+export const dynamic = 'force-dynamic'
+
 export async function generateMetadata(): Promise<Metadata> {
     const title = 'アクセサリーショップ とこりり'
     const creator = await getCreator()
