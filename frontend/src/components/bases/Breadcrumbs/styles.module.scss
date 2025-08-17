@@ -6,19 +6,24 @@ $breadcrumb-gap: 12px;
     align-items: center;
     gap: $breadcrumb-gap;
     user-select: none;
+    width: 100%;
+    overflow: hidden;
 
     .breadcrumb {
         display: flex;
         align-items: center;
         gap: $breadcrumb-gap;
+        flex-shrink: 0;
+
+        &:last-child {
+            flex-shrink: 1;
+            min-width: 0;
+        }
 
         &__label {
             font-size: $font-medium;
             color: $primary;
             cursor: auto;
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
             white-space: nowrap;
 
             &.link {
@@ -27,6 +32,14 @@ $breadcrumb-gap: 12px;
                 &:hover {
                     opacity: 0.8;
                 }
+            }
+        }
+
+        &.current-page {
+            .breadcrumb__label {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
             }
         }
 

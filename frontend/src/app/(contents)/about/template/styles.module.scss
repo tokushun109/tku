@@ -102,6 +102,10 @@
                 justify-content: center;
                 align-items: center;
 
+                @include media(sm) {
+                    font-size: $font-medium;
+                }
+
                 table {
                     border-spacing: 16px;
 
