@@ -1,8 +1,9 @@
 import * as aws from '@cdktf/provider-aws/lib'
 import { TerraformStack } from 'cdktf'
-import { compileForLambdaFunction } from '../../../../libs/compile'
+import { compileForLambdaFunction } from '../../libs/compile'
+import { snakeToCamelCase } from '../../libs/convert'
 import path = require('path')
-import { getDateString } from '../../../../libs/date'
+import { getDateString } from '../../libs/date'
 
 const LAMBDA_ASSUME_ROLE_POLICY = {
     Version: '2012-10-17',
@@ -22,20 +23,21 @@ export class LambdaResource {
 
     constructor(private stack: TerraformStack, private name: string, private lambdaFunctionName: string) {
         // lambda実行用のroleを作成
-        const role = new aws.iamRole.IamRole(this.stack, `${this.name}-lambda-exec`, {
-            name: `${this.name}-lambda-role`,
+        const role = new aws.iamRole.IamRole(this.stack, `${this.name}-${this.lambdaFunctionName}-lambda-exec`, {
+            name: `${this.name}-${this.lambdaFunctionName}-lambda-role`,
             assumeRolePolicy: JSON.stringify(LAMBDA_ASSUME_ROLE_POLICY),
         })
 
         // CloudWatchログへの書き込み権限を追加
-        new aws.iamRolePolicyAttachment.IamRolePolicyAttachment(this.stack, `${this.name}-lambda-managed-policy`, {
+        new aws.iamRolePolicyAttachment.IamRolePolicyAttachment(this.stack, `${this.name}-${this.lambdaFunctionName}-lambda-managed-policy`, {
             policyArn: 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
             role: role.name,
         })
 
         // lambda関数用のハンドラをコンパイルする
-        const lambda = new compileForLambdaFunction(this.stack, this.name, {
-            path: path.join(__dirname),
+        const handlerDirName = snakeToCamelCase(this.lambdaFunctionName)
+        const lambda = new compileForLambdaFunction(this.stack, `${this.name}-${this.lambdaFunctionName}`, {
+            path: path.join(__dirname, 'handlers', handlerDirName),
         })
 
         const prefix = `${this.name}-${this.lambdaFunctionName}`

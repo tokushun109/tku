@@ -27,7 +27,7 @@ export class EventBridgeResource {
         })
 
         // LambdaにEventBridgeからの実行権限を付与
-        new aws.lambdaPermission.LambdaPermission(this.stack, `${name}-allow-event-bridge-invoke-lambda`, {
+        new aws.lambdaPermission.LambdaPermission(this.stack, `${this.name}-${this.lambdaFunctionIdentifierName}-allow-event-bridge-invoke-lambda`, {
             statementId: 'AllowEventBridgeInvokeLambda',
             action: 'lambda:InvokeFunction',
             functionName: this.lambdaFunction.functionName,

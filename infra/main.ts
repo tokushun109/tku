@@ -5,8 +5,8 @@ import * as dotenv from 'dotenv'
 import { NetworkResource } from './resources/network'
 import { EcsClusterResource, EcsTaskRole, ServiceEnum } from './resources/ecs'
 import { SecretsManagerResource } from './resources/asm'
-import { LambdaResource } from './resources/lambda/healthCheck/handlers'
 import { EventBridgeResource } from './resources/eventBridge'
+import { LambdaResource } from './resources/lambda'
 
 interface OptionType {
     region: string
@@ -55,11 +55,17 @@ class TkuStack extends TerraformStack {
         // Amazon Secrets Managerのリソースを作成
         new SecretsManagerResource(this, name, apiEip.publicIp, dbInstance.privateIp)
 
-        // ヘルスチェック用のlambda関数を作成
-        const { lambdaFunction } = new LambdaResource(this, name, 'health-check')
+        // フロントエンドのwarmup用のlambda関数を作成
+        const { lambdaFunction: warmupLambdaFunction } = new LambdaResource(this, name, 'warmup')
+
+        // warmupのlambda関数を6時〜22時の間で5分ごとに実行(cron式はUTCを日本時間に変換したものを設定)
+        new EventBridgeResource(this, name, 'warmup', warmupLambdaFunction, 'cron(*/5 21-23,0-13 * * ? *)')
+
+        // apiのヘルスチェック用のlambda関数を作成
+        const { lambdaFunction: healthCheckLambdaFunction } = new LambdaResource(this, name, 'health-check')
 
         // ヘルスチェックのlambda関数を6時〜20時の間で1時間おきに実行(cron式はUTCを日本時間に変換したものを設定)
-        new EventBridgeResource(this, name, 'health-check', lambdaFunction, 'cron(0 21-23,0-11/1 * * ? *)')
+        new EventBridgeResource(this, name, 'health-check', healthCheckLambdaFunction, 'cron(0 21-23,0-11/1 * * ? *)')
     }
 }
 
