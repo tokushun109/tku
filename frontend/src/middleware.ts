@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { validateSession } from '@/apis/auth'
+import { healthCheck } from '@/apis/healthCheck'
 import { NavigationType } from '@/types/enum/navigation'
 
 import type { NextRequest } from 'next/server'
@@ -35,17 +36,7 @@ export async function middleware(request: NextRequest) {
 
     try {
         // ヘルスチェックAPIを呼び出し
-        const response = await fetch(`${process.env.API_BASE_URL}/health_check`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        })
-
-        // ヘルスチェックが失敗した場合、メンテナンスページにリダイレクト
-        if (!response.ok) {
-            return NextResponse.redirect(new URL('/maintenance', request.url))
-        }
+        await healthCheck()
 
         // admin配下のページで認証が必要なルートをチェック
         if (request.nextUrl.pathname.startsWith('/admin')) {
