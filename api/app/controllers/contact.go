@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	html_tmpl "html/template"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	text_tmpl "text/template"
@@ -38,7 +38,7 @@ func getAllContactListHandler(w http.ResponseWriter, r *http.Request) {
 
 // お問い合わせの新規作成
 func createContactHandler(w http.ResponseWriter, r *http.Request) {
-	reqBody, err := ioutil.ReadAll(r.Body)
+	reqBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)

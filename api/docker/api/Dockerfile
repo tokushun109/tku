@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 golang:1.21-alpine
+FROM golang:1.25-alpine
 
 ENV ROOT=/api
 WORKDIR ${ROOT}

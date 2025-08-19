@@ -9,7 +9,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -118,7 +117,7 @@ func createProductHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	reqBody, err := ioutil.ReadAll(r.Body)
+	reqBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
@@ -165,7 +164,7 @@ func duplicateProductHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	reqBody, err := ioutil.ReadAll(r.Body)
+	reqBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
@@ -204,7 +203,7 @@ func updateProductHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	uuid := vars["product_uuid"]
 
-	reqBody, err := ioutil.ReadAll(r.Body)
+	reqBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
@@ -319,7 +318,7 @@ func getProductImageBlobHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	binary, err := ioutil.ReadAll(file)
+	binary, err := io.ReadAll(file)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
@@ -522,7 +521,7 @@ func uploadProductsCsvHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 		return
 	}
-	buffer, _ := ioutil.ReadAll(csv)
+	buffer, _ := io.ReadAll(csv)
 
 	productCsv := []*models.ProductCsv{}
 	if err := gocsv.UnmarshalBytes(buffer, &productCsv); err != nil {
@@ -682,7 +681,7 @@ func DuplicateProduct(url string) {
 		panic(err)
 	}
 
-	buffer, _ := ioutil.ReadAll(res.Body)
+	buffer, _ := io.ReadAll(res.Body)
 
 	detector := chardet.NewTextDetector()
 	detectResult, _ := detector.DetectBest(buffer)
@@ -699,7 +698,7 @@ func DuplicateProduct(url string) {
 
 	// 価格
 	price := strings.Trim(strings.TrimSpace(document.Find("#js-item-detail > aside > div.p-item-detail-info.p-item-detail-info--side > div > div:nth-child(1) > div.p-item-detail-info__item.p-item-detail-info__item--price").Text()), "￥")
-	intPrice, _ := strconv.Atoi(strings.Replace(price, ",", "", -1))
+	intPrice, _ := strconv.Atoi(strings.ReplaceAll(price, ",", ""))
 	// タグ
 	tagsDom := document.Find("#js-item-detail > aside > div:nth-child(5) > ul:nth-child(3) > li > a")
 	tagNames := []string{}
