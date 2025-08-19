@@ -7,32 +7,37 @@ import (
 	"io"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/aws/request"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	awsconfig "github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
 func GetS3Content(keyName *string) (string, error) {
-	sess := session.Must(session.NewSession())
-
-	svc := s3.New(sess)
-
-	req, _ := svc.GetObjectRequest(&s3.GetObjectInput{
-		Bucket: &config.Config.ApiBucketName,
-		Key:    keyName,
-	})
-	url, err := req.Presign(time.Minute * 30)
+	cfg, err := awsconfig.LoadDefaultConfig(context.TODO())
 	if err != nil {
 		return "", err
 	}
-	return url, nil
+
+	s3Client := s3.NewFromConfig(cfg)
+	presignClient := s3.NewPresignClient(s3Client)
+
+	presignedReq, err := presignClient.PresignGetObject(context.TODO(), &s3.GetObjectInput{
+		Bucket: aws.String(config.Config.ApiBucketName),
+		Key:    keyName,
+	}, s3.WithPresignExpires(time.Minute*30))
+	if err != nil {
+		return "", err
+	}
+	return presignedReq.URL, nil
 }
 
 func UploadS3(keyName *string, body io.ReadSeeker) error {
-	sess := session.Must(session.NewSession())
+	cfg, err := awsconfig.LoadDefaultConfig(context.TODO())
+	if err != nil {
+		return err
+	}
 
-	svc := s3.New(sess)
+	s3Client := s3.NewFromConfig(cfg)
 
 	ctx := context.Background()
 	var cancelFn func()
@@ -44,18 +49,14 @@ func UploadS3(keyName *string, body io.ReadSeeker) error {
 		defer cancelFn()
 	}
 
-	_, err := svc.PutObjectWithContext(ctx, &s3.PutObjectInput{
-		Bucket: &config.Config.ApiBucketName,
+	_, err = s3Client.PutObject(ctx, &s3.PutObjectInput{
+		Bucket: aws.String(config.Config.ApiBucketName),
 		Key:    keyName,
 		Body:   body,
 	})
 
 	if err != nil {
-		if aerr, ok := err.(awserr.Error); ok && aerr.Code() == request.CanceledErrorCode {
-			return err
-		} else {
-			return err
-		}
+		return err
 	}
 	fmt.Printf("successfully uploaded file to %s/%s\n", config.Config.ApiBucketName, *keyName)
 	return nil
