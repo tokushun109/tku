@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -80,7 +79,7 @@ func getCreatorLogoBlobHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	binary, err := ioutil.ReadAll(file)
+	binary, err := io.ReadAll(file)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
@@ -99,7 +98,7 @@ func updateCreatorHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	reqBody, err := ioutil.ReadAll(r.Body)
+	reqBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
