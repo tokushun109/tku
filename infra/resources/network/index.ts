@@ -1,11 +1,11 @@
 import * as aws from '@cdktf/provider-aws/lib'
 import { TerraformStack } from 'cdktf'
 
-const VPC_CIDR_BLOCK = '172.31.0.0/16'
+const VPC_CIDR_BLOCK = '10.0.0.0/16'
 
 const SUBNET_CIDR_BLOCK = {
-    PublicA: '172.31.0.0/20',
-    PublicC: '172.31.96.0/20',
+    PublicA: '10.0.1.0/24',
+    PublicC: '10.0.2.0/24',
 } as const
 
 interface SubnetIds {
@@ -62,12 +62,23 @@ export class NetworkResource {
         })
 
         // Route Tableの作成
-        new aws.routeTable.RouteTable(this.stack, 'public-rt', {
+        const routeTable = new aws.routeTable.RouteTable(this.stack, 'public-rt', {
             vpcId: vpc.id,
             route: [{ cidrBlock: '0.0.0.0/0', gatewayId: internetGateway.id }],
             tags: {
                 Name: 'public-rt',
             },
+        })
+
+        // Route Table Associationの作成
+        new aws.routeTableAssociation.RouteTableAssociation(this.stack, 'public-rta-a', {
+            subnetId: subnetA.id,
+            routeTableId: routeTable.id,
+        })
+
+        new aws.routeTableAssociation.RouteTableAssociation(this.stack, 'public-rta-c', {
+            subnetId: subnetC.id,
+            routeTableId: routeTable.id,
         })
 
         // Security Groupの作成

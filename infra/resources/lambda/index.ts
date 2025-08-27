@@ -61,7 +61,7 @@ export class LambdaResource {
             s3Key: lambdaArchive.key,
             timeout: 30,
             handler: 'index.handler',
-            runtime: 'nodejs18.x',
+            runtime: 'nodejs22.x',
             memorySize: 512,
             role: role.arn,
             environment: {
