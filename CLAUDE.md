@@ -37,7 +37,7 @@ docker-compose up
 詳細は各ディレクトリの CLAUDE.md ファイルを参照：
 
 - **frontend/**: `/frontend/CLAUDE.md` - Next.js + TypeScript
-- **api/**: `/api/CLAUDE.md` - Go REST API
+- **backend/api/**: `/backend/api/CLAUDE.md` - Go REST API
 - **infra/**: `/infra/CLAUDE.md` - CDK for Terraform
 
 ## プロジェクトアーキテクチャ
@@ -45,7 +45,7 @@ docker-compose up
 詳細なプロジェクト構造は各ディレクトリの CLAUDE.md ファイルを参照：
 
 - **frontend/**: `/frontend/CLAUDE.md` - Next.js + TypeScript 構造
-- **api/**: `/api/CLAUDE.md` - Go REST API 構造
+- **backend/api/**: `/backend/api/CLAUDE.md` - Go REST API 構造
 - **infra/**: `/infra/CLAUDE.md` - AWS インフラ構造
 
 ### 主要機能
@@ -84,7 +84,7 @@ docker-compose up
 各ディレクトリでの開発における詳細なガイドラインは、それぞれの CLAUDE.md ファイルを参照してください：
 
 - **frontend/**: `/frontend/CLAUDE.md` - Next.js + TypeScript の開発規約とガイドライン
-- **api/**: `/api/CLAUDE.md` - Go REST API の開発ガイドライン
+- **backend/api/**: `/backend/api/CLAUDE.md` - Go REST API の開発ガイドライン
 - **infra/**: `/infra/CLAUDE.md` - CDK for Terraform のインフラ開発ガイドライン
 
 ## Git操作における重要な注意事項

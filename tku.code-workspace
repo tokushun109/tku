@@ -9,12 +9,8 @@
       "path": "./frontend"
     },
     {
-      "name": "api",
-      "path": "./api"
-    },
-    {
-      "name": "client",
-      "path": "./client"
+      "name": "backend/api",
+      "path": "./backend/api"
     },
     {
       "name": "infra",
