@@ -14,7 +14,7 @@
 ハンドメイドアクセサリー作家「tku」の商品販売サイト（tocoriri.com）です。プロジェクト構成：
 
 - **フロントエンド**: Next.js + TypeScript による SSR/SPA ハイブリッド
-- **バックエンド**: Go REST API with GORM、AWS ECS にデプロイ
+- **バックエンド**: Go REST API with GORM、Railway にデプロイ
 - **データベース**: MySQL with golang-migrate によるスキーマ管理
 - **インフラ**: CDK for Terraform による AWS リソース管理
 
@@ -59,8 +59,11 @@ docker-compose up
 
 ### デプロイ
 
-- **CI/CD**: GitHub Actions（`.github/workflows/ci.yml`）
-- **インフラ**: CDK for Terraform が VPC、ECS、RDS などを管理
+- **フロントエンド**: AWS Amplify にデプロイ
+- **バックエンド**: Railway にデプロイ
+- **Lambda関数**: CDK for Terraform による定期実行
+  - フロントエンドのwarmup用Lambda（5分ごと実行）
+  - バックエンドのヘルスチェック用Lambda（1時間ごと実行）
 - 詳細は各ディレクトリの CLAUDE.md を参照
 
 ## 重要な注意事項
@@ -68,7 +71,7 @@ docker-compose up
 - 日本語の EC サイト（コンテンツは日本語）
 - **フロントエンド**: Next.js + TypeScript による SSR/SPA ハイブリッド（初回レンダリングはSSR、その後はSPA的なルーティング）
 - バックエンドはフレームワークなしの Go + Gorilla Mux
-- データベースマイグレーションはバージョン管理され ECS タスクで実行
+- データベースマイグレーションはバージョン管理され Railway で実行予定
 - 画像は S3 に UUID ベースで保存
 
 ## 開発方針
