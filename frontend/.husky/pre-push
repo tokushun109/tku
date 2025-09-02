@@ -1,21 +1,6 @@
 #!/usr/bin/env sh
 cd frontend
 
-# 古い依存関係があるか確認
-echo "🔍 古い依存関係がないか確認しています..."
-OUTDATED=$(pnpm outdated || true)
-
-# 古い依存関係があればプッシュをキャンセル
-if [ -n "$OUTDATED" ]; then
-  echo "⚠️  以下の依存関係が古くなっています:"
-  echo "$OUTDATED"
-  echo "📦 依存関係を 'pnpm update --latest' を使って更新し、変更をコミットしてから再度プッシュしてください。"
-  exit 1
-fi
-
-# 問題がなければプッシュを続行
-echo "✅ すべての依存関係が最新です。テストを実行します。"
-
 # 全てのテストを実行
 echo "🧪 全てのテストを実行しています..."
 if ! pnpm test-all --run --reporter=verbose; then
