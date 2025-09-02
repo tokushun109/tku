@@ -23,7 +23,7 @@ jobs:
       - run: pnpm lint
       - run: pnpm tsc
       - run: pnpm build
-      - run: pnpm test --if-present
+      - run: pnpm test-all
 
   node-infra:
     runs-on: ubuntu-latest
