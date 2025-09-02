@@ -1,0 +1,69 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":semanticCommits"
+  ],
+
+  "timezone": "Asia/Tokyo",
+  "schedule": ["after 10pm and before 11pm on Sunday"],
+
+  "prHourlyLimit": 4,
+  "prConcurrentLimit": 10,
+  "stabilityDays": 3,
+
+  "enabledManagers": ["npm", "gomod", "dockerfile", "terraform", "github-actions"],
+
+  "packageRules": [
+    {
+      "description": "majorは手動レビュー",
+      "matchUpdateTypes": ["major"],
+      "labels": ["deps:major"],
+      "automerge": false,
+      "prPriority": -1
+    },
+    {
+      "description": "minor/patchは自動マージ（テスト成功が条件）",
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true
+    },
+
+    {
+      "description": "frontend: pnpm dedupe & まとめPR（eslint/@types）",
+      "matchManagers": ["npm"],
+      "matchPaths": ["frontend/**"],
+      "postUpdateOptions": ["pnpmDedupe"],
+      "groupName": "frontend: eslint + types",
+      "matchPackagePatterns": ["^eslint", "^@typescript-eslint/", "^@types/"]
+    },
+    {
+      "description": "infra: pnpm dedupe",
+      "matchManagers": ["npm"],
+      "matchPaths": ["infra/**"],
+      "postUpdateOptions": ["pnpmDedupe"]
+    },
+
+    {
+      "description": "backend: go mod tidy を実行",
+      "matchManagers": ["gomod"],
+      "matchPaths": ["backend/**"],
+      "postUpdateOptions": ["gomodTidy"]
+    },
+
+    {
+      "description": "GitHub Actions は1PRに集約",
+      "matchManagers": ["github-actions"],
+      "groupName": "GitHub Actions"
+    },
+    {
+      "description": "Dockerfile ベースイメージ更新",
+      "matchManagers": ["dockerfile"],
+      "groupName": "Docker base images"
+    },
+    {
+      "description": "Terraform プロバイダ/モジュール",
+      "matchManagers": ["terraform"],
+      "groupName": "Terraform deps"
+    }
+  ]
+}
