@@ -29,18 +29,11 @@
     },
 
     {
-      "description": "frontend: pnpm dedupe & まとめPR（eslint/@types）",
+      "description": "frontend: まとめPR（eslint/@types）",
       "matchManagers": ["npm"],
       "matchPaths": ["frontend/**"],
-      "postUpdateOptions": ["pnpmDedupe"],
       "groupName": "frontend: eslint + types",
       "matchPackagePatterns": ["^eslint", "^@typescript-eslint/", "^@types/"]
-    },
-    {
-      "description": "infra: pnpm dedupe",
-      "matchManagers": ["npm"],
-      "matchPaths": ["infra/**"],
-      "postUpdateOptions": ["pnpmDedupe"]
     },
 
     {
