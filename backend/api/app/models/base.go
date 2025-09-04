@@ -7,7 +7,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/google/uuid"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
@@ -21,12 +20,6 @@ type DefaultModel struct {
 	CreatedAt time.Time      `json:"-"`
 	UpdatedAt time.Time      `json:"-"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
-}
-
-func GenerateUuid() (uuidString string, err error) {
-	uuidObj, err := uuid.NewRandom()
-	uuidString = uuidObj.String()
-	return uuidString, err
 }
 
 func gormConnect() *gorm.DB {

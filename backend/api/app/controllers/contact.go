@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"api/app/controllers/utils"
 	"api/app/models"
 	"api/config"
+	"api/utils"
 	"bytes"
 	"encoding/json"
 	"fmt"

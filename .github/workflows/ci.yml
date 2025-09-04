@@ -42,6 +42,9 @@ jobs:
           cache-dependency-path: "infra/pnpm-lock.yaml"
       - run: pnpm install --no-frozen-lockfile
       - run: pnpm build
+      - run: pnpm synth
+      - run: ls -la cdktf.out/stacks/tku/ || echo "Synth output not found"
+      - run: test -f cdktf.out/stacks/tku/cdk.tf.json || (echo "Terraform JSON not generated" && exit 1)
       - run: pnpm test --if-present
 
   go-backend:

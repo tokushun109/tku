@@ -1,6 +1,7 @@
 package models
 
 import (
+	"api/utils"
 	"errors"
 )
 
@@ -74,7 +75,7 @@ func SalesSiteUniqueCheck(name string) (isUnique bool, err error) {
 
 func InsertSalesSite(salesSite *SalesSite) (err error) {
 	// uuidの設定
-	uuid, err := GenerateUuid()
+	uuid, err := utils.GenerateUUID()
 	if err != nil {
 		return err
 	}
@@ -143,7 +144,7 @@ func SkillMarketUniqueCheck(name string) (isUnique bool, err error) {
 
 func InsertSkillMarket(skillMarket *SkillMarket) (err error) {
 	// uuidの設定
-	uuid, err := GenerateUuid()
+	uuid, err := utils.GenerateUUID()
 	if err != nil {
 		return err
 	}
@@ -192,7 +193,7 @@ func SnsUniqueCheck(name string) (isUnique bool, err error) {
 
 func InsertSns(sns *Sns) (err error) {
 	// uuidの設定
-	uuid, err := GenerateUuid()
+	uuid, err := utils.GenerateUUID()
 	if err != nil {
 		return err
 	}

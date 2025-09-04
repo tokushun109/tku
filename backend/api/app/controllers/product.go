@@ -1,9 +1,10 @@
 package controllers
 
 import (
-	"api/app/controllers/utils"
+	"api/app/controllers/aws"
 	"api/app/models"
 	"api/config"
+	"api/utils"
 	"bytes"
 	"encoding/json"
 	"errors"
@@ -48,7 +49,7 @@ func setProductImageApiPath(product *models.Product) error {
 		// 本番の場合はS3から取得
 		var err error
 		for _, productImage := range product.ProductImages {
-			productImage.ApiPath, err = utils.GetS3Content(&productImage.Path)
+			productImage.ApiPath, err = aws.GetS3Content(&productImage.Path)
 			if err != nil {
 				return err
 			}
@@ -372,7 +373,7 @@ func createProductImageHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		defer file.Close()
 
-		uuid, err := models.GenerateUuid()
+		uuid, err := utils.GenerateUUID()
 		if err != nil {
 			log.Println(err)
 			http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
@@ -400,7 +401,7 @@ func createProductImageHandler(w http.ResponseWriter, r *http.Request) {
 			io.Copy(f, file)
 		} else {
 			// 本番の場合はS3にアップロード
-			if err := utils.UploadS3(&savePath, file); err != nil {
+			if err := aws.UploadS3(&savePath, file); err != nil {
 				log.Println(err)
 				http.Error(w, fmt.Sprintf("error: %s", err), http.StatusForbidden)
 				return
@@ -746,7 +747,7 @@ func DuplicateProduct(url string) {
 	img.Each(func(i int, s *goquery.Selection) {
 
 		func(i int) {
-			uuid, err := models.GenerateUuid()
+			uuid, err := utils.GenerateUUID()
 			if err != nil {
 				panic(err)
 			}
@@ -782,7 +783,7 @@ func DuplicateProduct(url string) {
 				}
 				defer file.Close()
 				// 本番の場合はS3にアップロード
-				if err := utils.UploadS3(&savePath, file); err != nil {
+				if err := aws.UploadS3(&savePath, file); err != nil {
 					panic(err)
 				}
 				os.Remove(savePath)
