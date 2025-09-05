@@ -7,4 +7,4 @@ npx lint-staged
 
 # lintとコンパイルエラーのがないか確認
 pnpm lint
-pnpm tsc
+pnpm type-check
