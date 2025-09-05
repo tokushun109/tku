@@ -4,7 +4,7 @@ on:
     branches: [main]
 
 jobs:
-  node-frontend:
+  frontend:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -26,7 +26,21 @@ jobs:
       - run: pnpm build
       - run: pnpm test-all
 
-  node-infra:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend/api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+          cache-dependency-path: "backend/api/go.sum"
+      - run: go build ./...
+      - run: go test ./...
+
+  infra:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -50,17 +64,3 @@ jobs:
       - run: pnpm synth
       - run: ls -la cdktf.out/stacks/tku/ || echo "Synth output not found"
       - run: test -f cdktf.out/stacks/tku/cdk.tf.json || (echo "Terraform JSON not generated" && exit 1)
-
-  go-backend:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./backend/api
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
-        with:
-          go-version: "1.25"
-          cache-dependency-path: "backend/api/go.sum"
-      - run: go build ./...
-      - run: go test ./...
