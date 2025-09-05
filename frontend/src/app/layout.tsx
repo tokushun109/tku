@@ -7,10 +7,8 @@ import { Toaster } from 'sonner'
 import { PageFadeTransition } from '@/components/layouts/PageFadeTransition'
 import { mainFontFace } from '@/utils/font'
 
-import Favicon from '/public/favicon/favicon.ico'
-
 export const metadata: Metadata = {
-    icons: [{ rel: 'icon', url: Favicon.src }],
+    icons: [{ rel: 'icon', url: '/favicon/favicon.ico' }],
 }
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
