@@ -22,7 +22,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/saintfish/chardet"
 	"golang.org/x/net/html/charset"
-	"gopkg.in/go-playground/validator.v9"
+	"github.com/go-playground/validator/v10"
 )
 
 var TypeToExtension = map[string]string{
