@@ -1,6 +1,7 @@
 package models
 
 import (
+	"api/utils"
 	"errors"
 
 	"gorm.io/gorm"
@@ -70,7 +71,7 @@ func CategoryUniqueCheck(name string) (isUnique bool, err error) {
 
 func InsertCategory(category *Category) (err error) {
 	// uuidの設定
-	uuid, err := GenerateUuid()
+	uuid, err := utils.GenerateUUID()
 	if err != nil {
 		return err
 	}
@@ -86,7 +87,7 @@ func InsertUnDuplicateCategory(category *Category) (err error) {
 		return nil
 	}
 	// uuidの設定
-	uuid, err := GenerateUuid()
+	uuid, err := utils.GenerateUUID()
 	if err != nil {
 		return err
 	}
@@ -159,7 +160,7 @@ func GetTarget(uuid string) (target Target) {
 
 func InsertTarget(target *Target) (err error) {
 	// uuidの設定
-	uuid, err := GenerateUuid()
+	uuid, err := utils.GenerateUUID()
 	if err != nil {
 		return err
 	}
@@ -220,7 +221,7 @@ func InsertUnDuplicateTarget(target *Target) (err error) {
 		return nil
 	}
 	// uuidの設定
-	uuid, err := GenerateUuid()
+	uuid, err := utils.GenerateUUID()
 	if err != nil {
 		return err
 	}
@@ -261,7 +262,7 @@ func TagUniqueCheck(name string) (isUnique bool, err error) {
 
 func InsertTag(tag *Tag) (err error) {
 	// uuidの設定
-	uuid, err := GenerateUuid()
+	uuid, err := utils.GenerateUUID()
 	if err != nil {
 		return err
 	}
@@ -277,7 +278,7 @@ func InsertUnDuplicateTag(tag *Tag) (err error) {
 		return nil
 	}
 	// uuidの設定
-	uuid, err := GenerateUuid()
+	uuid, err := utils.GenerateUUID()
 	if err != nil {
 		return err
 	}

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"api/utils"
 	"errors"
 	"fmt"
 
@@ -191,7 +192,7 @@ func InsertProduct(product *Product) (err error) {
 	}
 
 	// uuidの設定
-	uuid, err := GenerateUuid()
+	uuid, err := utils.GenerateUUID()
 	if err != nil {
 		return err
 	}
@@ -228,7 +229,7 @@ func InsertProduct(product *Product) (err error) {
 	// 商品と販売サイトを紐付け
 	for _, siteDetail := range product.SiteDetails {
 		// uuidの設定
-		uuid, err := GenerateUuid()
+		uuid, err := utils.GenerateUUID()
 		if err != nil {
 			return err
 		}
@@ -331,7 +332,7 @@ func UpdateProduct(product *Product, uuid string) (err error) {
 	// 商品と販売サイトを紐付け
 	for _, siteDetail := range product.SiteDetails {
 		// uuidの設定
-		uuid, err := GenerateUuid()
+		uuid, err := utils.GenerateUUID()
 		if err != nil {
 			return err
 		}
@@ -504,7 +505,7 @@ func GetProductImage(uuid string) (productImage ProductImage, err error) {
 
 func InsertProductImage(productImage *ProductImage) (err error) {
 	// uuidの設定
-	uuid, err := GenerateUuid()
+	uuid, err := utils.GenerateUUID()
 	if err != nil {
 		return err
 	}

@@ -1,0 +1,66 @@
+name: CI
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 8
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+          cache-dependency-path: "frontend/pnpm-lock.yaml"
+      - run: pnpm install --no-frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm type-check
+      - run: pnpm build
+      - run: pnpm test
+      - run: pnpm test-integration
+
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend/api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+          cache-dependency-path: "backend/api/go.sum"
+      - run: go build ./...
+      - run: go test ./...
+
+  infra:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./infra
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 8
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+          cache-dependency-path: "infra/pnpm-lock.yaml"
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.5.0"
+      - run: pnpm install --no-frozen-lockfile
+      - run: npm install -g cdktf-cli
+      - run: pnpm build
+      - run: pnpm synth
+      - run: ls -la cdktf.out/stacks/tku/ || echo "Synth output not found"
+      - run: test -f cdktf.out/stacks/tku/cdk.tf.json || (echo "Terraform JSON not generated" && exit 1)

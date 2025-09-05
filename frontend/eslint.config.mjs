@@ -17,6 +17,9 @@ const compat = new FlatCompat({
 })
 
 const configs = [
+    {
+        ignores: ['node_modules/**', '.next/**', 'out/**', 'build/**', 'next-env.d.ts', 'coverage/**', 'storybook-static/**'],
+    },
     ...compat.extends('next', 'next/core-web-vitals', 'eslint:recommended', 'plugin:storybook/recommended'),
     {
         plugins: {
@@ -100,14 +103,13 @@ const configs = [
             'react-hooks/exhaustive-deps': 'error',
         },
     },
-
     {
         files: ['**/*.stories.*'],
         rules: {
             'no-console': 'off',
         },
-    },
-    prettierConfig, // フォーマット は Prettier で行うため、フォーマット関連のルールを無効化
+    }, // フォーマット は Prettier で行うため、フォーマット関連のルールを無効化
+    prettierConfig,
 ]
 
 export default configs

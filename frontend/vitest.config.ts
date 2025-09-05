@@ -52,7 +52,26 @@ export default defineConfig({
                 ],
                 optimizeDeps: {
                     exclude: ['@mdx-js/react', '@storybook/blocks', '@storybook/addon-docs', '@storybook/addon-vitest'],
-                    include: ['react', 'react-dom', '@storybook/react', 'storybook', 'markdown-to-jsx'],
+                    include: [
+                        'react',
+                        'react-dom',
+                        'react/jsx-runtime',
+                        'react/jsx-dev-runtime',
+                        '@storybook/react',
+                        'storybook',
+                        'markdown-to-jsx',
+                        '@emotion/react',
+                        '@emotion/styled',
+                        '@mui/material',
+                        '@mui/icons-material',
+                        'framer-motion',
+                        'classnames',
+                        'sonner',
+                        'react-virtuoso',
+                    ],
+                },
+                ssr: {
+                    noExternal: ['@mui/*', '@emotion/*'],
                 },
                 test: {
                     name: 'storybook',

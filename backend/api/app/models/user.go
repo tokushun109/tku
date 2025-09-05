@@ -1,6 +1,7 @@
 package models
 
 import (
+	"api/utils"
 	"crypto/sha1"
 	"fmt"
 	"time"
@@ -52,7 +53,7 @@ func GeUserByEmail(email string) (user User) {
 func InsertUser(user *User, is_admin bool) (err error) {
 	user.IsAdmin = is_admin
 	// uuidの設定
-	uuid, err := GenerateUuid()
+	uuid, err := utils.GenerateUUID()
 	if err != nil {
 		return err
 	}
@@ -74,7 +75,7 @@ func (user *User) GetSessionByUser() (session Session) {
 // Sessionデータを作成する
 func (user *User) CreateSession() (session Session, err error) {
 	session = Session{}
-	uuid, err := GenerateUuid()
+	uuid, err := utils.GenerateUUID()
 	if err != nil {
 		return session, err
 	}
