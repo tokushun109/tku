@@ -29,9 +29,28 @@ const config: StorybookConfig = {
         // 依存関係最適化の設定
         config.optimizeDeps = {
             ...config.optimizeDeps,
+            entries: ['src/**/*.stories.@(ts|tsx|js|jsx)'],
             exclude: ['@mdx-js/react', '@storybook/blocks', '@storybook/addon-docs', '@storybook/addon-vitest'],
-            include: ['react', 'react-dom', '@storybook/react', 'storybook', 'markdown-to-jsx'],
+            include: [
+                'react',
+                'react-dom',
+                'react/jsx-runtime',
+                'react/jsx-dev-runtime',
+                '@storybook/react',
+                'storybook',
+                'markdown-to-jsx',
+                '@emotion/react',
+                '@emotion/styled',
+                '@mui/material',
+                '@mui/icons-material',
+                'framer-motion',
+                'classnames',
+                'sonner',
+            ],
         }
+
+        // Storybook配信ルートに合わせてbaseを固定
+        config.base = '/'
 
         // グローバルなscssファイルの読み込み
         if (config.css) {
