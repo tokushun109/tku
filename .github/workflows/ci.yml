@@ -41,6 +41,7 @@ jobs:
           cache: "pnpm"
           cache-dependency-path: "infra/pnpm-lock.yaml"
       - run: pnpm install --no-frozen-lockfile
+      - run: npm install -g cdktf-cli
       - run: pnpm build
       - run: pnpm synth
       - run: ls -la cdktf.out/stacks/tku/ || echo "Synth output not found"
