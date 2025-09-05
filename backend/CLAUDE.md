@@ -24,18 +24,18 @@ go build -o bin/main main.go
 
 ```
 backend/
-├── api/                     # Goアプリケーションのメインディレクトリ
-│   ├── app/                # アプリケーションコア
-│   │   ├── controllers/    # HTTP リクエストハンドラーとルーティング
-│   │   ├── models/         # GORM データベースモデル
-│   │   └── db/             # マイグレーションファイルと DB 設定
-│   ├── config/             # アプリケーション設定管理
-│   ├── utils/              # ユーティリティ関数
-│   ├── docker/             # Docker関連ファイル
-│   ├── main.go             # アプリケーションエントリーポイント
-│   ├── go.mod              # Go modules設定
-│   └── go.sum              # Go modules依存関係
-└── CLAUDE.md               # 本ドキュメント
+├── api/                   # Goアプリケーションのメインディレクトリ
+│   ├── app/              # アプリケーションコア
+│   │   ├── controllers/ # HTTP リクエストハンドラーとルーティング
+│   │   ├── models/      # GORM データベースモデル
+│   │   └── db/          # マイグレーションファイルと DB 設定
+│   ├── config/           # アプリケーション設定管理
+│   ├── utils/            # ユーティリティ関数
+│   ├── docker/           # Docker関連ファイル
+│   ├── main.go           # アプリケーションエントリーポイント
+│   ├── go.mod            # Go modules設定
+│   └── go.sum            # Go modules依存関係
+└── CLAUDE.md              # 本ドキュメント
 ```
 
 ### 詳細構成
@@ -76,7 +76,6 @@ backend/
 - **ルーター**: Gorilla Mux
 - **ORM**: GORM
 - **データベース**: MySQL
-- **デプロイ**: Railway にデプロイ
 - **画像保存**: S3 (UUID ベース)
 
 ## デプロイ

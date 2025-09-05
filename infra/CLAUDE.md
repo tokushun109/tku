@@ -33,7 +33,7 @@ pnpm test
 - **IaC**: CDK for Terraform
 - **クラウド**: AWS
 - **言語**: TypeScript
-- **パッケージマネージャー**: pnpm (package.jsonではnpmスクリプト使用)
+- **パッケージマネージャー**: pnpm
 
 ## 管理対象リソース
 
@@ -81,15 +81,15 @@ infra/
 │   ├── eventBridge/    # EventBridge関連
 │   ├── lambda/         # Lambda関数定義とハンドラー
 │   └── network/        # VPC、サブネット、セキュリティグループ等
-├── libs/               # ユーティリティライブラリ
+├── libs/                # ユーティリティライブラリ
 │   ├── compile.ts      # コンパイル関連ユーティリティ
 │   ├── convert.ts      # データ変換ユーティリティ
 │   ├── date.ts         # 日付操作ユーティリティ
 │   └── task.ts         # タスク関連ユーティリティ
-├── cdktf.json          # CDK for Terraform設定ファイル
-├── tsconfig.json       # TypeScript設定
-├── package.json        # パッケージ管理
-└── cdktf.out/          # 生成されるTerraformファイル（ビルド成果物）
+├── cdktf.json           # CDK for Terraform設定ファイル
+├── tsconfig.json        # TypeScript設定
+├── package.json         # パッケージ管理
+└── cdktf.out/           # 生成されるTerraformファイル（ビルド成果物）
 ```
 
 ## 開発方針
