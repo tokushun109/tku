@@ -4,13 +4,19 @@
 
 ## プロジェクト概要
 
-CDK for Terraform によるAWSリソース管理。VPC、ECS、RDS などのクラウドインフラをコードで管理しています。
+CDK for Terraform によるAWSリソース管理。VPC、ECS、RDS、Lambda などのクラウドインフラをコードで管理しています。
 
 ## 開発コマンド
 
 ```bash
 # 依存関係インストール
-yarn install
+pnpm install
+
+# TypeScript コンパイル
+pnpm build
+
+# Terraform設定生成
+pnpm synth
 
 # インフラ変更計画
 cdktf plan
@@ -18,8 +24,8 @@ cdktf plan
 # インフラ変更適用
 cdktf apply
 
-# Terraform設定生成
-cdktf synth
+# テスト実行
+pnpm test
 ```
 
 ## 技術スタック
@@ -27,7 +33,7 @@ cdktf synth
 - **IaC**: CDK for Terraform
 - **クラウド**: AWS
 - **言語**: TypeScript
-- **パッケージマネージャー**: yarn
+- **パッケージマネージャー**: pnpm
 
 ## 管理対象リソース
 
@@ -67,10 +73,23 @@ cdktf synth
 
 ```
 infra/
-├── stacks/           # CDK Stack 定義
-├── constructs/       # 再利用可能なコンストラクト
-├── config/          # 環境別設定
-└── scripts/         # デプロイ・管理スクリプト
+├── main.ts              # CDK for Terraform のメインエントリーポイント
+├── resources/           # AWSリソースの定義
+│   ├── asm/            # AWS Systems Manager関連
+│   ├── ec2/            # EC2関連（userData等）
+│   ├── ecs/            # ECS関連（クラスター、サービス、タスク定義）
+│   ├── eventBridge/    # EventBridge関連
+│   ├── lambda/         # Lambda関数定義とハンドラー
+│   └── network/        # VPC、サブネット、セキュリティグループ等
+├── libs/                # ユーティリティライブラリ
+│   ├── compile.ts      # コンパイル関連ユーティリティ
+│   ├── convert.ts      # データ変換ユーティリティ
+│   ├── date.ts         # 日付操作ユーティリティ
+│   └── task.ts         # タスク関連ユーティリティ
+├── cdktf.json           # CDK for Terraform設定ファイル
+├── tsconfig.json        # TypeScript設定
+├── package.json         # パッケージ管理
+└── cdktf.out/           # 生成されるTerraformファイル（ビルド成果物）
 ```
 
 ## 開発方針

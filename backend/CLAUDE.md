@@ -22,10 +22,29 @@ go build -o bin/main main.go
 
 ## プロジェクト構造
 
-- **Controllers**: `/app/controllers/` - HTTP リクエストハンドラーとルーティング
-- **Models**: `/app/models/` - GORM データベースモデル
-- **Database**: `/app/db/` - マイグレーションファイルと DB 設定
-- **Config**: `/config/` - アプリケーション設定管理
+```
+backend/
+├── api/                   # Goアプリケーションのメインディレクトリ
+│   ├── app/              # アプリケーションコア
+│   │   ├── controllers/ # HTTP リクエストハンドラーとルーティング
+│   │   ├── models/      # GORM データベースモデル
+│   │   └── db/          # マイグレーションファイルと DB 設定
+│   ├── config/           # アプリケーション設定管理
+│   ├── utils/            # ユーティリティ関数
+│   ├── docker/           # Docker関連ファイル
+│   ├── main.go           # アプリケーションエントリーポイント
+│   ├── go.mod            # Go modules設定
+│   └── go.sum            # Go modules依存関係
+└── CLAUDE.md              # 本ドキュメント
+```
+
+### 詳細構成
+
+- **Controllers**: `/api/app/controllers/` - HTTP リクエストハンドラーとルーティング
+- **Models**: `/api/app/models/` - GORM データベースモデル
+- **Database**: `/api/app/db/` - マイグレーションファイルと DB 設定
+- **Config**: `/api/config/` - アプリケーション設定管理
+- **Utils**: `/api/utils/` - UUID生成、ログ、ディレクトリ操作等のユーティリティ
 
 ## 主要機能
 
@@ -40,16 +59,16 @@ go build -o bin/main main.go
 
 ### マイグレーション
 
-- **場所**: `/app/db/migrations/`
+- **場所**: `/api/app/db/migrations/`
 - **管理**: golang-migrate による管理
-- **本番環境**: ECS タスクによる自動実行
+- **本番環境**: Railway でマイグレーション実行
 - **手動実行**: マイグレーション用 Docker コンテナ使用
 
 ### 設定
 
 - **ローカル**: `.env`ファイルと`config.ini`使用
-- **本番**: AWS サービスからの環境変数
-- **データベース設定**: `/config/config.go`で設定
+- **本番**: Railway の環境変数
+- **データベース設定**: `/api/config/config.go`で設定
 
 ## 技術スタック
 
@@ -57,14 +76,14 @@ go build -o bin/main main.go
 - **ルーター**: Gorilla Mux
 - **ORM**: GORM
 - **データベース**: MySQL
-- **クラウド**: AWS ECS にデプロイ
 - **画像保存**: S3 (UUID ベース)
 
 ## デプロイ
 
+- **プラットフォーム**: Railway にデプロイ
 - **CI/CD**: GitHub Actions（`.github/workflows/ci.yml`）
-- **方法**: Docker イメージを Amazon ECR → ECS デプロイ
-- **インフラ**: CDK for Terraform が ECS、RDS などを管理
+- **方法**: Git Push によるデプロイ（Railway 自動ビルド）
+- **データベース**: Railway MySQL インスタンス使用
 
 ## 開発方針
 
