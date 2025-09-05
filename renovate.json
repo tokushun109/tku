@@ -6,7 +6,7 @@
   ],
   "timezone": "Asia/Tokyo",
   "schedule": [
-    "after 10pm and before 11pm on Sunday"
+    "after 10pm and before 11pm on Thursday"
   ],
   "prHourlyLimit": 4,
   "prConcurrentLimit": 10,
