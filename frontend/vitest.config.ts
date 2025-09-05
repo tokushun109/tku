@@ -67,7 +67,11 @@ export default defineConfig({
                         'framer-motion',
                         'classnames',
                         'sonner',
+                        'react-virtuoso',
                     ],
+                },
+                ssr: {
+                    noExternal: ['@mui/*', '@emotion/*'],
                 },
                 test: {
                     name: 'storybook',
