@@ -20,6 +20,7 @@ jobs:
           cache: "pnpm"
           cache-dependency-path: "frontend/pnpm-lock.yaml"
       - run: pnpm install --no-frozen-lockfile
+      - run: pnpm playwright install --with-deps
       - run: pnpm lint
       - run: pnpm type-check
       - run: pnpm build
@@ -60,5 +61,6 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: "1.25"
+          cache-dependency-path: "backend/api/go.sum"
       - run: go build ./...
       - run: go test ./...
