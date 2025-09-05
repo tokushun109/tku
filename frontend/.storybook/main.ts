@@ -10,7 +10,11 @@ const config: StorybookConfig = {
         options: {},
     },
     build: {
-        disableMDXEntries: true,
+        test: {
+            disableMDXEntries: true,
+            disableAutoDocs: true,
+            disableSourcemaps: true,
+        },
     },
     staticDirs: ['../public'],
     viteFinal: async (config) => {
