@@ -10,7 +10,7 @@
   ],
   "prHourlyLimit": 4,
   "prConcurrentLimit": 10,
-  "stabilityDays": 3,
+  "minimumReleaseAge": "3 days",
   "enabledManagers": [
     "npm",
     "gomod",
@@ -57,15 +57,15 @@
       "matchManagers": [
         "npm"
       ],
-      "matchPaths": [
+      "matchFileNames": [
         "frontend/**"
       ],
       "groupName": "frontend: core deps",
-      "matchPackagePatterns": [
-        "^react",
-        "^next",
-        "^@next/",
-        "^typescript"
+      "matchPackageNames": [
+        "/^react/",
+        "/^next/",
+        "/^@next//",
+        "/^typescript/"
       ]
     },
     {
@@ -73,7 +73,7 @@
       "matchManagers": [
         "npm"
       ],
-      "matchPaths": [
+      "matchFileNames": [
         "frontend/**"
       ],
       "groupName": "frontend: other deps"
@@ -83,7 +83,7 @@
       "matchManagers": [
         "gomod"
       ],
-      "matchPaths": [
+      "matchFileNames": [
         "backend/**"
       ],
       "groupName": "backend: core deps",
@@ -101,7 +101,7 @@
       "matchManagers": [
         "gomod"
       ],
-      "matchPaths": [
+      "matchFileNames": [
         "backend/**"
       ],
       "groupName": "backend: other deps",
@@ -114,14 +114,14 @@
       "matchManagers": [
         "npm"
       ],
-      "matchPaths": [
+      "matchFileNames": [
         "infra/**"
       ],
       "groupName": "infra: CDKTF core",
-      "matchPackagePatterns": [
-        "^cdktf",
-        "^@cdktf/",
-        "^constructs"
+      "matchPackageNames": [
+        "/^cdktf/",
+        "/^@cdktf//",
+        "/^constructs/"
       ]
     },
     {
@@ -129,16 +129,16 @@
       "matchManagers": [
         "npm"
       ],
-      "matchPaths": [
+      "matchFileNames": [
         "infra/**"
       ],
       "groupName": "infra: dev tools + types",
-      "matchPackagePatterns": [
-        "^@types/",
-        "^typescript",
-        "^jest",
-        "^ts-jest",
-        "^ts-node"
+      "matchPackageNames": [
+        "/^@types//",
+        "/^typescript/",
+        "/^jest/",
+        "/^ts-jest/",
+        "/^ts-node/"
       ]
     },
     {
