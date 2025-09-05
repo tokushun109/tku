@@ -20,11 +20,11 @@ jobs:
           cache: "pnpm"
           cache-dependency-path: "frontend/pnpm-lock.yaml"
       - run: pnpm install --no-frozen-lockfile
-      - run: pnpm playwright install --with-deps
       - run: pnpm lint
       - run: pnpm type-check
       - run: pnpm build
-      - run: pnpm test-all
+      - run: pnpm test
+      - run: pnpm test-integration
 
   backend:
     runs-on: ubuntu-latest
