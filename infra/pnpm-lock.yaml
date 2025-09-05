@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@cdktf/provider-aws':
-        specifier: 21.9.0
-        version: 21.9.0(cdktf@0.21.0(constructs@10.4.2))(constructs@10.4.2)
+        specifier: 21.9.1
+        version: 21.9.1(cdktf@0.21.0(constructs@10.4.2))(constructs@10.4.2)
       cdktf:
         specifier: ^0.21.0
         version: 0.21.0(constructs@10.4.2)
@@ -217,8 +217,8 @@ packages:
   '@bcoe/v8-coverage@0.2.3':
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
 
-  '@cdktf/provider-aws@21.9.0':
-    resolution: {integrity: sha512-oug8S7or86ebeq3oajkOnY9OO0tVNduXw+/A3WCPwyWkbywG1JM5o9B7mql+KAeWzCex7Udlu5qSOlAD38i9jw==}
+  '@cdktf/provider-aws@21.9.1':
+    resolution: {integrity: sha512-uzvSW6aR8pXPg2haFnpKcMm9RjHt+P01dSXk5sbhHEqED7FX9xuY53a6ldIigf8UEMkohFnzMTSNgNjAL2JQ/Q==}
     engines: {node: '>= 20.9.0'}
     peerDependencies:
       cdktf: ^0.21.0
@@ -1823,7 +1823,7 @@ snapshots:
 
   '@bcoe/v8-coverage@0.2.3': {}
 
-  '@cdktf/provider-aws@21.9.0(cdktf@0.21.0(constructs@10.4.2))(constructs@10.4.2)':
+  '@cdktf/provider-aws@21.9.1(cdktf@0.21.0(constructs@10.4.2))(constructs@10.4.2)':
     dependencies:
       cdktf: 0.21.0(constructs@10.4.2)
       constructs: 10.4.2
