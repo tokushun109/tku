@@ -16,7 +16,7 @@ require (
 	github.com/sendgrid/sendgrid-go v3.16.1+incompatible
 	golang.org/x/net v0.43.0
 	gopkg.in/go-ini/ini.v1 v1.67.0
-	gopkg.in/go-playground/validator.v9 v9.31.0
+	gopkg.in/go-playground/validator.v10 v10.27.0
 	gorm.io/driver/mysql v1.6.0
 	gorm.io/gorm v1.30.2
 )
