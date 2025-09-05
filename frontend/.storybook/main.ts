@@ -50,6 +50,10 @@ const config: StorybookConfig = {
             ],
         }
 
+        config.ssr = {
+            noExternal: ['@mui/*', '@emotion/*'],
+        }
+
         // Storybook配信ルートに合わせてbaseを固定
         config.base = '/'
 
