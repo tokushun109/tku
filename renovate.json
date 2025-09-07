@@ -16,7 +16,8 @@
     "gomod",
     "dockerfile",
     "terraform",
-    "github-actions"
+    "github-actions",
+    "asdf"
   ],
   "packageRules": [
     {
@@ -147,6 +148,37 @@
         "terraform"
       ],
       "groupName": "Terraform deps"
+    },
+    {
+      "description": "asdf 言語バージョン管理",
+      "matchManagers": [
+        "asdf"
+      ],
+      "groupName": "asdf language versions",
+      "matchFileNames": [
+        ".tool-versions"
+      ]
+    },
+    {
+      "description": "Node.js LTS版のみ対象",
+      "matchDatasources": [
+        "node-version"
+      ],
+      "matchPackageNames": [
+        "nodejs"
+      ],
+      "allowedVersions": "/^(18|20|22)\\./",
+      "rangeStrategy": "bump"
+    },
+    {
+      "description": "Go LTS版のみ対象",
+      "matchDatasources": [
+        "golang-version"
+      ],
+      "matchPackageNames": [
+        "golang"
+      ],
+      "rangeStrategy": "bump"
     }
   ]
 }
