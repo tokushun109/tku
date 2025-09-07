@@ -171,12 +171,22 @@
       "rangeStrategy": "bump"
     },
     {
-      "description": "Go LTS版のみ対象",
+      "description": "Goのバージョンを更新",
       "matchDatasources": [
         "golang-version"
       ],
       "matchPackageNames": [
         "golang"
+      ],
+      "rangeStrategy": "bump"
+    },
+    {
+      "description": "Terraformのバージョンを更新",
+      "matchDatasources": [
+        "github-releases"
+      ],
+      "matchPackageNames": [
+        "terraform"
       ],
       "rangeStrategy": "bump"
     }
