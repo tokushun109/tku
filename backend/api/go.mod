@@ -18,7 +18,7 @@ require (
 	golang.org/x/net v0.43.0
 	gopkg.in/go-ini/ini.v1 v1.67.0
 	gorm.io/driver/mysql v1.6.0
-	gorm.io/gorm v1.30.3
+	gorm.io/gorm v1.30.5
 )
 
 require (
