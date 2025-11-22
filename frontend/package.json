@@ -2,6 +2,7 @@
     "name": "frontend",
     "version": "0.1.0",
     "private": true,
+    "packageManager": "pnpm@9.4.0",
     "lint-staged": {
         "**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
             "pnpm fmt"
@@ -19,7 +20,7 @@
         "sb": "storybook dev -p 6006",
         "build-storybook": "storybook build",
         "test": "vitest --project=unit",
-        "test-storybook": "vitest --project=storybook",
+        "test-storybook": "pnpm build-storybook --quiet && vitest --project=storybook",
         "test-integration": "vitest --project=integration",
         "test-all": "vitest",
         "test-coverage": "vitest --coverage",
@@ -87,6 +88,7 @@
         "lint-staged": "^16.1.6",
         "markdown-to-jsx": "^7.7.13",
         "msw": "^2.11.1",
+        "playwright": "^1.56.1",
         "prettier": "^3.6.2",
         "ress": "^5.0.2",
         "sass": "^1.92.0",
