@@ -2,6 +2,7 @@
     "name": "frontend",
     "version": "0.1.0",
     "private": true,
+    "packageManager": "pnpm@10.20.0",
     "lint-staged": {
         "**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
             "pnpm fmt"
