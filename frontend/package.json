@@ -104,6 +104,9 @@
             "msw",
             "sharp",
             "unrs-resolver"
-        ]
+        ],
+        "overrides": {
+            "next@>=15.5.0-canary.0 <15.5.7": ">=15.5.7"
+        }
     }
 }
