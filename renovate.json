@@ -167,7 +167,9 @@
       "matchPackageNames": [
         "nodejs"
       ],
-      "allowedVersions": "/^(18|20|22)\\./",
+      "supportPolicy": [
+        "lts_latest"
+      ],
       "rangeStrategy": "bump"
     },
     {
