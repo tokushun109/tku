@@ -9,14 +9,14 @@ importers:
   .:
     dependencies:
       '@cdktf/provider-aws':
-        specifier: 21.14.0
-        version: 21.14.0(cdktf@0.21.0(constructs@10.4.2))(constructs@10.4.2)
+        specifier: 21.22.1
+        version: 21.22.1(cdktf@0.21.0(constructs@10.4.4))(constructs@10.4.4)
       cdktf:
         specifier: ^0.21.0
-        version: 0.21.0(constructs@10.4.2)
+        version: 0.21.0(constructs@10.4.4)
       constructs:
         specifier: ^10.4.2
-        version: 10.4.2
+        version: 10.4.4
       dotenv:
         specifier: ^17.2.1
         version: 17.2.3
@@ -213,8 +213,8 @@ packages:
   '@bcoe/v8-coverage@0.2.3':
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
 
-  '@cdktf/provider-aws@21.14.0':
-    resolution: {integrity: sha512-ioED3S+Tpli0R/br4YMjK9jCO6LZ8P0952CXTc1j8nYaAo07ua7OWqEg01EARJq/KgN5x9VHf7naPHOXdBIgWQ==}
+  '@cdktf/provider-aws@21.22.1':
+    resolution: {integrity: sha512-BuSHeaQFUL9l33pBzIMRT7cTQ69AM2mLtijjteCPhVQRmvuhuj9Lvfymf7knAMhYqAT6+Lrls9jiGVW/Us3zrQ==}
     engines: {node: '>= 20.9.0'}
     deprecated: See https://cdk.tf/imports for details on how to continue to use the aws provider in your CDK for Terraform (CDKTF) projects by generating the bindings locally.
     peerDependencies:
@@ -844,8 +844,8 @@ packages:
   concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
 
-  constructs@10.4.2:
-    resolution: {integrity: sha512-wsNxBlAott2qg8Zv87q3eYZYgheb9lchtBfjHzzLHtXbttwSrHPs1NNQbBrmbb1YZvYg2+Vh0Dor76w4mFxJkA==}
+  constructs@10.4.4:
+    resolution: {integrity: sha512-lP0qC1oViYf1cutHo9/KQ8QL637f/W29tDmv/6sy35F5zs+MD9f66nbAAIjicwc7fwyuF3rkg6PhZh4sfvWIpA==}
 
   convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
@@ -1862,10 +1862,10 @@ snapshots:
 
   '@bcoe/v8-coverage@0.2.3': {}
 
-  '@cdktf/provider-aws@21.14.0(cdktf@0.21.0(constructs@10.4.2))(constructs@10.4.2)':
+  '@cdktf/provider-aws@21.22.1(cdktf@0.21.0(constructs@10.4.4))(constructs@10.4.4)':
     dependencies:
-      cdktf: 0.21.0(constructs@10.4.2)
-      constructs: 10.4.2
+      cdktf: 0.21.0(constructs@10.4.4)
+      constructs: 10.4.4
 
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
@@ -2473,9 +2473,9 @@ snapshots:
 
   caniuse-lite@1.0.30001751: {}
 
-  cdktf@0.21.0(constructs@10.4.2):
+  cdktf@0.21.0(constructs@10.4.4):
     dependencies:
-      constructs: 10.4.2
+      constructs: 10.4.4
 
   chalk@4.1.2:
     dependencies:
@@ -2508,7 +2508,7 @@ snapshots:
 
   concat-map@0.0.1: {}
 
-  constructs@10.4.2: {}
+  constructs@10.4.4: {}
 
   convert-source-map@2.0.0: {}
 
