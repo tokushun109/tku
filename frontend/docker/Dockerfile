@@ -1,6 +1,6 @@
 # Frontend Dockerfile for Next.js development
 
-FROM node:22-alpine
+FROM node:24-alpine
 
 # pnpmをグローバルインストール
 RUN npm install -g pnpm@8
