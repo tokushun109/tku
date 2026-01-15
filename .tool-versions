@@ -4,6 +4,6 @@
 
 # Frontend and infra use Node.js, backend API uses Go, infra uses Terraform
 
-nodejs 22.21.1 # Node.js LTS version for frontend and infrastructure
+nodejs 22.22.0 # Node.js LTS version for frontend and infrastructure
 golang 1.25.5 # Latest stable Go version for backend API
 terraform 1.14.3 # Latest stable Terraform version for infrastructure (CDK for Terraform)
