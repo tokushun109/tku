@@ -59,6 +59,13 @@ get_specified_version() {
     grep "^$tool " .tool-versions | awk '{print $2}' || echo ""
 }
 
+# 指定バージョンがインストール済みか確認する関数
+is_version_installed() {
+    local tool=$1
+    local version=$2
+    asdf where "$tool" "$version" >/dev/null 2>&1
+}
+
 # Node.js関連の追加パッケージをインストールする関数
 install_node_packages() {
     echo "📦 Node.js追加パッケージをインストール中..."
@@ -94,18 +101,27 @@ while IFS= read -r line || [ -n "$line" ]; do
 
     # 現在のバージョンを取得
     current_version=$(get_current_version $tool)
+    installed_flag=false
+    if is_version_installed "$tool" "$specified_version"; then
+        installed_flag=true
+    fi
 
     echo "  📋 指定バージョン: $tool $specified_version"
     echo "  📋 現在バージョン: $tool $current_version"
+    echo "  📦 インストール済み: $installed_flag"
 
     # バージョンが異なる場合のみ更新
-    if [ "$current_version" != "$specified_version" ]; then
-        echo "  🔄 バージョンの差異を検出しました。更新中..."
+    if [ "$current_version" != "$specified_version" ] || [ "$installed_flag" != "true" ]; then
+        echo "  🔄 バージョンの差異または未インストールを検出しました。更新中..."
 
         # 古いバージョンがインストールされている場合はアンインストール
-        if [ "$current_version" != "not-installed" ] && [ "$current_version" != "No version is set" ]; then
-            echo "  🗑️  古いバージョンをアンインストール中: $current_version"
-            asdf uninstall $tool $current_version || echo "  ⚠️  警告: $tool $current_version のアンインストールに失敗しました（未インストールの可能性があります）"
+        if [ "$current_version" != "$specified_version" ]; then
+            if [ "$current_version" != "not-installed" ] && [ "$current_version" != "No version is set" ]; then
+                if is_version_installed "$tool" "$current_version"; then
+                    echo "  🗑️  古いバージョンをアンインストール中: $current_version"
+                    asdf uninstall $tool $current_version || echo "  ⚠️  警告: $tool $current_version のアンインストールに失敗しました（未インストールの可能性があります）"
+                fi
+            fi
         fi
 
         # 新しいバージョンをインストール
