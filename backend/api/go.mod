@@ -4,9 +4,9 @@ go 1.25.0
 
 require (
 	github.com/PuerkitoBio/goquery v1.11.0
-	github.com/aws/aws-sdk-go-v2 v1.41.0
-	github.com/aws/aws-sdk-go-v2/config v1.32.6
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.95.0
+	github.com/aws/aws-sdk-go-v2 v1.41.1
+	github.com/aws/aws-sdk-go-v2/config v1.32.7
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.95.1
 	github.com/go-playground/validator/v10 v10.30.1
 	github.com/gocarina/gocsv v0.0.0-20240520201108-78e41c74b4b1
 	github.com/google/uuid v1.6.0
@@ -15,8 +15,8 @@ require (
 	github.com/rs/cors v1.11.1
 	github.com/saintfish/chardet v0.0.0-20230101081208-5e3ef4b5456d
 	github.com/sendgrid/sendgrid-go v3.16.1+incompatible
-	golang.org/x/net v0.48.0
-	gopkg.in/go-ini/ini.v1 v1.67.0
+	golang.org/x/net v0.49.0
+	gopkg.in/go-ini/ini.v1 v1.67.1
 	gorm.io/driver/mysql v1.6.0
 	gorm.io/gorm v1.31.1
 )
