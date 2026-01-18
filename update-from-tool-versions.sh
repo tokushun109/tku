@@ -101,9 +101,10 @@ while IFS= read -r line || [ -n "$line" ]; do
 
     # 現在のバージョンを取得
     current_version=$(get_current_version $tool)
-    installed_flag=false
     if is_version_installed "$tool" "$specified_version"; then
         installed_flag=true
+    else
+        installed_flag=false
     fi
 
     echo "  📋 指定バージョン: $tool $specified_version"
@@ -115,13 +116,12 @@ while IFS= read -r line || [ -n "$line" ]; do
         echo "  🔄 バージョンの差異または未インストールを検出しました。更新中..."
 
         # 古いバージョンがインストールされている場合はアンインストール
-        if [ "$current_version" != "$specified_version" ]; then
-            if [ "$current_version" != "not-installed" ] && [ "$current_version" != "No version is set" ]; then
-                if is_version_installed "$tool" "$current_version"; then
-                    echo "  🗑️  古いバージョンをアンインストール中: $current_version"
-                    asdf uninstall $tool $current_version || echo "  ⚠️  警告: $tool $current_version のアンインストールに失敗しました（未インストールの可能性があります）"
-                fi
-            fi
+        if [ "$current_version" != "$specified_version" ] && \
+           [ "$current_version" != "not-installed" ] && \
+           [ "$current_version" != "No version is set" ] && \
+           is_version_installed "$tool" "$current_version"; then
+            echo "  🗑️  古いバージョンをアンインストール中: $current_version"
+            asdf uninstall $tool $current_version || echo "  ⚠️  警告: $tool $current_version のアンインストールに失敗しました（未インストールの可能性があります）"
         fi
 
         # 新しいバージョンをインストール
