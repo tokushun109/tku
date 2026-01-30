@@ -105,6 +105,7 @@ func GetAllProducts(mode, category, target string) (products Products, err error
 			return db.Order("site_detail.detail_url Desc")
 		}).
 		Preload("SiteDetails.SalesSite").
+		Order("product.created_at Desc").
 		Find(&products)
 
 	return products, nil
