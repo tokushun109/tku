@@ -18,11 +18,11 @@ import (
 	"sync"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/go-playground/validator/v10"
 	"github.com/gocarina/gocsv"
 	"github.com/gorilla/mux"
 	"github.com/saintfish/chardet"
 	"golang.org/x/net/html/charset"
-	"github.com/go-playground/validator/v10"
 )
 
 var TypeToExtension = map[string]string{
@@ -698,7 +698,7 @@ func DuplicateProduct(url string) {
 	productDetail := document.Find("#introduction > div > div").Text()
 
 	// 価格
-	price := strings.Trim(strings.TrimSpace(document.Find("#js-item-detail > aside > div.p-item-detail-info.p-item-detail-info--side > div > div:nth-child(1) > div.p-item-detail-info__item.p-item-detail-info__item--price").Text()), "￥")
+	price := strings.Trim(strings.TrimSpace(document.Find("#js-item-detail > aside > div.p-item-detail-info.p-item-detail-info--side > div > div:nth-child(1) > div.p-item-detail-info__item--price--row > span.p-item-detail-info__item--price--row--price").Text()), "￥")
 	intPrice, _ := strconv.Atoi(strings.ReplaceAll(price, ",", ""))
 	// タグ
 	tagsDom := document.Find("#js-item-detail > aside > div:nth-child(5) > ul:nth-child(3) > li > a")
