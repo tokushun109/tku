@@ -671,6 +671,7 @@ func getAllCategoryProductsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// TODO: エラーハンドリングの見直しを行う
 func DuplicateProduct(url string) {
 	if !strings.Contains(url, "creema") {
 		err := errors.New("invalid url")
@@ -681,16 +682,32 @@ func DuplicateProduct(url string) {
 	if err != nil {
 		panic(err)
 	}
+	defer res.Body.Close()
+	if res.StatusCode != http.StatusOK {
+		panic(fmt.Errorf("unexpected status code: %d", res.StatusCode))
+	}
 
-	buffer, _ := io.ReadAll(res.Body)
+	buffer, err := io.ReadAll(res.Body)
+	if err != nil {
+		panic(err)
+	}
 
 	detector := chardet.NewTextDetector()
-	detectResult, _ := detector.DetectBest(buffer)
+	detectResult, err := detector.DetectBest(buffer)
+	if err != nil {
+		panic(err)
+	}
 
 	bufferReader := bytes.NewReader(buffer)
-	reader, _ := charset.NewReaderLabel(detectResult.Charset, bufferReader)
+	reader, err := charset.NewReaderLabel(detectResult.Charset, bufferReader)
+	if err != nil {
+		panic(err)
+	}
 
-	document, _ := goquery.NewDocumentFromReader(reader)
+	document, err := goquery.NewDocumentFromReader(reader)
+	if err != nil {
+		panic(err)
+	}
 
 	// 作品名
 	title := document.Find("title").Text()
@@ -699,7 +716,10 @@ func DuplicateProduct(url string) {
 
 	// 価格
 	price := strings.Trim(strings.TrimSpace(document.Find("#js-item-detail > aside > div.p-item-detail-info.p-item-detail-info--side > div > div:nth-child(1) > div.p-item-detail-info__item--price--row > span.p-item-detail-info__item--price--row--price").Text()), "￥")
-	intPrice, _ := strconv.Atoi(strings.ReplaceAll(price, ",", ""))
+	intPrice, err := strconv.Atoi(strings.ReplaceAll(price, ",", ""))
+	if err != nil {
+		panic(fmt.Errorf("価格の解析に失敗しました: %w", err))
+	}
 	// タグ
 	tagsDom := document.Find("#js-item-detail > aside > div:nth-child(5) > ul:nth-child(3) > li > a")
 	tagNames := []string{}
