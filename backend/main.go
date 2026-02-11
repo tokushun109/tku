@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	if os.Getenv("ENV") == "local" {
+	if _, err := os.Stat(".env"); err == nil {
 		_ = godotenv.Load(".env")
 	}
 
