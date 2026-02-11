@@ -5,6 +5,8 @@ import (
 	"os"
 
 	"github.com/tokushun109/tku/backend/adapter/api/action"
+	"github.com/tokushun109/tku/backend/adapter/api/middleware"
+	"github.com/tokushun109/tku/backend/adapter/logger"
 
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
@@ -16,12 +18,13 @@ type GorillaMuxServer struct {
 	handler http.Handler
 	port    Port
 	db      *gorm.DB
+	log     logger.Logger
 }
 
-func NewGorillaMuxServer(db *gorm.DB, port Port) *GorillaMuxServer {
+func NewGorillaMuxServer(log logger.Logger, db *gorm.DB, port Port) *GorillaMuxServer {
 	r := mux.NewRouter().StrictSlash(true)
 
-	healthCheck := action.NewHealthCheckAction(db)
+	healthCheck := action.NewHealthCheckAction(db, log)
 	r.HandleFunc("/api/health_check", healthCheck.Execute).Methods(http.MethodGet)
 
 	clientURL := os.Getenv("CLIENT_URL")
@@ -36,11 +39,17 @@ func NewGorillaMuxServer(db *gorm.DB, port Port) *GorillaMuxServer {
 		AllowCredentials: true,
 	})
 
+	var handler http.Handler = r
+	handler = middleware.NewRecovery(log)(handler)
+	handler = middleware.NewLogger(log)(handler)
+	handler = c.Handler(handler)
+
 	return &GorillaMuxServer{
 		router:  r,
-		handler: c.Handler(r),
+		handler: handler,
 		port:    port,
 		db:      db,
+		log:     log,
 	}
 }
 

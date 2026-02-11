@@ -1,7 +1,9 @@
 package infrastructure
 
 import (
+	"github.com/tokushun109/tku/backend/adapter/logger"
 	"github.com/tokushun109/tku/backend/infrastructure/database"
+	"github.com/tokushun109/tku/backend/infrastructure/log"
 	"github.com/tokushun109/tku/backend/infrastructure/router"
 
 	"gorm.io/gorm"
@@ -9,6 +11,7 @@ import (
 
 type config struct {
 	dbSQL         *gorm.DB
+	logger        logger.Logger
 	webServerPort string
 	webServer     router.Server
 }
@@ -22,6 +25,15 @@ func (c *config) WebServerPort(port string) *config {
 	return c
 }
 
+func (c *config) Logger(instance int) *config {
+	l, err := log.NewLoggerFactory(instance)
+	if err != nil {
+		panic(err)
+	}
+	c.logger = l
+	return c
+}
+
 func (c *config) DbSQL(instance int) *config {
 	db, err := database.NewDatabaseSQLFactory(instance)
 	if err != nil {
@@ -32,7 +44,7 @@ func (c *config) DbSQL(instance int) *config {
 }
 
 func (c *config) WebServer(instance int) *config {
-	s, err := router.NewWebServerFactory(instance, c.dbSQL, c.webServerPort)
+	s, err := router.NewWebServerFactory(instance, c.logger, c.dbSQL, c.webServerPort)
 	if err != nil {
 		panic(err)
 	}

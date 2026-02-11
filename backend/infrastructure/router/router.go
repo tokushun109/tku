@@ -3,6 +3,8 @@ package router
 import (
 	"errors"
 
+	"github.com/tokushun109/tku/backend/adapter/logger"
+
 	"gorm.io/gorm"
 )
 
@@ -16,10 +18,10 @@ const (
 	InstanceGorillaMux = iota
 )
 
-func NewWebServerFactory(instance int, db *gorm.DB, port string) (Server, error) {
+func NewWebServerFactory(instance int, log logger.Logger, db *gorm.DB, port string) (Server, error) {
 	switch instance {
 	case InstanceGorillaMux:
-		return NewGorillaMuxServer(db, Port(port)), nil
+		return NewGorillaMuxServer(log, db, Port(port)), nil
 	default:
 		return nil, errors.New("invalid web server instance")
 	}
