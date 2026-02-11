@@ -1,10 +1,14 @@
 package infrastructure
 
 import (
+	"github.com/tokushun109/tku/backend/infrastructure/database"
 	"github.com/tokushun109/tku/backend/infrastructure/router"
+
+	"gorm.io/gorm"
 )
 
 type config struct {
+	dbSQL         *gorm.DB
 	webServerPort string
 	webServer     router.Server
 }
@@ -18,8 +22,17 @@ func (c *config) WebServerPort(port string) *config {
 	return c
 }
 
+func (c *config) DbSQL(instance int) *config {
+	db, err := database.NewDatabaseSQLFactory(instance)
+	if err != nil {
+		panic(err)
+	}
+	c.dbSQL = db
+	return c
+}
+
 func (c *config) WebServer(instance int) *config {
-	s, err := router.NewWebServerFactory(instance, c.webServerPort)
+	s, err := router.NewWebServerFactory(instance, c.dbSQL, c.webServerPort)
 	if err != nil {
 		panic(err)
 	}

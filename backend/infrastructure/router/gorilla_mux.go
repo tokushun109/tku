@@ -8,18 +8,20 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
+	"gorm.io/gorm"
 )
 
 type GorillaMuxServer struct {
 	router  *mux.Router
 	handler http.Handler
 	port    Port
+	db      *gorm.DB
 }
 
-func NewGorillaMuxServer(port Port) *GorillaMuxServer {
+func NewGorillaMuxServer(db *gorm.DB, port Port) *GorillaMuxServer {
 	r := mux.NewRouter().StrictSlash(true)
 
-	healthCheck := action.NewHealthCheckAction()
+	healthCheck := action.NewHealthCheckAction(db)
 	r.HandleFunc("/api/health_check", healthCheck.Execute).Methods(http.MethodGet)
 
 	clientURL := os.Getenv("CLIENT_URL")
@@ -38,6 +40,7 @@ func NewGorillaMuxServer(port Port) *GorillaMuxServer {
 		router:  r,
 		handler: c.Handler(r),
 		port:    port,
+		db:      db,
 	}
 }
 
