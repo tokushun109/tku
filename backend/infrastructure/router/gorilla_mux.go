@@ -71,6 +71,9 @@ func (g *GorillaMuxServer) Listen() {
 	signal.Notify(stop, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
+		if g.log != nil {
+			g.log.Infof("starting HTTP server on :%s", string(g.port))
+		}
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			if g.log != nil {
 				g.log.Errorf("server error: %v", err)
