@@ -35,5 +35,5 @@ func (w Warn) Log(msg string) {
 			path = w.r.URL.String()
 		}
 	}
-	w.log.Warnf("method=%s path=%s http_status=%d error=%s msg=%s", method, path, w.httpStatus, errMsg, msg)
+	w.log.Warnf("method=%s path=%s status=%d error=%s msg=%s", method, path, w.httpStatus, errMsg, msg)
 }

@@ -29,5 +29,5 @@ func (i Info) Log(msg string) {
 			path = i.r.URL.String()
 		}
 	}
-	i.log.Infof("method=%s path=%s http_status=%d msg=%s", method, path, i.httpStatus, msg)
+	i.log.Infof("method=%s path=%s status=%d msg=%s", method, path, i.httpStatus, msg)
 }

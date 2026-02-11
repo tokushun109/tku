@@ -35,5 +35,5 @@ func (e Error) Log(msg string) {
 			path = e.r.URL.String()
 		}
 	}
-	e.log.Errorf("method=%s path=%s http_status=%d error=%s msg=%s", method, path, e.httpStatus, errMsg, msg)
+	e.log.Errorf("method=%s path=%s status=%d error=%s msg=%s", method, path, e.httpStatus, errMsg, msg)
 }
