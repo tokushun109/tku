@@ -4,8 +4,7 @@ import (
 	"errors"
 
 	"github.com/tokushun109/tku/backend/adapter/logger"
-
-	"gorm.io/gorm"
+	"github.com/tokushun109/tku/backend/adapter/repository"
 )
 
 type Server interface {
@@ -18,7 +17,7 @@ const (
 	InstanceGorillaMux = iota
 )
 
-func NewWebServerFactory(instance int, log logger.Logger, db *gorm.DB, port string) (Server, error) {
+func NewWebServerFactory(instance int, log logger.Logger, db repository.SQLDB, port string) (Server, error) {
 	switch instance {
 	case InstanceGorillaMux:
 		return NewGorillaMuxServer(log, db, Port(port)), nil

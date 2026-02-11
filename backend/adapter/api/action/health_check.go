@@ -8,7 +8,7 @@ import (
 
 	"github.com/tokushun109/tku/backend/adapter/api/logging"
 	"github.com/tokushun109/tku/backend/adapter/logger"
-	"gorm.io/gorm"
+	"github.com/tokushun109/tku/backend/adapter/repository"
 )
 
 type healthCheckResponse struct {
@@ -16,11 +16,11 @@ type healthCheckResponse struct {
 }
 
 type HealthCheckAction struct {
-	db  *gorm.DB
+	db  repository.SQLDB
 	log logger.Logger
 }
 
-func NewHealthCheckAction(db *gorm.DB, log logger.Logger) HealthCheckAction {
+func NewHealthCheckAction(db repository.SQLDB, log logger.Logger) HealthCheckAction {
 	return HealthCheckAction{db: db, log: log}
 }
 

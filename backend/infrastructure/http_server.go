@@ -2,15 +2,14 @@ package infrastructure
 
 import (
 	"github.com/tokushun109/tku/backend/adapter/logger"
+	"github.com/tokushun109/tku/backend/adapter/repository"
 	"github.com/tokushun109/tku/backend/infrastructure/database"
 	"github.com/tokushun109/tku/backend/infrastructure/log"
 	"github.com/tokushun109/tku/backend/infrastructure/router"
-
-	"gorm.io/gorm"
 )
 
 type config struct {
-	dbSQL         *gorm.DB
+	dbSQL         repository.SQLDB
 	logger        logger.Logger
 	webServerPort string
 	webServer     router.Server

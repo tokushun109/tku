@@ -3,14 +3,14 @@ package database
 import (
 	"errors"
 
-	"gorm.io/gorm"
+	"github.com/tokushun109/tku/backend/adapter/repository"
 )
 
 const (
 	InstanceMySQL = iota
 )
 
-func NewDatabaseSQLFactory(instance int) (*gorm.DB, error) {
+func NewDatabaseSQLFactory(instance int) (repository.SQLDB, error) {
 	switch instance {
 	case InstanceMySQL:
 		return GetMySQL()

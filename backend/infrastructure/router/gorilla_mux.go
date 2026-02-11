@@ -11,20 +11,20 @@ import (
 	"github.com/tokushun109/tku/backend/adapter/api/action"
 	"github.com/tokushun109/tku/backend/adapter/api/middleware"
 	"github.com/tokushun109/tku/backend/adapter/logger"
+	"github.com/tokushun109/tku/backend/adapter/repository"
 
 	"github.com/gorilla/mux"
-	"gorm.io/gorm"
 )
 
 type GorillaMuxServer struct {
 	router  *mux.Router
 	handler http.Handler
 	port    Port
-	db      *gorm.DB
+	db      repository.SQLDB
 	log     logger.Logger
 }
 
-func NewGorillaMuxServer(log logger.Logger, db *gorm.DB, port Port) *GorillaMuxServer {
+func NewGorillaMuxServer(log logger.Logger, db repository.SQLDB, port Port) *GorillaMuxServer {
 	r := mux.NewRouter().StrictSlash(true)
 
 	clientURL := os.Getenv("CLIENT_URL")
