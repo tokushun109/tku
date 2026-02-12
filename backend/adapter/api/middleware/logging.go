@@ -3,6 +3,7 @@ package middleware
 import (
 	"net"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/tokushun109/tku/backend/adapter/logger"
@@ -26,7 +27,17 @@ func NewLogger(log logger.Logger) func(http.Handler) http.Handler {
 
 			next.ServeHTTP(lrw, r)
 
-			remoteIP, _, _ := net.SplitHostPort(r.RemoteAddr)
+			remoteIP := ""
+			if xff := r.Header.Get("X-Forwarded-For"); xff != "" {
+				remoteIP = strings.TrimSpace(strings.Split(xff, ",")[0])
+			}
+			if remoteIP == "" {
+				if ip, _, err := net.SplitHostPort(r.RemoteAddr); err == nil {
+					remoteIP = ip
+				} else {
+					remoteIP = r.RemoteAddr
+				}
+			}
 			duration := time.Since(start)
 			log.Infof(
 				"method=%s path=%s status=%d duration=%s remote=%s",
