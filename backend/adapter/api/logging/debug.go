@@ -19,13 +19,6 @@ func NewDebug(log logger.Logger, r *http.Request) Debug {
 }
 
 func (d Debug) Log(msg string) {
-	method := ""
-	path := ""
-	if d.r != nil {
-		method = d.r.Method
-		if d.r.URL != nil {
-			path = d.r.URL.String()
-		}
-	}
+	method, path := getRequestMeta(d.r)
 	d.log.Debugf("method=%s path=%s msg=%s", method, path, msg)
 }

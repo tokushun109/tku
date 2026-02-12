@@ -27,13 +27,6 @@ func (e Error) Log(msg string) {
 	if e.err != nil {
 		errMsg = e.err.Error()
 	}
-	method := ""
-	path := ""
-	if e.r != nil {
-		method = e.r.Method
-		if e.r.URL != nil {
-			path = e.r.URL.String()
-		}
-	}
+	method, path := getRequestMeta(e.r)
 	e.log.Errorf("method=%s path=%s status=%d error=%s msg=%s", method, path, e.httpStatus, errMsg, msg)
 }

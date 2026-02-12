@@ -21,13 +21,6 @@ func NewInfo(log logger.Logger, r *http.Request, httpStatus int) Info {
 }
 
 func (i Info) Log(msg string) {
-	method := ""
-	path := ""
-	if i.r != nil {
-		method = i.r.Method
-		if i.r.URL != nil {
-			path = i.r.URL.String()
-		}
-	}
+	method, path := getRequestMeta(i.r)
 	i.log.Infof("method=%s path=%s status=%d msg=%s", method, path, i.httpStatus, msg)
 }

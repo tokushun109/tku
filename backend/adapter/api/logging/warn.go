@@ -27,13 +27,6 @@ func (w Warn) Log(msg string) {
 	if w.err != nil {
 		errMsg = w.err.Error()
 	}
-	method := ""
-	path := ""
-	if w.r != nil {
-		method = w.r.Method
-		if w.r.URL != nil {
-			path = w.r.URL.String()
-		}
-	}
+	method, path := getRequestMeta(w.r)
 	w.log.Warnf("method=%s path=%s status=%d error=%s msg=%s", method, path, w.httpStatus, errMsg, msg)
 }
