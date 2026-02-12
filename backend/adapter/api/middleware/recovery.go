@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"net/http"
+	"runtime/debug"
 
 	"github.com/tokushun109/tku/backend/adapter/logger"
 )
@@ -11,7 +12,7 @@ func NewRecovery(log logger.Logger) func(http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			defer func() {
 				if rec := recover(); rec != nil {
-					log.Errorf("panic recovered")
+					log.Errorf("panic recovered: %v\n%s", rec, string(debug.Stack()))
 					http.Error(w, "internal server error", http.StatusInternalServerError)
 				}
 			}()
