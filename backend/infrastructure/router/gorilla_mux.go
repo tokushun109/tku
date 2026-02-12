@@ -25,6 +25,9 @@ type GorillaMuxServer struct {
 }
 
 func NewGorillaMuxServer(log logger.Logger, db repository.SQLDB, port Port) *GorillaMuxServer {
+	if log == nil {
+		panic("logger is required")
+	}
 	r := mux.NewRouter().StrictSlash(true)
 
 	clientURL := os.Getenv("CLIENT_URL")
