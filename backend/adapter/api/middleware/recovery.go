@@ -11,7 +11,7 @@ func NewRecovery(log logger.Logger) func(http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			defer func() {
 				if rec := recover(); rec != nil {
-					log.Errorf("panic: %v", rec)
+					log.Errorf("panic recovered")
 					http.Error(w, "internal server error", http.StatusInternalServerError)
 				}
 			}()
