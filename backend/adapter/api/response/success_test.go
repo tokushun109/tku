@@ -5,12 +5,15 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/tokushun109/tku/backend/internal/testutil"
 )
 
 func TestNewSuccessSend(t *testing.T) {
 	rr := httptest.NewRecorder()
 
-	NewSuccess(http.StatusOK).Send(rr)
+	log := &testutil.Logger{}
+	NewSuccess(log, http.StatusOK).Send(rr)
 
 	if rr.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d", rr.Code)

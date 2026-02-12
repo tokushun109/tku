@@ -60,5 +60,5 @@ func (a HealthCheckAction) Execute(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.NewSuccess(http.StatusOK).Send(w)
+	response.NewSuccess(a.log, http.StatusOK).Send(w)
 }
