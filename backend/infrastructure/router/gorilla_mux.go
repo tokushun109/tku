@@ -36,9 +36,9 @@ func NewGorillaMuxServer(log logger.Logger, db repository.SQLDB, port Port) *Gor
 	}
 
 	var handler http.Handler = r
-	handler = middleware.NewRecovery(log)(handler)
-	handler = middleware.NewLogger(log)(handler)
 	handler = middleware.NewCORS([]string{clientURL}, true)(handler)
+	handler = middleware.NewLogger(log)(handler)
+	handler = middleware.NewRecovery(log)(handler)
 
 	srv := &GorillaMuxServer{
 		router:  r,
