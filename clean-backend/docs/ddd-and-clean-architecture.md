@@ -335,6 +335,104 @@ func getOrCreateRequestID(r *http.Request) string {
 
 - `db/migrations` をルート直下に置く（DB切り替え予定なしのため固定）
 
+## DB 接続（MySQL + GORM）
+
+- 接続初期化は `internal/infra/db/mysql/gorm.go` に集約する
+- 設定値は `internal/infra/config` から受け取る
+- 本番/開発で同一設定の想定（当面は分けない）
+
+### 接続実装例
+
+```go
+func NewDB(cfg *config.Config) (*gorm.DB, error) {
+    dsn := fmt.Sprintf(
+        "%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Asia%%2FTokyo",
+        cfg.DBUser,
+        cfg.DBPass,
+        cfg.DBHost,
+        cfg.DBPort,
+        cfg.DBName,
+    )
+
+    db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+        NamingStrategy: schema.NamingStrategy{SingularTable: true},
+    })
+    if err != nil {
+        return nil, err
+    }
+
+    sqlDB, err := db.DB()
+    if err != nil {
+        return nil, err
+    }
+    sqlDB.SetMaxOpenConns(25)
+    sqlDB.SetMaxIdleConns(10)
+    sqlDB.SetConnMaxLifetime(30 * time.Minute)
+
+    return db, nil
+}
+```
+
+## Repository 実装例（GORM）
+
+- Repository IF は `internal/domain/<domain>/repository.go`
+- 実装は `internal/infra/db/mysql/repository` に置く
+
+### Domain IF 例
+
+```go
+type Repository interface {
+    Create(ctx context.Context, p *Product) error
+    FindByID(ctx context.Context, id string) (*Product, error)
+    ExistsByName(ctx context.Context, name string) (bool, error)
+    Update(ctx context.Context, p *Product) error
+    Delete(ctx context.Context, id string) error
+}
+```
+
+### GORM 実装例
+
+```go
+type ProductRepository struct {
+    db *gorm.DB
+}
+
+func NewProductRepository(db *gorm.DB) *ProductRepository {
+    return &ProductRepository{db: db}
+}
+
+func (r *ProductRepository) Create(ctx context.Context, p *product.Product) error {
+    return r.db.WithContext(ctx).Create(p).Error
+}
+
+func (r *ProductRepository) FindByID(ctx context.Context, id string) (*product.Product, error) {
+    var p product.Product
+    if err := r.db.WithContext(ctx).First(&p, "uuid = ?", id).Error; err != nil {
+        return nil, err
+    }
+    return &p, nil
+}
+
+func (r *ProductRepository) ExistsByName(ctx context.Context, name string) (bool, error) {
+    var count int64
+    if err := r.db.WithContext(ctx).
+        Model(&product.Product{}).
+        Where("name = ?", name).
+        Count(&count).Error; err != nil {
+        return false, err
+    }
+    return count > 0, nil
+}
+
+func (r *ProductRepository) Update(ctx context.Context, p *product.Product) error {
+    return r.db.WithContext(ctx).Save(p).Error
+}
+
+func (r *ProductRepository) Delete(ctx context.Context, id string) error {
+    return r.db.WithContext(ctx).Where("uuid = ?", id).Delete(&product.Product{}).Error
+}
+```
+
 ## 進め方の原則
 
 - まずドメイン単位の最小移行を行い、構成の正当性を確認する
