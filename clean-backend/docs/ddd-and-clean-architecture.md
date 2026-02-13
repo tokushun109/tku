@@ -567,3 +567,72 @@ func (r *ProductRepository) Delete(ctx context.Context, id string) error {
 - まずドメイン単位の最小移行を行い、構成の正当性を確認する
 - `product` は依存が多いので後半に回しても良い
 - すべての新規実装はこの構成に沿って行う
+
+## 実装フロー（フェーズ方針）
+
+### フェーズ1: 最低限のAPIを完成形で実装
+
+- GET/POST + Session を対象に「完成形」で実装する
+- TODO は残さず、Domain/Usecase/Interface/Infra/DI/テストまで一通り行う
+- 対象例: `category`（一覧取得 + 作成）
+
+### フェーズ2: API実装の横展開
+
+- フェーズ1の型を踏襲し、`target` / `tag` / `sales_site` などへ展開する
+
+### フェーズ3: 複雑なドメインへの対応
+
+- `product` など複雑な機能（画像/CSV/S3/スクレイピング）を段階的に実装
+
+## フェーズ1（category）具体チェックリスト
+
+### API 仕様の確定
+
+- [ ] `GET /api/category?mode=all|used` を確定
+- [ ] `POST /api/category` のレスポンスは `{"success": true}` で統一
+- [ ] `POST /api/category` は session 認証必須
+- [ ] `name` のバリデーションは 1〜20
+
+### Domain
+
+- [ ] `internal/domain/category/entity.go` を作成
+- [ ] エンティティのバリデーションを実装（name 1〜20）
+- [ ] `internal/domain/category/errors.go` を作成
+- [ ] `internal/domain/category/repository.go` を作成
+
+### Usecase
+
+- [ ] `internal/usecase/category/usecase.go` を作成（IF）
+- [ ] `ListCategories(mode)` を実装
+- [ ] `CreateCategory(name)` を実装
+- [ ] Domain error → Usecase error 変換
+
+### Interface（HTTP）
+
+- [ ] `internal/interface/http/request/category.go` を作成
+- [ ] `internal/interface/http/response/category.go` を作成
+- [ ] `internal/interface/http/presenter/category.go` を作成
+- [ ] `internal/interface/http/handler/category.go` を作成
+- [ ] `internal/interface/http/router` にルーティング追加
+
+### Session
+
+- [ ] `internal/domain/session` を作成（entity/repository）
+- [ ] `internal/usecase/session` を作成（認証判定）
+- [ ] `internal/infra/db/mysql/repository/session.go` を作成
+- [ ] handler で session チェックを適用
+
+### Infra
+
+- [ ] `internal/infra/db/mysql/repository/category.go` を作成
+- [ ] `internal/infra/config` に必要項目を追加
+
+### DI
+
+- [ ] `internal/app/di` に Category/Session の組み立てを追加
+
+### テスト
+
+- [ ] Domain テスト（Category）
+- [ ] Usecase テスト（Category）
+- [ ] Handler テスト（Category）
