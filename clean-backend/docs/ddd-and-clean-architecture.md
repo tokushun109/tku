@@ -168,6 +168,12 @@ tku/clean-backend/
 - 想定外のエラーは `internal error` に統一し、詳細はログのみ出す
 - `http.Error` は使わず、JSON の統一レスポンスにする
 
+### バリデーションの方針
+
+- エンティティに集約する（単体で完結するルールのみ）
+- 例: 必須/文字数/フォーマット/値の範囲など
+- DB参照が必要な重複チェックは Usecase / Domain Service 側で扱う
+
 ### Domain エラー例（イメージ）
 
 - `internal/domain/<domain>/errors.go`
