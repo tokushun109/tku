@@ -133,6 +133,65 @@ tku/clean-backend/
 - handler の紐付けと middleware の適用順をここで定義する
 - ビジネスロジックは置かない
 
+## HTTP Request の役割
+
+- `internal/interface/http/request` は HTTP 入力の DTO を置く
+- JSON ボディ・クエリ・パスパラメータの受け取り型を定義する
+- ドメインエンティティやビジネスロジックは置かない
+
+### 例
+
+```go
+type CreateProductRequest struct {
+    Name        string `json:"name"`
+    Description string `json:"description"`
+    Price       int    `json:"price"`
+    CategoryID  string `json:"category_id"`
+}
+
+type ListProductsQuery struct {
+    Mode     string `json:"mode"`
+    Category string `json:"category"`
+    Target   string `json:"target"`
+}
+```
+
+## HTTP Response の役割
+
+- `internal/interface/http/response` は HTTP 出力の DTO とヘルパーを置く
+- レスポンスの形を統一する（`success` / `message` など）
+- Usecase の結果を HTTP 用に整形する処理のみを持つ
+
+### 例
+
+```go
+type ProductResponse struct {
+    ID          string `json:"id"`
+    Name        string `json:"name"`
+    Description string `json:"description"`
+    Price       int    `json:"price"`
+}
+```
+
+## Presenter の役割
+
+- `internal/interface/http/presenter` は **Usecase 出力 → Response DTO** の変換を担当
+- 変換ロジックを handler から分離するために置く
+- ドメインのルールは持たない
+
+### 例
+
+```go
+func ToProductResponse(p *product.Product) *response.ProductResponse {
+    return &response.ProductResponse{
+        ID:          p.ID,
+        Name:        p.Name,
+        Description: p.Description,
+        Price:       p.Price,
+    }
+}
+```
+
 ### CORS の扱い
 
 - CORS は `internal/interface/http/middleware` に実装する
