@@ -218,6 +218,86 @@ tku/clean-backend/
 
 - ResponseWriter をラップして `status` を取得する
 - handler が `WriteHeader` した結果を middleware が参照する
+- `request_id` は `X-Request-ID` ヘッダーを優先し、なければ UUID を生成する
+- `request_id` はレスポンスヘッダーにも付与する
+
+### ログ用ミドルウェアの雛形
+
+```go
+// internal/interface/http/middleware/logger.go
+func LoggingMiddleware(next http.Handler) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        start := time.Now()
+        reqID := getOrCreateRequestID(r)
+
+        // ResponseWriterをラップして status を取得
+        rw := NewResponseWriter(w)
+        rw.Header().Set("X-Request-ID", reqID)
+
+        next.ServeHTTP(rw, r)
+
+        latency := time.Since(start).Milliseconds()
+        status := rw.Status()
+
+        level := "INFO"
+        if status >= 500 {
+            level = "ERROR"
+        } else if status >= 400 {
+            level = "WARN"
+        }
+
+        log.Printf("[%s] request_id=%s method=%s path=%s status=%d latency_ms=%d",
+            level, reqID, r.Method, r.URL.Path, status, latency,
+        )
+    })
+}
+```
+
+### ResponseWriter ラッパー（ステータス取得用）
+
+```go
+type ResponseWriter struct {
+    http.ResponseWriter
+    status int
+}
+
+func NewResponseWriter(w http.ResponseWriter) *ResponseWriter {
+    return &ResponseWriter{ResponseWriter: w, status: http.StatusOK}
+}
+
+func (rw *ResponseWriter) WriteHeader(code int) {
+    rw.status = code
+    rw.ResponseWriter.WriteHeader(code)
+}
+
+func (rw *ResponseWriter) Status() int {
+    return rw.status
+}
+```
+
+### request_id 生成ルール（方針）
+
+- 受け入れヘッダーは `X-Request-ID`
+- ない場合は UUID v4 を生成
+- 生成/受け入れた `request_id` はレスポンスヘッダーに付与する
+
+### request_id 補助関数（例）
+
+```go
+func getOrCreateRequestID(r *http.Request) string {
+    if v := r.Header.Get("X-Request-ID"); v != "" {
+        return v
+    }
+    id := id.New() // internal/shared/id
+    r.Header.Set("X-Request-ID", id)
+    return id
+}
+```
+
+### UUID の配置
+
+- UUID 生成は `internal/shared/id` に置く
+- 例: `internal/shared/id/uuid.go` に `func New() string` を用意
 
 ## マイグレーション
 
