@@ -160,6 +160,65 @@ tku/clean-backend/
 - S3, SendGrid, HTTP などの外部サービスはすべて `infra` に配置
 - `controllers` 直下に外部パッケージを置かない
 
+## エラーの扱い
+
+- Domain は業務ルールのエラーのみを返す（`errors.New` のセンチネルでOK）
+- Usecase は Domain のエラーを受け取り、アプリケーションの結果に変換して返す
+- Interface（HTTP）は Usecase のエラーを HTTP ステータスと JSON に変換する
+- 想定外のエラーは `internal error` に統一し、詳細はログのみ出す
+- `http.Error` は使わず、JSON の統一レスポンスにする
+
+### Domain エラー例（イメージ）
+
+- `internal/domain/<domain>/errors.go`
+- `var ErrCategoryNameDuplicate = errors.New(\"category name is duplicate\")`
+
+### Usecase エラーの種別（例）
+
+- `ErrInvalidInput`
+- `ErrNotFound`
+- `ErrConflict`
+- `ErrInternal`
+
+### HTTP のエラーレスポンス（code なし）
+
+```
+{
+  \"message\": \"category name is duplicate\"
+}
+```
+
+### エラーレスポンスのヘルパー（設計方針）
+
+- `internal/interface/http/response` に共通ヘルパーを置く
+- Usecase エラーを `status` に変換して返す
+
+## ログの出し方
+
+- ログは Interface 層（middleware/handler）で集約する
+- Usecase/Domain は原則ログしない
+- Infra は外部I/O失敗時のみ補助ログを許可
+- 基本は「1リクエスト1ログ」（開始+終了、もしくは終了のみ）
+
+### レベルの基準
+
+- `INFO`: 正常終了
+- `WARN`: 想定されるエラー（バリデーション/重複/NotFound など）
+- `ERROR`: 想定外のエラー（DB/外部API/パニック）
+
+### ログ項目（最低限）
+
+- `request_id`
+- `method`, `path`
+- `status`
+- `latency_ms`
+- `error`（ある場合のみ）
+
+### 実装メモ
+
+- ResponseWriter をラップして `status` を取得する
+- handler が `WriteHeader` した結果を middleware が参照する
+
 ## マイグレーション
 
 - `db/migrations` をルート直下に置く（DB切り替え予定なしのため固定）
