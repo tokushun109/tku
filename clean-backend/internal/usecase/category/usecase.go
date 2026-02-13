@@ -5,7 +5,6 @@ import (
 	"errors"
 
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/category"
-	"github.com/tokushun109/tku/clean-backend/internal/shared/id"
 	"github.com/tokushun109/tku/clean-backend/internal/usecase"
 )
 
@@ -58,7 +57,7 @@ func (s *Service) Create(ctx context.Context, name string) error {
 		return usecase.NewAppErrorWithMessage(usecase.ErrConflict, domain.ErrNameDuplicated.Error())
 	}
 
-	c.ID = id.NewUUID()
+	c.UUID = domain.NewCategoryUUID()
 	if err := s.repo.Create(ctx, c); err != nil {
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}

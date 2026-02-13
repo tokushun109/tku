@@ -23,7 +23,11 @@ func (s *Service) Validate(ctx context.Context, token string) error {
 	if token == "" {
 		return usecase.NewAppError(usecase.ErrUnauthorized)
 	}
-	sess, err := s.repo.FindByUUID(ctx, token)
+	uuid, err := domain.ParseSessionUUID(token)
+	if err != nil {
+		return usecase.NewAppError(usecase.ErrUnauthorized)
+	}
+	sess, err := s.repo.FindByUUID(ctx, uuid)
 	if err != nil {
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}

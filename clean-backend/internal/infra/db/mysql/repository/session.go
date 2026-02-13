@@ -8,16 +8,8 @@ import (
 	"github.com/jmoiron/sqlx"
 
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/session"
+	"github.com/tokushun109/tku/clean-backend/internal/domain/user"
 )
-
-type SessionModel struct {
-	ID        uint      `db:"id"`
-	UUID      string    `db:"uuid"`
-	UserID    uint      `db:"user_id"`
-	CreatedAt time.Time `db:"created_at"`
-}
-
-func (SessionModel) TableName() string { return "session" }
 
 type SessionRepository struct {
 	db *sqlx.DB
@@ -27,14 +19,23 @@ func NewSessionRepository(db *sqlx.DB) *SessionRepository {
 	return &SessionRepository{db: db}
 }
 
-func (r *SessionRepository) FindByUUID(ctx context.Context, uuid string) (*domain.Session, error) {
-	var model SessionModel
-	err := r.db.GetContext(ctx, &model, `SELECT uuid, user_id, created_at FROM session WHERE uuid = ?`, uuid)
+func (r *SessionRepository) FindByUUID(ctx context.Context, uuid domain.SessionUUID) (*domain.Session, error) {
+	type row struct {
+		UUID      string    `db:"uuid"`
+		UserID    uint      `db:"user_id"`
+		CreatedAt time.Time `db:"created_at"`
+	}
+	var rrow row
+	err := r.db.GetContext(ctx, &rrow, `SELECT uuid, user_id, created_at FROM session WHERE uuid = ?`, uuid.String())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
 		return nil, err
 	}
-	return &domain.Session{UUID: model.UUID, UserID: model.UserID, CreatedAt: model.CreatedAt}, nil
+	parsed, err := domain.ParseSessionUUID(rrow.UUID)
+	if err != nil {
+		return nil, err
+	}
+	return &domain.Session{UUID: parsed, UserID: user.NewUserID(rrow.UserID), CreatedAt: rrow.CreatedAt}, nil
 }

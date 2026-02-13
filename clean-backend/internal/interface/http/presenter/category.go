@@ -7,8 +7,8 @@ import (
 
 func ToCategoryResponse(c *domain.Category) *response.CategoryResponse {
 	return &response.CategoryResponse{
-		UUID: c.ID,
-		Name: c.Name,
+		UUID: c.UUID.String(),
+		Name: c.Name.String(),
 	}
 }
 

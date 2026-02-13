@@ -113,6 +113,8 @@ tku/clean-backend/
   docs/
 ```
 
+※上記の `entity.go` 等は構成例です。実際のファイル名は命名規則に合わせて `category_entity.go` のようにドメイン名を明示します。
+
 ## 依存ルール（重要）
 
 - `domain` は外部に依存しない（純粋なルールとモデルのみ）
@@ -120,6 +122,51 @@ tku/clean-backend/
 - `interface` は `usecase` に依存してよい
 - `infra` は `domain` / `usecase` に依存してよい
 - 依存の向きは常に「外側 → 内側」
+
+## Entity / VO の扱い方と命名規則
+
+- Entity はドメインの中心モデル。`internal/domain/<domain>` に置く
+- Value Object（VO）も同じドメイン配下に置き、同一パッケージ内で完結させる
+- UUID は `internal/shared/id` に汎用ロジックを持ち、各ドメインで VO としてラップする
+  - 例: `CategoryUUID`, `SessionUUID` など
+- 文字列や数値の制約は VO に寄せる（Entity に生データを持たせない）
+
+### 命名規則（ファイル名）
+
+- Entity: `<domain>_entity.go`
+  - 例: `category_entity.go`, `session_entity.go`
+- VO: `<domain>_<value>_vo.go`
+  - 例: `category_uuid_vo.go`, `category_name_vo.go`, `session_uuid_vo.go`, `user_id_vo.go`
+- テスト: 対象ファイル名 + `_test.go`
+  - 例: `category_entity_test.go`, `category_name_vo_test.go`, `uuid_test.go`
+
+### 命名規則（型名）
+
+- Entity: `Category`, `Session` のようにドメイン名そのもの
+- VO: `CategoryUUID`, `CategoryName`, `SessionUUID`, `UserID` など
+
+### VO 例（UUID）
+
+- `internal/shared/id/uuid.go` に汎用の UUID 生成・パースを置く
+- ドメイン側で VO を定義し、型安全を確保する
+
+```
+// internal/domain/category/category_uuid_vo.go
+type CategoryUUID id.UUID
+```
+
+### VO 例（Name）
+
+- 文字列の長さ・形式などの制約は VO に閉じ込める
+- VO 内の定数は private にする
+
+```
+// internal/domain/category/category_name_vo.go
+const (
+    nameMinLen = 1
+    nameMaxLen = 20
+)
+```
 
 ## Interface の配置ルール
 
