@@ -97,7 +97,7 @@ tku/clean-backend/
         config.go
       db/
         mysql/
-          gorm.go
+          db.go
           repository/
       storage/
         s3/
@@ -132,6 +132,7 @@ tku/clean-backend/
 - `internal/interface/http/router` はルーティング定義のみを持つ
 - handler の紐付けと middleware の適用順をここで定義する
 - ビジネスロジックは置かない
+- 認証が必要なルートは `AuthMiddleware` を付与する
 
 ## HTTP Request の役割
 
@@ -269,7 +270,16 @@ func CORSMiddleware(allowedOrigins []string) func(http.Handler) http.Handler {
 - `ErrInvalidInput`
 - `ErrNotFound`
 - `ErrConflict`
+- `ErrUnauthorized`
 - `ErrInternal`
+
+### HTTP ステータス対応（例）
+
+- `ErrInvalidInput` → 400
+- `ErrNotFound` → 404
+- `ErrConflict` → 409
+- `ErrUnauthorized` → 401
+- `ErrInternal` → 500
 
 ### HTTP のエラーレスポンス（code なし）
 
@@ -379,7 +389,7 @@ func getOrCreateRequestID(r *http.Request) string {
     if v := r.Header.Get("X-Request-ID"); v != "" {
         return v
     }
-    id := id.New() // internal/shared/id
+    id := id.NewUUID() // internal/shared/id
     r.Header.Set("X-Request-ID", id)
     return id
 }
@@ -388,7 +398,7 @@ func getOrCreateRequestID(r *http.Request) string {
 ### UUID の配置
 
 - UUID 生成は `internal/shared/id` に置く
-- 例: `internal/shared/id/uuid.go` に `func New() string` を用意
+- 例: `internal/shared/id/uuid.go` に `func NewUUID() string` を用意
 
 ## マイグレーション
 
@@ -410,16 +420,18 @@ tku/clean-backend/
     migrations/
 ```
 
-## DB 接続（MySQL + GORM）
+## DB 接続（MySQL + sqlx）
 
-- 接続初期化は `internal/infra/db/mysql/gorm.go` に集約する
+- 既存の GORM から sqlx へ移行する（マイグレーションは golang-migrate を継続使用）
+
+- 接続初期化は `internal/infra/db/mysql/db.go` に集約する
 - 設定値は `internal/infra/config` から受け取る
 - 本番/開発で同一設定の想定（当面は分けない）
 
 ### 接続実装例
 
 ```go
-func NewDB(cfg *config.Config) (*gorm.DB, error) {
+func NewDB(cfg *config.Config) (*sqlx.DB, error) {
     dsn := fmt.Sprintf(
         "%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Asia%%2FTokyo",
         cfg.DBUser,
@@ -429,26 +441,20 @@ func NewDB(cfg *config.Config) (*gorm.DB, error) {
         cfg.DBName,
     )
 
-    db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
-        NamingStrategy: schema.NamingStrategy{SingularTable: true},
-    })
+    db, err := sqlx.Connect("mysql", dsn)
     if err != nil {
         return nil, err
     }
 
-    sqlDB, err := db.DB()
-    if err != nil {
-        return nil, err
-    }
-    sqlDB.SetMaxOpenConns(25)
-    sqlDB.SetMaxIdleConns(10)
-    sqlDB.SetConnMaxLifetime(30 * time.Minute)
+    db.SetMaxOpenConns(25)
+    db.SetMaxIdleConns(10)
+    db.SetConnMaxLifetime(30 * time.Minute)
 
     return db, nil
 }
 ```
 
-## Repository 実装例（GORM）
+## Repository 実装例（sqlx）
 
 - Repository IF は `internal/domain/<domain>/repository.go`
 - 実装は `internal/infra/db/mysql/repository` に置く
@@ -465,24 +471,29 @@ type Repository interface {
 }
 ```
 
-### GORM 実装例
+### sqlx 実装例
 
 ```go
 type ProductRepository struct {
-    db *gorm.DB
+    db *sqlx.DB
 }
 
-func NewProductRepository(db *gorm.DB) *ProductRepository {
+func NewProductRepository(db *sqlx.DB) *ProductRepository {
     return &ProductRepository{db: db}
 }
 
 func (r *ProductRepository) Create(ctx context.Context, p *product.Product) error {
-    return r.db.WithContext(ctx).Create(p).Error
+    _, err := r.db.ExecContext(
+        ctx,
+        `INSERT INTO product (uuid, name, price, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())`,
+        p.ID, p.Name, p.Price,
+    )
+    return err
 }
 
 func (r *ProductRepository) FindByID(ctx context.Context, id string) (*product.Product, error) {
     var p product.Product
-    if err := r.db.WithContext(ctx).First(&p, "uuid = ?", id).Error; err != nil {
+    if err := r.db.GetContext(ctx, &p, `SELECT uuid, name, price FROM product WHERE uuid = ?`, id); err != nil {
         return nil, err
     }
     return &p, nil
@@ -490,22 +501,45 @@ func (r *ProductRepository) FindByID(ctx context.Context, id string) (*product.P
 
 func (r *ProductRepository) ExistsByName(ctx context.Context, name string) (bool, error) {
     var count int64
-    if err := r.db.WithContext(ctx).
-        Model(&product.Product{}).
-        Where("name = ?", name).
-        Count(&count).Error; err != nil {
+    if err := r.db.GetContext(ctx, &count, `SELECT COUNT(1) FROM product WHERE name = ?`, name); err != nil {
         return false, err
     }
     return count > 0, nil
 }
 
 func (r *ProductRepository) Update(ctx context.Context, p *product.Product) error {
-    return r.db.WithContext(ctx).Save(p).Error
+    _, err := r.db.ExecContext(
+        ctx,
+        `UPDATE product SET name = ?, price = ?, updated_at = NOW() WHERE uuid = ?`,
+        p.Name, p.Price, p.ID,
+    )
+    return err
 }
 
 func (r *ProductRepository) Delete(ctx context.Context, id string) error {
-    return r.db.WithContext(ctx).Where("uuid = ?", id).Delete(&product.Product{}).Error
+    _, err := r.db.ExecContext(ctx, `DELETE FROM product WHERE uuid = ?`, id)
+    return err
 }
+```
+
+## SQL 実装の注意（sqlx）
+
+- **プレースホルダ（`?`）でパラメータを渡す**（文字列連結はしない）
+- `ORDER BY` / `LIMIT` / カラム名など動的SQLは **ホワイトリストで制限**
+- `IN` 句は `sqlx.In` を使って安全に組み立てる
+
+### 例（安全な書き方）
+
+```go
+db.GetContext(ctx, &row, `SELECT * FROM user WHERE email = ?`, email)
+```
+
+### 例（IN 句）
+
+```go
+query, args, _ := sqlx.In(`SELECT * FROM t WHERE id IN (?)`, ids)
+query = db.Rebind(query)
+db.SelectContext(ctx, &rows, query, args...)
 ```
 
 ## テスト方針（配置・命名・モック）
@@ -620,7 +654,7 @@ func (r *ProductRepository) Delete(ctx context.Context, id string) error {
 - [ ] `internal/domain/session` を作成（entity/repository）
 - [ ] `internal/usecase/session` を作成（認証判定）
 - [ ] `internal/infra/db/mysql/repository/session.go` を作成
-- [ ] handler で session チェックを適用
+- [ ] router で `AuthMiddleware` を付与
 
 ### Infra
 
