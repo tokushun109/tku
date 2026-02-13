@@ -394,6 +394,22 @@ func getOrCreateRequestID(r *http.Request) string {
 
 - `db/migrations` をルート直下に置く（DB切り替え予定なしのため固定）
 
+## Docker 配置方針
+
+- `tku/clean-backend/docker/` に新設して集約する
+- 既存 `tku/backend/api/docker` の内容をベースに移行して管理する
+- 重複期間は両方のディレクトリが存在してよい
+
+### 想定構成
+
+```
+tku/clean-backend/
+  docker/
+    api/
+    db/
+    migrations/
+```
+
 ## DB 接続（MySQL + GORM）
 
 - 接続初期化は `internal/infra/db/mysql/gorm.go` に集約する
