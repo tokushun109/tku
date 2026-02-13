@@ -127,6 +127,32 @@ tku/clean-backend/
 - Repository の IF は `internal/domain/<domain>/repository.go`
 - Repository の実装は `internal/infra/db/mysql/repository`
 
+## HTTP Router の責務
+
+- `internal/interface/http/router` はルーティング定義のみを持つ
+- handler の紐付けと middleware の適用順をここで定義する
+- ビジネスロジックは置かない
+
+### CORS の扱い
+
+- CORS は `internal/interface/http/middleware` に実装する
+- ルーターで `Use()` して全ルートに適用する
+- 許可 Origin は `CLIENT_URL` のみ
+- `AllowCredentials` は `true` 固定
+
+#### CORS ミドルウェア例
+
+```go
+func CORSMiddleware(allowedOrigins []string) func(http.Handler) http.Handler {
+    c := cors.New(cors.Options{
+        AllowedMethods:   []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
+        AllowedOrigins:   allowedOrigins,
+        AllowCredentials: true,
+    })
+    return c.Handler
+}
+```
+
 ## DI（Composition Root）
 
 - 依存注入は `internal/app/di` に集約する
