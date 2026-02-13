@@ -492,6 +492,60 @@ func (r *ProductRepository) Delete(ctx context.Context, id string) error {
 }
 ```
 
+## テスト方針（配置・命名・モック）
+
+### 配置場所
+
+- Domain: `internal/domain/<domain>/*_test.go`
+- Usecase: `internal/usecase/<domain>/*_test.go`
+- HTTP Handler: `internal/interface/http/handler/*_test.go`
+- Repository（結合/必要箇所のみ）: `internal/infra/db/mysql/repository/*_test.go`
+
+### 命名規則
+
+- 基本: `<対象>_test.go`
+- テスト関数: `Test<構造体/関数>_<条件>`（例: `TestCreateProduct_DuplicateName`）
+- Table test を推奨（`name` フィールド付き）
+
+### モックの置き場所
+
+- Usecase テスト用の Repository モック:
+  - `internal/usecase/<domain>/mock_repository_test.go`
+- Handler テスト用の Usecase モック:
+  - `internal/interface/http/handler/mocks_test.go`
+- 共有したい場合のみ `internal/shared/testutil` に集約
+
+### 優先順位
+
+1. Domain（最優先）
+2. Usecase
+3. Handler（薄く）
+4. Repository（必要な箇所のみ）
+
+### testdata の扱い
+
+- 大きな入力データは `testdata/` ディレクトリに置く
+- 参照先は各テストファイルの近くに配置（例: `internal/usecase/product/testdata`）
+- JSON/CSV などはテストで読み込み、固定値のベタ書きを避ける
+- Go の `testing` では `testdata` 配下はビルド対象外になる
+
+### DB 結合テストの起動方法（方針）
+
+- Repository の結合テストのみ対象
+- 起動方法は「Docker で MySQL を立ち上げる前提」に統一する
+- テスト用の接続情報は `.env.test` などで管理し、CI でも再利用する
+
+#### 例: 起動フロー（概念）
+
+1. `docker-compose -f docker-compose.test.yml up -d`
+2. `go test ./internal/infra/db/mysql/repository -count=1`
+3. `docker-compose -f docker-compose.test.yml down`
+
+#### ルール
+
+- テスト用DBは本番/開発と完全に分離する
+- 破壊的なマイグレーションは結合テスト専用DBでのみ実行する
+
 ## 進め方の原則
 
 - まずドメイン単位の最小移行を行い、構成の正当性を確認する
