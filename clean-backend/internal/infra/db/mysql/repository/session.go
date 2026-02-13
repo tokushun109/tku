@@ -8,7 +8,6 @@ import (
 	"github.com/jmoiron/sqlx"
 
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/session"
-	"github.com/tokushun109/tku/clean-backend/internal/domain/user"
 )
 
 type SessionRepository struct {
@@ -37,5 +36,5 @@ func (r *SessionRepository) FindByUUID(ctx context.Context, uuid domain.SessionU
 	if err != nil {
 		return nil, err
 	}
-	return &domain.Session{UUID: parsed, UserID: user.NewUserID(rrow.UserID), CreatedAt: rrow.CreatedAt}, nil
+	return &domain.Session{UUID: parsed, UserID: rrow.UserID, CreatedAt: rrow.CreatedAt}, nil
 }

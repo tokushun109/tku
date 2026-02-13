@@ -7,7 +7,6 @@ import (
 	"time"
 
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/session"
-	"github.com/tokushun109/tku/clean-backend/internal/domain/user"
 	"github.com/tokushun109/tku/clean-backend/internal/shared/id"
 	"github.com/tokushun109/tku/clean-backend/internal/usecase"
 )
@@ -52,7 +51,7 @@ func TestValidate_OK(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected uuid parse error: %v", err)
 	}
-	sess := &domain.Session{UUID: u, UserID: user.NewUserID(1), CreatedAt: time.Now()}
+	sess := &domain.Session{UUID: u, UserID: 1, CreatedAt: time.Now()}
 	uc := New(&stubRepo{sess: sess})
 	if err := uc.Validate(context.Background(), testUUID); err != nil {
 		t.Fatalf("unexpected error: %v", err)
