@@ -67,3 +67,15 @@ func (h *CategoryHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 	response.WriteSuccess(w)
 }
+
+func (h *CategoryHandler) Delete(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	uuid := vars["category_uuid"]
+
+	if err := h.categoryUC.Delete(r.Context(), uuid); err != nil {
+		response.WriteAppError(w, err)
+		return
+	}
+
+	response.WriteSuccess(w)
+}

@@ -21,6 +21,7 @@ type stubCategoryUC struct {
 	listErr   error
 	createErr error
 	updateErr error
+	deleteErr error
 }
 
 func (s *stubCategoryUC) List(ctx context.Context, mode string) ([]*domain.Category, error) {
@@ -33,6 +34,10 @@ func (s *stubCategoryUC) Create(ctx context.Context, name string) error {
 
 func (s *stubCategoryUC) Update(ctx context.Context, uuid string, name string) error {
 	return s.updateErr
+}
+
+func (s *stubCategoryUC) Delete(ctx context.Context, uuid string) error {
+	return s.deleteErr
 }
 
 type categoryResp struct {
@@ -144,6 +149,28 @@ func TestCategoryPut_OK(t *testing.T) {
 	rr := httptest.NewRecorder()
 
 	h.Update(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d", rr.Code)
+	}
+	var resp successResp
+	if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
+		t.Fatalf("decode error: %v", err)
+	}
+	if !resp.Success {
+		t.Fatalf("expected success true")
+	}
+}
+
+func TestCategoryDelete_OK(t *testing.T) {
+	catUC := &stubCategoryUC{}
+	h := NewCategoryHandler(catUC)
+
+	req := httptest.NewRequest(http.MethodDelete, "/api/category/uuid", nil)
+	req = mux.SetURLVars(req, map[string]string{"category_uuid": testUUID})
+	rr := httptest.NewRecorder()
+
+	h.Delete(rr, req)
 
 	if rr.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d", rr.Code)

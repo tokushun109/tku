@@ -27,6 +27,8 @@ type stubRepo struct {
 	findByErr   error
 	updateOK    bool
 	updateErr   error
+	deleteOK    bool
+	deleteErr   error
 }
 
 type stubUUIDGen struct {
@@ -76,6 +78,13 @@ func (s *stubRepo) Update(ctx context.Context, c *domain.Category) (bool, error)
 		return false, s.updateErr
 	}
 	return s.updateOK, nil
+}
+
+func (s *stubRepo) Delete(ctx context.Context, uuid primitive.UUID) (bool, error) {
+	if s.deleteErr != nil {
+		return false, s.deleteErr
+	}
+	return s.deleteOK, nil
 }
 
 func TestListCategories_All_OK(t *testing.T) {
@@ -259,6 +268,45 @@ func TestUpdateCategory_UpdateError(t *testing.T) {
 	uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
 
 	err := uc.Update(context.Background(), testUUID, "new")
+	if err == nil || !errors.Is(err, usecase.ErrInternal) {
+		t.Fatalf("expected ErrInternal, got %v", err)
+	}
+}
+
+func TestDeleteCategory_OK(t *testing.T) {
+	repo := &stubRepo{deleteOK: true}
+	uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+
+	if err := uc.Delete(context.Background(), testUUID); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestDeleteCategory_InvalidUUID(t *testing.T) {
+	repo := &stubRepo{}
+	uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+
+	err := uc.Delete(context.Background(), "bad-uuid")
+	if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
+		t.Fatalf("expected ErrInvalidInput, got %v", err)
+	}
+}
+
+func TestDeleteCategory_NotFound(t *testing.T) {
+	repo := &stubRepo{deleteOK: false}
+	uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+
+	err := uc.Delete(context.Background(), testUUID)
+	if err == nil || !errors.Is(err, usecase.ErrNotFound) {
+		t.Fatalf("expected ErrNotFound, got %v", err)
+	}
+}
+
+func TestDeleteCategory_RepoError(t *testing.T) {
+	repo := &stubRepo{deleteErr: errors.New("db error")}
+	uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+
+	err := uc.Delete(context.Background(), testUUID)
 	if err == nil || !errors.Is(err, usecase.ErrInternal) {
 		t.Fatalf("expected ErrInternal, got %v", err)
 	}

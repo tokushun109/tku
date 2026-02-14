@@ -13,6 +13,7 @@ type Usecase interface {
 	List(ctx context.Context, mode string) ([]*domain.Category, error)
 	Create(ctx context.Context, name string) error
 	Update(ctx context.Context, uuid string, name string) error
+	Delete(ctx context.Context, uuid string) error
 }
 
 type Service struct {
@@ -107,6 +108,22 @@ func (s *Service) Update(ctx context.Context, uuidStr string, name string) error
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 	if !updated {
+		return usecase.NewAppError(usecase.ErrNotFound)
+	}
+	return nil
+}
+
+func (s *Service) Delete(ctx context.Context, uuidStr string) error {
+	uuid, err := primitive.NewUUID(uuidStr)
+	if err != nil {
+		return usecase.NewAppError(usecase.ErrInvalidInput)
+	}
+
+	deleted, err := s.repo.Delete(ctx, uuid)
+	if err != nil {
+		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
+	}
+	if !deleted {
 		return usecase.NewAppError(usecase.ErrNotFound)
 	}
 	return nil

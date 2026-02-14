@@ -115,6 +115,41 @@ func (r *CategoryRepository) Update(ctx context.Context, c *domain.Category) (bo
 	return affected > 0, nil
 }
 
+func (r *CategoryRepository) Delete(ctx context.Context, uuid primitive.UUID) (bool, error) {
+	tx, err := r.db.BeginTxx(ctx, nil)
+	if err != nil {
+		return false, err
+	}
+	defer func() {
+		_ = tx.Rollback()
+	}()
+
+	var categoryID int64
+	if err := tx.GetContext(ctx, &categoryID, `SELECT id FROM category WHERE uuid = ?`, uuid.String()); err != nil {
+		if err == sql.ErrNoRows {
+			return false, nil
+		}
+		return false, err
+	}
+
+	if _, err := tx.ExecContext(ctx, `UPDATE product SET category_id = NULL WHERE category_id = ?`, categoryID); err != nil {
+		return false, err
+	}
+
+	res, err := tx.ExecContext(ctx, `DELETE FROM category WHERE id = ?`, categoryID)
+	if err != nil {
+		return false, err
+	}
+	affected, err := res.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+	if err := tx.Commit(); err != nil {
+		return false, err
+	}
+	return affected > 0, nil
+}
+
 func toDomainCategory(uuidStr, nameStr string) (*domain.Category, error) {
 	uuid, err := primitive.NewUUID(uuidStr)
 	if err != nil {

@@ -13,4 +13,5 @@ type Repository interface {
 	FindByUUID(ctx context.Context, uuid primitive.UUID) (*Category, error)
 	ExistsByName(ctx context.Context, name CategoryName) (bool, error)
 	Update(ctx context.Context, c *Category) (bool, error)
+	Delete(ctx context.Context, uuid primitive.UUID) (bool, error)
 }
