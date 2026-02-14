@@ -479,6 +479,9 @@ tku/clean-backend/
 ## DB 接続（MySQL + sqlx）
 
 - 既存の GORM から sqlx へ移行する（マイグレーションは golang-migrate を継続使用）
+- GORM の `gorm.DeletedAt` は **自動で `deleted_at IS NULL` を付与**するが、sqlx では **明示的に条件を追加**する必要がある
+  - 取得系: `WHERE deleted_at IS NULL`
+  - 削除系: `DELETE` ではなく `UPDATE ... SET deleted_at = NOW()` を使う（論理削除）
 
 - 接続初期化は `internal/infra/db/mysql/db.go` に集約する
 - 設定値は `internal/infra/config` から受け取る
