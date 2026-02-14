@@ -23,7 +23,7 @@ func Load() (*Config, error) {
 		_ = godotenv.Load(".env")
 	}
 
-	port := getEnv("PORT", "8001")
+	port := getEnv("PORT", "8081")
 	clientURL := getEnv("CLIENT_URL", "")
 
 	dbHost := getEnv("MYSQL_HOST", "127.0.0.1")

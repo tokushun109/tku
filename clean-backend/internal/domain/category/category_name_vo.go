@@ -1,6 +1,9 @@
 package category
 
-import "strings"
+import (
+	"strings"
+	"unicode/utf8"
+)
 
 const (
 	nameMinLen = 1
@@ -11,7 +14,8 @@ type CategoryName string
 
 func NewCategoryName(v string) (CategoryName, error) {
 	trimmed := strings.TrimSpace(v)
-	if len(trimmed) < nameMinLen || len(trimmed) > nameMaxLen {
+	length := utf8.RuneCountInString(trimmed)
+	if length < nameMinLen || length > nameMaxLen {
 		return "", ErrInvalidName
 	}
 	return CategoryName(trimmed), nil
