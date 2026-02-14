@@ -1,7 +1,9 @@
 package category
 
+import "github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
+
 type Category struct {
-	UUID CategoryUUID
+	UUID primitive.UUID
 	Name CategoryName
 }
 

@@ -6,6 +6,7 @@ import (
 	"github.com/tokushun109/tku/clean-backend/internal/infra/config"
 	"github.com/tokushun109/tku/clean-backend/internal/infra/db/mysql"
 	mysqlRepo "github.com/tokushun109/tku/clean-backend/internal/infra/db/mysql/repository"
+	uuidInfra "github.com/tokushun109/tku/clean-backend/internal/infra/uuid"
 	"github.com/tokushun109/tku/clean-backend/internal/interface/http/handler"
 	"github.com/tokushun109/tku/clean-backend/internal/interface/http/middleware"
 	"github.com/tokushun109/tku/clean-backend/internal/interface/http/router"
@@ -27,7 +28,8 @@ func BuildServer() (*config.Config, http.Handler, error) {
 	categoryRepo := mysqlRepo.NewCategoryRepository(db)
 	sessionRepo := mysqlRepo.NewSessionRepository(db)
 
-	categoryUC := usecaseCategory.New(categoryRepo)
+	uuidGen := uuidInfra.NewGenerator()
+	categoryUC := usecaseCategory.New(categoryRepo, uuidGen)
 	sessionUC := usecaseSession.New(sessionRepo)
 
 	categoryHandler := handler.NewCategoryHandler(categoryUC)

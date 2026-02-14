@@ -7,6 +7,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
+	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/session"
 )
 
@@ -18,7 +19,7 @@ func NewSessionRepository(db *sqlx.DB) *SessionRepository {
 	return &SessionRepository{db: db}
 }
 
-func (r *SessionRepository) FindByUUID(ctx context.Context, uuid domain.SessionUUID) (*domain.Session, error) {
+func (r *SessionRepository) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domain.Session, error) {
 	type row struct {
 		UUID      string    `db:"uuid"`
 		UserID    uint      `db:"user_id"`
@@ -32,7 +33,7 @@ func (r *SessionRepository) FindByUUID(ctx context.Context, uuid domain.SessionU
 		}
 		return nil, err
 	}
-	parsed, err := domain.ParseSessionUUID(rrow.UUID)
+	parsed, err := primitive.NewUUID(rrow.UUID)
 	if err != nil {
 		return nil, err
 	}

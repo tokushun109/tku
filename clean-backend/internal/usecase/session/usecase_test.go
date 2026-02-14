@@ -6,19 +6,20 @@ import (
 	"testing"
 	"time"
 
+	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/session"
 	"github.com/tokushun109/tku/clean-backend/internal/shared/id"
 	"github.com/tokushun109/tku/clean-backend/internal/usecase"
 )
 
-var testUUID = id.NewUUID().String()
+var testUUID = id.GenerateUUID()
 
 type stubRepo struct {
 	sess *domain.Session
 	err  error
 }
 
-func (s *stubRepo) FindByUUID(ctx context.Context, uuid domain.SessionUUID) (*domain.Session, error) {
+func (s *stubRepo) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domain.Session, error) {
 	if s.err != nil {
 		return nil, s.err
 	}
@@ -47,7 +48,7 @@ func TestValidate_RepoError_Internal(t *testing.T) {
 }
 
 func TestValidate_OK(t *testing.T) {
-	u, err := domain.ParseSessionUUID(testUUID)
+	u, err := primitive.NewUUID(testUUID)
 	if err != nil {
 		t.Fatalf("unexpected uuid parse error: %v", err)
 	}

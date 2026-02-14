@@ -29,38 +29,38 @@ tku/clean-backend/
     domain/
       product/
         entity.go
-        repository.go
+        product_repo.go
         service.go
       category/
         entity.go
-        repository.go
+        category_repo.go
       target/
         entity.go
-        repository.go
+        target_repo.go
       tag/
         entity.go
-        repository.go
+        tag_repo.go
       creator/
         entity.go
-        repository.go
+        creator_repo.go
       contact/
         entity.go
-        repository.go
+        contact_repo.go
       user/
         entity.go
-        repository.go
+        user_repo.go
       session/
         entity.go
-        repository.go
+        session_repo.go
       sales_site/
         entity.go
-        repository.go
+        sales_site_repo.go
       skill_market/
         entity.go
-        repository.go
+        skill_market_repo.go
       sns/
         entity.go
-        repository.go
+        sns_repo.go
     usecase/
       product/
         usecase.go
@@ -127,8 +127,12 @@ tku/clean-backend/
 
 - Entity はドメインの中心モデル。`internal/domain/<domain>` に置く
 - Value Object（VO）も同じドメイン配下に置き、同一パッケージ内で完結させる
-- UUID は `internal/shared/id` に汎用ロジックを持ち、各ドメインで VO としてラップする
-  - 例: `CategoryUUID`, `SessionUUID` など
+- UUID は **共通の VO を 1 つだけ用意**して使い回す
+  - `internal/domain/primitive/uuid.go` に `primitive.UUID` を定義
+  - 正規表現でフォーマット検証のみを行う（外部依存なし）
+- UUID の生成は **infra 層**（例: google/uuid）で行い、VO に変換して usecase に渡す
+  - usecase 側は `UUIDGenerator` インターフェースに依存
+  - infra 側で `UUIDGenerator` を実装して DI する
 - 文字列や数値の制約は VO に寄せる（Entity に生データを持たせない）
 
 ### 命名規則（ファイル名）
@@ -136,23 +140,25 @@ tku/clean-backend/
 - Entity: `<domain>_entity.go`
   - 例: `category_entity.go`, `session_entity.go`
 - VO: `<domain>_<value>_vo.go`
-  - 例: `category_uuid_vo.go`, `category_name_vo.go`, `session_uuid_vo.go`, `user_id_vo.go`
+  - 例: `category_name_vo.go`
+- 共通 VO: `internal/domain/primitive/<value>.go`
+  - 例: `internal/domain/primitive/uuid.go`
 - テスト: 対象ファイル名 + `_test.go`
   - 例: `category_entity_test.go`, `category_name_vo_test.go`, `uuid_test.go`
 
 ### 命名規則（型名）
 
 - Entity: `Category`, `Session` のようにドメイン名そのもの
-- VO: `CategoryUUID`, `CategoryName`, `SessionUUID`, `UserID` など
+- VO: `CategoryName` など（UUID は共通の `primitive.UUID` を使用）
 
 ### VO 例（UUID）
 
-- `internal/shared/id/uuid.go` に汎用の UUID 生成・パースを置く
-- ドメイン側で VO を定義し、型安全を確保する
+- `internal/domain/primitive/uuid.go` に共通 VO を定義
+- 生成は infra で行い、usecase で VO を受け取る
 
 ```
-// internal/domain/category/category_uuid_vo.go
-type CategoryUUID id.UUID
+// internal/domain/primitive/uuid.go
+type UUID string
 ```
 
 ### VO 例（Name）
@@ -171,7 +177,7 @@ const (
 ## Interface の配置ルール
 
 - Usecase の IF は `internal/usecase/<domain>/usecase.go`
-- Repository の IF は `internal/domain/<domain>/repository.go`
+- Repository の IF は `internal/domain/<domain>/<domain>_repo.go`
 - Repository の実装は `internal/infra/db/mysql/repository`
 
 ## HTTP Router の責務
@@ -276,17 +282,17 @@ func CORSMiddleware(allowedOrigins []string) func(http.Handler) http.Handler {
 
 この章は「どの処理をどこに移すべきか」の判断基準です。
 
-| 現状処理 | 目的/ルール | 移動先レイヤ | 移動先の例 | 補足 |
-| --- | --- | --- | --- | --- |
-| 重複チェック（Category/Target/Tag） | 名称の重複防止 | Usecase (+ Domain Service 任意) | `internal/usecase/*` | DB参照が必要。Usecaseで`repo.ExistsByName`を使う。 |
-| 削除時の関連整理 | 関連テーブルの整合性維持 | Usecase | `internal/usecase/*` | Repositoryで更新・削除。Usecaseでトランザクション制御。 |
-| スクレイピング複製 | 外部サイトから商品作成 | Usecase + Infra | Usecase: `internal/usecase/product` / Infra: `internal/infra/marketplace/creema` | HTTP/HTML解析はInfra。 |
-| CSV更新 | CSVからの更新処理 | Usecase | `internal/usecase/product` | CSV DTO は `interface` 層に置く。 |
-| 画像削除/ファイル操作 | DB更新 + ファイル削除 | Usecase + Infra | Usecase: `internal/usecase/product` / Infra: `internal/infra/storage` | I/OはInfra。順序制御はUsecase。 |
-| セッション判定 | 有効性チェック | Usecase | `internal/usecase/session` | 将来期限が入る場合はDomainにルール化。 |
-| パスワードハッシュ | 暗号化 | Domain Service or Infra | `internal/domain/user/password.go` or `internal/infra/crypto` | 実装差し替えを見込むならInfra。 |
-| 初期データ投入 | seed/migration | Infra (Seed/Migration) | `db/seed` or `internal/infra/seed` | 起動時に行わない。 |
-| ロゴ更新時の旧画像削除 | ストレージ操作 | Usecase + Infra | `internal/usecase/creator` + `internal/infra/storage` | 削除はStorageの責務。 |
+| 現状処理                            | 目的/ルール              | 移動先レイヤ                    | 移動先の例                                                                       | 補足                                                    |
+| ----------------------------------- | ------------------------ | ------------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| 重複チェック（Category/Target/Tag） | 名称の重複防止           | Usecase (+ Domain Service 任意) | `internal/usecase/*`                                                             | DB参照が必要。Usecaseで`repo.ExistsByName`を使う。      |
+| 削除時の関連整理                    | 関連テーブルの整合性維持 | Usecase                         | `internal/usecase/*`                                                             | Repositoryで更新・削除。Usecaseでトランザクション制御。 |
+| スクレイピング複製                  | 外部サイトから商品作成   | Usecase + Infra                 | Usecase: `internal/usecase/product` / Infra: `internal/infra/marketplace/creema` | HTTP/HTML解析はInfra。                                  |
+| CSV更新                             | CSVからの更新処理        | Usecase                         | `internal/usecase/product`                                                       | CSV DTO は `interface` 層に置く。                       |
+| 画像削除/ファイル操作               | DB更新 + ファイル削除    | Usecase + Infra                 | Usecase: `internal/usecase/product` / Infra: `internal/infra/storage`            | I/OはInfra。順序制御はUsecase。                         |
+| セッション判定                      | 有効性チェック           | Usecase                         | `internal/usecase/session`                                                       | 将来期限が入る場合はDomainにルール化。                  |
+| パスワードハッシュ                  | 暗号化                   | Domain Service or Infra         | `internal/domain/user/password.go` or `internal/infra/crypto`                    | 実装差し替えを見込むならInfra。                         |
+| 初期データ投入                      | seed/migration           | Infra (Seed/Migration)          | `db/seed` or `internal/infra/seed`                                               | 起動時に行わない。                                      |
+| ロゴ更新時の旧画像削除              | ストレージ操作           | Usecase + Infra                 | `internal/usecase/creator` + `internal/infra/storage`                            | 削除はStorageの責務。                                   |
 
 ## 外部I/Oの整理方針
 
@@ -309,8 +315,9 @@ func CORSMiddleware(allowedOrigins []string) func(http.Handler) http.Handler {
 
 ### Domain エラー例（イメージ）
 
-- `internal/domain/<domain>/errors.go`
+- `internal/domain/<domain>/<domain>_error.go`
 - `var ErrCategoryNameDuplicate = errors.New(\"category name is duplicate\")`
+- 共通プリミティブのエラーは `internal/domain/primitive/<name>_error.go` に置く
 
 ### Usecase エラーの種別（例）
 
@@ -436,7 +443,7 @@ func getOrCreateRequestID(r *http.Request) string {
     if v := r.Header.Get("X-Request-ID"); v != "" {
         return v
     }
-    id := id.NewUUID() // internal/shared/id
+    id := id.GenerateUUID() // internal/shared/id
     r.Header.Set("X-Request-ID", id)
     return id
 }
@@ -444,8 +451,10 @@ func getOrCreateRequestID(r *http.Request) string {
 
 ### UUID の配置
 
-- UUID 生成は `internal/shared/id` に置く
-- 例: `internal/shared/id/uuid.go` に `func NewUUID() string` を用意
+- `request_id` 用の UUID 生成は `internal/shared/id` に置く
+- 例: `internal/shared/id/uuid.go` に `func GenerateUUID() string` を用意
+- **エンティティの UUID** は共通 VO（`internal/domain/primitive/uuid.go`）を使用
+- エンティティ UUID の生成は infra 層で行い、usecase に DI する
 
 ## マイグレーション
 
@@ -503,7 +512,7 @@ func NewDB(cfg *config.Config) (*sqlx.DB, error) {
 
 ## Repository 実装例（sqlx）
 
-- Repository IF は `internal/domain/<domain>/repository.go`
+- Repository IF は `internal/domain/<domain>/<domain>_repo.go`
 - 実装は `internal/infra/db/mysql/repository` に置く
 
 ### Domain IF 例
@@ -678,8 +687,8 @@ db.SelectContext(ctx, &rows, query, args...)
 
 - [ ] `internal/domain/category/entity.go` を作成
 - [ ] エンティティのバリデーションを実装（name 1〜20）
-- [ ] `internal/domain/category/errors.go` を作成
-- [ ] `internal/domain/category/repository.go` を作成
+- [ ] `internal/domain/category/category_error.go` を作成
+- [ ] `internal/domain/category/category_repo.go` を作成
 
 ### Usecase
 

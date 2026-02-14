@@ -16,6 +16,7 @@ func NewRouter(cfg *config.Config, categoryHandler *handler.CategoryHandler, aut
 
 	r.HandleFunc("/api/category", categoryHandler.List).Methods(http.MethodGet)
 	r.Handle("/api/category", auth.RequireSession(http.HandlerFunc(categoryHandler.Create))).Methods(http.MethodPost)
+	r.Handle("/api/category/{category_uuid}", auth.RequireSession(http.HandlerFunc(categoryHandler.Update))).Methods(http.MethodPut)
 
 	return r
 }

@@ -2,11 +2,13 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
 
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/category"
+	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
 )
 
 type CategoryRepository struct {
@@ -73,6 +75,21 @@ func (r *CategoryRepository) FindUsed(ctx context.Context) ([]*domain.Category, 
 	return res, nil
 }
 
+func (r *CategoryRepository) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domain.Category, error) {
+	type row struct {
+		UUID string `db:"uuid"`
+		Name string `db:"name"`
+	}
+	var rrow row
+	if err := r.db.GetContext(ctx, &rrow, `SELECT uuid, name FROM category WHERE uuid = ?`, uuid.String()); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return toDomainCategory(rrow.UUID, rrow.Name)
+}
+
 func (r *CategoryRepository) ExistsByName(ctx context.Context, name domain.CategoryName) (bool, error) {
 	var count int64
 	if err := r.db.GetContext(ctx, &count, `SELECT COUNT(1) FROM category WHERE name = ?`, name.String()); err != nil {
@@ -81,8 +98,25 @@ func (r *CategoryRepository) ExistsByName(ctx context.Context, name domain.Categ
 	return count > 0, nil
 }
 
+func (r *CategoryRepository) Update(ctx context.Context, c *domain.Category) (bool, error) {
+	res, err := r.db.ExecContext(
+		ctx,
+		`UPDATE category SET name = ?, updated_at = NOW() WHERE uuid = ?`,
+		c.Name.String(),
+		c.UUID.String(),
+	)
+	if err != nil {
+		return false, err
+	}
+	affected, err := res.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+	return affected > 0, nil
+}
+
 func toDomainCategory(uuidStr, nameStr string) (*domain.Category, error) {
-	uuid, err := domain.ParseCategoryUUID(uuidStr)
+	uuid, err := primitive.NewUUID(uuidStr)
 	if err != nil {
 		return nil, fmt.Errorf("invalid category uuid: %w", err)
 	}

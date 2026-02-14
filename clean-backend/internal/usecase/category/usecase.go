@@ -5,20 +5,23 @@ import (
 	"errors"
 
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/category"
+	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
 	"github.com/tokushun109/tku/clean-backend/internal/usecase"
 )
 
 type Usecase interface {
 	List(ctx context.Context, mode string) ([]*domain.Category, error)
 	Create(ctx context.Context, name string) error
+	Update(ctx context.Context, uuid string, name string) error
 }
 
 type Service struct {
-	repo domain.Repository
+	repo    domain.Repository
+	uuidGen usecase.UUIDGenerator
 }
 
-func New(repo domain.Repository) *Service {
-	return &Service{repo: repo}
+func New(repo domain.Repository, uuidGen usecase.UUIDGenerator) *Service {
+	return &Service{repo: repo, uuidGen: uuidGen}
 }
 
 func (s *Service) List(ctx context.Context, mode string) ([]*domain.Category, error) {
@@ -57,9 +60,54 @@ func (s *Service) Create(ctx context.Context, name string) error {
 		return usecase.NewAppErrorWithMessage(usecase.ErrConflict, domain.ErrNameDuplicated.Error())
 	}
 
-	c.UUID = domain.NewCategoryUUID()
+	newUUID, err := s.uuidGen.New()
+	if err != nil {
+		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
+	}
+	c.UUID = newUUID
 	if err := s.repo.Create(ctx, c); err != nil {
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
+	}
+	return nil
+}
+
+func (s *Service) Update(ctx context.Context, uuidStr string, name string) error {
+	uuid, err := primitive.NewUUID(uuidStr)
+	if err != nil {
+		return usecase.NewAppError(usecase.ErrInvalidInput)
+	}
+	newName, err := domain.NewCategoryName(name)
+	if err != nil {
+		if errors.Is(err, domain.ErrInvalidName) {
+			return usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error())
+		}
+		return usecase.NewAppError(usecase.ErrInternal)
+	}
+
+	current, err := s.repo.FindByUUID(ctx, uuid)
+	if err != nil {
+		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
+	}
+	if current == nil {
+		return usecase.NewAppError(usecase.ErrNotFound)
+	}
+
+	if current.Name.String() != newName.String() {
+		exists, err := s.repo.ExistsByName(ctx, newName)
+		if err != nil {
+			return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
+		}
+		if exists {
+			return usecase.NewAppErrorWithMessage(usecase.ErrConflict, domain.ErrNameDuplicated.Error())
+		}
+	}
+
+	updated, err := s.repo.Update(ctx, &domain.Category{UUID: uuid, Name: newName})
+	if err != nil {
+		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
+	}
+	if !updated {
+		return usecase.NewAppError(usecase.ErrNotFound)
 	}
 	return nil
 }

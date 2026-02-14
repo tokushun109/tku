@@ -8,16 +8,19 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/gorilla/mux"
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/category"
+	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
 	"github.com/tokushun109/tku/clean-backend/internal/shared/id"
 )
 
-var testUUID = id.NewUUID().String()
+var testUUID = id.GenerateUUID()
 
 type stubCategoryUC struct {
 	listRes   []*domain.Category
 	listErr   error
 	createErr error
+	updateErr error
 }
 
 func (s *stubCategoryUC) List(ctx context.Context, mode string) ([]*domain.Category, error) {
@@ -26,6 +29,10 @@ func (s *stubCategoryUC) List(ctx context.Context, mode string) ([]*domain.Categ
 
 func (s *stubCategoryUC) Create(ctx context.Context, name string) error {
 	return s.createErr
+}
+
+func (s *stubCategoryUC) Update(ctx context.Context, uuid string, name string) error {
+	return s.updateErr
 }
 
 type categoryResp struct {
@@ -111,8 +118,47 @@ func TestCategoryPost_OK(t *testing.T) {
 	}
 }
 
+func TestCategoryPut_InvalidJSON(t *testing.T) {
+	catUC := &stubCategoryUC{}
+	h := NewCategoryHandler(catUC)
+
+	body := bytes.NewBufferString(`{invalid}`)
+	req := httptest.NewRequest(http.MethodPut, "/api/category/uuid", body)
+	req = mux.SetURLVars(req, map[string]string{"category_uuid": testUUID})
+	rr := httptest.NewRecorder()
+
+	h.Update(rr, req)
+
+	if rr.Code != http.StatusBadRequest {
+		t.Fatalf("expected 400, got %d", rr.Code)
+	}
+}
+
+func TestCategoryPut_OK(t *testing.T) {
+	catUC := &stubCategoryUC{}
+	h := NewCategoryHandler(catUC)
+
+	body := bytes.NewBufferString(`{"name":"a"}`)
+	req := httptest.NewRequest(http.MethodPut, "/api/category/uuid", body)
+	req = mux.SetURLVars(req, map[string]string{"category_uuid": testUUID})
+	rr := httptest.NewRecorder()
+
+	h.Update(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d", rr.Code)
+	}
+	var resp successResp
+	if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
+		t.Fatalf("decode error: %v", err)
+	}
+	if !resp.Success {
+		t.Fatalf("expected success true")
+	}
+}
+
 func mustCategory(uuidStr, name string) *domain.Category {
-	u, err := domain.ParseCategoryUUID(uuidStr)
+	u, err := primitive.NewUUID(uuidStr)
 	if err != nil {
 		panic(err)
 	}

@@ -3,6 +3,7 @@ package session
 import (
 	"context"
 
+	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/session"
 	"github.com/tokushun109/tku/clean-backend/internal/usecase"
 )
@@ -23,7 +24,7 @@ func (s *Service) Validate(ctx context.Context, token string) error {
 	if token == "" {
 		return usecase.NewAppError(usecase.ErrUnauthorized)
 	}
-	uuid, err := domain.ParseSessionUUID(token)
+	uuid, err := primitive.NewUUID(token)
 	if err != nil {
 		return usecase.NewAppError(usecase.ErrUnauthorized)
 	}

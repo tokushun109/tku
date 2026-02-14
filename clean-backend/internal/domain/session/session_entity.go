@@ -1,9 +1,13 @@
 package session
 
-import "time"
+import (
+	"time"
+
+	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
+)
 
 type Session struct {
-	UUID      SessionUUID
+	UUID      primitive.UUID
 	UserID    uint
 	CreatedAt time.Time
 }

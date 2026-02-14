@@ -39,7 +39,7 @@ func getOrCreateRequestID(r *http.Request) string {
 	if v := r.Header.Get("X-Request-ID"); v != "" {
 		return v
 	}
-	newID := id.NewUUID().String()
+	newID := id.GenerateUUID()
 	r.Header.Set("X-Request-ID", newID)
 	return newID
 }
