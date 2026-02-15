@@ -7,7 +7,7 @@ import (
 
 const (
 	nameMinLen = 1
-	nameMaxLen = 20
+	nameMaxLen = 30
 )
 
 type CategoryName string
