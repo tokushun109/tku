@@ -3,6 +3,7 @@ package middleware
 import (
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/tokushun109/tku/clean-backend/internal/shared/id"
@@ -37,9 +38,20 @@ func LoggingMiddleware(next http.Handler) http.Handler {
 
 func getOrCreateRequestID(r *http.Request) string {
 	if v := r.Header.Get("X-Request-ID"); v != "" {
-		return v
+		return sanitizeRequestID(v)
 	}
 	newID := id.GenerateUUID()
 	r.Header.Set("X-Request-ID", newID)
 	return newID
+}
+
+func sanitizeRequestID(v string) string {
+	// ログインジェクション防止のため CR/LF を除去
+	v = strings.ReplaceAll(v, "\r", "")
+	v = strings.ReplaceAll(v, "\n", "")
+	const maxLen = 128
+	if len(v) > maxLen {
+		v = v[:maxLen]
+	}
+	return v
 }
