@@ -21,6 +21,7 @@ func New(repo domain.Repository) *Service {
 }
 
 func (s *Service) Validate(ctx context.Context, token string) error {
+	// TODO: セッションの有効期限チェックを追加する（CreatedAt + TTL など）。
 	if token == "" {
 		return usecase.NewAppError(usecase.ErrUnauthorized)
 	}
