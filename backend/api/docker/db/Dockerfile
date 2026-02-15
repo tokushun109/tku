@@ -1,4 +1,4 @@
-FROM mysql:9.5
+FROM mysql:8.4
 
 ADD ./app/db/my.cnf /etc/mysql/conf.d/my.cnf
 ADD ./app/db/initdb.d /docker-entrypoint-initdb.d

@@ -12,7 +12,7 @@ import (
 
 func NewDB(cfg *config.Config) (*sqlx.DB, error) {
 	dsn := fmt.Sprintf(
-		"%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Asia%%2FTokyo",
+		"%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Asia%%2FTokyo&time_zone=Asia%%2FTokyo",
 		cfg.DBUser,
 		cfg.DBPass,
 		cfg.DBHost,
