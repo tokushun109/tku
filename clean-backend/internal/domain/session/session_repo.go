@@ -8,4 +8,5 @@ import (
 
 type Repository interface {
 	FindByUUID(ctx context.Context, uuid primitive.UUID) (*Session, error)
+	DeleteByUUID(ctx context.Context, uuid primitive.UUID) error
 }

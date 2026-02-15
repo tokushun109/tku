@@ -45,7 +45,9 @@ func (s *Service) Validate(ctx context.Context, token string) error {
 		return usecase.NewAppError(usecase.ErrUnauthorized)
 	}
 	if s.ttl > 0 && s.clock.Now().After(sess.CreatedAt.Add(s.ttl)) {
-		// TODO: 期限切れのセッションを削除する（DeleteByUUID を Repository に追加する）。
+		if err := s.repo.DeleteByUUID(ctx, uuid); err != nil {
+			return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
+		}
 		return usecase.NewAppError(usecase.ErrUnauthorized)
 	}
 	return nil

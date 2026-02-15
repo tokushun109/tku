@@ -39,3 +39,8 @@ func (r *SessionRepository) FindByUUID(ctx context.Context, uuid primitive.UUID)
 	}
 	return &domain.Session{UUID: parsed, UserID: rrow.UserID, CreatedAt: rrow.CreatedAt}, nil
 }
+
+func (r *SessionRepository) DeleteByUUID(ctx context.Context, uuid primitive.UUID) error {
+	_, err := r.db.ExecContext(ctx, `DELETE FROM session WHERE uuid = ?`, uuid.String())
+	return err
+}
