@@ -31,26 +31,24 @@ func LoggingMiddleware(next http.Handler) http.Handler {
 		}
 
 		log.Printf("[%s] request_id=%s method=%s path=%s status=%d latency_ms=%d",
-			level, reqID, r.Method, r.URL.Path, status, latency,
+			level, reqID, r.Method, sanitizeLogValue(r.URL.Path, 256), status, latency,
 		)
 	})
 }
 
 func getOrCreateRequestID(r *http.Request) string {
 	if v := r.Header.Get("X-Request-ID"); v != "" {
-		return sanitizeRequestID(v)
+		return sanitizeLogValue(v, 128)
 	}
 	newID := id.GenerateUUID()
 	r.Header.Set("X-Request-ID", newID)
 	return newID
 }
 
-func sanitizeRequestID(v string) string {
-	// ログインジェクション防止のため CR/LF を除去
+func sanitizeLogValue(v string, maxLen int) string {
 	v = strings.ReplaceAll(v, "\r", "")
 	v = strings.ReplaceAll(v, "\n", "")
-	const maxLen = 128
-	if len(v) > maxLen {
+	if maxLen > 0 && len(v) > maxLen {
 		v = v[:maxLen]
 	}
 	return v

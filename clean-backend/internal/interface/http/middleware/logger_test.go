@@ -87,9 +87,9 @@ func TestLoggingMiddleware_GeneratesRequestID(t *testing.T) {
 	}
 }
 
-func TestSanitizeRequestID_RemovesCRLF(t *testing.T) {
+func TestSanitizeLogValue_RemovesCRLF(t *testing.T) {
 	in := "abc\r\ndef\nghi\r"
-	got := sanitizeRequestID(in)
+	got := sanitizeLogValue(in, 128)
 	if strings.ContainsAny(got, "\r\n") {
 		t.Fatalf("expected no CR/LF, got %q", got)
 	}
@@ -98,9 +98,9 @@ func TestSanitizeRequestID_RemovesCRLF(t *testing.T) {
 	}
 }
 
-func TestSanitizeRequestID_Truncates(t *testing.T) {
+func TestSanitizeLogValue_Truncates(t *testing.T) {
 	in := strings.Repeat("a", 200)
-	got := sanitizeRequestID(in)
+	got := sanitizeLogValue(in, 128)
 	if len(got) != 128 {
 		t.Fatalf("expected length 128, got %d", len(got))
 	}
