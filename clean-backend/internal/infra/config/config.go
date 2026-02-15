@@ -4,18 +4,20 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/joho/godotenv"
 )
 
 type Config struct {
-	Port      string
-	DBHost    string
-	DBPort    int
-	DBName    string
-	DBUser    string
-	DBPass    string
-	ClientURL string
+	Port       string
+	DBHost     string
+	DBPort     int
+	DBName     string
+	DBUser     string
+	DBPass     string
+	ClientURL  string
+	SessionTTL time.Duration
 }
 
 func Load() (*Config, error) {
@@ -32,14 +34,21 @@ func Load() (*Config, error) {
 	if err != nil {
 		return nil, fmt.Errorf("invalid MYSQL_PORT: %w", err)
 	}
+
+	ttlStr := getEnv("SESSION_TTL", "24h")
+	ttl, err := time.ParseDuration(ttlStr)
+	if err != nil {
+		return nil, fmt.Errorf("invalid SESSION_TTL: %w", err)
+	}
 	cfg := &Config{
-		Port:      port,
-		DBHost:    dbHost,
-		DBPort:    dbPort,
-		DBName:    getEnv("DB_NAME", ""),
-		DBUser:    getEnv("DB_USER", ""),
-		DBPass:    getEnv("DB_PASS", ""),
-		ClientURL: clientURL,
+		Port:       port,
+		DBHost:     dbHost,
+		DBPort:     dbPort,
+		DBName:     getEnv("DB_NAME", ""),
+		DBUser:     getEnv("DB_USER", ""),
+		DBPass:     getEnv("DB_PASS", ""),
+		ClientURL:  clientURL,
+		SessionTTL: ttl,
 	}
 	return cfg, nil
 }

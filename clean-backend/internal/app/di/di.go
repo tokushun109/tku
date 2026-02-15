@@ -3,6 +3,7 @@ package di
 import (
 	"net/http"
 
+	clockInfra "github.com/tokushun109/tku/clean-backend/internal/infra/clock"
 	"github.com/tokushun109/tku/clean-backend/internal/infra/config"
 	"github.com/tokushun109/tku/clean-backend/internal/infra/db/mysql"
 	mysqlRepo "github.com/tokushun109/tku/clean-backend/internal/infra/db/mysql/repository"
@@ -30,7 +31,8 @@ func BuildServer() (*config.Config, http.Handler, error) {
 
 	uuidGen := uuidInfra.NewGenerator()
 	categoryUC := usecaseCategory.New(categoryRepo, uuidGen)
-	sessionUC := usecaseSession.New(sessionRepo)
+	clock := clockInfra.NewClock()
+	sessionUC := usecaseSession.New(sessionRepo, cfg.SessionTTL, clock)
 
 	categoryHandler := handler.NewCategoryHandler(categoryUC)
 	auth := middleware.NewAuthMiddleware(sessionUC)
