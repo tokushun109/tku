@@ -596,9 +596,14 @@ db.GetContext(ctx, &row, `SELECT * FROM user WHERE email = ?`, email)
 ### 例（IN 句）
 
 ```go
-query, args, _ := sqlx.In(`SELECT * FROM t WHERE id IN (?)`, ids)
+query, args, err := sqlx.In(`SELECT * FROM t WHERE id IN (?)`, ids)
+if err != nil {
+    return err
+}
 query = db.Rebind(query)
-db.SelectContext(ctx, &rows, query, args...)
+if err := db.SelectContext(ctx, &rows, query, args...); err != nil {
+    return err
+}
 ```
 
 ## テスト方針（配置・命名・モック）
