@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS accesory_category;
+DROP TABLE IF EXISTS category;
