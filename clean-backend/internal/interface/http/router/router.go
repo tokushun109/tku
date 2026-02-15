@@ -14,6 +14,7 @@ func NewRouter(cfg *config.Config, categoryHandler *handler.CategoryHandler, aut
 	r.Use(middleware.LoggingMiddleware)
 
 	r.HandleFunc("/api/category", categoryHandler.List).Methods(http.MethodGet)
+	// TODO: User取得処理作成後、管理者権限チェック（AdminMiddleware 等）を追加する。
 	r.Handle("/api/category", auth.RequireSession(http.HandlerFunc(categoryHandler.Create))).Methods(http.MethodPost)
 	r.Handle("/api/category/{category_uuid}", auth.RequireSession(http.HandlerFunc(categoryHandler.Update))).Methods(http.MethodPut)
 	r.Handle("/api/category/{category_uuid}", auth.RequireSession(http.HandlerFunc(categoryHandler.Delete))).Methods(http.MethodDelete)
