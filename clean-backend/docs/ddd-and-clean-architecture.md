@@ -576,7 +576,7 @@ func (r *ProductRepository) Update(ctx context.Context, p *product.Product) erro
 }
 
 func (r *ProductRepository) Delete(ctx context.Context, id string) error {
-    _, err := r.db.ExecContext(ctx, `DELETE FROM product WHERE uuid = ?`, id)
+    _, err := r.db.ExecContext(ctx, `UPDATE product SET deleted_at = NOW() WHERE uuid = ?`, id)
     return err
 }
 ```
