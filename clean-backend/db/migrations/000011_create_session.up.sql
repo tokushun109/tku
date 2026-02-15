@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS session(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    uuid VARCHAR(36) NOT NULL UNIQUE,
+    user_id INT NOT NULL,
+    created_at DATETIME,
+    FOREIGN KEY (user_id) REFERENCES user (id)
+);

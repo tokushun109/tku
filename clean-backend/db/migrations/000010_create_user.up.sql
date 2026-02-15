@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS user(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    uuid VARCHAR(36) NOT NULL UNIQUE,
+    name VARCHAR(30) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    is_admin BOOLEAN NOT NULL,
+    created_at DATETIME,
+    updated_at DATETIME,
+    deleted_at DATETIME
+);
