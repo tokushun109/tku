@@ -13,5 +13,18 @@ if ! pnpm test-all --run --reporter=verbose; then
   exit 1
 fi
 
-# テストが成功したらプッシュを続行
+# フロントエンドのテストが成功したら次へ
+echo "✅ フロントエンドのテストが成功しました。"
+
+# clean-backend のテストを実行
+echo "🧪 clean-backend のテストを実行しています..."
+cd ../clean-backend
+if ! go test ./...; then
+  echo "❌ clean-backend のテストが失敗しました。以下を確認してください:"
+  echo "  - (cd clean-backend && go test ./...)"
+  echo "🔧 テストを修正してから再度プッシュしてください。"
+  exit 1
+fi
+
+# すべてのテストが成功したらプッシュを続行
 echo "✅ すべてのテストが成功しました。プッシュを続行します。"

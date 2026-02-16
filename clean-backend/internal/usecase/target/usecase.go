@@ -1,16 +1,16 @@
-package category
+package target
 
 import (
 	"context"
 	"errors"
 
-	domain "github.com/tokushun109/tku/clean-backend/internal/domain/category"
+	domain "github.com/tokushun109/tku/clean-backend/internal/domain/target"
 	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
 	"github.com/tokushun109/tku/clean-backend/internal/usecase"
 )
 
 type Usecase interface {
-	List(ctx context.Context, mode string) ([]*domain.Category, error)
+	List(ctx context.Context, mode string) ([]*domain.Target, error)
 	Create(ctx context.Context, name string) error
 	Update(ctx context.Context, uuid string, name string) error
 	Delete(ctx context.Context, uuid string) error
@@ -30,27 +30,27 @@ func New(repo domain.Repository, uuidGen usecase.UUIDGenerator) *Service {
 	return &Service{repo: repo, uuidGen: uuidGen}
 }
 
-func (s *Service) List(ctx context.Context, mode string) ([]*domain.Category, error) {
+func (s *Service) List(ctx context.Context, mode string) ([]*domain.Target, error) {
 	switch mode {
 	case ListModeAll:
-		categories, err := s.repo.FindAll(ctx)
+		targets, err := s.repo.FindAll(ctx)
 		if err != nil {
 			return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 		}
-		return categories, nil
+		return targets, nil
 	case ListModeUsed:
-		categories, err := s.repo.FindUsed(ctx)
+		targets, err := s.repo.FindUsed(ctx)
 		if err != nil {
 			return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 		}
-		return categories, nil
+		return targets, nil
 	default:
 		return nil, usecase.NewAppError(usecase.ErrInvalidInput)
 	}
 }
 
 func (s *Service) Create(ctx context.Context, name string) error {
-	c, err := domain.New(name)
+	t, err := domain.New(name)
 	if err != nil {
 		if errors.Is(err, domain.ErrInvalidName) {
 			return usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error())
@@ -58,7 +58,7 @@ func (s *Service) Create(ctx context.Context, name string) error {
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 
-	exists, err := s.repo.ExistsByName(ctx, c.Name)
+	exists, err := s.repo.ExistsByName(ctx, t.Name)
 	if err != nil {
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
@@ -70,8 +70,8 @@ func (s *Service) Create(ctx context.Context, name string) error {
 	if err != nil {
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
-	c.UUID = newUUID
-	if err := s.repo.Create(ctx, c); err != nil {
+	t.UUID = newUUID
+	if err := s.repo.Create(ctx, t); err != nil {
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 	return nil
@@ -82,7 +82,7 @@ func (s *Service) Update(ctx context.Context, uuidStr string, name string) error
 	if err != nil {
 		return usecase.NewAppError(usecase.ErrInvalidInput)
 	}
-	newName, err := domain.NewCategoryName(name)
+	newName, err := domain.NewTargetName(name)
 	if err != nil {
 		if errors.Is(err, domain.ErrInvalidName) {
 			return usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error())
@@ -108,7 +108,7 @@ func (s *Service) Update(ctx context.Context, uuidStr string, name string) error
 		}
 	}
 
-	updated, err := s.repo.Update(ctx, &domain.Category{UUID: uuid, Name: newName})
+	updated, err := s.repo.Update(ctx, &domain.Target{UUID: uuid, Name: newName})
 	if err != nil {
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}

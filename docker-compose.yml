@@ -6,8 +6,8 @@ services:
       dockerfile: ./docker/db/Dockerfile
     container_name: mysql
     volumes:
-      - ./clean-backend/app/db/my.cnf:/etc/mysql/conf.d/my.cnf
-      - ./clean-backend/app/db/initdb.d:/docker-entrypoint-initdb.d
+      - ./clean-backend/docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./clean-backend/docker/db/initdb.d:/docker-entrypoint-initdb.d
     environment:
       - MYSQL_ROOT_PASSWORD=root
       - DB_USER=root

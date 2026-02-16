@@ -1,0 +1,21 @@
+package presenter
+
+import (
+	domain "github.com/tokushun109/tku/clean-backend/internal/domain/tag"
+	"github.com/tokushun109/tku/clean-backend/internal/interface/http/response"
+)
+
+func ToTagResponse(t *domain.Tag) *response.TagResponse {
+	return &response.TagResponse{
+		UUID: t.UUID.String(),
+		Name: t.Name.String(),
+	}
+}
+
+func ToTagResponses(list []*domain.Tag) []*response.TagResponse {
+	res := make([]*response.TagResponse, 0, len(list))
+	for _, t := range list {
+		res = append(res, ToTagResponse(t))
+	}
+	return res
+}
