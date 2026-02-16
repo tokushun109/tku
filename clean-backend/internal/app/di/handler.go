@@ -8,6 +8,7 @@ type handlers struct {
 	health   *handler.HealthHandler
 	category *handler.CategoryHandler
 	target   *handler.TargetHandler
+	tag      *handler.TagHandler
 }
 
 func newHandlers(ucs *usecases) *handlers {
@@ -15,5 +16,6 @@ func newHandlers(ucs *usecases) *handlers {
 		health:   handler.NewHealthHandler(ucs.health),
 		category: handler.NewCategoryHandler(ucs.category),
 		target:   handler.NewTargetHandler(ucs.target),
+		tag:      handler.NewTagHandler(ucs.tag),
 	}
 }

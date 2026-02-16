@@ -28,6 +28,7 @@ func BuildServer() (*config.Config, http.Handler, error) {
 		handlers.health,
 		handlers.category,
 		handlers.target,
+		handlers.tag,
 		middlewares.auth,
 		middlewares.logging,
 		middlewares.cors,
