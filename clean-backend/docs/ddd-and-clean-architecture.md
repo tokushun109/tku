@@ -170,7 +170,7 @@ type UUID string
 // internal/domain/category/category_name_vo.go
 const (
     nameMinLen = 1
-    nameMaxLen = 20
+    nameMaxLen = 30
 )
 ```
 
