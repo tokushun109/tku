@@ -3,29 +3,28 @@ package primitive
 import (
 	"net/url"
 	"strings"
-	"unicode/utf8"
-)
-
-const (
-	urlMinLen = 1
-	urlMaxLen = 255
 )
 
 type URL string
 
 func NewURL(s string) (URL, error) {
-	trimmed := strings.TrimSpace(s)
-	length := utf8.RuneCountInString(trimmed)
-	if length < urlMinLen || length > urlMaxLen {
+	normalized := strings.ToLower(s)
+	if len(normalized) == 0 {
 		return "", ErrInvalidURL
 	}
 
-	u, err := url.Parse(trimmed)
-	if err != nil || u.Scheme == "" || u.Host == "" {
+	u, err := url.Parse(normalized)
+	if err != nil || u.Scheme == "" {
 		return "", ErrInvalidURL
 	}
 
-	return URL(trimmed), nil
+	isFileScheme := u.Scheme == "file"
+	if (isFileScheme && (len(u.Path) == 0 || u.Path == "/")) ||
+		(!isFileScheme && len(u.Host) == 0 && len(u.Fragment) == 0 && len(u.Opaque) == 0) {
+		return "", ErrInvalidURL
+	}
+
+	return URL(s), nil
 }
 
 func (u URL) String() string {
