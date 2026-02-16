@@ -1,0 +1,163 @@
+package repository
+
+import (
+	"context"
+	"database/sql"
+	"fmt"
+
+	"github.com/jmoiron/sqlx"
+
+	domain "github.com/tokushun109/tku/clean-backend/internal/domain/target"
+	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
+)
+
+type TargetRepository struct {
+	db *sqlx.DB
+}
+
+func NewTargetRepository(db *sqlx.DB) *TargetRepository {
+	return &TargetRepository{db: db}
+}
+
+func (r *TargetRepository) Create(ctx context.Context, t *domain.Target) error {
+	_, err := r.db.ExecContext(
+		ctx,
+		`INSERT INTO target (uuid, name, created_at, updated_at) VALUES (?, ?, NOW(), NOW())`,
+		t.UUID.String(), t.Name.String(),
+	)
+	return err
+}
+
+func (r *TargetRepository) FindAll(ctx context.Context) ([]*domain.Target, error) {
+	type row struct {
+		UUID string `db:"uuid"`
+		Name string `db:"name"`
+	}
+	var rows []row
+	if err := r.db.SelectContext(ctx, &rows, `SELECT uuid, name FROM target WHERE deleted_at IS NULL`); err != nil {
+		return nil, err
+	}
+	res := make([]*domain.Target, 0, len(rows))
+	for _, r := range rows {
+		t, err := toDomainTarget(r.UUID, r.Name)
+		if err != nil {
+			return nil, err
+		}
+		res = append(res, t)
+	}
+	return res, nil
+}
+
+func (r *TargetRepository) FindUsed(ctx context.Context) ([]*domain.Target, error) {
+	type row struct {
+		UUID string `db:"uuid"`
+		Name string `db:"name"`
+	}
+	var rows []row
+	query := `
+		SELECT t.uuid, t.name
+		FROM target t
+		INNER JOIN product p ON p.target_id = t.id
+		WHERE t.deleted_at IS NULL AND p.deleted_at IS NULL
+		GROUP BY t.id, t.uuid, t.name
+	`
+	if err := r.db.SelectContext(ctx, &rows, query); err != nil {
+		return nil, err
+	}
+	res := make([]*domain.Target, 0, len(rows))
+	for _, r := range rows {
+		t, err := toDomainTarget(r.UUID, r.Name)
+		if err != nil {
+			return nil, err
+		}
+		res = append(res, t)
+	}
+	return res, nil
+}
+
+func (r *TargetRepository) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domain.Target, error) {
+	type row struct {
+		UUID string `db:"uuid"`
+		Name string `db:"name"`
+	}
+	var rrow row
+	if err := r.db.GetContext(ctx, &rrow, `SELECT uuid, name FROM target WHERE uuid = ? AND deleted_at IS NULL`, uuid.String()); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return toDomainTarget(rrow.UUID, rrow.Name)
+}
+
+func (r *TargetRepository) ExistsByName(ctx context.Context, name domain.TargetName) (bool, error) {
+	var count int64
+	if err := r.db.GetContext(ctx, &count, `SELECT COUNT(1) FROM target WHERE name = ? AND deleted_at IS NULL`, name.String()); err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+
+func (r *TargetRepository) Update(ctx context.Context, t *domain.Target) (bool, error) {
+	res, err := r.db.ExecContext(
+		ctx,
+		`UPDATE target SET name = ?, updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`,
+		t.Name.String(),
+		t.UUID.String(),
+	)
+	if err != nil {
+		return false, err
+	}
+	affected, err := res.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+	return affected > 0, nil
+}
+
+func (r *TargetRepository) Delete(ctx context.Context, uuid primitive.UUID) (bool, error) {
+	tx, err := r.db.BeginTxx(ctx, nil)
+	if err != nil {
+		return false, err
+	}
+	defer func() {
+		_ = tx.Rollback()
+	}()
+
+	var targetID int64
+	if err := tx.GetContext(ctx, &targetID, `SELECT id FROM target WHERE uuid = ? AND deleted_at IS NULL`, uuid.String()); err != nil {
+		if err == sql.ErrNoRows {
+			return false, nil
+		}
+		return false, err
+	}
+
+	if _, err := tx.ExecContext(ctx, `UPDATE product SET target_id = NULL WHERE target_id = ?`, targetID); err != nil {
+		return false, err
+	}
+
+	res, err := tx.ExecContext(ctx, `UPDATE target SET deleted_at = NOW(), updated_at = NOW() WHERE id = ? AND deleted_at IS NULL`, targetID)
+	if err != nil {
+		return false, err
+	}
+	affected, err := res.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+	if err := tx.Commit(); err != nil {
+		return false, err
+	}
+	return affected > 0, nil
+}
+
+func toDomainTarget(uuidStr, nameStr string) (*domain.Target, error) {
+	uuid, err := primitive.NewUUID(uuidStr)
+	if err != nil {
+		return nil, fmt.Errorf("invalid target uuid: %w", err)
+	}
+	name, err := domain.NewTargetName(nameStr)
+	if err != nil {
+		return nil, fmt.Errorf("invalid target name: %w", err)
+	}
+	return &domain.Target{UUID: uuid, Name: name}, nil
+}

@@ -22,7 +22,15 @@ func BuildServer() (*config.Config, http.Handler, error) {
 	repos := newRepositories(db)
 	ucs := newUsecases(repos, cfg)
 	handlers := newHandlers(ucs)
+	middlewares := newMiddlewares(cfg, ucs)
 
-	r := router.NewRouter(cfg, handlers.health, handlers.category, handlers.auth)
+	r := router.NewRouter(
+		handlers.health,
+		handlers.category,
+		handlers.target,
+		middlewares.auth,
+		middlewares.logging,
+		middlewares.cors,
+	)
 	return cfg, r, nil
 }
