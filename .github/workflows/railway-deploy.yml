@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - "clean-backend/**"
+      # TODO: apiがまだ移行途中のため追加。以降が完了したら見直しを行う。
+      - "backend/**"
       - ".github/workflows/railway-deploy.yml"
   workflow_dispatch:
 
@@ -25,6 +27,8 @@ jobs:
       - name: Install Railway CLI
         run: npm i -g @railway/cli
       - name: Deploy migrate
+        working-directory: ./clean-backend # TODO: apiがまだ移行途中のため追加。以降が完了したら見直しを行う。
         run: railway up --ci --service "$RAILWAY_SERVICE_MIGRATE" --project "$RAILWAY_PROJECT_ID" --environment "$RAILWAY_ENVIRONMENT"
       - name: Deploy api
+        working-directory: ./backend/api # TODO: apiがまだ移行途中のため追加。以降が完了したら見直しを行う。
         run: railway up --ci --service "$RAILWAY_SERVICE_API" --project "$RAILWAY_PROJECT_ID" --environment "$RAILWAY_ENVIRONMENT"
