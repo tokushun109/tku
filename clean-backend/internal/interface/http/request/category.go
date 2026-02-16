@@ -3,6 +3,8 @@ package request
 import (
 	"errors"
 	"net/http"
+
+	usecaseCategory "github.com/tokushun109/tku/clean-backend/internal/usecase/category"
 )
 
 type CreateCategoryRequest struct {
@@ -17,16 +19,11 @@ type ListCategoryQuery struct {
 	Mode string
 }
 
-const (
-	CategoryModeAll  = "all"
-	CategoryModeUsed = "used"
-)
-
 func ParseListCategoryQuery(r *http.Request) (ListCategoryQuery, error) {
 	q := r.URL.Query()
 	mode := q.Get("mode")
 	switch mode {
-	case CategoryModeAll, CategoryModeUsed:
+	case usecaseCategory.ListModeAll, usecaseCategory.ListModeUsed:
 		return ListCategoryQuery{Mode: mode}, nil
 	default:
 		return ListCategoryQuery{}, errors.New("invalid mode")

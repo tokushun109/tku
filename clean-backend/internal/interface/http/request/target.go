@@ -3,6 +3,8 @@ package request
 import (
 	"errors"
 	"net/http"
+
+	usecaseTarget "github.com/tokushun109/tku/clean-backend/internal/usecase/target"
 )
 
 type CreateTargetRequest struct {
@@ -17,16 +19,11 @@ type ListTargetQuery struct {
 	Mode string
 }
 
-const (
-	TargetModeAll  = "all"
-	TargetModeUsed = "used"
-)
-
 func ParseListTargetQuery(r *http.Request) (ListTargetQuery, error) {
 	q := r.URL.Query()
 	mode := q.Get("mode")
 	switch mode {
-	case TargetModeAll, TargetModeUsed:
+	case usecaseTarget.ListModeAll, usecaseTarget.ListModeUsed:
 		return ListTargetQuery{Mode: mode}, nil
 	default:
 		return ListTargetQuery{}, errors.New("invalid mode")

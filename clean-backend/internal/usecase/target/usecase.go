@@ -21,19 +21,24 @@ type Service struct {
 	uuidGen usecase.UUIDGenerator
 }
 
+const (
+	ListModeAll  = "all"
+	ListModeUsed = "used"
+)
+
 func New(repo domain.Repository, uuidGen usecase.UUIDGenerator) *Service {
 	return &Service{repo: repo, uuidGen: uuidGen}
 }
 
 func (s *Service) List(ctx context.Context, mode string) ([]*domain.Target, error) {
 	switch mode {
-	case "all":
+	case ListModeAll:
 		targets, err := s.repo.FindAll(ctx)
 		if err != nil {
 			return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 		}
 		return targets, nil
-	case "used":
+	case ListModeUsed:
 		targets, err := s.repo.FindUsed(ctx)
 		if err != nil {
 			return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
