@@ -71,6 +71,9 @@ install_node_packages() {
     echo "📦 Node.js追加パッケージをインストール中..."
     npm install -g pnpm
     npm install -g @anthropic-ai/claude-code
+    npm install -g @openai/codex
+    echo "🎭 Playwrightのブラウザをインストール中..."
+    pnpm exec playwright install || echo "⚠️ Playwrightのインストールに失敗しました（継続します）"
     echo "asdfのshimを再構築しています..."
     asdf reshim nodejs
     echo "✅ Node.js追加パッケージのインストール完了"
