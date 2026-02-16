@@ -11,6 +11,7 @@ import (
 	"github.com/gorilla/mux"
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/category"
 	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
+	"github.com/tokushun109/tku/clean-backend/internal/interface/http/response"
 	"github.com/tokushun109/tku/clean-backend/internal/shared/id"
 )
 
@@ -43,10 +44,6 @@ func (s *stubCategoryUC) Delete(ctx context.Context, uuid string) error {
 type categoryResp struct {
 	UUID string `json:"uuid"`
 	Name string `json:"name"`
-}
-
-type successResp struct {
-	Success bool `json:"success"`
 }
 
 func TestCategoryGet_OK(t *testing.T) {
@@ -114,7 +111,7 @@ func TestCategoryPost_OK(t *testing.T) {
 	if rr.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d", rr.Code)
 	}
-	var resp successResp
+	var resp response.SuccessResponse
 	if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
 		t.Fatalf("decode error: %v", err)
 	}
@@ -153,7 +150,7 @@ func TestCategoryPut_OK(t *testing.T) {
 	if rr.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d", rr.Code)
 	}
-	var resp successResp
+	var resp response.SuccessResponse
 	if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
 		t.Fatalf("decode error: %v", err)
 	}
@@ -175,7 +172,7 @@ func TestCategoryDelete_OK(t *testing.T) {
 	if rr.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d", rr.Code)
 	}
-	var resp successResp
+	var resp response.SuccessResponse
 	if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
 		t.Fatalf("decode error: %v", err)
 	}

@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/tokushun109/tku/clean-backend/internal/interface/http/response"
 )
 
 type stubHealthUC struct {
@@ -15,10 +17,6 @@ type stubHealthUC struct {
 
 func (s *stubHealthUC) Check(ctx context.Context) error {
 	return s.err
-}
-
-type errorResp struct {
-	Message string `json:"message"`
 }
 
 func TestHealthCheck_OK(t *testing.T) {
@@ -33,7 +31,7 @@ func TestHealthCheck_OK(t *testing.T) {
 	if rr.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d", rr.Code)
 	}
-	var resp successResp
+	var resp response.SuccessResponse
 	if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
 		t.Fatalf("decode error: %v", err)
 	}
@@ -54,7 +52,7 @@ func TestHealthCheck_Error(t *testing.T) {
 	if rr.Code != http.StatusInternalServerError {
 		t.Fatalf("expected 500, got %d", rr.Code)
 	}
-	var resp errorResp
+	var resp response.ErrorResponse
 	if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
 		t.Fatalf("decode error: %v", err)
 	}
