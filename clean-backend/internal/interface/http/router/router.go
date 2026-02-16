@@ -9,10 +9,11 @@ import (
 	"github.com/tokushun109/tku/clean-backend/internal/interface/http/middleware"
 )
 
-func NewRouter(cfg *config.Config, categoryHandler *handler.CategoryHandler, auth *middleware.AuthMiddleware) http.Handler {
+func NewRouter(cfg *config.Config, healthHandler *handler.HealthHandler, categoryHandler *handler.CategoryHandler, auth *middleware.AuthMiddleware) http.Handler {
 	r := mux.NewRouter()
 	r.Use(middleware.LoggingMiddleware)
 
+	r.HandleFunc("/api/health_check", healthHandler.Check).Methods(http.MethodGet)
 	r.HandleFunc("/api/category", categoryHandler.List).Methods(http.MethodGet)
 	// TODO: User取得処理作成後、管理者権限チェック（AdminMiddleware 等）を追加する。
 	r.Handle("/api/category", auth.RequireSession(http.HandlerFunc(categoryHandler.Create))).Methods(http.MethodPost)
