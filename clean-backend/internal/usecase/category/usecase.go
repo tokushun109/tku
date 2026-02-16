@@ -50,7 +50,7 @@ func (s *Service) Create(ctx context.Context, name string) error {
 		if errors.Is(err, domain.ErrInvalidName) {
 			return usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error())
 		}
-		return usecase.NewAppError(usecase.ErrInternal)
+		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 
 	exists, err := s.repo.ExistsByName(ctx, c.Name)
@@ -82,7 +82,7 @@ func (s *Service) Update(ctx context.Context, uuidStr string, name string) error
 		if errors.Is(err, domain.ErrInvalidName) {
 			return usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error())
 		}
-		return usecase.NewAppError(usecase.ErrInternal)
+		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 
 	current, err := s.repo.FindByUUID(ctx, uuid)
