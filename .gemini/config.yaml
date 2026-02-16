@@ -1,0 +1,28 @@
+# Gemini Code Assist repository configuration
+# このファイルはリポジトリ単位のGemini Code Assist設定です。
+
+# 最初のPRサマリーに遊び心（例: 詩）を入れるか
+have_fun: false
+# 永続メモリの有効/無効（組織設定が有効な場合の上書き）
+memory_config:
+  disabled: false
+# コードレビュー機能の設定
+code_review:
+  # レビュー機能自体の有効/無効
+  disable: false
+  # コメントとして投稿する最小重大度（LOW/MEDIUM/HIGH/CRITICAL）
+  comment_severity_threshold: MEDIUM
+  # レビューコメント数の上限（-1は無制限）
+  max_review_comments: -1
+  # PR作成時の自動投稿設定
+  pull_request_opened:
+    # ヘルプメッセージを投稿するか
+    help: false
+    # サマリーを投稿するか
+    summary: true
+    # コードレビューを投稿するか
+    code_review: true
+    # Draft PRでも有効にするか
+    include_drafts: true
+# 対象外にするパスのGlobパターン
+ignore_patterns: []
