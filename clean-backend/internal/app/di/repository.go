@@ -10,6 +10,7 @@ type repositories struct {
 	category    *mysqlRepo.CategoryRepository
 	target      *mysqlRepo.TargetRepository
 	tag         *mysqlRepo.TagRepository
+	sns         *mysqlRepo.SnsRepository
 	salesSite   *mysqlRepo.SalesSiteRepository
 	skillMarket *mysqlRepo.SkillMarketRepository
 	session     *mysqlRepo.SessionRepository
@@ -21,6 +22,7 @@ func newRepositories(db *sqlx.DB) *repositories {
 		category:    mysqlRepo.NewCategoryRepository(db),
 		target:      mysqlRepo.NewTargetRepository(db),
 		tag:         mysqlRepo.NewTagRepository(db),
+		sns:         mysqlRepo.NewSnsRepository(db),
 		salesSite:   mysqlRepo.NewSalesSiteRepository(db),
 		skillMarket: mysqlRepo.NewSkillMarketRepository(db),
 		session:     mysqlRepo.NewSessionRepository(db),

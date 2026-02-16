@@ -9,6 +9,7 @@ import (
 	usecaseSalesSite "github.com/tokushun109/tku/clean-backend/internal/usecase/sales_site"
 	usecaseSession "github.com/tokushun109/tku/clean-backend/internal/usecase/session"
 	usecaseSkillMarket "github.com/tokushun109/tku/clean-backend/internal/usecase/skill_market"
+	usecaseSns "github.com/tokushun109/tku/clean-backend/internal/usecase/sns"
 	usecaseTag "github.com/tokushun109/tku/clean-backend/internal/usecase/tag"
 	usecaseTarget "github.com/tokushun109/tku/clean-backend/internal/usecase/target"
 )
@@ -18,6 +19,7 @@ type usecases struct {
 	category    usecaseCategory.Usecase
 	target      usecaseTarget.Usecase
 	tag         usecaseTag.Usecase
+	sns         usecaseSns.Usecase
 	salesSite   usecaseSalesSite.Usecase
 	skillMarket usecaseSkillMarket.Usecase
 	session     usecaseSession.Usecase
@@ -31,6 +33,7 @@ func newUsecases(repos *repositories, cfg *config.Config) *usecases {
 		category:    usecaseCategory.New(repos.category, uuidGen),
 		target:      usecaseTarget.New(repos.target, uuidGen),
 		tag:         usecaseTag.New(repos.tag, uuidGen),
+		sns:         usecaseSns.New(repos.sns, uuidGen),
 		salesSite:   usecaseSalesSite.New(repos.salesSite, uuidGen),
 		skillMarket: usecaseSkillMarket.New(repos.skillMarket, uuidGen),
 		session:     usecaseSession.New(repos.session, cfg.SessionTTL, clock),

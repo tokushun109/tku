@@ -14,6 +14,7 @@ func NewRouter(
 	categoryHandler *handler.CategoryHandler,
 	targetHandler *handler.TargetHandler,
 	tagHandler *handler.TagHandler,
+	snsHandler *handler.SnsHandler,
 	salesSiteHandler *handler.SalesSiteHandler,
 	skillMarketHandler *handler.SkillMarketHandler,
 	auth *middleware.AuthMiddleware,
@@ -43,6 +44,12 @@ func NewRouter(
 	r.Handle("/api/tag", auth.RequireSession(http.HandlerFunc(tagHandler.Create))).Methods(http.MethodPost)
 	r.Handle("/api/tag/{tag_uuid}", auth.RequireSession(http.HandlerFunc(tagHandler.Update))).Methods(http.MethodPut)
 	r.Handle("/api/tag/{tag_uuid}", auth.RequireSession(http.HandlerFunc(tagHandler.Delete))).Methods(http.MethodDelete)
+
+	// sns
+	r.HandleFunc("/api/sns", snsHandler.List).Methods(http.MethodGet)
+	r.Handle("/api/sns", auth.RequireSession(http.HandlerFunc(snsHandler.Create))).Methods(http.MethodPost)
+	r.Handle("/api/sns/{sns_uuid}", auth.RequireSession(http.HandlerFunc(snsHandler.Update))).Methods(http.MethodPut)
+	r.Handle("/api/sns/{sns_uuid}", auth.RequireSession(http.HandlerFunc(snsHandler.Delete))).Methods(http.MethodDelete)
 
 	// sales site
 	r.HandleFunc("/api/sales_site", salesSiteHandler.List).Methods(http.MethodGet)

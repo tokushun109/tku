@@ -29,6 +29,7 @@ func BuildServer() (*config.Config, http.Handler, error) {
 		handlers.category,
 		handlers.target,
 		handlers.tag,
+		handlers.sns,
 		handlers.salesSite,
 		handlers.skillMarket,
 		middlewares.auth,
