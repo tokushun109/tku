@@ -1,0 +1,43 @@
+package skill_market
+
+import (
+	"testing"
+
+	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
+)
+
+func TestNewSkillMarket_OK(t *testing.T) {
+	s, err := New("minne", "https://minne.com", "https://example.com/icon.png")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if s.Name.String() != "minne" {
+		t.Fatalf("expected name to be %q, got %q", "minne", s.Name.String())
+	}
+	if s.URL.String() != "https://minne.com" {
+		t.Fatalf("expected url to be %q, got %q", "https://minne.com", s.URL.String())
+	}
+	if s.Icon != "https://example.com/icon.png" {
+		t.Fatalf("expected icon to be %q, got %q", "https://example.com/icon.png", s.Icon)
+	}
+}
+
+func TestNewSkillMarket_InvalidName(t *testing.T) {
+	_, err := New("", "https://minne.com", "")
+	if err == nil {
+		t.Fatalf("expected error")
+	}
+	if err != ErrInvalidName {
+		t.Fatalf("expected ErrInvalidName, got %v", err)
+	}
+}
+
+func TestNewSkillMarket_InvalidURL(t *testing.T) {
+	_, err := New("minne", "not-url", "")
+	if err == nil {
+		t.Fatalf("expected error")
+	}
+	if err != primitive.ErrInvalidURL {
+		t.Fatalf("expected primitive.ErrInvalidURL, got %v", err)
+	}
+}

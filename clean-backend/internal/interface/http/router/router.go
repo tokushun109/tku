@@ -15,6 +15,7 @@ func NewRouter(
 	targetHandler *handler.TargetHandler,
 	tagHandler *handler.TagHandler,
 	salesSiteHandler *handler.SalesSiteHandler,
+	skillMarketHandler *handler.SkillMarketHandler,
 	auth *middleware.AuthMiddleware,
 	logging func(http.Handler) http.Handler,
 	cors func(http.Handler) http.Handler,
@@ -48,6 +49,12 @@ func NewRouter(
 	r.Handle("/api/sales_site", auth.RequireSession(http.HandlerFunc(salesSiteHandler.Create))).Methods(http.MethodPost)
 	r.Handle("/api/sales_site/{sales_site_uuid}", auth.RequireSession(http.HandlerFunc(salesSiteHandler.Update))).Methods(http.MethodPut)
 	r.Handle("/api/sales_site/{sales_site_uuid}", auth.RequireSession(http.HandlerFunc(salesSiteHandler.Delete))).Methods(http.MethodDelete)
+
+	// skill market
+	r.HandleFunc("/api/skill_market", skillMarketHandler.List).Methods(http.MethodGet)
+	r.Handle("/api/skill_market", auth.RequireSession(http.HandlerFunc(skillMarketHandler.Create))).Methods(http.MethodPost)
+	r.Handle("/api/skill_market/{skill_market_uuid}", auth.RequireSession(http.HandlerFunc(skillMarketHandler.Update))).Methods(http.MethodPut)
+	r.Handle("/api/skill_market/{skill_market_uuid}", auth.RequireSession(http.HandlerFunc(skillMarketHandler.Delete))).Methods(http.MethodDelete)
 
 	return cors(r)
 }

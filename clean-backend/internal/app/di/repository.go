@@ -6,21 +6,23 @@ import (
 )
 
 type repositories struct {
-	health    *mysqlRepo.HealthRepository
-	category  *mysqlRepo.CategoryRepository
-	target    *mysqlRepo.TargetRepository
-	tag       *mysqlRepo.TagRepository
-	salesSite *mysqlRepo.SalesSiteRepository
-	session   *mysqlRepo.SessionRepository
+	health      *mysqlRepo.HealthRepository
+	category    *mysqlRepo.CategoryRepository
+	target      *mysqlRepo.TargetRepository
+	tag         *mysqlRepo.TagRepository
+	salesSite   *mysqlRepo.SalesSiteRepository
+	skillMarket *mysqlRepo.SkillMarketRepository
+	session     *mysqlRepo.SessionRepository
 }
 
 func newRepositories(db *sqlx.DB) *repositories {
 	return &repositories{
-		health:    mysqlRepo.NewHealthRepository(db),
-		category:  mysqlRepo.NewCategoryRepository(db),
-		target:    mysqlRepo.NewTargetRepository(db),
-		tag:       mysqlRepo.NewTagRepository(db),
-		salesSite: mysqlRepo.NewSalesSiteRepository(db),
-		session:   mysqlRepo.NewSessionRepository(db),
+		health:      mysqlRepo.NewHealthRepository(db),
+		category:    mysqlRepo.NewCategoryRepository(db),
+		target:      mysqlRepo.NewTargetRepository(db),
+		tag:         mysqlRepo.NewTagRepository(db),
+		salesSite:   mysqlRepo.NewSalesSiteRepository(db),
+		skillMarket: mysqlRepo.NewSkillMarketRepository(db),
+		session:     mysqlRepo.NewSessionRepository(db),
 	}
 }
