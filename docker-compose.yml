@@ -33,7 +33,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    command: [ "up" ]
     volumes:
       - ./clean-backend/db/migrations:/migrations
 
