@@ -55,11 +55,10 @@ func (r *TargetRepository) FindUsed(ctx context.Context) ([]*domain.Target, erro
 	}
 	var rows []row
 	query := `
-		SELECT t.uuid, t.name
+		SELECT DISTINCT t.uuid, t.name
 		FROM target t
 		INNER JOIN product p ON p.target_id = t.id
 		WHERE t.deleted_at IS NULL AND p.deleted_at IS NULL
-		GROUP BY t.id, t.uuid, t.name
 	`
 	if err := r.db.SelectContext(ctx, &rows, query); err != nil {
 		return nil, err

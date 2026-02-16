@@ -55,11 +55,10 @@ func (r *CategoryRepository) FindUsed(ctx context.Context) ([]*domain.Category, 
 	}
 	var rows []row
 	query := `
-		SELECT c.uuid, c.name
+		SELECT DISTINCT c.uuid, c.name
 		FROM category c
 		INNER JOIN product p ON p.category_id = c.id
 		WHERE c.deleted_at IS NULL AND p.deleted_at IS NULL
-		GROUP BY c.id, c.uuid, c.name
 	`
 	if err := r.db.SelectContext(ctx, &rows, query); err != nil {
 		return nil, err
