@@ -1,0 +1,15 @@
+package sales_site
+
+import (
+	"context"
+
+	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
+)
+
+type Repository interface {
+	Create(ctx context.Context, s *SalesSite) error
+	FindAll(ctx context.Context) ([]*SalesSite, error)
+	FindByUUID(ctx context.Context, uuid primitive.UUID) (*SalesSite, error)
+	Update(ctx context.Context, s *SalesSite) (bool, error)
+	Delete(ctx context.Context, uuid primitive.UUID) (bool, error)
+}

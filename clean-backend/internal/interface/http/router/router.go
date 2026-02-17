@@ -14,11 +14,14 @@ func NewRouter(
 	categoryHandler *handler.CategoryHandler,
 	targetHandler *handler.TargetHandler,
 	tagHandler *handler.TagHandler,
+	snsHandler *handler.SnsHandler,
+	salesSiteHandler *handler.SalesSiteHandler,
+	skillMarketHandler *handler.SkillMarketHandler,
 	auth *middleware.AuthMiddleware,
 	logging func(http.Handler) http.Handler,
 	cors func(http.Handler) http.Handler,
 ) http.Handler {
-	r := mux.NewRouter()
+	r := mux.NewRouter().StrictSlash(true)
 	r.Use(logging)
 
 	// health check
@@ -41,6 +44,24 @@ func NewRouter(
 	r.Handle("/api/tag", auth.RequireSession(http.HandlerFunc(tagHandler.Create))).Methods(http.MethodPost)
 	r.Handle("/api/tag/{tag_uuid}", auth.RequireSession(http.HandlerFunc(tagHandler.Update))).Methods(http.MethodPut)
 	r.Handle("/api/tag/{tag_uuid}", auth.RequireSession(http.HandlerFunc(tagHandler.Delete))).Methods(http.MethodDelete)
+
+	// sns
+	r.HandleFunc("/api/sns", snsHandler.List).Methods(http.MethodGet)
+	r.Handle("/api/sns", auth.RequireSession(http.HandlerFunc(snsHandler.Create))).Methods(http.MethodPost)
+	r.Handle("/api/sns/{sns_uuid}", auth.RequireSession(http.HandlerFunc(snsHandler.Update))).Methods(http.MethodPut)
+	r.Handle("/api/sns/{sns_uuid}", auth.RequireSession(http.HandlerFunc(snsHandler.Delete))).Methods(http.MethodDelete)
+
+	// sales site
+	r.HandleFunc("/api/sales_site", salesSiteHandler.List).Methods(http.MethodGet)
+	r.Handle("/api/sales_site", auth.RequireSession(http.HandlerFunc(salesSiteHandler.Create))).Methods(http.MethodPost)
+	r.Handle("/api/sales_site/{sales_site_uuid}", auth.RequireSession(http.HandlerFunc(salesSiteHandler.Update))).Methods(http.MethodPut)
+	r.Handle("/api/sales_site/{sales_site_uuid}", auth.RequireSession(http.HandlerFunc(salesSiteHandler.Delete))).Methods(http.MethodDelete)
+
+	// skill market
+	r.HandleFunc("/api/skill_market", skillMarketHandler.List).Methods(http.MethodGet)
+	r.Handle("/api/skill_market", auth.RequireSession(http.HandlerFunc(skillMarketHandler.Create))).Methods(http.MethodPost)
+	r.Handle("/api/skill_market/{skill_market_uuid}", auth.RequireSession(http.HandlerFunc(skillMarketHandler.Update))).Methods(http.MethodPut)
+	r.Handle("/api/skill_market/{skill_market_uuid}", auth.RequireSession(http.HandlerFunc(skillMarketHandler.Delete))).Methods(http.MethodDelete)
 
 	return cors(r)
 }

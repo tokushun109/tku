@@ -40,10 +40,18 @@ export async function middleware(request: NextRequest) {
 
         // admin配下のページで認証が必要なルートをチェック
         if (request.nextUrl.pathname.startsWith('/admin')) {
+            const isAuthenticated = await checkAuth(request)
+            const isAdminRoot = request.nextUrl.pathname === '/admin' || request.nextUrl.pathname === '/admin/'
+
+            // /admin は認証状態に応じて遷移先を振り分ける
+            if (isAdminRoot) {
+                const destination = isAuthenticated ? NavigationType.AdminProduct : NavigationType.AdminLogin
+                return NextResponse.redirect(new URL(destination, request.url))
+            }
+
             // ログインページの場合
             if (request.nextUrl.pathname === NavigationType.AdminLogin) {
                 // 既にログイン済みの場合は商品管理ページにリダイレクト
-                const isAuthenticated = await checkAuth(request)
                 if (isAuthenticated) {
                     return NextResponse.redirect(new URL(NavigationType.AdminProduct, request.url))
                 }
@@ -51,7 +59,6 @@ export async function middleware(request: NextRequest) {
             }
 
             // その他のadminページは認証チェック
-            const isAuthenticated = await checkAuth(request)
             if (!isAuthenticated) {
                 return NextResponse.redirect(new URL(NavigationType.AdminLogin, request.url))
             }
