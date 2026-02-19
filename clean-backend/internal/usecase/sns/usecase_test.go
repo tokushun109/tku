@@ -69,196 +69,208 @@ func (s *stubRepo) Delete(ctx context.Context, uuid primitive.UUID) (bool, error
 	return s.deleteOK, nil
 }
 
-func TestListSns_OK(t *testing.T) {
-	s := mustSns(testUUID, "Instagram", "https://www.instagram.com", "")
-	repo := &stubRepo{findAll: []*domain.Sns{s}}
-	uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+func TestListSns(t *testing.T) {
+	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
 
-	res, err := uc.List(context.Background())
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if len(res) != 1 {
-		t.Fatalf("expected 1, got %d", len(res))
-	}
+		s := mustSns(testUUID, "Instagram", "https://www.instagram.com", "")
+		repo := &stubRepo{findAll: []*domain.Sns{s}}
+		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+
+		res, err := uc.List(context.Background())
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if len(res) != 1 {
+			t.Fatalf("expected 1, got %d", len(res))
+		}
+	})
+	t.Run("リポジトリでエラーが発生したなら内部エラーを返す", func(t *testing.T) {
+
+		repo := &stubRepo{findAllErr: errors.New("db error")}
+		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+
+		_, err := uc.List(context.Background())
+		if err == nil || !errors.Is(err, usecase.ErrInternal) {
+			t.Fatalf("expected ErrInternal, got %v", err)
+		}
+	})
 }
 
-func TestListSns_RepoError(t *testing.T) {
-	repo := &stubRepo{findAllErr: errors.New("db error")}
-	uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+func TestCreateSns(t *testing.T) {
+	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
 
-	_, err := uc.List(context.Background())
-	if err == nil || !errors.Is(err, usecase.ErrInternal) {
-		t.Fatalf("expected ErrInternal, got %v", err)
-	}
+		repo := &stubRepo{}
+		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+
+		if err := uc.Create(context.Background(), "Instagram", "https://www.instagram.com", ""); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if repo.created == nil {
+			t.Fatalf("expected sns created")
+		}
+		if repo.created.UUID.String() != testUUIDVO.String() {
+			t.Fatalf("expected uuid %s, got %s", testUUIDVO.String(), repo.created.UUID.String())
+		}
+	})
+	t.Run("UUID生成でエラーが発生したなら内部エラーを返す", func(t *testing.T) {
+
+		repo := &stubRepo{}
+		uc := New(repo, &stubUUIDGen{err: errors.New("gen error")})
+
+		err := uc.Create(context.Background(), "Instagram", "https://www.instagram.com", "")
+		if err == nil || !errors.Is(err, usecase.ErrInternal) {
+			t.Fatalf("expected ErrInternal, got %v", err)
+		}
+	})
+	t.Run("名前が不正なときバリデーションエラーで失敗する", func(t *testing.T) {
+
+		repo := &stubRepo{}
+		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+
+		err := uc.Create(context.Background(), "", "https://www.instagram.com", "")
+		if err == nil {
+			t.Fatalf("expected error")
+		}
+		if !errors.Is(err, usecase.ErrInvalidInput) {
+			t.Fatalf("expected ErrInvalidInput, got %v", err)
+		}
+	})
+	t.Run("URLが不正なときバリデーションエラーで失敗する", func(t *testing.T) {
+
+		repo := &stubRepo{}
+		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+
+		err := uc.Create(context.Background(), "Instagram", "not-url", "")
+		if err == nil {
+			t.Fatalf("expected error")
+		}
+		if !errors.Is(err, usecase.ErrInvalidInput) {
+			t.Fatalf("expected ErrInvalidInput, got %v", err)
+		}
+	})
+	t.Run("作成処理でエラーが発生したなら内部エラーを返す", func(t *testing.T) {
+
+		repo := &stubRepo{createErr: errors.New("db error")}
+		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+
+		err := uc.Create(context.Background(), "Instagram", "https://www.instagram.com", "")
+		if err == nil {
+			t.Fatalf("expected error")
+		}
+		if !errors.Is(err, usecase.ErrInternal) {
+			t.Fatalf("expected ErrInternal, got %v", err)
+		}
+	})
 }
 
-func TestCreateSns_OK(t *testing.T) {
-	repo := &stubRepo{}
-	uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+func TestUpdateSns(t *testing.T) {
+	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
 
-	if err := uc.Create(context.Background(), "Instagram", "https://www.instagram.com", ""); err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if repo.created == nil {
-		t.Fatalf("expected sns created")
-	}
-	if repo.created.UUID.String() != testUUIDVO.String() {
-		t.Fatalf("expected uuid %s, got %s", testUUIDVO.String(), repo.created.UUID.String())
-	}
+		repo := &stubRepo{
+			findByUUID: mustSns(testUUID, "old", "https://old.example.com", ""),
+			updateOK:   true,
+		}
+		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+
+		if err := uc.Update(context.Background(), testUUID, "new", "https://new.example.com", "icon"); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+	t.Run("UUIDが不正なときバリデーションエラーで失敗する", func(t *testing.T) {
+
+		repo := &stubRepo{}
+		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+
+		err := uc.Update(context.Background(), "bad-uuid", "new", "https://new.example.com", "")
+		if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
+			t.Fatalf("expected ErrInvalidInput, got %v", err)
+		}
+	})
+	t.Run("名前が不正なときバリデーションエラーで失敗する", func(t *testing.T) {
+
+		repo := &stubRepo{findByUUID: mustSns(testUUID, "old", "https://old.example.com", "")}
+		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+
+		err := uc.Update(context.Background(), testUUID, "", "https://new.example.com", "")
+		if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
+			t.Fatalf("expected ErrInvalidInput, got %v", err)
+		}
+	})
+	t.Run("URLが不正なときバリデーションエラーで失敗する", func(t *testing.T) {
+
+		repo := &stubRepo{findByUUID: mustSns(testUUID, "old", "https://old.example.com", "")}
+		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+
+		err := uc.Update(context.Background(), testUUID, "new", "not-url", "")
+		if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
+			t.Fatalf("expected ErrInvalidInput, got %v", err)
+		}
+	})
+	t.Run("対象が見つからないならNotFoundエラーを返す", func(t *testing.T) {
+
+		repo := &stubRepo{findByUUID: nil}
+		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+
+		err := uc.Update(context.Background(), testUUID, "new", "https://new.example.com", "")
+		if err == nil || !errors.Is(err, usecase.ErrNotFound) {
+			t.Fatalf("expected ErrNotFound, got %v", err)
+		}
+	})
+	t.Run("更新処理でエラーが発生したなら内部エラーを返す", func(t *testing.T) {
+
+		repo := &stubRepo{
+			findByUUID: mustSns(testUUID, "old", "https://old.example.com", ""),
+			updateErr:  errors.New("db error"),
+		}
+		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+
+		err := uc.Update(context.Background(), testUUID, "new", "https://new.example.com", "")
+		if err == nil || !errors.Is(err, usecase.ErrInternal) {
+			t.Fatalf("expected ErrInternal, got %v", err)
+		}
+	})
 }
 
-func TestCreateSns_UUIDGenError(t *testing.T) {
-	repo := &stubRepo{}
-	uc := New(repo, &stubUUIDGen{err: errors.New("gen error")})
+func TestDeleteSns(t *testing.T) {
+	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
 
-	err := uc.Create(context.Background(), "Instagram", "https://www.instagram.com", "")
-	if err == nil || !errors.Is(err, usecase.ErrInternal) {
-		t.Fatalf("expected ErrInternal, got %v", err)
-	}
-}
+		repo := &stubRepo{deleteOK: true}
+		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
 
-func TestCreateSns_InvalidName(t *testing.T) {
-	repo := &stubRepo{}
-	uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+		if err := uc.Delete(context.Background(), testUUID); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+	t.Run("UUIDが不正なときバリデーションエラーで失敗する", func(t *testing.T) {
 
-	err := uc.Create(context.Background(), "", "https://www.instagram.com", "")
-	if err == nil {
-		t.Fatalf("expected error")
-	}
-	if !errors.Is(err, usecase.ErrInvalidInput) {
-		t.Fatalf("expected ErrInvalidInput, got %v", err)
-	}
-}
+		repo := &stubRepo{}
+		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
 
-func TestCreateSns_InvalidURL(t *testing.T) {
-	repo := &stubRepo{}
-	uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+		err := uc.Delete(context.Background(), "bad-uuid")
+		if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
+			t.Fatalf("expected ErrInvalidInput, got %v", err)
+		}
+	})
+	t.Run("対象が見つからないならNotFoundエラーを返す", func(t *testing.T) {
 
-	err := uc.Create(context.Background(), "Instagram", "not-url", "")
-	if err == nil {
-		t.Fatalf("expected error")
-	}
-	if !errors.Is(err, usecase.ErrInvalidInput) {
-		t.Fatalf("expected ErrInvalidInput, got %v", err)
-	}
-}
+		repo := &stubRepo{deleteOK: false}
+		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
 
-func TestCreateSns_CreateError(t *testing.T) {
-	repo := &stubRepo{createErr: errors.New("db error")}
-	uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+		err := uc.Delete(context.Background(), testUUID)
+		if err == nil || !errors.Is(err, usecase.ErrNotFound) {
+			t.Fatalf("expected ErrNotFound, got %v", err)
+		}
+	})
+	t.Run("リポジトリでエラーが発生したなら内部エラーを返す", func(t *testing.T) {
 
-	err := uc.Create(context.Background(), "Instagram", "https://www.instagram.com", "")
-	if err == nil {
-		t.Fatalf("expected error")
-	}
-	if !errors.Is(err, usecase.ErrInternal) {
-		t.Fatalf("expected ErrInternal, got %v", err)
-	}
-}
+		repo := &stubRepo{deleteErr: errors.New("db error")}
+		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
 
-func TestUpdateSns_OK(t *testing.T) {
-	repo := &stubRepo{
-		findByUUID: mustSns(testUUID, "old", "https://old.example.com", ""),
-		updateOK:   true,
-	}
-	uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
-
-	if err := uc.Update(context.Background(), testUUID, "new", "https://new.example.com", "icon"); err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-}
-
-func TestUpdateSns_InvalidUUID(t *testing.T) {
-	repo := &stubRepo{}
-	uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
-
-	err := uc.Update(context.Background(), "bad-uuid", "new", "https://new.example.com", "")
-	if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
-		t.Fatalf("expected ErrInvalidInput, got %v", err)
-	}
-}
-
-func TestUpdateSns_InvalidName(t *testing.T) {
-	repo := &stubRepo{findByUUID: mustSns(testUUID, "old", "https://old.example.com", "")}
-	uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
-
-	err := uc.Update(context.Background(), testUUID, "", "https://new.example.com", "")
-	if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
-		t.Fatalf("expected ErrInvalidInput, got %v", err)
-	}
-}
-
-func TestUpdateSns_InvalidURL(t *testing.T) {
-	repo := &stubRepo{findByUUID: mustSns(testUUID, "old", "https://old.example.com", "")}
-	uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
-
-	err := uc.Update(context.Background(), testUUID, "new", "not-url", "")
-	if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
-		t.Fatalf("expected ErrInvalidInput, got %v", err)
-	}
-}
-
-func TestUpdateSns_NotFound(t *testing.T) {
-	repo := &stubRepo{findByUUID: nil}
-	uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
-
-	err := uc.Update(context.Background(), testUUID, "new", "https://new.example.com", "")
-	if err == nil || !errors.Is(err, usecase.ErrNotFound) {
-		t.Fatalf("expected ErrNotFound, got %v", err)
-	}
-}
-
-func TestUpdateSns_UpdateError(t *testing.T) {
-	repo := &stubRepo{
-		findByUUID: mustSns(testUUID, "old", "https://old.example.com", ""),
-		updateErr:  errors.New("db error"),
-	}
-	uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
-
-	err := uc.Update(context.Background(), testUUID, "new", "https://new.example.com", "")
-	if err == nil || !errors.Is(err, usecase.ErrInternal) {
-		t.Fatalf("expected ErrInternal, got %v", err)
-	}
-}
-
-func TestDeleteSns_OK(t *testing.T) {
-	repo := &stubRepo{deleteOK: true}
-	uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
-
-	if err := uc.Delete(context.Background(), testUUID); err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-}
-
-func TestDeleteSns_InvalidUUID(t *testing.T) {
-	repo := &stubRepo{}
-	uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
-
-	err := uc.Delete(context.Background(), "bad-uuid")
-	if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
-		t.Fatalf("expected ErrInvalidInput, got %v", err)
-	}
-}
-
-func TestDeleteSns_NotFound(t *testing.T) {
-	repo := &stubRepo{deleteOK: false}
-	uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
-
-	err := uc.Delete(context.Background(), testUUID)
-	if err == nil || !errors.Is(err, usecase.ErrNotFound) {
-		t.Fatalf("expected ErrNotFound, got %v", err)
-	}
-}
-
-func TestDeleteSns_RepoError(t *testing.T) {
-	repo := &stubRepo{deleteErr: errors.New("db error")}
-	uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
-
-	err := uc.Delete(context.Background(), testUUID)
-	if err == nil || !errors.Is(err, usecase.ErrInternal) {
-		t.Fatalf("expected ErrInternal, got %v", err)
-	}
+		err := uc.Delete(context.Background(), testUUID)
+		if err == nil || !errors.Is(err, usecase.ErrInternal) {
+			t.Fatalf("expected ErrInternal, got %v", err)
+		}
+	})
 }
 
 func mustSns(uuidStr, name, rawURL, icon string) *domain.Sns {

@@ -7,11 +7,15 @@ import (
 )
 
 func TestGenerateUUID(t *testing.T) {
-	u := GenerateUUID()
-	if u == "" {
-		t.Fatalf("expected non-empty uuid")
-	}
-	if _, err := uuid.Parse(u); err != nil {
-		t.Fatalf("expected valid uuid, got error: %v", err)
-	}
+	t.Run("UUIDを生成したとき空でないUUIDの生成に成功する", func(t *testing.T) {
+
+		u := GenerateUUID()
+		if u == "" {
+			t.Fatalf("expected non-empty uuid")
+		}
+		if _, err := uuid.Parse(u); err != nil {
+			t.Fatalf("expected valid uuid, got error: %v", err)
+		}
+	})
+
 }

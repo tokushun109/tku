@@ -7,8 +7,8 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	domain "github.com/tokushun109/tku/clean-backend/internal/domain/tag"
 	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
+	domain "github.com/tokushun109/tku/clean-backend/internal/domain/tag"
 )
 
 type TagRepository struct {
@@ -20,7 +20,7 @@ func NewTagRepository(db *sqlx.DB) *TagRepository {
 }
 
 func (r *TagRepository) Create(ctx context.Context, t *domain.Tag) error {
-	_, err := r.db.ExecContext(
+	_, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`INSERT INTO tag (uuid, name, created_at, updated_at) VALUES (?, ?, NOW(), NOW())`,
 		t.UUID.String(), t.Name.String(),
@@ -34,7 +34,7 @@ func (r *TagRepository) FindAll(ctx context.Context) ([]*domain.Tag, error) {
 		Name string `db:"name"`
 	}
 	var rows []row
-	if err := r.db.SelectContext(ctx, &rows, `SELECT uuid, name FROM tag WHERE deleted_at IS NULL`); err != nil {
+	if err := getExecutor(ctx, r.db).SelectContext(ctx, &rows, `SELECT uuid, name FROM tag WHERE deleted_at IS NULL`); err != nil {
 		return nil, err
 	}
 	res := make([]*domain.Tag, 0, len(rows))
@@ -54,7 +54,7 @@ func (r *TagRepository) FindByUUID(ctx context.Context, uuid primitive.UUID) (*d
 		Name string `db:"name"`
 	}
 	var rrow row
-	if err := r.db.GetContext(ctx, &rrow, `SELECT uuid, name FROM tag WHERE uuid = ? AND deleted_at IS NULL`, uuid.String()); err != nil {
+	if err := getExecutor(ctx, r.db).GetContext(ctx, &rrow, `SELECT uuid, name FROM tag WHERE uuid = ? AND deleted_at IS NULL`, uuid.String()); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
@@ -65,14 +65,14 @@ func (r *TagRepository) FindByUUID(ctx context.Context, uuid primitive.UUID) (*d
 
 func (r *TagRepository) ExistsByName(ctx context.Context, name domain.TagName) (bool, error) {
 	var count int64
-	if err := r.db.GetContext(ctx, &count, `SELECT COUNT(1) FROM tag WHERE name = ? AND deleted_at IS NULL`, name.String()); err != nil {
+	if err := getExecutor(ctx, r.db).GetContext(ctx, &count, `SELECT COUNT(1) FROM tag WHERE name = ? AND deleted_at IS NULL`, name.String()); err != nil {
 		return false, err
 	}
 	return count > 0, nil
 }
 
 func (r *TagRepository) Update(ctx context.Context, t *domain.Tag) (bool, error) {
-	res, err := r.db.ExecContext(
+	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`UPDATE tag SET name = ?, updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`,
 		t.Name.String(),

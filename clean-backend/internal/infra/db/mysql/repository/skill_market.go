@@ -20,7 +20,7 @@ func NewSkillMarketRepository(db *sqlx.DB) *SkillMarketRepository {
 }
 
 func (r *SkillMarketRepository) Create(ctx context.Context, s *domain.SkillMarket) error {
-	_, err := r.db.ExecContext(
+	_, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`INSERT INTO skill_market (uuid, name, url, icon, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())`,
 		s.UUID.String(), s.Name.String(), s.URL.String(), s.Icon,
@@ -36,7 +36,7 @@ func (r *SkillMarketRepository) FindAll(ctx context.Context) ([]*domain.SkillMar
 		Icon sql.NullString `db:"icon"`
 	}
 	var rows []row
-	if err := r.db.SelectContext(ctx, &rows, `SELECT uuid, name, url, icon FROM skill_market WHERE deleted_at IS NULL`); err != nil {
+	if err := getExecutor(ctx, r.db).SelectContext(ctx, &rows, `SELECT uuid, name, url, icon FROM skill_market WHERE deleted_at IS NULL`); err != nil {
 		return nil, err
 	}
 	res := make([]*domain.SkillMarket, 0, len(rows))
@@ -58,7 +58,7 @@ func (r *SkillMarketRepository) FindByUUID(ctx context.Context, uuid primitive.U
 		Icon sql.NullString `db:"icon"`
 	}
 	var rrow row
-	if err := r.db.GetContext(ctx, &rrow, `SELECT uuid, name, url, icon FROM skill_market WHERE uuid = ? AND deleted_at IS NULL`, uuid.String()); err != nil {
+	if err := getExecutor(ctx, r.db).GetContext(ctx, &rrow, `SELECT uuid, name, url, icon FROM skill_market WHERE uuid = ? AND deleted_at IS NULL`, uuid.String()); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
@@ -68,7 +68,7 @@ func (r *SkillMarketRepository) FindByUUID(ctx context.Context, uuid primitive.U
 }
 
 func (r *SkillMarketRepository) Update(ctx context.Context, s *domain.SkillMarket) (bool, error) {
-	res, err := r.db.ExecContext(
+	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`UPDATE skill_market SET name = ?, url = ?, icon = ?, updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`,
 		s.Name.String(),
@@ -87,7 +87,7 @@ func (r *SkillMarketRepository) Update(ctx context.Context, s *domain.SkillMarke
 }
 
 func (r *SkillMarketRepository) Delete(ctx context.Context, uuid primitive.UUID) (bool, error) {
-	res, err := r.db.ExecContext(
+	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`UPDATE skill_market SET deleted_at = NOW(), updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`,
 		uuid.String(),

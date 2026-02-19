@@ -48,125 +48,139 @@ type snsResp struct {
 	Icon string `json:"icon"`
 }
 
-func TestSnsGet_OK(t *testing.T) {
-	s := mustSns(snsTestUUID, "Instagram", "https://www.instagram.com", "icon")
-	snsUC := &stubSnsUC{listRes: []*domain.Sns{s}}
-	h := NewSnsHandler(snsUC)
+func TestSnsGet(t *testing.T) {
+	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
 
-	req := httptest.NewRequest(http.MethodGet, "/api/sns", nil)
-	rr := httptest.NewRecorder()
+		s := mustSns(snsTestUUID, "Instagram", "https://www.instagram.com", "icon")
+		snsUC := &stubSnsUC{listRes: []*domain.Sns{s}}
+		h := NewSnsHandler(snsUC)
 
-	h.List(rr, req)
+		req := httptest.NewRequest(http.MethodGet, "/api/sns", nil)
+		rr := httptest.NewRecorder()
 
-	if rr.Code != http.StatusOK {
-		t.Fatalf("expected 200, got %d", rr.Code)
-	}
+		h.List(rr, req)
 
-	var resp []snsResp
-	if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
-		t.Fatalf("decode error: %v", err)
-	}
-	if len(resp) != 1 || resp[0].Name != "Instagram" || resp[0].URL != "https://www.instagram.com" {
-		t.Fatalf("unexpected response: %+v", resp)
-	}
+		if rr.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d", rr.Code)
+		}
+
+		var resp []snsResp
+		if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
+			t.Fatalf("decode error: %v", err)
+		}
+		if len(resp) != 1 || resp[0].Name != "Instagram" || resp[0].URL != "https://www.instagram.com" {
+			t.Fatalf("unexpected response: %+v", resp)
+		}
+	})
+
 }
 
-func TestSnsPost_InvalidJSON(t *testing.T) {
-	snsUC := &stubSnsUC{}
-	h := NewSnsHandler(snsUC)
+func TestSnsPost(t *testing.T) {
+	t.Run("JSONが不正なときバリデーションエラーで失敗する", func(t *testing.T) {
 
-	body := bytes.NewBufferString(`{invalid}`)
-	req := httptest.NewRequest(http.MethodPost, "/api/sns", body)
-	rr := httptest.NewRecorder()
+		snsUC := &stubSnsUC{}
+		h := NewSnsHandler(snsUC)
 
-	h.Create(rr, req)
+		body := bytes.NewBufferString(`{invalid}`)
+		req := httptest.NewRequest(http.MethodPost, "/api/sns", body)
+		rr := httptest.NewRecorder()
 
-	if rr.Code != http.StatusBadRequest {
-		t.Fatalf("expected 400, got %d", rr.Code)
-	}
+		h.Create(rr, req)
+
+		if rr.Code != http.StatusBadRequest {
+			t.Fatalf("expected 400, got %d", rr.Code)
+		}
+	})
+	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
+
+		snsUC := &stubSnsUC{}
+		h := NewSnsHandler(snsUC)
+
+		body := bytes.NewBufferString(`{"name":"Instagram","url":"https://www.instagram.com"}`)
+		req := httptest.NewRequest(http.MethodPost, "/api/sns", body)
+		rr := httptest.NewRecorder()
+
+		h.Create(rr, req)
+
+		if rr.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d", rr.Code)
+		}
+		var resp response.SuccessResponse
+		if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
+			t.Fatalf("decode error: %v", err)
+		}
+		if !resp.Success {
+			t.Fatalf("expected success true")
+		}
+	})
 }
 
-func TestSnsPost_OK(t *testing.T) {
-	snsUC := &stubSnsUC{}
-	h := NewSnsHandler(snsUC)
+func TestSnsPut(t *testing.T) {
+	t.Run("JSONが不正なときバリデーションエラーで失敗する", func(t *testing.T) {
 
-	body := bytes.NewBufferString(`{"name":"Instagram","url":"https://www.instagram.com"}`)
-	req := httptest.NewRequest(http.MethodPost, "/api/sns", body)
-	rr := httptest.NewRecorder()
+		snsUC := &stubSnsUC{}
+		h := NewSnsHandler(snsUC)
 
-	h.Create(rr, req)
+		body := bytes.NewBufferString(`{invalid}`)
+		req := httptest.NewRequest(http.MethodPut, "/api/sns/uuid", body)
+		req = mux.SetURLVars(req, map[string]string{"sns_uuid": snsTestUUID})
+		rr := httptest.NewRecorder()
 
-	if rr.Code != http.StatusOK {
-		t.Fatalf("expected 200, got %d", rr.Code)
-	}
-	var resp response.SuccessResponse
-	if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
-		t.Fatalf("decode error: %v", err)
-	}
-	if !resp.Success {
-		t.Fatalf("expected success true")
-	}
+		h.Update(rr, req)
+
+		if rr.Code != http.StatusBadRequest {
+			t.Fatalf("expected 400, got %d", rr.Code)
+		}
+	})
+	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
+
+		snsUC := &stubSnsUC{}
+		h := NewSnsHandler(snsUC)
+
+		body := bytes.NewBufferString(`{"name":"Instagram","url":"https://www.instagram.com"}`)
+		req := httptest.NewRequest(http.MethodPut, "/api/sns/uuid", body)
+		req = mux.SetURLVars(req, map[string]string{"sns_uuid": snsTestUUID})
+		rr := httptest.NewRecorder()
+
+		h.Update(rr, req)
+
+		if rr.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d", rr.Code)
+		}
+		var resp response.SuccessResponse
+		if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
+			t.Fatalf("decode error: %v", err)
+		}
+		if !resp.Success {
+			t.Fatalf("expected success true")
+		}
+	})
 }
 
-func TestSnsPut_InvalidJSON(t *testing.T) {
-	snsUC := &stubSnsUC{}
-	h := NewSnsHandler(snsUC)
+func TestSnsDelete(t *testing.T) {
+	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
 
-	body := bytes.NewBufferString(`{invalid}`)
-	req := httptest.NewRequest(http.MethodPut, "/api/sns/uuid", body)
-	req = mux.SetURLVars(req, map[string]string{"sns_uuid": snsTestUUID})
-	rr := httptest.NewRecorder()
+		snsUC := &stubSnsUC{}
+		h := NewSnsHandler(snsUC)
 
-	h.Update(rr, req)
+		req := httptest.NewRequest(http.MethodDelete, "/api/sns/uuid", nil)
+		req = mux.SetURLVars(req, map[string]string{"sns_uuid": snsTestUUID})
+		rr := httptest.NewRecorder()
 
-	if rr.Code != http.StatusBadRequest {
-		t.Fatalf("expected 400, got %d", rr.Code)
-	}
-}
+		h.Delete(rr, req)
 
-func TestSnsPut_OK(t *testing.T) {
-	snsUC := &stubSnsUC{}
-	h := NewSnsHandler(snsUC)
+		if rr.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d", rr.Code)
+		}
+		var resp response.SuccessResponse
+		if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
+			t.Fatalf("decode error: %v", err)
+		}
+		if !resp.Success {
+			t.Fatalf("expected success true")
+		}
+	})
 
-	body := bytes.NewBufferString(`{"name":"Instagram","url":"https://www.instagram.com"}`)
-	req := httptest.NewRequest(http.MethodPut, "/api/sns/uuid", body)
-	req = mux.SetURLVars(req, map[string]string{"sns_uuid": snsTestUUID})
-	rr := httptest.NewRecorder()
-
-	h.Update(rr, req)
-
-	if rr.Code != http.StatusOK {
-		t.Fatalf("expected 200, got %d", rr.Code)
-	}
-	var resp response.SuccessResponse
-	if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
-		t.Fatalf("decode error: %v", err)
-	}
-	if !resp.Success {
-		t.Fatalf("expected success true")
-	}
-}
-
-func TestSnsDelete_OK(t *testing.T) {
-	snsUC := &stubSnsUC{}
-	h := NewSnsHandler(snsUC)
-
-	req := httptest.NewRequest(http.MethodDelete, "/api/sns/uuid", nil)
-	req = mux.SetURLVars(req, map[string]string{"sns_uuid": snsTestUUID})
-	rr := httptest.NewRecorder()
-
-	h.Delete(rr, req)
-
-	if rr.Code != http.StatusOK {
-		t.Fatalf("expected 200, got %d", rr.Code)
-	}
-	var resp response.SuccessResponse
-	if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
-		t.Fatalf("decode error: %v", err)
-	}
-	if !resp.Success {
-		t.Fatalf("expected success true")
-	}
 }
 
 func mustSns(uuidStr, name, rawURL, icon string) *domain.Sns {

@@ -8,35 +8,38 @@ import (
 	usecaseTarget "github.com/tokushun109/tku/clean-backend/internal/usecase/target"
 )
 
-func TestParseListTargetQuery_All(t *testing.T) {
-	req := httptest.NewRequest(http.MethodGet, "/api/target?mode=all", nil)
+func TestParseListTargetQuery(t *testing.T) {
+	t.Run("allモードを指定したならallモードを返す", func(t *testing.T) {
 
-	q, err := ParseListTargetQuery(req)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if q.Mode != usecaseTarget.ListModeAll {
-		t.Fatalf("expected %q, got %q", usecaseTarget.ListModeAll, q.Mode)
-	}
-}
+		req := httptest.NewRequest(http.MethodGet, "/api/target?mode=all", nil)
 
-func TestParseListTargetQuery_Used(t *testing.T) {
-	req := httptest.NewRequest(http.MethodGet, "/api/target?mode=used", nil)
+		q, err := ParseListTargetQuery(req)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if q.Mode != usecaseTarget.ListModeAll {
+			t.Fatalf("expected %q, got %q", usecaseTarget.ListModeAll, q.Mode)
+		}
+	})
+	t.Run("usedモードを指定したならusedモードを返す", func(t *testing.T) {
 
-	q, err := ParseListTargetQuery(req)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if q.Mode != usecaseTarget.ListModeUsed {
-		t.Fatalf("expected %q, got %q", usecaseTarget.ListModeUsed, q.Mode)
-	}
-}
+		req := httptest.NewRequest(http.MethodGet, "/api/target?mode=used", nil)
 
-func TestParseListTargetQuery_Invalid(t *testing.T) {
-	req := httptest.NewRequest(http.MethodGet, "/api/target?mode=bad", nil)
+		q, err := ParseListTargetQuery(req)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if q.Mode != usecaseTarget.ListModeUsed {
+			t.Fatalf("expected %q, got %q", usecaseTarget.ListModeUsed, q.Mode)
+		}
+	})
+	t.Run("値が不正なときバリデーションエラーで失敗する", func(t *testing.T) {
 
-	_, err := ParseListTargetQuery(req)
-	if err == nil {
-		t.Fatalf("expected error")
-	}
+		req := httptest.NewRequest(http.MethodGet, "/api/target?mode=bad", nil)
+
+		_, err := ParseListTargetQuery(req)
+		if err == nil {
+			t.Fatalf("expected error")
+		}
+	})
 }

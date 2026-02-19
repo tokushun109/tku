@@ -48,125 +48,139 @@ type skillMarketResp struct {
 	Icon string `json:"icon"`
 }
 
-func TestSkillMarketGet_OK(t *testing.T) {
-	s := mustSkillMarket(skillMarketTestUUID, "minne", "https://minne.com", "icon")
-	skillMarketUC := &stubSkillMarketUC{listRes: []*domain.SkillMarket{s}}
-	h := NewSkillMarketHandler(skillMarketUC)
+func TestSkillMarketGet(t *testing.T) {
+	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
 
-	req := httptest.NewRequest(http.MethodGet, "/api/skill_market", nil)
-	rr := httptest.NewRecorder()
+		s := mustSkillMarket(skillMarketTestUUID, "minne", "https://minne.com", "icon")
+		skillMarketUC := &stubSkillMarketUC{listRes: []*domain.SkillMarket{s}}
+		h := NewSkillMarketHandler(skillMarketUC)
 
-	h.List(rr, req)
+		req := httptest.NewRequest(http.MethodGet, "/api/skill_market", nil)
+		rr := httptest.NewRecorder()
 
-	if rr.Code != http.StatusOK {
-		t.Fatalf("expected 200, got %d", rr.Code)
-	}
+		h.List(rr, req)
 
-	var resp []skillMarketResp
-	if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
-		t.Fatalf("decode error: %v", err)
-	}
-	if len(resp) != 1 || resp[0].Name != "minne" || resp[0].URL != "https://minne.com" {
-		t.Fatalf("unexpected response: %+v", resp)
-	}
+		if rr.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d", rr.Code)
+		}
+
+		var resp []skillMarketResp
+		if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
+			t.Fatalf("decode error: %v", err)
+		}
+		if len(resp) != 1 || resp[0].Name != "minne" || resp[0].URL != "https://minne.com" {
+			t.Fatalf("unexpected response: %+v", resp)
+		}
+	})
+
 }
 
-func TestSkillMarketPost_InvalidJSON(t *testing.T) {
-	skillMarketUC := &stubSkillMarketUC{}
-	h := NewSkillMarketHandler(skillMarketUC)
+func TestSkillMarketPost(t *testing.T) {
+	t.Run("JSONが不正なときバリデーションエラーで失敗する", func(t *testing.T) {
 
-	body := bytes.NewBufferString(`{invalid}`)
-	req := httptest.NewRequest(http.MethodPost, "/api/skill_market", body)
-	rr := httptest.NewRecorder()
+		skillMarketUC := &stubSkillMarketUC{}
+		h := NewSkillMarketHandler(skillMarketUC)
 
-	h.Create(rr, req)
+		body := bytes.NewBufferString(`{invalid}`)
+		req := httptest.NewRequest(http.MethodPost, "/api/skill_market", body)
+		rr := httptest.NewRecorder()
 
-	if rr.Code != http.StatusBadRequest {
-		t.Fatalf("expected 400, got %d", rr.Code)
-	}
+		h.Create(rr, req)
+
+		if rr.Code != http.StatusBadRequest {
+			t.Fatalf("expected 400, got %d", rr.Code)
+		}
+	})
+	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
+
+		skillMarketUC := &stubSkillMarketUC{}
+		h := NewSkillMarketHandler(skillMarketUC)
+
+		body := bytes.NewBufferString(`{"name":"minne","url":"https://minne.com"}`)
+		req := httptest.NewRequest(http.MethodPost, "/api/skill_market", body)
+		rr := httptest.NewRecorder()
+
+		h.Create(rr, req)
+
+		if rr.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d", rr.Code)
+		}
+		var resp response.SuccessResponse
+		if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
+			t.Fatalf("decode error: %v", err)
+		}
+		if !resp.Success {
+			t.Fatalf("expected success true")
+		}
+	})
 }
 
-func TestSkillMarketPost_OK(t *testing.T) {
-	skillMarketUC := &stubSkillMarketUC{}
-	h := NewSkillMarketHandler(skillMarketUC)
+func TestSkillMarketPut(t *testing.T) {
+	t.Run("JSONが不正なときバリデーションエラーで失敗する", func(t *testing.T) {
 
-	body := bytes.NewBufferString(`{"name":"minne","url":"https://minne.com"}`)
-	req := httptest.NewRequest(http.MethodPost, "/api/skill_market", body)
-	rr := httptest.NewRecorder()
+		skillMarketUC := &stubSkillMarketUC{}
+		h := NewSkillMarketHandler(skillMarketUC)
 
-	h.Create(rr, req)
+		body := bytes.NewBufferString(`{invalid}`)
+		req := httptest.NewRequest(http.MethodPut, "/api/skill_market/uuid", body)
+		req = mux.SetURLVars(req, map[string]string{"skill_market_uuid": skillMarketTestUUID})
+		rr := httptest.NewRecorder()
 
-	if rr.Code != http.StatusOK {
-		t.Fatalf("expected 200, got %d", rr.Code)
-	}
-	var resp response.SuccessResponse
-	if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
-		t.Fatalf("decode error: %v", err)
-	}
-	if !resp.Success {
-		t.Fatalf("expected success true")
-	}
+		h.Update(rr, req)
+
+		if rr.Code != http.StatusBadRequest {
+			t.Fatalf("expected 400, got %d", rr.Code)
+		}
+	})
+	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
+
+		skillMarketUC := &stubSkillMarketUC{}
+		h := NewSkillMarketHandler(skillMarketUC)
+
+		body := bytes.NewBufferString(`{"name":"minne","url":"https://minne.com"}`)
+		req := httptest.NewRequest(http.MethodPut, "/api/skill_market/uuid", body)
+		req = mux.SetURLVars(req, map[string]string{"skill_market_uuid": skillMarketTestUUID})
+		rr := httptest.NewRecorder()
+
+		h.Update(rr, req)
+
+		if rr.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d", rr.Code)
+		}
+		var resp response.SuccessResponse
+		if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
+			t.Fatalf("decode error: %v", err)
+		}
+		if !resp.Success {
+			t.Fatalf("expected success true")
+		}
+	})
 }
 
-func TestSkillMarketPut_InvalidJSON(t *testing.T) {
-	skillMarketUC := &stubSkillMarketUC{}
-	h := NewSkillMarketHandler(skillMarketUC)
+func TestSkillMarketDelete(t *testing.T) {
+	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
 
-	body := bytes.NewBufferString(`{invalid}`)
-	req := httptest.NewRequest(http.MethodPut, "/api/skill_market/uuid", body)
-	req = mux.SetURLVars(req, map[string]string{"skill_market_uuid": skillMarketTestUUID})
-	rr := httptest.NewRecorder()
+		skillMarketUC := &stubSkillMarketUC{}
+		h := NewSkillMarketHandler(skillMarketUC)
 
-	h.Update(rr, req)
+		req := httptest.NewRequest(http.MethodDelete, "/api/skill_market/uuid", nil)
+		req = mux.SetURLVars(req, map[string]string{"skill_market_uuid": skillMarketTestUUID})
+		rr := httptest.NewRecorder()
 
-	if rr.Code != http.StatusBadRequest {
-		t.Fatalf("expected 400, got %d", rr.Code)
-	}
-}
+		h.Delete(rr, req)
 
-func TestSkillMarketPut_OK(t *testing.T) {
-	skillMarketUC := &stubSkillMarketUC{}
-	h := NewSkillMarketHandler(skillMarketUC)
+		if rr.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d", rr.Code)
+		}
+		var resp response.SuccessResponse
+		if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
+			t.Fatalf("decode error: %v", err)
+		}
+		if !resp.Success {
+			t.Fatalf("expected success true")
+		}
+	})
 
-	body := bytes.NewBufferString(`{"name":"minne","url":"https://minne.com"}`)
-	req := httptest.NewRequest(http.MethodPut, "/api/skill_market/uuid", body)
-	req = mux.SetURLVars(req, map[string]string{"skill_market_uuid": skillMarketTestUUID})
-	rr := httptest.NewRecorder()
-
-	h.Update(rr, req)
-
-	if rr.Code != http.StatusOK {
-		t.Fatalf("expected 200, got %d", rr.Code)
-	}
-	var resp response.SuccessResponse
-	if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
-		t.Fatalf("decode error: %v", err)
-	}
-	if !resp.Success {
-		t.Fatalf("expected success true")
-	}
-}
-
-func TestSkillMarketDelete_OK(t *testing.T) {
-	skillMarketUC := &stubSkillMarketUC{}
-	h := NewSkillMarketHandler(skillMarketUC)
-
-	req := httptest.NewRequest(http.MethodDelete, "/api/skill_market/uuid", nil)
-	req = mux.SetURLVars(req, map[string]string{"skill_market_uuid": skillMarketTestUUID})
-	rr := httptest.NewRecorder()
-
-	h.Delete(rr, req)
-
-	if rr.Code != http.StatusOK {
-		t.Fatalf("expected 200, got %d", rr.Code)
-	}
-	var resp response.SuccessResponse
-	if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
-		t.Fatalf("decode error: %v", err)
-	}
-	if !resp.Success {
-		t.Fatalf("expected success true")
-	}
 }
 
 func mustSkillMarket(uuidStr, name, rawURL, icon string) *domain.SkillMarket {

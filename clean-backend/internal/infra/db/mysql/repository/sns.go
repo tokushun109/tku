@@ -20,7 +20,7 @@ func NewSnsRepository(db *sqlx.DB) *SnsRepository {
 }
 
 func (r *SnsRepository) Create(ctx context.Context, s *domain.Sns) error {
-	_, err := r.db.ExecContext(
+	_, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`INSERT INTO sns (uuid, name, url, icon, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())`,
 		s.UUID.String(), s.Name.String(), s.URL.String(), s.Icon,
@@ -36,7 +36,7 @@ func (r *SnsRepository) FindAll(ctx context.Context) ([]*domain.Sns, error) {
 		Icon sql.NullString `db:"icon"`
 	}
 	var rows []row
-	if err := r.db.SelectContext(ctx, &rows, `SELECT uuid, name, url, icon FROM sns WHERE deleted_at IS NULL`); err != nil {
+	if err := getExecutor(ctx, r.db).SelectContext(ctx, &rows, `SELECT uuid, name, url, icon FROM sns WHERE deleted_at IS NULL`); err != nil {
 		return nil, err
 	}
 	res := make([]*domain.Sns, 0, len(rows))
@@ -58,7 +58,7 @@ func (r *SnsRepository) FindByUUID(ctx context.Context, uuid primitive.UUID) (*d
 		Icon sql.NullString `db:"icon"`
 	}
 	var rrow row
-	if err := r.db.GetContext(ctx, &rrow, `SELECT uuid, name, url, icon FROM sns WHERE uuid = ? AND deleted_at IS NULL`, uuid.String()); err != nil {
+	if err := getExecutor(ctx, r.db).GetContext(ctx, &rrow, `SELECT uuid, name, url, icon FROM sns WHERE uuid = ? AND deleted_at IS NULL`, uuid.String()); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
@@ -68,7 +68,7 @@ func (r *SnsRepository) FindByUUID(ctx context.Context, uuid primitive.UUID) (*d
 }
 
 func (r *SnsRepository) Update(ctx context.Context, s *domain.Sns) (bool, error) {
-	res, err := r.db.ExecContext(
+	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`UPDATE sns SET name = ?, url = ?, icon = ?, updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`,
 		s.Name.String(),
@@ -87,7 +87,7 @@ func (r *SnsRepository) Update(ctx context.Context, s *domain.Sns) (bool, error)
 }
 
 func (r *SnsRepository) Delete(ctx context.Context, uuid primitive.UUID) (bool, error) {
-	res, err := r.db.ExecContext(
+	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`UPDATE sns SET deleted_at = NOW(), updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`,
 		uuid.String(),

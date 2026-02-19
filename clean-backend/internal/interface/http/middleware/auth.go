@@ -4,15 +4,16 @@ import (
 	"net/http"
 
 	"github.com/tokushun109/tku/clean-backend/internal/interface/http/response"
-	usecaseSession "github.com/tokushun109/tku/clean-backend/internal/usecase/session"
+	"github.com/tokushun109/tku/clean-backend/internal/usecase"
+	usecaseUser "github.com/tokushun109/tku/clean-backend/internal/usecase/user"
 )
 
 type AuthMiddleware struct {
-	sessionUC usecaseSession.Usecase
+	userUC usecaseUser.Usecase
 }
 
-func NewAuthMiddleware(sessionUC usecaseSession.Usecase) *AuthMiddleware {
-	return &AuthMiddleware{sessionUC: sessionUC}
+func NewAuthMiddleware(userUC usecaseUser.Usecase) *AuthMiddleware {
+	return &AuthMiddleware{userUC: userUC}
 }
 
 func (m *AuthMiddleware) RequireSession(next http.Handler) http.Handler {
@@ -21,10 +22,25 @@ func (m *AuthMiddleware) RequireSession(next http.Handler) http.Handler {
 		if cookie, err := r.Cookie("__sess__"); err == nil {
 			token = cookie.Value
 		}
-		if err := m.sessionUC.Validate(r.Context(), token); err != nil {
+
+		user, err := m.userUC.GetBySessionToken(r.Context(), token)
+		if err != nil {
 			response.WriteAppError(w, err)
 			return
 		}
-		next.ServeHTTP(w, r)
+		if user == nil {
+			response.WriteAppError(w, usecase.NewAppError(usecase.ErrUnauthorized))
+			return
+		}
+
+		ctx := ContextWithAuthenticatedUser(r.Context(), AuthenticatedUser{
+			UserID:       user.ID,
+			UUID:         user.UUID.String(),
+			Name:         user.Name,
+			Email:        user.Email,
+			IsAdmin:      user.IsAdmin,
+			SessionToken: token,
+		})
+		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
