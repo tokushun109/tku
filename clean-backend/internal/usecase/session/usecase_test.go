@@ -55,102 +55,113 @@ func (c *stubClock) Now() time.Time {
 	return c.now
 }
 
-func TestValidate_EmptyToken_Unauthorized(t *testing.T) {
-	uc := New(&stubRepo{}, 24*time.Hour, &stubClock{now: time.Now()})
-	if err := uc.Validate(context.Background(), ""); err == nil || !errors.Is(err, usecase.ErrUnauthorized) {
-		t.Fatalf("expected ErrUnauthorized, got %v", err)
-	}
+func TestValidate(t *testing.T) {
+	t.Run("トークンが空なら未認証エラーを返す", func(t *testing.T) {
+
+		uc := New(&stubRepo{}, 24*time.Hour, &stubClock{now: time.Now()})
+		if err := uc.Validate(context.Background(), ""); err == nil || !errors.Is(err, usecase.ErrUnauthorized) {
+			t.Fatalf("expected ErrUnauthorized, got %v", err)
+		}
+	})
+	t.Run("セッションが見つからないなら未認証エラーを返す", func(t *testing.T) {
+
+		uc := New(&stubRepo{sess: nil}, 24*time.Hour, &stubClock{now: time.Now()})
+		if err := uc.Validate(context.Background(), testUUID); err == nil || !errors.Is(err, usecase.ErrUnauthorized) {
+			t.Fatalf("expected ErrUnauthorized, got %v", err)
+		}
+	})
+	t.Run("リポジトリエラーが発生したなら内部エラーを返す", func(t *testing.T) {
+
+		uc := New(&stubRepo{err: errors.New("db error")}, 24*time.Hour, &stubClock{now: time.Now()})
+		if err := uc.Validate(context.Background(), testUUID); err == nil || !errors.Is(err, usecase.ErrInternal) {
+			t.Fatalf("expected ErrInternal, got %v", err)
+		}
+	})
+	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
+
+		u, err := primitive.NewUUID(testUUID)
+		if err != nil {
+			t.Fatalf("unexpected uuid parse error: %v", err)
+		}
+		sess := &domain.Session{UUID: u, UserID: 1, CreatedAt: time.Now()}
+		uc := New(&stubRepo{sess: sess}, 24*time.Hour, &stubClock{now: time.Now()})
+		if err := uc.Validate(context.Background(), testUUID); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+	t.Run("セッションが期限切れなら未認証エラーを返す", func(t *testing.T) {
+
+		u, err := primitive.NewUUID(testUUID)
+		if err != nil {
+			t.Fatalf("unexpected uuid parse error: %v", err)
+		}
+		now := time.Date(2026, 2, 15, 12, 0, 0, 0, time.UTC)
+		sess := &domain.Session{UUID: u, UserID: 1, CreatedAt: now.Add(-25 * time.Hour)}
+		uc := New(&stubRepo{sess: sess}, 24*time.Hour, &stubClock{now: now})
+		if err := uc.Validate(context.Background(), testUUID); err == nil || !errors.Is(err, usecase.ErrUnauthorized) {
+			t.Fatalf("expected ErrUnauthorized, got %v", err)
+		}
+	})
+	t.Run("セッションが期限内なら認証済みユーザーを返す", func(t *testing.T) {
+
+		u, err := primitive.NewUUID(testUUID)
+		if err != nil {
+			t.Fatalf("unexpected uuid parse error: %v", err)
+		}
+		now := time.Date(2026, 2, 15, 12, 0, 0, 0, time.UTC)
+		sess := &domain.Session{UUID: u, UserID: 1, CreatedAt: now.Add(-23 * time.Hour)}
+		uc := New(&stubRepo{sess: sess}, 24*time.Hour, &stubClock{now: now})
+		if err := uc.Validate(context.Background(), testUUID); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+	t.Run("期限切れセッションの削除に失敗したなら内部エラーを返す", func(t *testing.T) {
+
+		u, err := primitive.NewUUID(testUUID)
+		if err != nil {
+			t.Fatalf("unexpected uuid parse error: %v", err)
+		}
+		now := time.Date(2026, 2, 15, 12, 0, 0, 0, time.UTC)
+		sess := &domain.Session{UUID: u, UserID: 1, CreatedAt: now.Add(-25 * time.Hour)}
+		uc := New(&stubRepo{sess: sess, deleteErr: errors.New("delete error")}, 24*time.Hour, &stubClock{now: now})
+		if err := uc.Validate(context.Background(), testUUID); err == nil || !errors.Is(err, usecase.ErrInternal) {
+			t.Fatalf("expected ErrInternal, got %v", err)
+		}
+	})
 }
 
-func TestValidate_NotFound_Unauthorized(t *testing.T) {
-	uc := New(&stubRepo{sess: nil}, 24*time.Hour, &stubClock{now: time.Now()})
-	if err := uc.Validate(context.Background(), testUUID); err == nil || !errors.Is(err, usecase.ErrUnauthorized) {
-		t.Fatalf("expected ErrUnauthorized, got %v", err)
-	}
+func TestResolve(t *testing.T) {
+	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
+
+		u, err := primitive.NewUUID(testUUID)
+		if err != nil {
+			t.Fatalf("unexpected uuid parse error: %v", err)
+		}
+		sess := &domain.Session{UUID: u, UserID: 1, CreatedAt: time.Now()}
+		uc := New(&stubRepo{sess: sess}, 24*time.Hour, &stubClock{now: time.Now()})
+		got, err := uc.Resolve(context.Background(), testUUID)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if got == nil || got.UserID != 1 {
+			t.Fatalf("unexpected session: %+v", got)
+		}
+	})
+
 }
 
-func TestValidate_RepoError_Internal(t *testing.T) {
-	uc := New(&stubRepo{err: errors.New("db error")}, 24*time.Hour, &stubClock{now: time.Now()})
-	if err := uc.Validate(context.Background(), testUUID); err == nil || !errors.Is(err, usecase.ErrInternal) {
-		t.Fatalf("expected ErrInternal, got %v", err)
-	}
-}
+func TestDelete(t *testing.T) {
+	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
 
-func TestValidate_OK(t *testing.T) {
-	u, err := primitive.NewUUID(testUUID)
-	if err != nil {
-		t.Fatalf("unexpected uuid parse error: %v", err)
-	}
-	sess := &domain.Session{UUID: u, UserID: 1, CreatedAt: time.Now()}
-	uc := New(&stubRepo{sess: sess}, 24*time.Hour, &stubClock{now: time.Now()})
-	if err := uc.Validate(context.Background(), testUUID); err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-}
+		u, err := primitive.NewUUID(testUUID)
+		if err != nil {
+			t.Fatalf("unexpected uuid parse error: %v", err)
+		}
+		sess := &domain.Session{UUID: u, UserID: 1, CreatedAt: time.Now()}
+		uc := New(&stubRepo{sess: sess}, 24*time.Hour, &stubClock{now: time.Now()})
+		if err := uc.Delete(context.Background(), testUUID); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
 
-func TestValidate_Expired_Unauthorized(t *testing.T) {
-	u, err := primitive.NewUUID(testUUID)
-	if err != nil {
-		t.Fatalf("unexpected uuid parse error: %v", err)
-	}
-	now := time.Date(2026, 2, 15, 12, 0, 0, 0, time.UTC)
-	sess := &domain.Session{UUID: u, UserID: 1, CreatedAt: now.Add(-25 * time.Hour)}
-	uc := New(&stubRepo{sess: sess}, 24*time.Hour, &stubClock{now: now})
-	if err := uc.Validate(context.Background(), testUUID); err == nil || !errors.Is(err, usecase.ErrUnauthorized) {
-		t.Fatalf("expected ErrUnauthorized, got %v", err)
-	}
-}
-
-func TestValidate_NotExpired_OK(t *testing.T) {
-	u, err := primitive.NewUUID(testUUID)
-	if err != nil {
-		t.Fatalf("unexpected uuid parse error: %v", err)
-	}
-	now := time.Date(2026, 2, 15, 12, 0, 0, 0, time.UTC)
-	sess := &domain.Session{UUID: u, UserID: 1, CreatedAt: now.Add(-23 * time.Hour)}
-	uc := New(&stubRepo{sess: sess}, 24*time.Hour, &stubClock{now: now})
-	if err := uc.Validate(context.Background(), testUUID); err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-}
-
-func TestValidate_Expired_DeleteError_Internal(t *testing.T) {
-	u, err := primitive.NewUUID(testUUID)
-	if err != nil {
-		t.Fatalf("unexpected uuid parse error: %v", err)
-	}
-	now := time.Date(2026, 2, 15, 12, 0, 0, 0, time.UTC)
-	sess := &domain.Session{UUID: u, UserID: 1, CreatedAt: now.Add(-25 * time.Hour)}
-	uc := New(&stubRepo{sess: sess, deleteErr: errors.New("delete error")}, 24*time.Hour, &stubClock{now: now})
-	if err := uc.Validate(context.Background(), testUUID); err == nil || !errors.Is(err, usecase.ErrInternal) {
-		t.Fatalf("expected ErrInternal, got %v", err)
-	}
-}
-
-func TestResolve_OK(t *testing.T) {
-	u, err := primitive.NewUUID(testUUID)
-	if err != nil {
-		t.Fatalf("unexpected uuid parse error: %v", err)
-	}
-	sess := &domain.Session{UUID: u, UserID: 1, CreatedAt: time.Now()}
-	uc := New(&stubRepo{sess: sess}, 24*time.Hour, &stubClock{now: time.Now()})
-	got, err := uc.Resolve(context.Background(), testUUID)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if got == nil || got.UserID != 1 {
-		t.Fatalf("unexpected session: %+v", got)
-	}
-}
-
-func TestDelete_OK(t *testing.T) {
-	u, err := primitive.NewUUID(testUUID)
-	if err != nil {
-		t.Fatalf("unexpected uuid parse error: %v", err)
-	}
-	sess := &domain.Session{UUID: u, UserID: 1, CreatedAt: time.Now()}
-	uc := New(&stubRepo{sess: sess}, 24*time.Hour, &stubClock{now: time.Now()})
-	if err := uc.Delete(context.Background(), testUUID); err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
 }

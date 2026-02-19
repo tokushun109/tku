@@ -46,139 +46,152 @@ type categoryResp struct {
 	Name string `json:"name"`
 }
 
-func TestCategoryGet_OK(t *testing.T) {
-	cat := mustCategory(testUUID, "a")
-	catUC := &stubCategoryUC{listRes: []*domain.Category{cat}}
-	h := NewCategoryHandler(catUC)
+func TestCategoryGet(t *testing.T) {
+	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
 
-	req := httptest.NewRequest(http.MethodGet, "/api/category?mode=all", nil)
-	rr := httptest.NewRecorder()
+		cat := mustCategory(testUUID, "a")
+		catUC := &stubCategoryUC{listRes: []*domain.Category{cat}}
+		h := NewCategoryHandler(catUC)
 
-	h.List(rr, req)
+		req := httptest.NewRequest(http.MethodGet, "/api/category?mode=all", nil)
+		rr := httptest.NewRecorder()
 
-	if rr.Code != http.StatusOK {
-		t.Fatalf("expected 200, got %d", rr.Code)
-	}
+		h.List(rr, req)
 
-	var resp []categoryResp
-	if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
-		t.Fatalf("decode error: %v", err)
-	}
-	if len(resp) != 1 || resp[0].Name != "a" {
-		t.Fatalf("unexpected response: %+v", resp)
-	}
+		if rr.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d", rr.Code)
+		}
+
+		var resp []categoryResp
+		if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
+			t.Fatalf("decode error: %v", err)
+		}
+		if len(resp) != 1 || resp[0].Name != "a" {
+			t.Fatalf("unexpected response: %+v", resp)
+		}
+	})
+	t.Run("モードが不正なときバリデーションエラーで失敗する", func(t *testing.T) {
+
+		catUC := &stubCategoryUC{}
+		h := NewCategoryHandler(catUC)
+
+		req := httptest.NewRequest(http.MethodGet, "/api/category?mode=", nil)
+		rr := httptest.NewRecorder()
+
+		h.List(rr, req)
+
+		if rr.Code != http.StatusBadRequest {
+			t.Fatalf("expected 400, got %d", rr.Code)
+		}
+	})
 }
 
-func TestCategoryGet_InvalidMode(t *testing.T) {
-	catUC := &stubCategoryUC{}
-	h := NewCategoryHandler(catUC)
+func TestCategoryPost(t *testing.T) {
+	t.Run("JSONが不正なときバリデーションエラーで失敗する", func(t *testing.T) {
 
-	req := httptest.NewRequest(http.MethodGet, "/api/category?mode=", nil)
-	rr := httptest.NewRecorder()
+		catUC := &stubCategoryUC{}
+		h := NewCategoryHandler(catUC)
 
-	h.List(rr, req)
+		body := bytes.NewBufferString(`{invalid}`)
+		req := httptest.NewRequest(http.MethodPost, "/api/category", body)
+		rr := httptest.NewRecorder()
 
-	if rr.Code != http.StatusBadRequest {
-		t.Fatalf("expected 400, got %d", rr.Code)
-	}
+		h.Create(rr, req)
+
+		if rr.Code != http.StatusBadRequest {
+			t.Fatalf("expected 400, got %d", rr.Code)
+		}
+	})
+	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
+
+		catUC := &stubCategoryUC{}
+		h := NewCategoryHandler(catUC)
+
+		body := bytes.NewBufferString(`{"name":"a"}`)
+		req := httptest.NewRequest(http.MethodPost, "/api/category", body)
+		rr := httptest.NewRecorder()
+
+		h.Create(rr, req)
+
+		if rr.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d", rr.Code)
+		}
+		var resp response.SuccessResponse
+		if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
+			t.Fatalf("decode error: %v", err)
+		}
+		if !resp.Success {
+			t.Fatalf("expected success true")
+		}
+	})
 }
 
-func TestCategoryPost_InvalidJSON(t *testing.T) {
-	catUC := &stubCategoryUC{}
-	h := NewCategoryHandler(catUC)
+func TestCategoryPut(t *testing.T) {
+	t.Run("JSONが不正なときバリデーションエラーで失敗する", func(t *testing.T) {
 
-	body := bytes.NewBufferString(`{invalid}`)
-	req := httptest.NewRequest(http.MethodPost, "/api/category", body)
-	rr := httptest.NewRecorder()
+		catUC := &stubCategoryUC{}
+		h := NewCategoryHandler(catUC)
 
-	h.Create(rr, req)
+		body := bytes.NewBufferString(`{invalid}`)
+		req := httptest.NewRequest(http.MethodPut, "/api/category/uuid", body)
+		req = mux.SetURLVars(req, map[string]string{"category_uuid": testUUID})
+		rr := httptest.NewRecorder()
 
-	if rr.Code != http.StatusBadRequest {
-		t.Fatalf("expected 400, got %d", rr.Code)
-	}
+		h.Update(rr, req)
+
+		if rr.Code != http.StatusBadRequest {
+			t.Fatalf("expected 400, got %d", rr.Code)
+		}
+	})
+	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
+
+		catUC := &stubCategoryUC{}
+		h := NewCategoryHandler(catUC)
+
+		body := bytes.NewBufferString(`{"name":"a"}`)
+		req := httptest.NewRequest(http.MethodPut, "/api/category/uuid", body)
+		req = mux.SetURLVars(req, map[string]string{"category_uuid": testUUID})
+		rr := httptest.NewRecorder()
+
+		h.Update(rr, req)
+
+		if rr.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d", rr.Code)
+		}
+		var resp response.SuccessResponse
+		if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
+			t.Fatalf("decode error: %v", err)
+		}
+		if !resp.Success {
+			t.Fatalf("expected success true")
+		}
+	})
 }
 
-func TestCategoryPost_OK(t *testing.T) {
-	catUC := &stubCategoryUC{}
-	h := NewCategoryHandler(catUC)
+func TestCategoryDelete(t *testing.T) {
+	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
 
-	body := bytes.NewBufferString(`{"name":"a"}`)
-	req := httptest.NewRequest(http.MethodPost, "/api/category", body)
-	rr := httptest.NewRecorder()
+		catUC := &stubCategoryUC{}
+		h := NewCategoryHandler(catUC)
 
-	h.Create(rr, req)
+		req := httptest.NewRequest(http.MethodDelete, "/api/category/uuid", nil)
+		req = mux.SetURLVars(req, map[string]string{"category_uuid": testUUID})
+		rr := httptest.NewRecorder()
 
-	if rr.Code != http.StatusOK {
-		t.Fatalf("expected 200, got %d", rr.Code)
-	}
-	var resp response.SuccessResponse
-	if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
-		t.Fatalf("decode error: %v", err)
-	}
-	if !resp.Success {
-		t.Fatalf("expected success true")
-	}
-}
+		h.Delete(rr, req)
 
-func TestCategoryPut_InvalidJSON(t *testing.T) {
-	catUC := &stubCategoryUC{}
-	h := NewCategoryHandler(catUC)
+		if rr.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d", rr.Code)
+		}
+		var resp response.SuccessResponse
+		if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
+			t.Fatalf("decode error: %v", err)
+		}
+		if !resp.Success {
+			t.Fatalf("expected success true")
+		}
+	})
 
-	body := bytes.NewBufferString(`{invalid}`)
-	req := httptest.NewRequest(http.MethodPut, "/api/category/uuid", body)
-	req = mux.SetURLVars(req, map[string]string{"category_uuid": testUUID})
-	rr := httptest.NewRecorder()
-
-	h.Update(rr, req)
-
-	if rr.Code != http.StatusBadRequest {
-		t.Fatalf("expected 400, got %d", rr.Code)
-	}
-}
-
-func TestCategoryPut_OK(t *testing.T) {
-	catUC := &stubCategoryUC{}
-	h := NewCategoryHandler(catUC)
-
-	body := bytes.NewBufferString(`{"name":"a"}`)
-	req := httptest.NewRequest(http.MethodPut, "/api/category/uuid", body)
-	req = mux.SetURLVars(req, map[string]string{"category_uuid": testUUID})
-	rr := httptest.NewRecorder()
-
-	h.Update(rr, req)
-
-	if rr.Code != http.StatusOK {
-		t.Fatalf("expected 200, got %d", rr.Code)
-	}
-	var resp response.SuccessResponse
-	if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
-		t.Fatalf("decode error: %v", err)
-	}
-	if !resp.Success {
-		t.Fatalf("expected success true")
-	}
-}
-
-func TestCategoryDelete_OK(t *testing.T) {
-	catUC := &stubCategoryUC{}
-	h := NewCategoryHandler(catUC)
-
-	req := httptest.NewRequest(http.MethodDelete, "/api/category/uuid", nil)
-	req = mux.SetURLVars(req, map[string]string{"category_uuid": testUUID})
-	rr := httptest.NewRecorder()
-
-	h.Delete(rr, req)
-
-	if rr.Code != http.StatusOK {
-		t.Fatalf("expected 200, got %d", rr.Code)
-	}
-	var resp response.SuccessResponse
-	if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
-		t.Fatalf("decode error: %v", err)
-	}
-	if !resp.Success {
-		t.Fatalf("expected success true")
-	}
 }
 
 func mustCategory(uuidStr, name string) *domain.Category {

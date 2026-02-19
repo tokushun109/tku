@@ -9,8 +9,8 @@ import (
 	"testing"
 
 	"github.com/gorilla/mux"
-	domain "github.com/tokushun109/tku/clean-backend/internal/domain/tag"
 	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
+	domain "github.com/tokushun109/tku/clean-backend/internal/domain/tag"
 	"github.com/tokushun109/tku/clean-backend/internal/interface/http/response"
 	"github.com/tokushun109/tku/clean-backend/internal/shared/id"
 )
@@ -46,125 +46,139 @@ type tagResp struct {
 	Name string `json:"name"`
 }
 
-func TestTagGet_OK(t *testing.T) {
-	tg := mustTag(tagTestUUID, "a")
-	tgUC := &stubTagUC{listRes: []*domain.Tag{tg}}
-	h := NewTagHandler(tgUC)
+func TestTagGet(t *testing.T) {
+	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
 
-	req := httptest.NewRequest(http.MethodGet, "/api/tag", nil)
-	rr := httptest.NewRecorder()
+		tg := mustTag(tagTestUUID, "a")
+		tgUC := &stubTagUC{listRes: []*domain.Tag{tg}}
+		h := NewTagHandler(tgUC)
 
-	h.List(rr, req)
+		req := httptest.NewRequest(http.MethodGet, "/api/tag", nil)
+		rr := httptest.NewRecorder()
 
-	if rr.Code != http.StatusOK {
-		t.Fatalf("expected 200, got %d", rr.Code)
-	}
+		h.List(rr, req)
 
-	var resp []tagResp
-	if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
-		t.Fatalf("decode error: %v", err)
-	}
-	if len(resp) != 1 || resp[0].Name != "a" {
-		t.Fatalf("unexpected response: %+v", resp)
-	}
+		if rr.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d", rr.Code)
+		}
+
+		var resp []tagResp
+		if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
+			t.Fatalf("decode error: %v", err)
+		}
+		if len(resp) != 1 || resp[0].Name != "a" {
+			t.Fatalf("unexpected response: %+v", resp)
+		}
+	})
+
 }
 
-func TestTagPost_InvalidJSON(t *testing.T) {
-	tgUC := &stubTagUC{}
-	h := NewTagHandler(tgUC)
+func TestTagPost(t *testing.T) {
+	t.Run("JSONが不正なときバリデーションエラーで失敗する", func(t *testing.T) {
 
-	body := bytes.NewBufferString(`{invalid}`)
-	req := httptest.NewRequest(http.MethodPost, "/api/tag", body)
-	rr := httptest.NewRecorder()
+		tgUC := &stubTagUC{}
+		h := NewTagHandler(tgUC)
 
-	h.Create(rr, req)
+		body := bytes.NewBufferString(`{invalid}`)
+		req := httptest.NewRequest(http.MethodPost, "/api/tag", body)
+		rr := httptest.NewRecorder()
 
-	if rr.Code != http.StatusBadRequest {
-		t.Fatalf("expected 400, got %d", rr.Code)
-	}
+		h.Create(rr, req)
+
+		if rr.Code != http.StatusBadRequest {
+			t.Fatalf("expected 400, got %d", rr.Code)
+		}
+	})
+	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
+
+		tgUC := &stubTagUC{}
+		h := NewTagHandler(tgUC)
+
+		body := bytes.NewBufferString(`{"name":"a"}`)
+		req := httptest.NewRequest(http.MethodPost, "/api/tag", body)
+		rr := httptest.NewRecorder()
+
+		h.Create(rr, req)
+
+		if rr.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d", rr.Code)
+		}
+		var resp response.SuccessResponse
+		if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
+			t.Fatalf("decode error: %v", err)
+		}
+		if !resp.Success {
+			t.Fatalf("expected success true")
+		}
+	})
 }
 
-func TestTagPost_OK(t *testing.T) {
-	tgUC := &stubTagUC{}
-	h := NewTagHandler(tgUC)
+func TestTagPut(t *testing.T) {
+	t.Run("JSONが不正なときバリデーションエラーで失敗する", func(t *testing.T) {
 
-	body := bytes.NewBufferString(`{"name":"a"}`)
-	req := httptest.NewRequest(http.MethodPost, "/api/tag", body)
-	rr := httptest.NewRecorder()
+		tgUC := &stubTagUC{}
+		h := NewTagHandler(tgUC)
 
-	h.Create(rr, req)
+		body := bytes.NewBufferString(`{invalid}`)
+		req := httptest.NewRequest(http.MethodPut, "/api/tag/uuid", body)
+		req = mux.SetURLVars(req, map[string]string{"tag_uuid": tagTestUUID})
+		rr := httptest.NewRecorder()
 
-	if rr.Code != http.StatusOK {
-		t.Fatalf("expected 200, got %d", rr.Code)
-	}
-	var resp response.SuccessResponse
-	if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
-		t.Fatalf("decode error: %v", err)
-	}
-	if !resp.Success {
-		t.Fatalf("expected success true")
-	}
+		h.Update(rr, req)
+
+		if rr.Code != http.StatusBadRequest {
+			t.Fatalf("expected 400, got %d", rr.Code)
+		}
+	})
+	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
+
+		tgUC := &stubTagUC{}
+		h := NewTagHandler(tgUC)
+
+		body := bytes.NewBufferString(`{"name":"a"}`)
+		req := httptest.NewRequest(http.MethodPut, "/api/tag/uuid", body)
+		req = mux.SetURLVars(req, map[string]string{"tag_uuid": tagTestUUID})
+		rr := httptest.NewRecorder()
+
+		h.Update(rr, req)
+
+		if rr.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d", rr.Code)
+		}
+		var resp response.SuccessResponse
+		if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
+			t.Fatalf("decode error: %v", err)
+		}
+		if !resp.Success {
+			t.Fatalf("expected success true")
+		}
+	})
 }
 
-func TestTagPut_InvalidJSON(t *testing.T) {
-	tgUC := &stubTagUC{}
-	h := NewTagHandler(tgUC)
+func TestTagDelete(t *testing.T) {
+	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
 
-	body := bytes.NewBufferString(`{invalid}`)
-	req := httptest.NewRequest(http.MethodPut, "/api/tag/uuid", body)
-	req = mux.SetURLVars(req, map[string]string{"tag_uuid": tagTestUUID})
-	rr := httptest.NewRecorder()
+		tgUC := &stubTagUC{}
+		h := NewTagHandler(tgUC)
 
-	h.Update(rr, req)
+		req := httptest.NewRequest(http.MethodDelete, "/api/tag/uuid", nil)
+		req = mux.SetURLVars(req, map[string]string{"tag_uuid": tagTestUUID})
+		rr := httptest.NewRecorder()
 
-	if rr.Code != http.StatusBadRequest {
-		t.Fatalf("expected 400, got %d", rr.Code)
-	}
-}
+		h.Delete(rr, req)
 
-func TestTagPut_OK(t *testing.T) {
-	tgUC := &stubTagUC{}
-	h := NewTagHandler(tgUC)
+		if rr.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d", rr.Code)
+		}
+		var resp response.SuccessResponse
+		if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
+			t.Fatalf("decode error: %v", err)
+		}
+		if !resp.Success {
+			t.Fatalf("expected success true")
+		}
+	})
 
-	body := bytes.NewBufferString(`{"name":"a"}`)
-	req := httptest.NewRequest(http.MethodPut, "/api/tag/uuid", body)
-	req = mux.SetURLVars(req, map[string]string{"tag_uuid": tagTestUUID})
-	rr := httptest.NewRecorder()
-
-	h.Update(rr, req)
-
-	if rr.Code != http.StatusOK {
-		t.Fatalf("expected 200, got %d", rr.Code)
-	}
-	var resp response.SuccessResponse
-	if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
-		t.Fatalf("decode error: %v", err)
-	}
-	if !resp.Success {
-		t.Fatalf("expected success true")
-	}
-}
-
-func TestTagDelete_OK(t *testing.T) {
-	tgUC := &stubTagUC{}
-	h := NewTagHandler(tgUC)
-
-	req := httptest.NewRequest(http.MethodDelete, "/api/tag/uuid", nil)
-	req = mux.SetURLVars(req, map[string]string{"tag_uuid": tagTestUUID})
-	rr := httptest.NewRecorder()
-
-	h.Delete(rr, req)
-
-	if rr.Code != http.StatusOK {
-		t.Fatalf("expected 200, got %d", rr.Code)
-	}
-	var resp response.SuccessResponse
-	if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
-		t.Fatalf("decode error: %v", err)
-	}
-	if !resp.Success {
-		t.Fatalf("expected success true")
-	}
 }
 
 func mustTag(uuidStr, name string) *domain.Tag {

@@ -11,60 +11,63 @@ type adminErrorResp struct {
 	Message string `json:"message"`
 }
 
-func TestAdminMiddleware_Unauthorized_NoContext(t *testing.T) {
-	admin := NewAdminMiddleware()
-	h := admin.RequireAdmin(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-	}))
+func TestAdminMiddleware(t *testing.T) {
+	t.Run("コンテキストに認証情報がないなら未認証エラーを返す", func(t *testing.T) {
 
-	req := httptest.NewRequest(http.MethodPost, "/api/category", nil)
-	rr := httptest.NewRecorder()
+		admin := NewAdminMiddleware()
+		h := admin.RequireAdmin(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+		}))
 
-	h.ServeHTTP(rr, req)
+		req := httptest.NewRequest(http.MethodPost, "/api/category", nil)
+		rr := httptest.NewRecorder()
 
-	if rr.Code != http.StatusUnauthorized {
-		t.Fatalf("expected 401, got %d", rr.Code)
-	}
+		h.ServeHTTP(rr, req)
 
-	var resp adminErrorResp
-	if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
-		t.Fatalf("decode error: %v", err)
-	}
-	if resp.Message == "" {
-		t.Fatalf("expected error message")
-	}
-}
+		if rr.Code != http.StatusUnauthorized {
+			t.Fatalf("expected 401, got %d", rr.Code)
+		}
 
-func TestAdminMiddleware_Forbidden_NotAdmin(t *testing.T) {
-	admin := NewAdminMiddleware()
-	h := admin.RequireAdmin(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-	}))
+		var resp adminErrorResp
+		if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
+			t.Fatalf("decode error: %v", err)
+		}
+		if resp.Message == "" {
+			t.Fatalf("expected error message")
+		}
+	})
+	t.Run("管理者権限がないなら権限エラーを返す", func(t *testing.T) {
 
-	req := httptest.NewRequest(http.MethodPost, "/api/category", nil)
-	req = req.WithContext(ContextWithAuthenticatedUser(req.Context(), AuthenticatedUser{UserID: 1, IsAdmin: false}))
-	rr := httptest.NewRecorder()
+		admin := NewAdminMiddleware()
+		h := admin.RequireAdmin(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+		}))
 
-	h.ServeHTTP(rr, req)
+		req := httptest.NewRequest(http.MethodPost, "/api/category", nil)
+		req = req.WithContext(ContextWithAuthenticatedUser(req.Context(), AuthenticatedUser{UserID: 1, IsAdmin: false}))
+		rr := httptest.NewRecorder()
 
-	if rr.Code != http.StatusForbidden {
-		t.Fatalf("expected 403, got %d", rr.Code)
-	}
-}
+		h.ServeHTTP(rr, req)
 
-func TestAdminMiddleware_OK(t *testing.T) {
-	admin := NewAdminMiddleware()
-	h := admin.RequireAdmin(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-	}))
+		if rr.Code != http.StatusForbidden {
+			t.Fatalf("expected 403, got %d", rr.Code)
+		}
+	})
+	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
 
-	req := httptest.NewRequest(http.MethodPost, "/api/category", nil)
-	req = req.WithContext(ContextWithAuthenticatedUser(req.Context(), AuthenticatedUser{UserID: 1, IsAdmin: true}))
-	rr := httptest.NewRecorder()
+		admin := NewAdminMiddleware()
+		h := admin.RequireAdmin(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+		}))
 
-	h.ServeHTTP(rr, req)
+		req := httptest.NewRequest(http.MethodPost, "/api/category", nil)
+		req = req.WithContext(ContextWithAuthenticatedUser(req.Context(), AuthenticatedUser{UserID: 1, IsAdmin: true}))
+		rr := httptest.NewRecorder()
 
-	if rr.Code != http.StatusOK {
-		t.Fatalf("expected 200, got %d", rr.Code)
-	}
+		h.ServeHTTP(rr, req)
+
+		if rr.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d", rr.Code)
+		}
+	})
 }

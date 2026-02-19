@@ -48,125 +48,139 @@ type salesSiteResp struct {
 	Icon string `json:"icon"`
 }
 
-func TestSalesSiteGet_OK(t *testing.T) {
-	s := mustSalesSite(salesSiteTestUUID, "Creema", "https://www.creema.jp", "icon")
-	salesSiteUC := &stubSalesSiteUC{listRes: []*domain.SalesSite{s}}
-	h := NewSalesSiteHandler(salesSiteUC)
+func TestSalesSiteGet(t *testing.T) {
+	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
 
-	req := httptest.NewRequest(http.MethodGet, "/api/sales_site", nil)
-	rr := httptest.NewRecorder()
+		s := mustSalesSite(salesSiteTestUUID, "Creema", "https://www.creema.jp", "icon")
+		salesSiteUC := &stubSalesSiteUC{listRes: []*domain.SalesSite{s}}
+		h := NewSalesSiteHandler(salesSiteUC)
 
-	h.List(rr, req)
+		req := httptest.NewRequest(http.MethodGet, "/api/sales_site", nil)
+		rr := httptest.NewRecorder()
 
-	if rr.Code != http.StatusOK {
-		t.Fatalf("expected 200, got %d", rr.Code)
-	}
+		h.List(rr, req)
 
-	var resp []salesSiteResp
-	if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
-		t.Fatalf("decode error: %v", err)
-	}
-	if len(resp) != 1 || resp[0].Name != "Creema" || resp[0].URL != "https://www.creema.jp" {
-		t.Fatalf("unexpected response: %+v", resp)
-	}
+		if rr.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d", rr.Code)
+		}
+
+		var resp []salesSiteResp
+		if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
+			t.Fatalf("decode error: %v", err)
+		}
+		if len(resp) != 1 || resp[0].Name != "Creema" || resp[0].URL != "https://www.creema.jp" {
+			t.Fatalf("unexpected response: %+v", resp)
+		}
+	})
+
 }
 
-func TestSalesSitePost_InvalidJSON(t *testing.T) {
-	salesSiteUC := &stubSalesSiteUC{}
-	h := NewSalesSiteHandler(salesSiteUC)
+func TestSalesSitePost(t *testing.T) {
+	t.Run("JSONが不正なときバリデーションエラーで失敗する", func(t *testing.T) {
 
-	body := bytes.NewBufferString(`{invalid}`)
-	req := httptest.NewRequest(http.MethodPost, "/api/sales_site", body)
-	rr := httptest.NewRecorder()
+		salesSiteUC := &stubSalesSiteUC{}
+		h := NewSalesSiteHandler(salesSiteUC)
 
-	h.Create(rr, req)
+		body := bytes.NewBufferString(`{invalid}`)
+		req := httptest.NewRequest(http.MethodPost, "/api/sales_site", body)
+		rr := httptest.NewRecorder()
 
-	if rr.Code != http.StatusBadRequest {
-		t.Fatalf("expected 400, got %d", rr.Code)
-	}
+		h.Create(rr, req)
+
+		if rr.Code != http.StatusBadRequest {
+			t.Fatalf("expected 400, got %d", rr.Code)
+		}
+	})
+	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
+
+		salesSiteUC := &stubSalesSiteUC{}
+		h := NewSalesSiteHandler(salesSiteUC)
+
+		body := bytes.NewBufferString(`{"name":"Creema","url":"https://www.creema.jp"}`)
+		req := httptest.NewRequest(http.MethodPost, "/api/sales_site", body)
+		rr := httptest.NewRecorder()
+
+		h.Create(rr, req)
+
+		if rr.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d", rr.Code)
+		}
+		var resp response.SuccessResponse
+		if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
+			t.Fatalf("decode error: %v", err)
+		}
+		if !resp.Success {
+			t.Fatalf("expected success true")
+		}
+	})
 }
 
-func TestSalesSitePost_OK(t *testing.T) {
-	salesSiteUC := &stubSalesSiteUC{}
-	h := NewSalesSiteHandler(salesSiteUC)
+func TestSalesSitePut(t *testing.T) {
+	t.Run("JSONが不正なときバリデーションエラーで失敗する", func(t *testing.T) {
 
-	body := bytes.NewBufferString(`{"name":"Creema","url":"https://www.creema.jp"}`)
-	req := httptest.NewRequest(http.MethodPost, "/api/sales_site", body)
-	rr := httptest.NewRecorder()
+		salesSiteUC := &stubSalesSiteUC{}
+		h := NewSalesSiteHandler(salesSiteUC)
 
-	h.Create(rr, req)
+		body := bytes.NewBufferString(`{invalid}`)
+		req := httptest.NewRequest(http.MethodPut, "/api/sales_site/uuid", body)
+		req = mux.SetURLVars(req, map[string]string{"sales_site_uuid": salesSiteTestUUID})
+		rr := httptest.NewRecorder()
 
-	if rr.Code != http.StatusOK {
-		t.Fatalf("expected 200, got %d", rr.Code)
-	}
-	var resp response.SuccessResponse
-	if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
-		t.Fatalf("decode error: %v", err)
-	}
-	if !resp.Success {
-		t.Fatalf("expected success true")
-	}
+		h.Update(rr, req)
+
+		if rr.Code != http.StatusBadRequest {
+			t.Fatalf("expected 400, got %d", rr.Code)
+		}
+	})
+	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
+
+		salesSiteUC := &stubSalesSiteUC{}
+		h := NewSalesSiteHandler(salesSiteUC)
+
+		body := bytes.NewBufferString(`{"name":"Creema","url":"https://www.creema.jp"}`)
+		req := httptest.NewRequest(http.MethodPut, "/api/sales_site/uuid", body)
+		req = mux.SetURLVars(req, map[string]string{"sales_site_uuid": salesSiteTestUUID})
+		rr := httptest.NewRecorder()
+
+		h.Update(rr, req)
+
+		if rr.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d", rr.Code)
+		}
+		var resp response.SuccessResponse
+		if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
+			t.Fatalf("decode error: %v", err)
+		}
+		if !resp.Success {
+			t.Fatalf("expected success true")
+		}
+	})
 }
 
-func TestSalesSitePut_InvalidJSON(t *testing.T) {
-	salesSiteUC := &stubSalesSiteUC{}
-	h := NewSalesSiteHandler(salesSiteUC)
+func TestSalesSiteDelete(t *testing.T) {
+	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
 
-	body := bytes.NewBufferString(`{invalid}`)
-	req := httptest.NewRequest(http.MethodPut, "/api/sales_site/uuid", body)
-	req = mux.SetURLVars(req, map[string]string{"sales_site_uuid": salesSiteTestUUID})
-	rr := httptest.NewRecorder()
+		salesSiteUC := &stubSalesSiteUC{}
+		h := NewSalesSiteHandler(salesSiteUC)
 
-	h.Update(rr, req)
+		req := httptest.NewRequest(http.MethodDelete, "/api/sales_site/uuid", nil)
+		req = mux.SetURLVars(req, map[string]string{"sales_site_uuid": salesSiteTestUUID})
+		rr := httptest.NewRecorder()
 
-	if rr.Code != http.StatusBadRequest {
-		t.Fatalf("expected 400, got %d", rr.Code)
-	}
-}
+		h.Delete(rr, req)
 
-func TestSalesSitePut_OK(t *testing.T) {
-	salesSiteUC := &stubSalesSiteUC{}
-	h := NewSalesSiteHandler(salesSiteUC)
+		if rr.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d", rr.Code)
+		}
+		var resp response.SuccessResponse
+		if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
+			t.Fatalf("decode error: %v", err)
+		}
+		if !resp.Success {
+			t.Fatalf("expected success true")
+		}
+	})
 
-	body := bytes.NewBufferString(`{"name":"Creema","url":"https://www.creema.jp"}`)
-	req := httptest.NewRequest(http.MethodPut, "/api/sales_site/uuid", body)
-	req = mux.SetURLVars(req, map[string]string{"sales_site_uuid": salesSiteTestUUID})
-	rr := httptest.NewRecorder()
-
-	h.Update(rr, req)
-
-	if rr.Code != http.StatusOK {
-		t.Fatalf("expected 200, got %d", rr.Code)
-	}
-	var resp response.SuccessResponse
-	if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
-		t.Fatalf("decode error: %v", err)
-	}
-	if !resp.Success {
-		t.Fatalf("expected success true")
-	}
-}
-
-func TestSalesSiteDelete_OK(t *testing.T) {
-	salesSiteUC := &stubSalesSiteUC{}
-	h := NewSalesSiteHandler(salesSiteUC)
-
-	req := httptest.NewRequest(http.MethodDelete, "/api/sales_site/uuid", nil)
-	req = mux.SetURLVars(req, map[string]string{"sales_site_uuid": salesSiteTestUUID})
-	rr := httptest.NewRecorder()
-
-	h.Delete(rr, req)
-
-	if rr.Code != http.StatusOK {
-		t.Fatalf("expected 200, got %d", rr.Code)
-	}
-	var resp response.SuccessResponse
-	if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
-		t.Fatalf("decode error: %v", err)
-	}
-	if !resp.Success {
-		t.Fatalf("expected success true")
-	}
 }
 
 func mustSalesSite(uuidStr, name, rawURL, icon string) *domain.SalesSite {

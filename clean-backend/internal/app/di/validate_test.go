@@ -16,7 +16,8 @@ type testService struct{}
 func (*testService) Run() {}
 
 func TestRequireNonNil(t *testing.T) {
-	t.Run("nil値を渡した場合はErrNilDependencyを返す", func(t *testing.T) {
+
+	t.Run("nil値を渡したならErrNilDependencyを返す", func(t *testing.T) {
 		if err := requireNonNil("dep", nil); err == nil {
 			t.Fatal("expected error, got nil")
 		} else if !errors.Is(err, ErrNilDependency) {
@@ -24,7 +25,7 @@ func TestRequireNonNil(t *testing.T) {
 		}
 	})
 
-	t.Run("typed nilを渡した場合はErrNilDependencyを返す", func(t *testing.T) {
+	t.Run("typed nilを渡したならErrNilDependencyを返す", func(t *testing.T) {
 		var healthUC usecaseHealth.Usecase = (*usecaseHealth.Service)(nil)
 		if err := requireNonNil("healthUC", healthUC); err == nil {
 			t.Fatal("expected error, got nil")
@@ -33,15 +34,17 @@ func TestRequireNonNil(t *testing.T) {
 		}
 	})
 
-	t.Run("nilではない値を渡した場合はnilを返す", func(t *testing.T) {
+	t.Run("nilでない値を渡したならnilを返す", func(t *testing.T) {
 		if err := requireNonNil("dep", struct{}{}); err != nil {
 			t.Fatalf("expected nil, got %v", err)
 		}
 	})
+
 }
 
 func TestRequireStructFieldsNonNil(t *testing.T) {
-	t.Run("構造体にnilフィールドがある場合はErrNilDependencyを返す", func(t *testing.T) {
+
+	t.Run("構造体にnilフィールドがあるならErrNilDependencyを返す", func(t *testing.T) {
 		deps := struct {
 			A *int
 		}{}
@@ -52,7 +55,7 @@ func TestRequireStructFieldsNonNil(t *testing.T) {
 		}
 	})
 
-	t.Run("interface型フィールドがtyped nilの場合はErrNilDependencyを返す", func(t *testing.T) {
+	t.Run("interface型フィールドがtyped nilならErrNilDependencyを返す", func(t *testing.T) {
 		deps := struct {
 			UC testUsecase
 		}{
@@ -65,7 +68,7 @@ func TestRequireStructFieldsNonNil(t *testing.T) {
 		}
 	})
 
-	t.Run("全フィールドがnilではない場合はnilを返す", func(t *testing.T) {
+	t.Run("全フィールドがnilでないならnilを返す", func(t *testing.T) {
 		value := 1
 		deps := struct {
 			A *int
@@ -76,4 +79,5 @@ func TestRequireStructFieldsNonNil(t *testing.T) {
 			t.Fatalf("expected nil, got %v", err)
 		}
 	})
+
 }
