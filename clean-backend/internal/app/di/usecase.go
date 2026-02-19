@@ -3,6 +3,7 @@ package di
 import (
 	clockInfra "github.com/tokushun109/tku/clean-backend/internal/infra/clock"
 	"github.com/tokushun109/tku/clean-backend/internal/infra/config"
+	cryptoInfra "github.com/tokushun109/tku/clean-backend/internal/infra/crypto"
 	uuidInfra "github.com/tokushun109/tku/clean-backend/internal/infra/uuid"
 	usecaseCategory "github.com/tokushun109/tku/clean-backend/internal/usecase/category"
 	usecaseHealth "github.com/tokushun109/tku/clean-backend/internal/usecase/health"
@@ -12,6 +13,7 @@ import (
 	usecaseSns "github.com/tokushun109/tku/clean-backend/internal/usecase/sns"
 	usecaseTag "github.com/tokushun109/tku/clean-backend/internal/usecase/tag"
 	usecaseTarget "github.com/tokushun109/tku/clean-backend/internal/usecase/target"
+	usecaseUser "github.com/tokushun109/tku/clean-backend/internal/usecase/user"
 )
 
 type usecases struct {
@@ -23,12 +25,36 @@ type usecases struct {
 	salesSite   usecaseSalesSite.Usecase
 	skillMarket usecaseSkillMarket.Usecase
 	session     usecaseSession.Usecase
+	user        usecaseUser.Usecase
 }
 
-func newUsecases(repos *repositories, cfg *config.Config) *usecases {
+func newUsecases(repos *repositories, cfg *config.Config) (*usecases, error) {
+	// 入力側の依存関係のチェック
+	if err := requireStructFieldsNonNil("repositories", repos); err != nil {
+		return nil, err
+	}
+	if err := requireNonNil("config", cfg); err != nil {
+		return nil, err
+	}
+
 	uuidGen := uuidInfra.NewGenerator()
+	if err := requireNonNil("uuidGenerator", uuidGen); err != nil {
+		return nil, err
+	}
 	clock := clockInfra.NewClock()
-	return &usecases{
+	if err := requireNonNil("clock", clock); err != nil {
+		return nil, err
+	}
+	passwordHasher := cryptoInfra.NewPasswordHasherSHA1()
+	if err := requireNonNil("passwordHasher", passwordHasher); err != nil {
+		return nil, err
+	}
+	sessionUC := usecaseSession.New(repos.session, cfg.SessionTTL, clock)
+	if err := requireNonNil("sessionUsecase", sessionUC); err != nil {
+		return nil, err
+	}
+
+	ucs := &usecases{
 		health:      usecaseHealth.New(repos.health),
 		category:    usecaseCategory.New(repos.category, uuidGen),
 		target:      usecaseTarget.New(repos.target, uuidGen),
@@ -36,6 +62,14 @@ func newUsecases(repos *repositories, cfg *config.Config) *usecases {
 		sns:         usecaseSns.New(repos.sns, uuidGen),
 		salesSite:   usecaseSalesSite.New(repos.salesSite, uuidGen),
 		skillMarket: usecaseSkillMarket.New(repos.skillMarket, uuidGen),
-		session:     usecaseSession.New(repos.session, cfg.SessionTTL, clock),
+		session:     sessionUC,
+		user:        usecaseUser.New(repos.user, repos.session, sessionUC, passwordHasher, uuidGen, clock),
 	}
+
+	// 出力側の依存関係のチェック
+	if err := requireStructFieldsNonNil("usecases", ucs); err != nil {
+		return nil, err
+	}
+
+	return ucs, nil
 }

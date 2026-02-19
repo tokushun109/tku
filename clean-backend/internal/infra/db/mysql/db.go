@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -10,7 +11,13 @@ import (
 	"github.com/tokushun109/tku/clean-backend/internal/infra/config"
 )
 
+var ErrNilConfig = errors.New("nil config")
+
 func NewDB(cfg *config.Config) (*sqlx.DB, error) {
+	if cfg == nil {
+		return nil, ErrNilConfig
+	}
+
 	dsn := fmt.Sprintf(
 		"%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Asia%%2FTokyo&time_zone='Asia%%2FTokyo'",
 		cfg.DBUser,

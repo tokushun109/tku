@@ -15,9 +15,20 @@ import (
 var testUUID = id.GenerateUUID()
 
 type stubRepo struct {
-	sess *domain.Session
-	err  error
+	sess      *domain.Session
+	err       error
+	createErr error
 	deleteErr error
+	userID    uint
+	created   *domain.Session
+}
+
+func (s *stubRepo) Create(ctx context.Context, sess *domain.Session) error {
+	if s.createErr != nil {
+		return s.createErr
+	}
+	s.created = sess
+	return nil
 }
 
 func (s *stubRepo) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domain.Session, error) {
@@ -28,6 +39,11 @@ func (s *stubRepo) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domain
 }
 
 func (s *stubRepo) DeleteByUUID(ctx context.Context, uuid primitive.UUID) error {
+	return s.deleteErr
+}
+
+func (s *stubRepo) DeleteByUserID(ctx context.Context, userID uint) error {
+	s.userID = userID
 	return s.deleteErr
 }
 
@@ -108,5 +124,33 @@ func TestValidate_Expired_DeleteError_Internal(t *testing.T) {
 	uc := New(&stubRepo{sess: sess, deleteErr: errors.New("delete error")}, 24*time.Hour, &stubClock{now: now})
 	if err := uc.Validate(context.Background(), testUUID); err == nil || !errors.Is(err, usecase.ErrInternal) {
 		t.Fatalf("expected ErrInternal, got %v", err)
+	}
+}
+
+func TestResolve_OK(t *testing.T) {
+	u, err := primitive.NewUUID(testUUID)
+	if err != nil {
+		t.Fatalf("unexpected uuid parse error: %v", err)
+	}
+	sess := &domain.Session{UUID: u, UserID: 1, CreatedAt: time.Now()}
+	uc := New(&stubRepo{sess: sess}, 24*time.Hour, &stubClock{now: time.Now()})
+	got, err := uc.Resolve(context.Background(), testUUID)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got == nil || got.UserID != 1 {
+		t.Fatalf("unexpected session: %+v", got)
+	}
+}
+
+func TestDelete_OK(t *testing.T) {
+	u, err := primitive.NewUUID(testUUID)
+	if err != nil {
+		t.Fatalf("unexpected uuid parse error: %v", err)
+	}
+	sess := &domain.Session{UUID: u, UserID: 1, CreatedAt: time.Now()}
+	uc := New(&stubRepo{sess: sess}, 24*time.Hour, &stubClock{now: time.Now()})
+	if err := uc.Delete(context.Background(), testUUID); err != nil {
+		t.Fatalf("unexpected error: %v", err)
 	}
 }

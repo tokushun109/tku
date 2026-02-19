@@ -1,6 +1,7 @@
 package di
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/tokushun109/tku/clean-backend/internal/infra/config"
@@ -11,18 +12,33 @@ import (
 func BuildServer() (*config.Config, http.Handler, error) {
 	cfg, err := config.Load()
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("load config: %w", err)
 	}
 
 	db, err := mysql.NewDB(cfg)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("build db: %w", err)
 	}
 
-	repos := newRepositories(db)
-	ucs := newUsecases(repos, cfg)
-	handlers := newHandlers(ucs)
-	middlewares := newMiddlewares(cfg, ucs)
+	repos, err := newRepositories(db)
+	if err != nil {
+		return nil, nil, fmt.Errorf("build repositories: %w", err)
+	}
+
+	ucs, err := newUsecases(repos, cfg)
+	if err != nil {
+		return nil, nil, fmt.Errorf("build usecases: %w", err)
+	}
+
+	handlers, err := newHandlers(ucs)
+	if err != nil {
+		return nil, nil, fmt.Errorf("build handlers: %w", err)
+	}
+
+	middlewares, err := newMiddlewares(cfg, ucs)
+	if err != nil {
+		return nil, nil, fmt.Errorf("build middlewares: %w", err)
+	}
 
 	r := router.NewRouter(
 		handlers.health,
@@ -32,7 +48,9 @@ func BuildServer() (*config.Config, http.Handler, error) {
 		handlers.sns,
 		handlers.salesSite,
 		handlers.skillMarket,
+		handlers.user,
 		middlewares.auth,
+		middlewares.admin,
 		middlewares.logging,
 		middlewares.cors,
 	)

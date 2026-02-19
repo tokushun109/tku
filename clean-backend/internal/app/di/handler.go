@@ -12,10 +12,16 @@ type handlers struct {
 	sns         *handler.SnsHandler
 	salesSite   *handler.SalesSiteHandler
 	skillMarket *handler.SkillMarketHandler
+	user        *handler.UserHandler
 }
 
-func newHandlers(ucs *usecases) *handlers {
-	return &handlers{
+func newHandlers(ucs *usecases) (*handlers, error) {
+	// 入力側の依存関係のチェック
+	if err := requireStructFieldsNonNil("usecases", ucs); err != nil {
+		return nil, err
+	}
+
+	hs := &handlers{
 		health:      handler.NewHealthHandler(ucs.health),
 		category:    handler.NewCategoryHandler(ucs.category),
 		target:      handler.NewTargetHandler(ucs.target),
@@ -23,5 +29,13 @@ func newHandlers(ucs *usecases) *handlers {
 		sns:         handler.NewSnsHandler(ucs.sns),
 		salesSite:   handler.NewSalesSiteHandler(ucs.salesSite),
 		skillMarket: handler.NewSkillMarketHandler(ucs.skillMarket),
+		user:        handler.NewUserHandler(ucs.user),
 	}
+
+	// 出力側の依存関係のチェック
+	if err := requireStructFieldsNonNil("handlers", hs); err != nil {
+		return nil, err
+	}
+
+	return hs, nil
 }

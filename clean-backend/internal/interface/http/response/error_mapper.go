@@ -17,6 +17,8 @@ func MapError(err error) (status int, msg string) {
 		return http.StatusConflict, err.Error()
 	case errors.Is(err, usecase.ErrUnauthorized):
 		return http.StatusUnauthorized, err.Error()
+	case errors.Is(err, usecase.ErrForbidden):
+		return http.StatusForbidden, err.Error()
 	default:
 		return http.StatusInternalServerError, usecase.ErrInternal.Error()
 	}
