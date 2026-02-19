@@ -24,7 +24,7 @@ func (r *SessionRepository) Create(ctx context.Context, s *domain.Session) error
 	if createdAt.IsZero() {
 		createdAt = time.Now()
 	}
-	_, err := r.db.ExecContext(
+	_, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`INSERT INTO session (uuid, user_id, created_at) VALUES (?, ?, ?)`,
 		s.UUID.String(),
@@ -41,7 +41,7 @@ func (r *SessionRepository) FindByUUID(ctx context.Context, uuid primitive.UUID)
 		CreatedAt time.Time `db:"created_at"`
 	}
 	var rrow row
-	err := r.db.GetContext(ctx, &rrow, `SELECT uuid, user_id, created_at FROM session WHERE uuid = ?`, uuid.String())
+	err := getExecutor(ctx, r.db).GetContext(ctx, &rrow, `SELECT uuid, user_id, created_at FROM session WHERE uuid = ?`, uuid.String())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
@@ -56,11 +56,11 @@ func (r *SessionRepository) FindByUUID(ctx context.Context, uuid primitive.UUID)
 }
 
 func (r *SessionRepository) DeleteByUUID(ctx context.Context, uuid primitive.UUID) error {
-	_, err := r.db.ExecContext(ctx, `DELETE FROM session WHERE uuid = ?`, uuid.String())
+	_, err := getExecutor(ctx, r.db).ExecContext(ctx, `DELETE FROM session WHERE uuid = ?`, uuid.String())
 	return err
 }
 
 func (r *SessionRepository) DeleteByUserID(ctx context.Context, userID uint) error {
-	_, err := r.db.ExecContext(ctx, `DELETE FROM session WHERE user_id = ?`, userID)
+	_, err := getExecutor(ctx, r.db).ExecContext(ctx, `DELETE FROM session WHERE user_id = ?`, userID)
 	return err
 }

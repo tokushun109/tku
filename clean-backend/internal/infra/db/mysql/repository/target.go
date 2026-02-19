@@ -7,8 +7,8 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	domain "github.com/tokushun109/tku/clean-backend/internal/domain/target"
 	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
+	domain "github.com/tokushun109/tku/clean-backend/internal/domain/target"
 )
 
 type TargetRepository struct {
@@ -20,7 +20,7 @@ func NewTargetRepository(db *sqlx.DB) *TargetRepository {
 }
 
 func (r *TargetRepository) Create(ctx context.Context, t *domain.Target) error {
-	_, err := r.db.ExecContext(
+	_, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`INSERT INTO target (uuid, name, created_at, updated_at) VALUES (?, ?, NOW(), NOW())`,
 		t.UUID.String(), t.Name.String(),
@@ -34,7 +34,7 @@ func (r *TargetRepository) FindAll(ctx context.Context) ([]*domain.Target, error
 		Name string `db:"name"`
 	}
 	var rows []row
-	if err := r.db.SelectContext(ctx, &rows, `SELECT uuid, name FROM target WHERE deleted_at IS NULL`); err != nil {
+	if err := getExecutor(ctx, r.db).SelectContext(ctx, &rows, `SELECT uuid, name FROM target WHERE deleted_at IS NULL`); err != nil {
 		return nil, err
 	}
 	res := make([]*domain.Target, 0, len(rows))
@@ -60,7 +60,7 @@ func (r *TargetRepository) FindUsed(ctx context.Context) ([]*domain.Target, erro
 		INNER JOIN product p ON p.target_id = t.id
 		WHERE t.deleted_at IS NULL AND p.deleted_at IS NULL
 	`
-	if err := r.db.SelectContext(ctx, &rows, query); err != nil {
+	if err := getExecutor(ctx, r.db).SelectContext(ctx, &rows, query); err != nil {
 		return nil, err
 	}
 	res := make([]*domain.Target, 0, len(rows))
@@ -80,7 +80,7 @@ func (r *TargetRepository) FindByUUID(ctx context.Context, uuid primitive.UUID) 
 		Name string `db:"name"`
 	}
 	var rrow row
-	if err := r.db.GetContext(ctx, &rrow, `SELECT uuid, name FROM target WHERE uuid = ? AND deleted_at IS NULL`, uuid.String()); err != nil {
+	if err := getExecutor(ctx, r.db).GetContext(ctx, &rrow, `SELECT uuid, name FROM target WHERE uuid = ? AND deleted_at IS NULL`, uuid.String()); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
@@ -91,14 +91,14 @@ func (r *TargetRepository) FindByUUID(ctx context.Context, uuid primitive.UUID) 
 
 func (r *TargetRepository) ExistsByName(ctx context.Context, name domain.TargetName) (bool, error) {
 	var count int64
-	if err := r.db.GetContext(ctx, &count, `SELECT COUNT(1) FROM target WHERE name = ? AND deleted_at IS NULL`, name.String()); err != nil {
+	if err := getExecutor(ctx, r.db).GetContext(ctx, &count, `SELECT COUNT(1) FROM target WHERE name = ? AND deleted_at IS NULL`, name.String()); err != nil {
 		return false, err
 	}
 	return count > 0, nil
 }
 
 func (r *TargetRepository) Update(ctx context.Context, t *domain.Target) (bool, error) {
-	res, err := r.db.ExecContext(
+	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`UPDATE target SET name = ?, updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`,
 		t.Name.String(),

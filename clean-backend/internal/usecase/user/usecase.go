@@ -23,6 +23,7 @@ type Service struct {
 	passwordHasher PasswordHasher
 	uuidGen        usecase.UUIDGenerator
 	clock          usecase.Clock
+	txManager      usecase.TxManager
 }
 
 func New(
@@ -32,6 +33,7 @@ func New(
 	passwordHasher PasswordHasher,
 	uuidGen usecase.UUIDGenerator,
 	clock usecase.Clock,
+	txManager usecase.TxManager,
 ) *Service {
 	return &Service{
 		userRepo:       userRepo,
@@ -40,6 +42,7 @@ func New(
 		passwordHasher: passwordHasher,
 		uuidGen:        uuidGen,
 		clock:          clock,
+		txManager:      txManager,
 	}
 }
 
@@ -65,10 +68,6 @@ func (s *Service) Login(ctx context.Context, email string, password string) (*do
 		return nil, usecase.NewAppError(usecase.ErrUnauthorized)
 	}
 
-	if err := s.sessionRepo.DeleteByUserID(ctx, u.ID); err != nil {
-		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
-	}
-
 	sessionUUID, err := s.uuidGen.New()
 	if err != nil {
 		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
@@ -79,7 +78,15 @@ func (s *Service) Login(ctx context.Context, email string, password string) (*do
 		UserID:    u.ID,
 		CreatedAt: s.clock.Now(),
 	}
-	if err := s.sessionRepo.Create(ctx, sess); err != nil {
+	if err := s.txManager.WithinTransaction(ctx, func(txCtx context.Context) error {
+		if err := s.sessionRepo.DeleteByUserID(txCtx, u.ID); err != nil {
+			return err
+		}
+		if err := s.sessionRepo.Create(txCtx, sess); err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
 		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 

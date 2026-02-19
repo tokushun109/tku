@@ -5,6 +5,7 @@ import (
 	"github.com/tokushun109/tku/clean-backend/internal/infra/config"
 	cryptoInfra "github.com/tokushun109/tku/clean-backend/internal/infra/crypto"
 	uuidInfra "github.com/tokushun109/tku/clean-backend/internal/infra/uuid"
+	usecase "github.com/tokushun109/tku/clean-backend/internal/usecase"
 	usecaseCategory "github.com/tokushun109/tku/clean-backend/internal/usecase/category"
 	usecaseHealth "github.com/tokushun109/tku/clean-backend/internal/usecase/health"
 	usecaseSalesSite "github.com/tokushun109/tku/clean-backend/internal/usecase/sales_site"
@@ -28,12 +29,15 @@ type usecases struct {
 	user        usecaseUser.Usecase
 }
 
-func newUsecases(repos *repositories, cfg *config.Config) (*usecases, error) {
+func newUsecases(repos *repositories, cfg *config.Config, txManager usecase.TxManager) (*usecases, error) {
 	// 入力側の依存関係のチェック
 	if err := requireStructFieldsNonNil("repositories", repos); err != nil {
 		return nil, err
 	}
 	if err := requireNonNil("config", cfg); err != nil {
+		return nil, err
+	}
+	if err := requireNonNil("txManager", txManager); err != nil {
 		return nil, err
 	}
 
@@ -63,7 +67,7 @@ func newUsecases(repos *repositories, cfg *config.Config) (*usecases, error) {
 		salesSite:   usecaseSalesSite.New(repos.salesSite, uuidGen),
 		skillMarket: usecaseSkillMarket.New(repos.skillMarket, uuidGen),
 		session:     sessionUC,
-		user:        usecaseUser.New(repos.user, repos.session, sessionUC, passwordHasher, uuidGen, clock),
+		user:        usecaseUser.New(repos.user, repos.session, sessionUC, passwordHasher, uuidGen, clock, txManager),
 	}
 
 	// 出力側の依存関係のチェック

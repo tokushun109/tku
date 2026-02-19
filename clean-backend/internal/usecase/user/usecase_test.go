@@ -128,6 +128,21 @@ func (c *stubClock) Now() time.Time {
 	return c.now
 }
 
+type stubTxManager struct {
+	err       error
+	called    int
+	calledCtx context.Context
+}
+
+func (s *stubTxManager) WithinTransaction(ctx context.Context, fn func(ctx context.Context) error) error {
+	s.called++
+	s.calledCtx = ctx
+	if s.err != nil {
+		return s.err
+	}
+	return fn(ctx)
+}
+
 func TestLogin_OK(t *testing.T) {
 	hash, err := domainUser.NewUserPasswordHash("hash")
 	if err != nil {
@@ -138,8 +153,9 @@ func TestLogin_OK(t *testing.T) {
 	sessionUC := &stubSessionUC{}
 	hasher := &stubPasswordHasher{verifyOK: true}
 	clock := &stubClock{now: time.Date(2026, 2, 17, 10, 0, 0, 0, time.UTC)}
+	txManager := &stubTxManager{}
 
-	uc := New(userRepo, sessionRepo, sessionUC, hasher, &stubUUIDGen{uuid: testUUIDVO}, clock)
+	uc := New(userRepo, sessionRepo, sessionUC, hasher, &stubUUIDGen{uuid: testUUIDVO}, clock, txManager)
 
 	sess, err := uc.Login(context.Background(), "mail@example.com", "password")
 	if err != nil {
@@ -154,11 +170,14 @@ func TestLogin_OK(t *testing.T) {
 	if sessionRepo.created == nil {
 		t.Fatalf("expected session create called")
 	}
+	if txManager.called != 1 {
+		t.Fatalf("expected tx manager called once, got %d", txManager.called)
+	}
 }
 
 func TestLogin_UserNotFound_Unauthorized(t *testing.T) {
 	userRepo := &stubUserRepo{userByEmail: nil}
-	uc := New(userRepo, &stubSessionRepo{}, &stubSessionUC{}, &stubPasswordHasher{verifyOK: true}, &stubUUIDGen{uuid: testUUIDVO}, &stubClock{now: time.Now()})
+	uc := New(userRepo, &stubSessionRepo{}, &stubSessionUC{}, &stubPasswordHasher{verifyOK: true}, &stubUUIDGen{uuid: testUUIDVO}, &stubClock{now: time.Now()}, &stubTxManager{})
 
 	_, err := uc.Login(context.Background(), "mail@example.com", "password")
 	if err == nil || !errors.Is(err, usecase.ErrUnauthorized) {
@@ -172,7 +191,7 @@ func TestLogin_WrongPassword_Unauthorized(t *testing.T) {
 		t.Fatalf("unexpected hash error: %v", err)
 	}
 	userRepo := &stubUserRepo{userByEmail: mustUser(1, testUUID, "name", "mail@example.com", hash, true)}
-	uc := New(userRepo, &stubSessionRepo{}, &stubSessionUC{}, &stubPasswordHasher{verifyOK: false}, &stubUUIDGen{uuid: testUUIDVO}, &stubClock{now: time.Now()})
+	uc := New(userRepo, &stubSessionRepo{}, &stubSessionUC{}, &stubPasswordHasher{verifyOK: false}, &stubUUIDGen{uuid: testUUIDVO}, &stubClock{now: time.Now()}, &stubTxManager{})
 
 	_, err = uc.Login(context.Background(), "mail@example.com", "bad")
 	if err == nil || !errors.Is(err, usecase.ErrUnauthorized) {
@@ -187,7 +206,7 @@ func TestGetBySessionToken_OK(t *testing.T) {
 	}
 	userRepo := &stubUserRepo{userByID: mustUser(1, testUUID, "name", "mail@example.com", hash, true)}
 	sessionUC := &stubSessionUC{resolveRes: &domainSession.Session{UserID: 1}}
-	uc := New(userRepo, &stubSessionRepo{}, sessionUC, &stubPasswordHasher{verifyOK: true}, &stubUUIDGen{uuid: testUUIDVO}, &stubClock{now: time.Now()})
+	uc := New(userRepo, &stubSessionRepo{}, sessionUC, &stubPasswordHasher{verifyOK: true}, &stubUUIDGen{uuid: testUUIDVO}, &stubClock{now: time.Now()}, &stubTxManager{})
 
 	u, err := uc.GetBySessionToken(context.Background(), testUUID)
 	if err != nil {
@@ -200,7 +219,7 @@ func TestGetBySessionToken_OK(t *testing.T) {
 
 func TestGetBySessionToken_Unauthorized(t *testing.T) {
 	sessionUC := &stubSessionUC{resolveErr: usecase.NewAppError(usecase.ErrUnauthorized)}
-	uc := New(&stubUserRepo{}, &stubSessionRepo{}, sessionUC, &stubPasswordHasher{verifyOK: true}, &stubUUIDGen{uuid: testUUIDVO}, &stubClock{now: time.Now()})
+	uc := New(&stubUserRepo{}, &stubSessionRepo{}, sessionUC, &stubPasswordHasher{verifyOK: true}, &stubUUIDGen{uuid: testUUIDVO}, &stubClock{now: time.Now()}, &stubTxManager{})
 
 	_, err := uc.GetBySessionToken(context.Background(), "bad")
 	if err == nil || !errors.Is(err, usecase.ErrUnauthorized) {
@@ -210,10 +229,32 @@ func TestGetBySessionToken_Unauthorized(t *testing.T) {
 
 func TestLogout_OK(t *testing.T) {
 	sessionUC := &stubSessionUC{}
-	uc := New(&stubUserRepo{}, &stubSessionRepo{}, sessionUC, &stubPasswordHasher{verifyOK: true}, &stubUUIDGen{uuid: testUUIDVO}, &stubClock{now: time.Now()})
+	uc := New(&stubUserRepo{}, &stubSessionRepo{}, sessionUC, &stubPasswordHasher{verifyOK: true}, &stubUUIDGen{uuid: testUUIDVO}, &stubClock{now: time.Now()}, &stubTxManager{})
 
 	if err := uc.Logout(context.Background(), testUUID); err != nil {
 		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestLogin_TxManagerError_Internal(t *testing.T) {
+	hash, err := domainUser.NewUserPasswordHash("hash")
+	if err != nil {
+		t.Fatalf("unexpected hash error: %v", err)
+	}
+	userRepo := &stubUserRepo{userByEmail: mustUser(1, testUUID, "name", "mail@example.com", hash, true)}
+	uc := New(
+		userRepo,
+		&stubSessionRepo{},
+		&stubSessionUC{},
+		&stubPasswordHasher{verifyOK: true},
+		&stubUUIDGen{uuid: testUUIDVO},
+		&stubClock{now: time.Now()},
+		&stubTxManager{err: errors.New("tx failed")},
+	)
+
+	_, err = uc.Login(context.Background(), "mail@example.com", "password")
+	if err == nil || !errors.Is(err, usecase.ErrInternal) {
+		t.Fatalf("expected ErrInternal, got %v", err)
 	}
 }
 

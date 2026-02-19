@@ -30,7 +30,7 @@ func NewUserRepository(db *sqlx.DB) *UserRepository {
 
 func (r *UserRepository) FindByEmail(ctx context.Context, email string) (*domain.User, error) {
 	var rrow userRow
-	err := r.db.GetContext(
+	err := getExecutor(ctx, r.db).GetContext(
 		ctx,
 		&rrow,
 		`SELECT id, uuid, name, email, password, is_admin FROM user WHERE email = ? AND deleted_at IS NULL LIMIT 1`,
@@ -48,7 +48,7 @@ func (r *UserRepository) FindByEmail(ctx context.Context, email string) (*domain
 
 func (r *UserRepository) FindByID(ctx context.Context, id uint) (*domain.User, error) {
 	var rrow userRow
-	err := r.db.GetContext(
+	err := getExecutor(ctx, r.db).GetContext(
 		ctx,
 		&rrow,
 		`SELECT id, uuid, name, email, password, is_admin FROM user WHERE id = ? AND deleted_at IS NULL LIMIT 1`,

@@ -19,13 +19,17 @@ func BuildServer() (*config.Config, http.Handler, error) {
 	if err != nil {
 		return nil, nil, fmt.Errorf("build db: %w", err)
 	}
+	txManager, err := mysql.NewTxManager(db)
+	if err != nil {
+		return nil, nil, fmt.Errorf("build tx manager: %w", err)
+	}
 
 	repos, err := newRepositories(db)
 	if err != nil {
 		return nil, nil, fmt.Errorf("build repositories: %w", err)
 	}
 
-	ucs, err := newUsecases(repos, cfg)
+	ucs, err := newUsecases(repos, cfg, txManager)
 	if err != nil {
 		return nil, nil, fmt.Errorf("build usecases: %w", err)
 	}
