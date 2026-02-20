@@ -21,8 +21,9 @@ import (
 const (
 	sendGridEndpoint = "https://api.sendgrid.com/v3/mail/send"
 
-	defaultFromName  = "とこりり"
-	defaultFromEmail = "no-reply@tocoriri.com"
+	defaultFromName     = "とこりり"
+	defaultFromEmail    = "no-reply@tocoriri.com"
+	defaultSupportEmail = "no-reply@tocoriri.com"
 
 	autoReplySubject = "【とこりり】お問い合わせを受け付けました"
 	adminMailSubject = "【とこりり】お問い合わせが届きました"
@@ -39,19 +40,21 @@ var (
 )
 
 type ContactNotifier struct {
-	enabled  bool
-	apiKey   string
-	userRepo domainUser.Repository
-	client   *http.Client
+	enabled      bool
+	apiKey       string
+	supportEmail string
+	userRepo     domainUser.Repository
+	client       *http.Client
 }
 
 type mailTemplateData struct {
-	Title       string
-	Name        string
-	Company     string
-	PhoneNumber string
-	Email       string
-	Content     string
+	Title        string
+	Name         string
+	Company      string
+	PhoneNumber  string
+	Email        string
+	Content      string
+	SupportEmail string
 }
 
 type emailAddress struct {
@@ -75,18 +78,23 @@ type sendGridContent struct {
 	Value string `json:"value"`
 }
 
-func NewContactNotifier(env, apiKey string, userRepo domainUser.Repository) *ContactNotifier {
+func NewContactNotifier(env, apiKey, supportEmail string, userRepo domainUser.Repository) *ContactNotifier {
 	normalizedEnv := strings.ToLower(strings.TrimSpace(env))
 	trimmedAPIKey := strings.TrimSpace(apiKey)
+	trimmedSupportEmail := strings.TrimSpace(supportEmail)
+	if trimmedSupportEmail == "" {
+		trimmedSupportEmail = defaultSupportEmail
+	}
 	if trimmedAPIKey == "" {
 		log.Printf("[WARN] contact notifier is disabled: sendgrid api key is empty (env=%s)", normalizedEnv)
 	}
 
 	return &ContactNotifier{
-		enabled:  trimmedAPIKey != "",
-		apiKey:   trimmedAPIKey,
-		userRepo: userRepo,
-		client:   &http.Client{},
+		enabled:      trimmedAPIKey != "",
+		apiKey:       trimmedAPIKey,
+		supportEmail: trimmedSupportEmail,
+		userRepo:     userRepo,
+		client:       &http.Client{},
 	}
 }
 
@@ -131,7 +139,7 @@ func (n *ContactNotifier) NotifyContactCreated(ctx context.Context, contact *dom
 }
 
 func (n *ContactNotifier) sendAutoReply(ctx context.Context, contact *domainContact.Contact) error {
-	data := newMailTemplateData(autoReplySubject, contact)
+	data := n.newMailTemplateData(autoReplySubject, contact)
 	textBody, err := executeTextTemplate(autoReplyTextTemplate, data)
 	if err != nil {
 		return err
@@ -147,7 +155,7 @@ func (n *ContactNotifier) sendAutoReply(ctx context.Context, contact *domainCont
 }
 
 func (n *ContactNotifier) sendAdminNotification(ctx context.Context, contact *domainContact.Contact, recipients []emailAddress) error {
-	data := newMailTemplateData(adminMailSubject, contact)
+	data := n.newMailTemplateData(adminMailSubject, contact)
 	textBody, err := executeTextTemplate(adminTextTemplate, data)
 	if err != nil {
 		return err
@@ -211,14 +219,15 @@ func (n *ContactNotifier) send(ctx context.Context, recipients []emailAddress, s
 	return fmt.Errorf("sendgrid request failed: status=%d body=%s", resp.StatusCode, strings.TrimSpace(string(respBody)))
 }
 
-func newMailTemplateData(title string, contact *domainContact.Contact) mailTemplateData {
+func (n *ContactNotifier) newMailTemplateData(title string, contact *domainContact.Contact) mailTemplateData {
 	return mailTemplateData{
-		Title:       title,
-		Name:        strings.TrimSpace(contact.Name.String()),
-		Company:     optional.ToTrimmedStringOrEmpty(contact.Company),
-		PhoneNumber: optional.ToTrimmedStringOrEmpty(contact.PhoneNumber),
-		Email:       strings.TrimSpace(contact.Email.String()),
-		Content:     contact.Content.String(),
+		Title:        title,
+		Name:         strings.TrimSpace(contact.Name.String()),
+		Company:      optional.ToTrimmedStringOrEmpty(contact.Company),
+		PhoneNumber:  optional.ToTrimmedStringOrEmpty(contact.PhoneNumber),
+		Email:        strings.TrimSpace(contact.Email.String()),
+		Content:      contact.Content.String(),
+		SupportEmail: n.supportEmail,
 	}
 }
 

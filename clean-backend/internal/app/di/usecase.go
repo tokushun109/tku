@@ -56,7 +56,7 @@ func newUsecases(repos *repositories, cfg *config.Config, txManager usecase.TxMa
 	if err := requireNonNil("passwordHasher", passwordHasher); err != nil {
 		return nil, err
 	}
-	contactNotifier := mailInfra.NewContactNotifier(cfg.Env, cfg.SendGridAPIKey, repos.user)
+	contactNotifier := mailInfra.NewContactNotifier(cfg.Env, cfg.SendGridAPIKey, cfg.ContactSupportEmail, repos.user)
 	if err := requireNonNil("contactNotifier", contactNotifier); err != nil {
 		return nil, err
 	}
