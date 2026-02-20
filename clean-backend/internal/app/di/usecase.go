@@ -44,6 +44,7 @@ func newUsecases(repos *repositories, cfg *config.Config, txManager usecase.TxMa
 		return nil, err
 	}
 
+	// 汎用的なユースケースの依存関係の構築
 	uuidGen := uuidInfra.NewGenerator()
 	if err := requireNonNil("uuidGenerator", uuidGen); err != nil {
 		return nil, err
@@ -56,7 +57,13 @@ func newUsecases(repos *repositories, cfg *config.Config, txManager usecase.TxMa
 	if err := requireNonNil("passwordHasher", passwordHasher); err != nil {
 		return nil, err
 	}
-	contactNotifier := mailInfra.NewContactNotifier(cfg.Env, cfg.SendGridAPIKey, cfg.ContactSupportEmail, repos.user)
+	mailer := mailInfra.NewMailer(cfg.Env, cfg.SendGridAPIKey)
+	if err := requireNonNil("mailer", mailer); err != nil {
+		return nil, err
+	}
+
+	// ドメイン固有のユースケースの依存関係の構築
+	contactNotifier := usecaseContact.NewContactNotifier(mailer, repos.user, cfg.ContactSupportEmail)
 	if err := requireNonNil("contactNotifier", contactNotifier); err != nil {
 		return nil, err
 	}

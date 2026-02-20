@@ -20,9 +20,6 @@ type Service struct {
 }
 
 func New(repo domain.Repository, notifier Notifier) *Service {
-	if notifier == nil {
-		notifier = nopNotifier{}
-	}
 	return &Service{
 		repo:     repo,
 		notifier: notifier,

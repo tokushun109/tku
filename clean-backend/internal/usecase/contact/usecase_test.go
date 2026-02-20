@@ -132,14 +132,4 @@ func TestCreateContact(t *testing.T) {
 			t.Fatalf("expected notifier not called, got %d", notifier.called)
 		}
 	})
-
-	t.Run("notifierがnilで渡されたときでも作成処理に成功する", func(t *testing.T) {
-		repo := &stubRepo{}
-		uc := New(repo, nil)
-
-		err := uc.Create(context.Background(), "山田太郎", "", "", "test@example.com", "お問い合わせです")
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-	})
 }
