@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"strings"
 	texttmpl "text/template"
+	"time"
 
 	domainContact "github.com/tokushun109/tku/clean-backend/internal/domain/contact"
 	domainUser "github.com/tokushun109/tku/clean-backend/internal/domain/user"
@@ -94,7 +95,7 @@ func NewContactNotifier(env, apiKey, supportEmail string, userRepo domainUser.Re
 		apiKey:       trimmedAPIKey,
 		supportEmail: trimmedSupportEmail,
 		userRepo:     userRepo,
-		client:       &http.Client{},
+		client:       &http.Client{Timeout: 5 * time.Second},
 	}
 }
 
