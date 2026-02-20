@@ -21,6 +21,7 @@ func NewRouter(
 	auth *middleware.AuthMiddleware,
 	admin *middleware.AdminMiddleware,
 	logging func(http.Handler) http.Handler,
+	rateLimit func(http.Handler) http.Handler,
 	cors func(http.Handler) http.Handler,
 ) http.Handler {
 	r := mux.NewRouter().StrictSlash(true)
@@ -70,7 +71,7 @@ func NewRouter(
 
 	// contact
 	r.Handle("/api/contact", requireAdmin(contactHandler.List)).Methods(http.MethodGet)
-	r.HandleFunc("/api/contact", contactHandler.Create).Methods(http.MethodPost)
+	r.Handle("/api/contact", rateLimit(http.HandlerFunc(contactHandler.Create))).Methods(http.MethodPost)
 
 	// user
 	r.Handle("/api/user/login", auth.RequireSession(http.HandlerFunc(userHandler.GetLoginUser))).Methods(http.MethodGet)
