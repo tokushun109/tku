@@ -150,8 +150,8 @@ func (n *ContactNotifier) sendAutoReply(ctx context.Context, contact *domainCont
 		return err
 	}
 	return n.send(ctx, []emailAddress{{
-		Name:  strings.TrimSpace(contact.Name.String()),
-		Email: strings.TrimSpace(contact.Email.String()),
+		Name:  contact.Name.String(),
+		Email: contact.Email.String(),
 	}}, autoReplySubject, textBody, htmlBody)
 }
 
@@ -223,10 +223,10 @@ func (n *ContactNotifier) send(ctx context.Context, recipients []emailAddress, s
 func (n *ContactNotifier) newMailTemplateData(title string, contact *domainContact.Contact) mailTemplateData {
 	return mailTemplateData{
 		Title:        title,
-		Name:         strings.TrimSpace(contact.Name.String()),
+		Name:         contact.Name.String(),
 		Company:      optional.ToTrimmedStringOrEmpty(contact.Company),
 		PhoneNumber:  optional.ToTrimmedStringOrEmpty(contact.PhoneNumber),
-		Email:        strings.TrimSpace(contact.Email.String()),
+		Email:        contact.Email.String(),
 		Content:      contact.Content.String(),
 		SupportEmail: n.supportEmail,
 	}

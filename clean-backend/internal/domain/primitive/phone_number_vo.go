@@ -11,11 +11,7 @@ type PhoneNumber string
 
 func NewPhoneNumber(v string) (PhoneNumber, error) {
 	trimmed := strings.TrimSpace(v)
-	if trimmed == "" {
-		return "", ErrInvalidPhoneNumber
-	}
-
-	if utf8.RuneCountInString(trimmed) > phoneNumberMaxLen {
+	if trimmed == "" || utf8.RuneCountInString(trimmed) > phoneNumberMaxLen {
 		return "", ErrInvalidPhoneNumber
 	}
 
