@@ -36,8 +36,8 @@ func (m *AuthMiddleware) RequireSession(next http.Handler) http.Handler {
 		ctx := ContextWithAuthenticatedUser(r.Context(), AuthenticatedUser{
 			UserID:       user.ID,
 			UUID:         user.UUID.String(),
-			Name:         user.Name,
-			Email:        user.Email,
+			Name:         user.Name.String(),
+			Email:        user.Email.String(),
 			IsAdmin:      user.IsAdmin,
 			SessionToken: token,
 		})

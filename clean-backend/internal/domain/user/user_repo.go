@@ -1,8 +1,13 @@
 package user
 
-import "context"
+import (
+	"context"
+
+	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
+)
 
 type Repository interface {
-	FindByEmail(ctx context.Context, email string) (*User, error)
+	FindByEmail(ctx context.Context, email primitive.Email) (*User, error)
 	FindByID(ctx context.Context, id uint) (*User, error)
+	FindContactNotificationUsers(ctx context.Context) ([]*ContactNotificationUser, error)
 }

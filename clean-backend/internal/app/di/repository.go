@@ -13,6 +13,7 @@ type repositories struct {
 	sns         *mysqlRepo.SnsRepository
 	salesSite   *mysqlRepo.SalesSiteRepository
 	skillMarket *mysqlRepo.SkillMarketRepository
+	contact     *mysqlRepo.ContactRepository
 	session     *mysqlRepo.SessionRepository
 	user        *mysqlRepo.UserRepository
 }
@@ -31,6 +32,7 @@ func newRepositories(db *sqlx.DB) (*repositories, error) {
 		sns:         mysqlRepo.NewSnsRepository(db),
 		salesSite:   mysqlRepo.NewSalesSiteRepository(db),
 		skillMarket: mysqlRepo.NewSkillMarketRepository(db),
+		contact:     mysqlRepo.NewContactRepository(db),
 		session:     mysqlRepo.NewSessionRepository(db),
 		user:        mysqlRepo.NewUserRepository(db),
 	}

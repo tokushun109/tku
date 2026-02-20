@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 
+	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
 	domainSession "github.com/tokushun109/tku/clean-backend/internal/domain/session"
 	domainUser "github.com/tokushun109/tku/clean-backend/internal/domain/user"
 	"github.com/tokushun109/tku/clean-backend/internal/usecase"
@@ -51,8 +52,12 @@ func (s *Service) Login(ctx context.Context, email string, password string) (*do
 	if trimmedEmail == "" || password == "" {
 		return nil, usecase.NewAppError(usecase.ErrUnauthorized)
 	}
+	emailVO, err := primitive.NewEmail(trimmedEmail)
+	if err != nil {
+		return nil, usecase.NewAppError(usecase.ErrUnauthorized)
+	}
 
-	u, err := s.userRepo.FindByEmail(ctx, trimmedEmail)
+	u, err := s.userRepo.FindByEmail(ctx, emailVO)
 	if err != nil {
 		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}

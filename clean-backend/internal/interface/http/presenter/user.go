@@ -9,8 +9,8 @@ import (
 func ToLoginUserResponse(u *domainUser.User) *response.LoginUserResponse {
 	return &response.LoginUserResponse{
 		UUID:    u.UUID.String(),
-		Name:    u.Name,
-		Email:   u.Email,
+		Name:    u.Name.String(),
+		Email:   u.Email.String(),
 		IsAdmin: u.IsAdmin,
 	}
 }

@@ -4,9 +4,11 @@ import (
 	clockInfra "github.com/tokushun109/tku/clean-backend/internal/infra/clock"
 	"github.com/tokushun109/tku/clean-backend/internal/infra/config"
 	cryptoInfra "github.com/tokushun109/tku/clean-backend/internal/infra/crypto"
+	mailInfra "github.com/tokushun109/tku/clean-backend/internal/infra/mail/sendgrid"
 	uuidInfra "github.com/tokushun109/tku/clean-backend/internal/infra/uuid"
 	usecase "github.com/tokushun109/tku/clean-backend/internal/usecase"
 	usecaseCategory "github.com/tokushun109/tku/clean-backend/internal/usecase/category"
+	usecaseContact "github.com/tokushun109/tku/clean-backend/internal/usecase/contact"
 	usecaseHealth "github.com/tokushun109/tku/clean-backend/internal/usecase/health"
 	usecaseSalesSite "github.com/tokushun109/tku/clean-backend/internal/usecase/sales_site"
 	usecaseSession "github.com/tokushun109/tku/clean-backend/internal/usecase/session"
@@ -25,6 +27,7 @@ type usecases struct {
 	sns         usecaseSns.Usecase
 	salesSite   usecaseSalesSite.Usecase
 	skillMarket usecaseSkillMarket.Usecase
+	contact     usecaseContact.Usecase
 	session     usecaseSession.Usecase
 	user        usecaseUser.Usecase
 }
@@ -53,6 +56,10 @@ func newUsecases(repos *repositories, cfg *config.Config, txManager usecase.TxMa
 	if err := requireNonNil("passwordHasher", passwordHasher); err != nil {
 		return nil, err
 	}
+	contactNotifier := mailInfra.NewContactNotifier(cfg.Env, cfg.SendGridAPIKey, repos.user)
+	if err := requireNonNil("contactNotifier", contactNotifier); err != nil {
+		return nil, err
+	}
 	sessionUC := usecaseSession.New(repos.session, cfg.SessionTTL, clock)
 	if err := requireNonNil("sessionUsecase", sessionUC); err != nil {
 		return nil, err
@@ -66,6 +73,7 @@ func newUsecases(repos *repositories, cfg *config.Config, txManager usecase.TxMa
 		sns:         usecaseSns.New(repos.sns, uuidGen),
 		salesSite:   usecaseSalesSite.New(repos.salesSite, uuidGen),
 		skillMarket: usecaseSkillMarket.New(repos.skillMarket, uuidGen),
+		contact:     usecaseContact.New(repos.contact, contactNotifier),
 		session:     sessionUC,
 		user:        usecaseUser.New(repos.user, repos.session, sessionUC, passwordHasher, uuidGen, clock, txManager),
 	}
