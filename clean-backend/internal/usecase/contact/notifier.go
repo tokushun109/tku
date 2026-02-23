@@ -5,6 +5,7 @@ import (
 	"context"
 	"embed"
 	htmltmpl "html/template"
+	"io"
 	"log"
 	"strings"
 	texttmpl "text/template"
@@ -49,6 +50,10 @@ type mailTemplateData struct {
 	Email        string
 	Content      string
 	SupportEmail string
+}
+
+type templateExecutor interface {
+	Execute(wr io.Writer, data any) error
 }
 
 func NewContactNotifier(mailer usecase.Mailer, userRepo domainUser.Repository, supportEmail string) Notifier {
@@ -106,11 +111,11 @@ func (n *notifier) NotifyContactCreated(ctx context.Context, contact *domainCont
 
 func (n *notifier) sendAutoReply(ctx context.Context, contact *domainContact.Contact) error {
 	data := n.newMailTemplateData(autoReplySubject, contact)
-	textBody, err := executeTextTemplate(autoReplyTextTemplate, data)
+	textBody, err := executeTemplate(autoReplyTextTemplate, data)
 	if err != nil {
 		return err
 	}
-	htmlBody, err := executeHTMLTemplate(autoReplyHTMLTemplate, data)
+	htmlBody, err := executeTemplate(autoReplyHTMLTemplate, data)
 	if err != nil {
 		return err
 	}
@@ -130,11 +135,11 @@ func (n *notifier) sendAutoReply(ctx context.Context, contact *domainContact.Con
 
 func (n *notifier) sendAdminNotification(ctx context.Context, contact *domainContact.Contact, recipients []usecase.MailAddress) error {
 	data := n.newMailTemplateData(adminMailSubject, contact)
-	textBody, err := executeTextTemplate(adminTextTemplate, data)
+	textBody, err := executeTemplate(adminTextTemplate, data)
 	if err != nil {
 		return err
 	}
-	htmlBody, err := executeHTMLTemplate(adminHTMLTemplate, data)
+	htmlBody, err := executeTemplate(adminHTMLTemplate, data)
 	if err != nil {
 		return err
 	}
@@ -159,15 +164,7 @@ func (n *notifier) newMailTemplateData(title string, contact *domainContact.Cont
 	}
 }
 
-func executeTextTemplate(tpl *texttmpl.Template, data mailTemplateData) (string, error) {
-	var buffer bytes.Buffer
-	if err := tpl.Execute(&buffer, data); err != nil {
-		return "", err
-	}
-	return buffer.String(), nil
-}
-
-func executeHTMLTemplate(tpl *htmltmpl.Template, data mailTemplateData) (string, error) {
+func executeTemplate(tpl templateExecutor, data mailTemplateData) (string, error) {
 	var buffer bytes.Buffer
 	if err := tpl.Execute(&buffer, data); err != nil {
 		return "", err
