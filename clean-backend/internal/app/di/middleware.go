@@ -8,11 +8,10 @@ import (
 )
 
 type middlewares struct {
-	auth             *middleware.AuthMiddleware
-	admin            *middleware.AdminMiddleware
-	logging          func(http.Handler) http.Handler
-	contactRateLimit func(http.Handler) http.Handler
-	cors             func(http.Handler) http.Handler
+	auth    *middleware.AuthMiddleware
+	admin   *middleware.AdminMiddleware
+	logging func(http.Handler) http.Handler
+	cors    func(http.Handler) http.Handler
 }
 
 func newMiddlewares(cfg *config.Config, ucs *usecases) (*middlewares, error) {
@@ -25,11 +24,10 @@ func newMiddlewares(cfg *config.Config, ucs *usecases) (*middlewares, error) {
 	}
 
 	mws := &middlewares{
-		auth:             middleware.NewAuthMiddleware(ucs.user),
-		admin:            middleware.NewAdminMiddleware(),
-		logging:          middleware.LoggingMiddleware,
-		contactRateLimit: middleware.NewRateLimitMiddleware(),
-		cors:             middleware.CORSMiddleware([]string{cfg.ClientURL}),
+		auth:    middleware.NewAuthMiddleware(ucs.user),
+		admin:   middleware.NewAdminMiddleware(),
+		logging: middleware.LoggingMiddleware,
+		cors:    middleware.CORSMiddleware([]string{cfg.ClientURL}),
 	}
 
 	// 出力側の依存関係のチェック

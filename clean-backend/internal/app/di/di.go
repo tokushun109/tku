@@ -57,7 +57,6 @@ func BuildServer() (*config.Config, http.Handler, error) {
 		middlewares.auth,
 		middlewares.admin,
 		middlewares.logging,
-		middlewares.contactRateLimit,
 		middlewares.cors,
 	)
 	return cfg, r, nil
