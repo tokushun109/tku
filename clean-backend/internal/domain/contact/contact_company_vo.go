@@ -11,7 +11,8 @@ type ContactCompany string
 
 func NewContactCompany(v string) (ContactCompany, error) {
 	trimmed := strings.TrimSpace(v)
-	if trimmed == "" || utf8.RuneCountInString(trimmed) > companyMaxLen {
+	length := utf8.RuneCountInString(trimmed)
+	if length == 0 || length > companyMaxLen {
 		return "", ErrInvalidCompany
 	}
 	return ContactCompany(trimmed), nil
