@@ -78,7 +78,7 @@ func TestRateLimitMiddleware(t *testing.T) {
 
 		req2 := httptest.NewRequest(http.MethodPost, "/api/contact", nil)
 		req2.RemoteAddr = "203.0.113.99:99999"
-		req2.Header.Set("X-Forwarded-For", "198.51.100.1, 203.0.113.10")
+		req2.Header.Set("X-Forwarded-For", "198.51.100.1, 203.0.113.99")
 		rr2 := httptest.NewRecorder()
 		h.ServeHTTP(rr2, req2)
 		if rr2.Code != http.StatusTooManyRequests {
@@ -195,9 +195,110 @@ func TestNewRateLimitMiddleware(t *testing.T) {
 	})
 }
 
+func TestRateLimiterOverflow(t *testing.T) {
+	now := time.Date(2026, 2, 20, 0, 0, 0, 0, time.UTC)
+
+	limiter := newRateLimiter(rateLimitOptions{
+		limitPerWindow:   10,
+		window:           time.Minute,
+		maxEntries:       2,
+		cleanupBatchSize: 4,
+	})
+	limiter.now = func() time.Time { return now }
+	limiter.lastCleanup = now
+
+	allowed, _ := limiter.allow("203.0.113.1")
+	if !allowed {
+		t.Fatalf("expected first key allowed")
+	}
+	allowed, _ = limiter.allow("203.0.113.2")
+	if !allowed {
+		t.Fatalf("expected second key allowed")
+	}
+
+	allowed, retryAfter := limiter.allow("203.0.113.3")
+	if allowed {
+		t.Fatalf("expected third key rejected due to max entries")
+	}
+	if retryAfter != time.Minute {
+		t.Fatalf("expected retryAfter %s, got %s", time.Minute, retryAfter)
+	}
+
+	allowed, _ = limiter.allow("203.0.113.1")
+	if !allowed {
+		t.Fatalf("expected existing key allowed even when max entries reached")
+	}
+
+	if got := len(limiter.entries); got != 2 {
+		t.Fatalf("expected entries size 2, got %d", got)
+	}
+}
+
+func TestRateLimiterCleanupBatch(t *testing.T) {
+	base := time.Date(2026, 2, 20, 0, 0, 0, 0, time.UTC)
+	current := base
+
+	limiter := newRateLimiter(rateLimitOptions{
+		limitPerWindow:   10,
+		window:           time.Second,
+		maxEntries:       10,
+		cleanupBatchSize: 1,
+	})
+	limiter.now = func() time.Time { return current }
+	limiter.lastCleanup = base
+
+	allowed, _ := limiter.allow("old-1")
+	if !allowed {
+		t.Fatalf("expected old-1 allowed")
+	}
+	current = current.Add(10 * time.Millisecond)
+	allowed, _ = limiter.allow("old-2")
+	if !allowed {
+		t.Fatalf("expected old-2 allowed")
+	}
+
+	current = base.Add(6 * time.Second) // staleTTL=window*5=5s を超える
+	allowed, _ = limiter.allow("fresh-1")
+	if !allowed {
+		t.Fatalf("expected fresh-1 allowed")
+	}
+	if _, exists := limiter.entries["old-1"]; exists {
+		t.Fatalf("expected old-1 removed in first cleanup batch")
+	}
+	if _, exists := limiter.entries["old-2"]; !exists {
+		t.Fatalf("expected old-2 remains after first cleanup batch")
+	}
+
+	current = current.Add(2 * time.Second)
+	allowed, _ = limiter.allow("fresh-2")
+	if !allowed {
+		t.Fatalf("expected fresh-2 allowed")
+	}
+	if _, exists := limiter.entries["old-2"]; exists {
+		t.Fatalf("expected old-2 removed in second cleanup batch")
+	}
+	if got := len(limiter.entries); got != 2 {
+		t.Fatalf("expected entries size 2 after second batch, got %d", got)
+	}
+}
+
 func TestClientIPKey(t *testing.T) {
-	t.Run("X-Forwarded-Forがあるなら先頭IPを返す", func(t *testing.T) {
+	t.Run("CF-Connecting-IPを最優先で返す", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodPost, "/api/contact", nil)
+		req.RemoteAddr = "203.0.113.5:55555"
+		req.Header.Set("CF-Connecting-IP", "198.51.100.9")
+		req.Header.Set("X-Forwarded-For", "198.51.100.1, 198.51.100.2")
+		req.Header.Set("X-Real-IP", "198.51.100.3")
+
+		got := ClientIPKey(req)
+		if got != "198.51.100.9" {
+			t.Fatalf("expected 198.51.100.9, got %s", got)
+		}
+	})
+
+	t.Run("CF-Connecting-IPがないならX-Forwarded-For先頭IPを返す", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodPost, "/api/contact", nil)
+		req.RemoteAddr = "203.0.113.5:55555"
 		req.Header.Set("X-Forwarded-For", "198.51.100.1, 198.51.100.2")
 
 		got := ClientIPKey(req)
@@ -206,7 +307,18 @@ func TestClientIPKey(t *testing.T) {
 		}
 	})
 
-	t.Run("X-Forwarded-ForがないならRemoteAddrからIPを返す", func(t *testing.T) {
+	t.Run("CF-Connecting-IPとX-Forwarded-ForがないならX-Real-IPを返す", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodPost, "/api/contact", nil)
+		req.RemoteAddr = "203.0.113.5:55555"
+		req.Header.Set("X-Real-IP", "198.51.100.3")
+
+		got := ClientIPKey(req)
+		if got != "198.51.100.3" {
+			t.Fatalf("expected 198.51.100.3, got %s", got)
+		}
+	})
+
+	t.Run("ヘッダーがないならRemoteAddrからIPを返す", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodPost, "/api/contact", nil)
 		req.RemoteAddr = "203.0.113.5:55555"
 
