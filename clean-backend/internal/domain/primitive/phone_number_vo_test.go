@@ -30,13 +30,10 @@ func TestNewPhoneNumber(t *testing.T) {
 		}
 	})
 
-	t.Run("数字以外を含む有効な入力を渡したとき有効な値の生成に成功する", func(t *testing.T) {
-		phoneNumber, err := NewPhoneNumber("090-1234-5678")
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		if phoneNumber.String() != "090-1234-5678" {
-			t.Fatalf("unexpected phone number: %s", phoneNumber.String())
+	t.Run("数字以外を含む入力のときバリデーションエラーで失敗する", func(t *testing.T) {
+		_, err := NewPhoneNumber("090-1234-5678")
+		if err != ErrInvalidPhoneNumber {
+			t.Fatalf("expected ErrInvalidPhoneNumber, got %v", err)
 		}
 	})
 
