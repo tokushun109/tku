@@ -10,14 +10,17 @@ import (
 )
 
 type Config struct {
-	Port       string
-	DBHost     string
-	DBPort     int
-	DBName     string
-	DBUser     string
-	DBPass     string
-	ClientURL  string
-	SessionTTL time.Duration
+	Port                string
+	Env                 string
+	SendGridAPIKey      string
+	ContactSupportEmail string
+	DBHost              string
+	DBPort              int
+	DBName              string
+	DBUser              string
+	DBPass              string
+	ClientURL           string
+	SessionTTL          time.Duration
 }
 
 func Load() (*Config, error) {
@@ -26,6 +29,7 @@ func Load() (*Config, error) {
 	}
 
 	port := getEnv("PORT", "8081")
+	env := getEnv("ENV", "local")
 	clientURL := getEnv("CLIENT_URL", "")
 
 	dbHost := getEnv("MYSQL_HOST", "127.0.0.1")
@@ -40,15 +44,20 @@ func Load() (*Config, error) {
 	if err != nil {
 		return nil, fmt.Errorf("invalid SESSION_TTL: %w", err)
 	}
+	sendGridAPIKey := getEnv("SEND_GRID_API_KEY", "")
+	contactSupportEmail := getEnv("CONTACT_SUPPORT_EMAIL", "no-reply@tocoriri.com")
 	cfg := &Config{
-		Port:       port,
-		DBHost:     dbHost,
-		DBPort:     dbPort,
-		DBName:     getEnv("DB_NAME", ""),
-		DBUser:     getEnv("DB_USER", ""),
-		DBPass:     getEnv("DB_PASS", ""),
-		ClientURL:  clientURL,
-		SessionTTL: ttl,
+		Port:                port,
+		Env:                 env,
+		SendGridAPIKey:      sendGridAPIKey,
+		ContactSupportEmail: contactSupportEmail,
+		DBHost:              dbHost,
+		DBPort:              dbPort,
+		DBName:              getEnv("DB_NAME", ""),
+		DBUser:              getEnv("DB_USER", ""),
+		DBPass:              getEnv("DB_PASS", ""),
+		ClientURL:           clientURL,
+		SessionTTL:          ttl,
 	}
 	return cfg, nil
 }

@@ -23,7 +23,7 @@ type stubUserRepo struct {
 	userByIDErr    error
 }
 
-func (s *stubUserRepo) FindByEmail(ctx context.Context, email string) (*domainUser.User, error) {
+func (s *stubUserRepo) FindByEmail(ctx context.Context, email primitive.Email) (*domainUser.User, error) {
 	if s.userByEmailErr != nil {
 		return nil, s.userByEmailErr
 	}
@@ -35,6 +35,10 @@ func (s *stubUserRepo) FindByID(ctx context.Context, id uint) (*domainUser.User,
 		return nil, s.userByIDErr
 	}
 	return s.userByID, nil
+}
+
+func (s *stubUserRepo) FindContactNotificationUsers(ctx context.Context) ([]*domainUser.ContactNotificationUser, error) {
+	return nil, nil
 }
 
 type stubSessionRepo struct {
@@ -275,11 +279,27 @@ func mustUser(id uint, uuidStr string, name string, email string, hash domainUse
 	return &domainUser.User{
 		ID:           id,
 		UUID:         uuid,
-		Name:         name,
-		Email:        email,
+		Name:         mustName(name),
+		Email:        mustEmail(email),
 		PasswordHash: hash,
 		IsAdmin:      isAdmin,
 	}
+}
+
+func mustEmail(s string) primitive.Email {
+	email, err := primitive.NewEmail(s)
+	if err != nil {
+		panic(err)
+	}
+	return email
+}
+
+func mustName(s string) domainUser.UserName {
+	name, err := domainUser.NewUserName(s)
+	if err != nil {
+		panic(err)
+	}
+	return name
 }
 
 func mustNewUUID(s string) primitive.UUID {

@@ -4,9 +4,11 @@ import (
 	clockInfra "github.com/tokushun109/tku/clean-backend/internal/infra/clock"
 	"github.com/tokushun109/tku/clean-backend/internal/infra/config"
 	cryptoInfra "github.com/tokushun109/tku/clean-backend/internal/infra/crypto"
+	mailInfra "github.com/tokushun109/tku/clean-backend/internal/infra/mail/sendgrid"
 	uuidInfra "github.com/tokushun109/tku/clean-backend/internal/infra/uuid"
 	usecase "github.com/tokushun109/tku/clean-backend/internal/usecase"
 	usecaseCategory "github.com/tokushun109/tku/clean-backend/internal/usecase/category"
+	usecaseContact "github.com/tokushun109/tku/clean-backend/internal/usecase/contact"
 	usecaseHealth "github.com/tokushun109/tku/clean-backend/internal/usecase/health"
 	usecaseSalesSite "github.com/tokushun109/tku/clean-backend/internal/usecase/sales_site"
 	usecaseSession "github.com/tokushun109/tku/clean-backend/internal/usecase/session"
@@ -25,6 +27,7 @@ type usecases struct {
 	sns         usecaseSns.Usecase
 	salesSite   usecaseSalesSite.Usecase
 	skillMarket usecaseSkillMarket.Usecase
+	contact     usecaseContact.Usecase
 	session     usecaseSession.Usecase
 	user        usecaseUser.Usecase
 }
@@ -41,6 +44,7 @@ func newUsecases(repos *repositories, cfg *config.Config, txManager usecase.TxMa
 		return nil, err
 	}
 
+	// 汎用的なユースケースの依存関係の構築
 	uuidGen := uuidInfra.NewGenerator()
 	if err := requireNonNil("uuidGenerator", uuidGen); err != nil {
 		return nil, err
@@ -51,6 +55,16 @@ func newUsecases(repos *repositories, cfg *config.Config, txManager usecase.TxMa
 	}
 	passwordHasher := cryptoInfra.NewPasswordHasherSHA1()
 	if err := requireNonNil("passwordHasher", passwordHasher); err != nil {
+		return nil, err
+	}
+	mailer := mailInfra.NewMailer(cfg.Env, cfg.SendGridAPIKey)
+	if err := requireNonNil("mailer", mailer); err != nil {
+		return nil, err
+	}
+
+	// ドメイン固有のユースケースの依存関係の構築
+	contactNotifier := usecaseContact.NewContactNotifier(mailer, repos.user, cfg.ContactSupportEmail)
+	if err := requireNonNil("contactNotifier", contactNotifier); err != nil {
 		return nil, err
 	}
 	sessionUC := usecaseSession.New(repos.session, cfg.SessionTTL, clock)
@@ -66,6 +80,7 @@ func newUsecases(repos *repositories, cfg *config.Config, txManager usecase.TxMa
 		sns:         usecaseSns.New(repos.sns, uuidGen),
 		salesSite:   usecaseSalesSite.New(repos.salesSite, uuidGen),
 		skillMarket: usecaseSkillMarket.New(repos.skillMarket, uuidGen),
+		contact:     usecaseContact.New(repos.contact, contactNotifier),
 		session:     sessionUC,
 		user:        usecaseUser.New(repos.user, repos.session, sessionUC, passwordHasher, uuidGen, clock, txManager),
 	}
