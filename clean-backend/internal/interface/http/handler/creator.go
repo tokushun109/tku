@@ -13,8 +13,6 @@ import (
 	usecaseCreator "github.com/tokushun109/tku/clean-backend/internal/usecase/creator"
 )
 
-const maxCreatorLogoSize = 10 << 20 // 10MB
-
 type CreatorHandler struct {
 	creatorUC usecaseCreator.Usecase
 }
@@ -58,12 +56,12 @@ func (h *CreatorHandler) UpdateLogo(w http.ResponseWriter, r *http.Request) {
 		_ = file.Close()
 	}()
 
-	logoBytes, err := io.ReadAll(io.LimitReader(file, maxCreatorLogoSize+1))
+	logoBytes, err := io.ReadAll(file)
 	if err != nil {
 		response.WriteAppError(w, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error()))
 		return
 	}
-	if len(logoBytes) == 0 || len(logoBytes) > maxCreatorLogoSize {
+	if len(logoBytes) == 0 {
 		response.WriteAppError(w, usecase.NewAppError(usecase.ErrInvalidInput))
 		return
 	}
