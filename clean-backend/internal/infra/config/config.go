@@ -14,6 +14,7 @@ type Config struct {
 	Env                 string
 	APIBaseURL          string
 	APIBucketName       string
+	S3UsePathStyle      bool
 	SendGridAPIKey      string
 	ContactSupportEmail string
 	DBHost              string
@@ -35,6 +36,9 @@ func Load() (*Config, error) {
 	clientURL := getEnv("CLIENT_URL", "")
 	apiBaseURL := getEnv("API_BASE_URL", "")
 	apiBucketName := getEnv("API_BUCKET_NAME", "")
+	// AWS_ENDPOINT_URL_S3が設定されている場合はS3互換ストレージを使用するため、PathStyleを有効にする
+	// (主にローカル開発環境でMinIOを使用するため)
+	s3UsePathStyle := os.Getenv("AWS_ENDPOINT_URL_S3") != ""
 
 	dbHost := getEnv("MYSQL_HOST", "127.0.0.1")
 	dbPortStr := getEnv("MYSQL_PORT", "3306")
@@ -55,6 +59,7 @@ func Load() (*Config, error) {
 		Env:                 env,
 		APIBaseURL:          apiBaseURL,
 		APIBucketName:       apiBucketName,
+		S3UsePathStyle:      s3UsePathStyle,
 		SendGridAPIKey:      sendGridAPIKey,
 		ContactSupportEmail: contactSupportEmail,
 		DBHost:              dbHost,

@@ -2,13 +2,11 @@ package di
 
 import (
 	"fmt"
-	"strings"
 
 	clockInfra "github.com/tokushun109/tku/clean-backend/internal/infra/clock"
 	"github.com/tokushun109/tku/clean-backend/internal/infra/config"
 	cryptoInfra "github.com/tokushun109/tku/clean-backend/internal/infra/crypto"
 	mailInfra "github.com/tokushun109/tku/clean-backend/internal/infra/mail/sendgrid"
-	localStorage "github.com/tokushun109/tku/clean-backend/internal/infra/storage/local"
 	s3Storage "github.com/tokushun109/tku/clean-backend/internal/infra/storage/s3"
 	uuidInfra "github.com/tokushun109/tku/clean-backend/internal/infra/uuid"
 	usecase "github.com/tokushun109/tku/clean-backend/internal/usecase"
@@ -68,7 +66,7 @@ func newUsecases(repos *repositories, cfg *config.Config, txManager usecase.TxMa
 	if err := requireNonNil("mailer", mailer); err != nil {
 		return nil, err
 	}
-	storage, err := newLogoStorage(cfg)
+	storage, err := s3Storage.NewStorage(cfg.APIBucketName, cfg.S3UsePathStyle)
 	if err != nil {
 		return nil, fmt.Errorf("new creator logo storage: %w", err)
 	}
@@ -94,7 +92,7 @@ func newUsecases(repos *repositories, cfg *config.Config, txManager usecase.TxMa
 		sns:         usecaseSns.New(repos.sns, uuidGen),
 		salesSite:   usecaseSalesSite.New(repos.salesSite, uuidGen),
 		skillMarket: usecaseSkillMarket.New(repos.skillMarket, uuidGen),
-		creator:     usecaseCreator.New(repos.creator, storage, uuidGen, cfg.Env, cfg.APIBaseURL, 0),
+		creator:     usecaseCreator.New(repos.creator, storage, uuidGen),
 		contact:     usecaseContact.New(repos.contact, contactNotifier),
 		session:     sessionUC,
 		user:        usecaseUser.New(repos.user, repos.session, sessionUC, passwordHasher, uuidGen, clock, txManager),
@@ -106,11 +104,4 @@ func newUsecases(repos *repositories, cfg *config.Config, txManager usecase.TxMa
 	}
 
 	return ucs, nil
-}
-
-func newLogoStorage(cfg *config.Config) (usecase.Storage, error) {
-	if strings.EqualFold(strings.TrimSpace(cfg.Env), "local") || strings.TrimSpace(cfg.Env) == "" {
-		return localStorage.NewStorage("."), nil
-	}
-	return s3Storage.NewStorage(cfg.APIBucketName)
 }

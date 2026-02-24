@@ -37,32 +37,20 @@ type LogoBlob struct {
 }
 
 type Service struct {
-	repo       domain.Repository
-	storage    usecase.Storage
-	uuidGen    usecase.UUIDGenerator
-	env        string
-	apiBaseURL string
-	logoURLTTL time.Duration
+	repo    domain.Repository
+	storage usecase.Storage
+	uuidGen usecase.UUIDGenerator
 }
 
 func New(
 	repo domain.Repository,
 	storage usecase.Storage,
 	uuidGen usecase.UUIDGenerator,
-	env string,
-	apiBaseURL string,
-	logoURLTTL time.Duration,
 ) *Service {
-	if logoURLTTL <= 0 {
-		logoURLTTL = defaultLogoPresignTTL
-	}
 	return &Service{
-		repo:       repo,
-		storage:    storage,
-		uuidGen:    uuidGen,
-		env:        env,
-		apiBaseURL: apiBaseURL,
-		logoURLTTL: logoURLTTL,
+		repo:    repo,
+		storage: storage,
+		uuidGen: uuidGen,
 	}
 }
 
@@ -77,15 +65,11 @@ func (s *Service) Get(ctx context.Context) (*CreatorDetail, error) {
 
 	logoAPIPath := ""
 	if current.LogoPath != nil {
-		if isLocalEnv(s.env) {
-			logoAPIPath = buildLocalLogoAPIPath(s.apiBaseURL, current.LogoPath.String())
-		} else {
-			url, err := s.storage.PresignGet(ctx, current.LogoPath.String(), s.logoURLTTL)
-			if err != nil {
-				return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
-			}
-			logoAPIPath = url
+		url, err := s.storage.PresignGet(ctx, current.LogoPath.String(), defaultLogoPresignTTL)
+		if err != nil {
+			return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 		}
+		logoAPIPath = url
 	}
 
 	return &CreatorDetail{
@@ -240,18 +224,4 @@ func buildCreatorLogoPath(uuid primitive.UUID, mimeType domain.CreatorLogoMimeTy
 	)
 
 	return domain.NewCreatorLogoPath(rawPath)
-}
-
-func buildLocalLogoAPIPath(apiBaseURL string, logoPath string) string {
-	logoFile := path.Base(logoPath)
-	base := strings.TrimRight(strings.TrimSpace(apiBaseURL), "/")
-	if base == "" {
-		return "/api/creator/logo/" + logoFile + "/blob"
-	}
-	return base + "/creator/logo/" + logoFile + "/blob"
-}
-
-func isLocalEnv(env string) bool {
-	normalized := strings.ToLower(strings.TrimSpace(env))
-	return normalized == "" || normalized == "local"
 }

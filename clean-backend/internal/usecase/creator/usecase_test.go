@@ -49,8 +49,9 @@ type stubLogoStorage struct {
 	getErr error
 	getRes []byte
 
-	presignErr error
-	presignURL string
+	presignErr     error
+	presignURL     string
+	presignExpires time.Duration
 
 	putKey        string
 	putMimeType   string
@@ -78,6 +79,7 @@ func (s *stubLogoStorage) Delete(ctx context.Context, key string) error {
 }
 
 func (s *stubLogoStorage) PresignGet(ctx context.Context, key string, expires time.Duration) (string, error) {
+	s.presignExpires = expires
 	if s.presignErr != nil {
 		return "", s.presignErr
 	}
@@ -94,28 +96,12 @@ func (s *stubUUIDGenerator) New() (primitive.UUID, error) {
 }
 
 func TestServiceGet(t *testing.T) {
-	t.Run("local環境でロゴがあるならblob取得用のapiPathを返す", func(t *testing.T) {
-		creator := mustCreator(1, "作家", "紹介", "image/png", "img/logo/a/b/test.png")
-		repo := &stubCreatorRepository{findRes: creator}
-		storage := &stubLogoStorage{}
-		uuidGen := &stubUUIDGenerator{}
-		svc := New(repo, storage, uuidGen, "local", "http://localhost:8081/api", 30*time.Minute)
-
-		detail, err := svc.Get(context.Background())
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		if detail.APIPath != "http://localhost:8081/api/creator/logo/test.png/blob" {
-			t.Fatalf("unexpected apiPath: %s", detail.APIPath)
-		}
-	})
-
-	t.Run("本番環境でロゴがあるならpresignedURLをapiPathに返す", func(t *testing.T) {
+	t.Run("ロゴがあるならpresignedURLをapiPathに返す", func(t *testing.T) {
 		creator := mustCreator(1, "作家", "紹介", "image/png", "img/logo/a/b/test.png")
 		repo := &stubCreatorRepository{findRes: creator}
 		storage := &stubLogoStorage{presignURL: "https://example.com/presigned"}
 		uuidGen := &stubUUIDGenerator{}
-		svc := New(repo, storage, uuidGen, "prod", "http://localhost:8081/api", 30*time.Minute)
+		svc := New(repo, storage, uuidGen)
 
 		detail, err := svc.Get(context.Background())
 		if err != nil {
@@ -123,6 +109,22 @@ func TestServiceGet(t *testing.T) {
 		}
 		if detail.APIPath != "https://example.com/presigned" {
 			t.Fatalf("unexpected apiPath: %s", detail.APIPath)
+		}
+		if storage.presignExpires != defaultLogoPresignTTL {
+			t.Fatalf("unexpected presign ttl: %s", storage.presignExpires)
+		}
+	})
+
+	t.Run("presignedURLの生成に失敗したらエラーを返す", func(t *testing.T) {
+		creator := mustCreator(1, "作家", "紹介", "image/png", "img/logo/a/b/test.png")
+		repo := &stubCreatorRepository{findRes: creator}
+		storage := &stubLogoStorage{presignErr: errors.New("presign failed")}
+		uuidGen := &stubUUIDGenerator{}
+		svc := New(repo, storage, uuidGen)
+
+		_, err := svc.Get(context.Background())
+		if err == nil || !errors.Is(err, usecase.ErrInternal) {
+			t.Fatalf("expected ErrInternal, got %v", err)
 		}
 	})
 }
@@ -141,7 +143,7 @@ func TestServiceUpdateLogo(t *testing.T) {
 			t.Fatalf("unexpected uuid error: %v", err)
 		}
 		uuidGen := &stubUUIDGenerator{uuid: uuid}
-		svc := New(repo, storage, uuidGen, "local", "http://localhost:8081/api", 30*time.Minute)
+		svc := New(repo, storage, uuidGen)
 
 		pngBinary := []byte{0x89, 'P', 'N', 'G', '\r', '\n', 0x1a, '\n', 0, 0, 0, 0}
 		err = svc.UpdateLogo(context.Background(), pngBinary)
@@ -169,7 +171,7 @@ func TestServiceUpdateLogo(t *testing.T) {
 		repo := &stubCreatorRepository{findRes: creator}
 		storage := &stubLogoStorage{}
 		uuidGen := &stubUUIDGenerator{}
-		svc := New(repo, storage, uuidGen, "local", "http://localhost:8081/api", 30*time.Minute)
+		svc := New(repo, storage, uuidGen)
 
 		err := svc.UpdateLogo(context.Background(), []byte("plain-text"))
 		if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
@@ -184,7 +186,7 @@ func TestServiceGetLogoBlob(t *testing.T) {
 		repo := &stubCreatorRepository{findRes: creator}
 		storage := &stubLogoStorage{getRes: []byte("binary")}
 		uuidGen := &stubUUIDGenerator{}
-		svc := New(repo, storage, uuidGen, "local", "http://localhost:8081/api", 30*time.Minute)
+		svc := New(repo, storage, uuidGen)
 
 		blob, err := svc.GetLogoBlob(context.Background(), "logo.png")
 		if err != nil {
@@ -210,7 +212,7 @@ func TestServiceGetLogoBlob(t *testing.T) {
 		repo := &stubCreatorRepository{findRes: creator}
 		storage := &stubLogoStorage{}
 		uuidGen := &stubUUIDGenerator{}
-		svc := New(repo, storage, uuidGen, "local", "http://localhost:8081/api", 30*time.Minute)
+		svc := New(repo, storage, uuidGen)
 
 		_, err := svc.GetLogoBlob(context.Background(), "other.png")
 		if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
@@ -223,7 +225,7 @@ func TestServiceGetLogoBlob(t *testing.T) {
 		repo := &stubCreatorRepository{findRes: creator}
 		storage := &stubLogoStorage{getErr: usecase.ErrStorageNotFound}
 		uuidGen := &stubUUIDGenerator{}
-		svc := New(repo, storage, uuidGen, "local", "http://localhost:8081/api", 30*time.Minute)
+		svc := New(repo, storage, uuidGen)
 
 		_, err := svc.GetLogoBlob(context.Background(), "logo.png")
 		if err == nil || !errors.Is(err, usecase.ErrNotFound) {

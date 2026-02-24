@@ -25,7 +25,7 @@ type Storage struct {
 
 var _ usecase.Storage = (*Storage)(nil)
 
-func NewStorage(bucket string) (*Storage, error) {
+func NewStorage(bucket string, usePathStyle bool) (*Storage, error) {
 	trimmedBucket := strings.TrimSpace(bucket)
 	if trimmedBucket == "" {
 		return nil, errors.New("api bucket name is empty")
@@ -36,7 +36,10 @@ func NewStorage(bucket string) (*Storage, error) {
 		return nil, err
 	}
 
-	client := awss3.NewFromConfig(cfg)
+	client := awss3.NewFromConfig(cfg, func(options *awss3.Options) {
+		options.UsePathStyle = usePathStyle
+	})
+
 	return &Storage{
 		bucket:        trimmedBucket,
 		client:        client,
