@@ -12,6 +12,8 @@ import (
 type Config struct {
 	Port                string
 	Env                 string
+	APIBaseURL          string
+	APIBucketName       string
 	SendGridAPIKey      string
 	ContactSupportEmail string
 	DBHost              string
@@ -31,6 +33,8 @@ func Load() (*Config, error) {
 	port := getEnv("PORT", "8081")
 	env := getEnv("ENV", "local")
 	clientURL := getEnv("CLIENT_URL", "")
+	apiBaseURL := getEnv("API_BASE_URL", "")
+	apiBucketName := getEnv("API_BUCKET_NAME", "")
 
 	dbHost := getEnv("MYSQL_HOST", "127.0.0.1")
 	dbPortStr := getEnv("MYSQL_PORT", "3306")
@@ -49,6 +53,8 @@ func Load() (*Config, error) {
 	cfg := &Config{
 		Port:                port,
 		Env:                 env,
+		APIBaseURL:          apiBaseURL,
+		APIBucketName:       apiBucketName,
 		SendGridAPIKey:      sendGridAPIKey,
 		ContactSupportEmail: contactSupportEmail,
 		DBHost:              dbHost,

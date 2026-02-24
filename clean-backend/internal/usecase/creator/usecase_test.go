@@ -1,0 +1,256 @@
+package creator
+
+import (
+	"context"
+	"errors"
+	"testing"
+	"time"
+
+	domain "github.com/tokushun109/tku/clean-backend/internal/domain/creator"
+	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
+	"github.com/tokushun109/tku/clean-backend/internal/usecase"
+)
+
+type stubCreatorRepository struct {
+	findRes *domain.Creator
+	findErr error
+
+	updateProfileRes bool
+	updateProfileErr error
+	updatedProfile   *domain.Creator
+
+	updateLogoRes       bool
+	updateLogoErr       error
+	updateLogoCreatorID uint
+	updateLogoMimeType  domain.CreatorLogoMimeType
+	updateLogoPath      domain.CreatorLogoPath
+}
+
+func (s *stubCreatorRepository) Find(ctx context.Context) (*domain.Creator, error) {
+	return s.findRes, s.findErr
+}
+
+func (s *stubCreatorRepository) UpdateProfile(ctx context.Context, c *domain.Creator) (bool, error) {
+	s.updatedProfile = c
+	return s.updateProfileRes, s.updateProfileErr
+}
+
+func (s *stubCreatorRepository) UpdateLogo(ctx context.Context, creatorID uint, mimeType domain.CreatorLogoMimeType, logoPath domain.CreatorLogoPath) (bool, error) {
+	s.updateLogoCreatorID = creatorID
+	s.updateLogoMimeType = mimeType
+	s.updateLogoPath = logoPath
+	return s.updateLogoRes, s.updateLogoErr
+}
+
+type stubLogoStorage struct {
+	putErr error
+	getErr error
+	getRes []byte
+
+	presignErr error
+	presignURL string
+
+	putKey        string
+	putMimeType   string
+	putBinarySize int
+	deletedKeys   []string
+}
+
+func (s *stubLogoStorage) Put(ctx context.Context, key string, contentType string, data []byte) error {
+	s.putKey = key
+	s.putMimeType = contentType
+	s.putBinarySize = len(data)
+	return s.putErr
+}
+
+func (s *stubLogoStorage) Get(ctx context.Context, key string) ([]byte, error) {
+	if s.getErr != nil {
+		return nil, s.getErr
+	}
+	return s.getRes, nil
+}
+
+func (s *stubLogoStorage) Delete(ctx context.Context, key string) error {
+	s.deletedKeys = append(s.deletedKeys, key)
+	return nil
+}
+
+func (s *stubLogoStorage) PresignGet(ctx context.Context, key string, expires time.Duration) (string, error) {
+	if s.presignErr != nil {
+		return "", s.presignErr
+	}
+	return s.presignURL, nil
+}
+
+type stubUUIDGenerator struct {
+	uuid primitive.UUID
+	err  error
+}
+
+func (s *stubUUIDGenerator) New() (primitive.UUID, error) {
+	return s.uuid, s.err
+}
+
+func TestServiceGet(t *testing.T) {
+	t.Run("local環境でロゴがあるならblob取得用のapiPathを返す", func(t *testing.T) {
+		creator := mustCreator(1, "作家", "紹介", "image/png", "img/logo/a/b/test.png")
+		repo := &stubCreatorRepository{findRes: creator}
+		storage := &stubLogoStorage{}
+		uuidGen := &stubUUIDGenerator{}
+		svc := New(repo, storage, uuidGen, "local", "http://localhost:8081/api", 30*time.Minute)
+
+		detail, err := svc.Get(context.Background())
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if detail.APIPath != "http://localhost:8081/api/creator/logo/test.png/blob" {
+			t.Fatalf("unexpected apiPath: %s", detail.APIPath)
+		}
+	})
+
+	t.Run("本番環境でロゴがあるならpresignedURLをapiPathに返す", func(t *testing.T) {
+		creator := mustCreator(1, "作家", "紹介", "image/png", "img/logo/a/b/test.png")
+		repo := &stubCreatorRepository{findRes: creator}
+		storage := &stubLogoStorage{presignURL: "https://example.com/presigned"}
+		uuidGen := &stubUUIDGenerator{}
+		svc := New(repo, storage, uuidGen, "prod", "http://localhost:8081/api", 30*time.Minute)
+
+		detail, err := svc.Get(context.Background())
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if detail.APIPath != "https://example.com/presigned" {
+			t.Fatalf("unexpected apiPath: %s", detail.APIPath)
+		}
+	})
+}
+
+func TestServiceUpdateLogo(t *testing.T) {
+	t.Run("有効な画像を渡したとき新規保存とDB更新に成功する", func(t *testing.T) {
+		creator := mustCreator(10, "作家", "紹介", "image/jpeg", "img/logo/o/l/old.jpg")
+		repo := &stubCreatorRepository{
+			findRes:       creator,
+			updateLogoRes: true,
+		}
+		storage := &stubLogoStorage{}
+
+		uuid, err := primitive.NewUUID("123e4567-e89b-12d3-a456-426614174000")
+		if err != nil {
+			t.Fatalf("unexpected uuid error: %v", err)
+		}
+		uuidGen := &stubUUIDGenerator{uuid: uuid}
+		svc := New(repo, storage, uuidGen, "local", "http://localhost:8081/api", 30*time.Minute)
+
+		pngBinary := []byte{0x89, 'P', 'N', 'G', '\r', '\n', 0x1a, '\n', 0, 0, 0, 0}
+		err = svc.UpdateLogo(context.Background(), pngBinary)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		expectedPath := "img/logo/1/2/123e4567-e89b-12d3-a456-426614174000.png"
+		if storage.putKey != expectedPath {
+			t.Fatalf("unexpected save path: %s", storage.putKey)
+		}
+		if repo.updateLogoPath.String() != expectedPath {
+			t.Fatalf("unexpected updated logo path: %s", repo.updateLogoPath.String())
+		}
+		if repo.updateLogoCreatorID != 10 {
+			t.Fatalf("unexpected creator id: %d", repo.updateLogoCreatorID)
+		}
+		if len(storage.deletedKeys) != 1 || storage.deletedKeys[0] != "img/logo/o/l/old.jpg" {
+			t.Fatalf("unexpected deleted keys: %#v", storage.deletedKeys)
+		}
+	})
+
+	t.Run("対応外のMIMEタイプならバリデーションエラーで失敗する", func(t *testing.T) {
+		creator := mustCreator(10, "作家", "紹介", "", "")
+		repo := &stubCreatorRepository{findRes: creator}
+		storage := &stubLogoStorage{}
+		uuidGen := &stubUUIDGenerator{}
+		svc := New(repo, storage, uuidGen, "local", "http://localhost:8081/api", 30*time.Minute)
+
+		err := svc.UpdateLogo(context.Background(), []byte("plain-text"))
+		if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
+			t.Fatalf("expected ErrInvalidInput, got %v", err)
+		}
+	})
+}
+
+func TestServiceGetLogoBlob(t *testing.T) {
+	t.Run("リクエストのファイル名が保存済みロゴと一致するなら画像取得に成功する", func(t *testing.T) {
+		creator := mustCreator(1, "作家", "紹介", "image/png", "img/logo/a/b/logo.png")
+		repo := &stubCreatorRepository{findRes: creator}
+		storage := &stubLogoStorage{getRes: []byte("binary")}
+		uuidGen := &stubUUIDGenerator{}
+		svc := New(repo, storage, uuidGen, "local", "http://localhost:8081/api", 30*time.Minute)
+
+		blob, err := svc.GetLogoBlob(context.Background(), "logo.png")
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if blob.ContentType != "image/png" {
+			t.Fatalf("unexpected content type: %s", blob.ContentType)
+		}
+		if string(blob.Binary) != "binary" {
+			t.Fatalf("unexpected binary: %s", string(blob.Binary))
+		}
+	})
+
+	t.Run("リクエストのファイル名が不一致ならバリデーションエラーで失敗する", func(t *testing.T) {
+		creator := mustCreator(1, "作家", "紹介", "image/png", "img/logo/a/b/logo.png")
+		repo := &stubCreatorRepository{findRes: creator}
+		storage := &stubLogoStorage{}
+		uuidGen := &stubUUIDGenerator{}
+		svc := New(repo, storage, uuidGen, "local", "http://localhost:8081/api", 30*time.Minute)
+
+		_, err := svc.GetLogoBlob(context.Background(), "other.png")
+		if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
+			t.Fatalf("expected ErrInvalidInput, got %v", err)
+		}
+	})
+
+	t.Run("ストレージ上にロゴが存在しないならNotFoundで失敗する", func(t *testing.T) {
+		creator := mustCreator(1, "作家", "紹介", "image/png", "img/logo/a/b/logo.png")
+		repo := &stubCreatorRepository{findRes: creator}
+		storage := &stubLogoStorage{getErr: usecase.ErrStorageNotFound}
+		uuidGen := &stubUUIDGenerator{}
+		svc := New(repo, storage, uuidGen, "local", "http://localhost:8081/api", 30*time.Minute)
+
+		_, err := svc.GetLogoBlob(context.Background(), "logo.png")
+		if err == nil || !errors.Is(err, usecase.ErrNotFound) {
+			t.Fatalf("expected ErrNotFound, got %v", err)
+		}
+	})
+}
+
+func mustCreator(id uint, name, introduction, mimeType, logoPath string) *domain.Creator {
+	n, err := domain.NewCreatorName(name)
+	if err != nil {
+		panic(err)
+	}
+	i, err := domain.NewCreatorIntroductionForRead(introduction)
+	if err != nil {
+		panic(err)
+	}
+
+	creator := &domain.Creator{
+		ID:           id,
+		Name:         n,
+		Introduction: i,
+	}
+	if mimeType != "" {
+		m, err := domain.NewCreatorLogoMimeType(mimeType)
+		if err != nil {
+			panic(err)
+		}
+		creator.LogoMimeType = &m
+	}
+	if logoPath != "" {
+		p, err := domain.NewCreatorLogoPath(logoPath)
+		if err != nil {
+			panic(err)
+		}
+		creator.LogoPath = &p
+	}
+	return creator
+}
