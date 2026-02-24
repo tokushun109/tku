@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"path"
 	"strings"
@@ -32,7 +33,7 @@ type CreatorDetail struct {
 
 type LogoBlob struct {
 	ContentType string
-	Binary      []byte
+	Body        io.ReadCloser
 }
 
 type Service struct {
@@ -210,7 +211,7 @@ func (s *Service) GetLogoBlob(ctx context.Context, requestLogoFile string) (*Log
 		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, domain.ErrInvalidLogoFileName.Error())
 	}
 
-	logoBinary, err := s.storage.Get(ctx, current.LogoPath.String())
+	logoBody, err := s.storage.Get(ctx, current.LogoPath.String())
 	if err != nil {
 		if errors.Is(err, usecase.ErrStorageNotFound) {
 			return nil, usecase.NewAppError(usecase.ErrNotFound)
@@ -220,7 +221,7 @@ func (s *Service) GetLogoBlob(ctx context.Context, requestLogoFile string) (*Log
 
 	return &LogoBlob{
 		ContentType: current.LogoMimeType.String(),
-		Binary:      logoBinary,
+		Body:        logoBody,
 	}, nil
 }
 

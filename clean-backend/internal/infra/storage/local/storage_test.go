@@ -3,6 +3,7 @@ package local
 import (
 	"context"
 	"errors"
+	"io"
 	"testing"
 
 	"github.com/tokushun109/tku/clean-backend/internal/usecase"
@@ -23,8 +24,15 @@ func TestStoragePutGetDelete(t *testing.T) {
 		if err != nil {
 			t.Fatalf("get error: %v", err)
 		}
-		if string(actual) != "logo-binary" {
-			t.Fatalf("unexpected payload: %s", string(actual))
+		defer func() {
+			_ = actual.Close()
+		}()
+		payloadRead, err := io.ReadAll(actual)
+		if err != nil {
+			t.Fatalf("read error: %v", err)
+		}
+		if string(payloadRead) != "logo-binary" {
+			t.Fatalf("unexpected payload: %s", string(payloadRead))
 		}
 
 		if err := storage.Delete(ctx, key); err != nil {

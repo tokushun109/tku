@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"io"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
@@ -162,6 +163,33 @@ func TestCreatorLogoPut(t *testing.T) {
 			t.Fatalf("expected non-empty logo bytes")
 		}
 	})
+
+	t.Run("20MBを超える画像ファイルを渡したときバリデーションエラーで失敗する", func(t *testing.T) {
+		uc := &stubCreatorUC{}
+		h := NewCreatorHandler(uc)
+
+		var body bytes.Buffer
+		writer := multipart.NewWriter(&body)
+		part, err := writer.CreateFormFile("logo", "logo.png")
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		_, _ = part.Write(bytes.Repeat([]byte("a"), maxCreatorLogoSize+1))
+		_ = writer.Close()
+
+		req := httptest.NewRequest(http.MethodPut, "/api/creator/logo", &body)
+		req.Header.Set("Content-Type", writer.FormDataContentType())
+		rr := httptest.NewRecorder()
+
+		h.UpdateLogo(rr, req)
+
+		if rr.Code != http.StatusBadRequest {
+			t.Fatalf("expected 400, got %d", rr.Code)
+		}
+		if len(uc.updateLogoReq) != 0 {
+			t.Fatalf("usecase should not be called when payload is too large")
+		}
+	})
 }
 
 func TestCreatorLogoBlobGet(t *testing.T) {
@@ -169,7 +197,7 @@ func TestCreatorLogoBlobGet(t *testing.T) {
 		h := NewCreatorHandler(&stubCreatorUC{
 			getLogoBlobRes: &usecaseCreator.LogoBlob{
 				ContentType: "image/png",
-				Binary:      []byte("binary"),
+				Body:        io.NopCloser(bytes.NewReader([]byte("binary"))),
 			},
 		})
 

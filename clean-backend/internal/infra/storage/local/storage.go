@@ -69,7 +69,7 @@ func (s *Storage) Put(ctx context.Context, key string, contentType string, data 
 	return nil
 }
 
-func (s *Storage) Get(ctx context.Context, key string) ([]byte, error) {
+func (s *Storage) Get(ctx context.Context, key string) (io.ReadCloser, error) {
 	select {
 	case <-ctx.Done():
 		return nil, ctx.Err()
@@ -81,14 +81,14 @@ func (s *Storage) Get(ctx context.Context, key string) ([]byte, error) {
 		return nil, err
 	}
 
-	binary, err := os.ReadFile(filePath)
+	file, err := os.Open(filePath)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			return nil, usecase.ErrStorageNotFound
 		}
 		return nil, err
 	}
-	return binary, nil
+	return file, nil
 }
 
 func (s *Storage) Delete(ctx context.Context, key string) error {

@@ -1,8 +1,10 @@
 package creator
 
 import (
+	"bytes"
 	"context"
 	"errors"
+	"io"
 	"testing"
 	"time"
 
@@ -63,11 +65,11 @@ func (s *stubLogoStorage) Put(ctx context.Context, key string, contentType strin
 	return s.putErr
 }
 
-func (s *stubLogoStorage) Get(ctx context.Context, key string) ([]byte, error) {
+func (s *stubLogoStorage) Get(ctx context.Context, key string) (io.ReadCloser, error) {
 	if s.getErr != nil {
 		return nil, s.getErr
 	}
-	return s.getRes, nil
+	return io.NopCloser(bytes.NewReader(s.getRes)), nil
 }
 
 func (s *stubLogoStorage) Delete(ctx context.Context, key string) error {
@@ -188,11 +190,18 @@ func TestServiceGetLogoBlob(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
+		defer func() {
+			_ = blob.Body.Close()
+		}()
 		if blob.ContentType != "image/png" {
 			t.Fatalf("unexpected content type: %s", blob.ContentType)
 		}
-		if string(blob.Binary) != "binary" {
-			t.Fatalf("unexpected binary: %s", string(blob.Binary))
+		binary, err := io.ReadAll(blob.Body)
+		if err != nil {
+			t.Fatalf("unexpected read error: %v", err)
+		}
+		if string(binary) != "binary" {
+			t.Fatalf("unexpected binary: %s", string(binary))
 		}
 	})
 

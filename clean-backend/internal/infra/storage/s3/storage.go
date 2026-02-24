@@ -54,7 +54,7 @@ func (s *Storage) Put(ctx context.Context, key string, contentType string, data 
 	return err
 }
 
-func (s *Storage) Get(ctx context.Context, key string) ([]byte, error) {
+func (s *Storage) Get(ctx context.Context, key string) (io.ReadCloser, error) {
 	output, err := s.client.GetObject(ctx, &awss3.GetObjectInput{
 		Bucket: aws.String(s.bucket),
 		Key:    aws.String(key),
@@ -62,11 +62,7 @@ func (s *Storage) Get(ctx context.Context, key string) ([]byte, error) {
 	if err != nil {
 		return nil, mapS3NotFoundError(err)
 	}
-	defer func() {
-		_ = output.Body.Close()
-	}()
-
-	return io.ReadAll(output.Body)
+	return output.Body, nil
 }
 
 func (s *Storage) Delete(ctx context.Context, key string) error {
