@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"path"
 	"strings"
@@ -157,17 +158,23 @@ func (s *Service) UpdateLogo(ctx context.Context, logoBytes []byte) error {
 
 	updated, err := s.repo.UpdateLogo(ctx, current.ID, logoMimeType, newLogoPath)
 	if err != nil {
-		_ = s.storage.Delete(ctx, newLogoPath.String())
+		if delErr := s.storage.Delete(ctx, newLogoPath.String()); delErr != nil {
+			log.Printf("[WARN] creator update logo rollback delete failed: path=%s err=%v", newLogoPath.String(), delErr)
+		}
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 	if !updated {
-		_ = s.storage.Delete(ctx, newLogoPath.String())
+		if delErr := s.storage.Delete(ctx, newLogoPath.String()); delErr != nil {
+			log.Printf("[WARN] creator update logo rollback delete failed: path=%s err=%v", newLogoPath.String(), delErr)
+		}
 		return usecase.NewAppErrorWithMessage(usecase.ErrNotFound, domain.ErrCreatorRecordMissing.Error())
 	}
 
 	// DB の更新後に旧ファイルを削除する。削除失敗は orphan を許容して成功扱いにする。
 	if current.LogoPath != nil && current.LogoPath.String() != newLogoPath.String() {
-		_ = s.storage.Delete(ctx, current.LogoPath.String())
+		if delErr := s.storage.Delete(ctx, current.LogoPath.String()); delErr != nil {
+			log.Printf("[WARN] creator update logo old file delete failed: path=%s err=%v", current.LogoPath.String(), delErr)
+		}
 	}
 
 	return nil
