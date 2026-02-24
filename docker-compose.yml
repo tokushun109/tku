@@ -40,9 +40,7 @@ services:
   minio:
     image: minio/minio:latest
     container_name: minio
-    environment:
-      - MINIO_ROOT_USER=minioadmin
-      - MINIO_ROOT_PASSWORD=minioadmin
+    env_file: ./clean-backend/.env
     command: server /data --console-address ":9001"
     ports:
       - 9000:9000
@@ -54,12 +52,9 @@ services:
   minio-init:
     image: minio/mc:latest
     container_name: minio-init
+    env_file: ./clean-backend/.env
     depends_on:
       - minio
-    environment:
-      - MINIO_ROOT_USER=minioadmin
-      - MINIO_ROOT_PASSWORD=minioadmin
-      - API_BUCKET_NAME=tku-local
     entrypoint: >
       /bin/sh -c "
       until /usr/bin/mc alias set local http://minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD; do sleep 1; done;
