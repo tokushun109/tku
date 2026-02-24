@@ -36,6 +36,32 @@ services:
     volumes:
       - ./clean-backend/db/migrations:/migrations
 
+  # S3 compatible storage (MinIO) for clean-backend local development
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    env_file: ./clean-backend/.env
+    command: server /data --console-address ":9001"
+    ports:
+      - 9000:9000
+      - 9001:9001
+    volumes:
+      - minio_data:/data
+
+  # Initialize bucket for local development
+  minio-init:
+    image: minio/mc:latest
+    container_name: minio-init
+    env_file: ./clean-backend/.env
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      until /usr/bin/mc alias set local http://minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD; do sleep 1; done;
+      /usr/bin/mc mb -p local/$$API_BUCKET_NAME || true;
+      exit 0;
+      "
+
   # API(backend ※今後移行予定)
   api:
     build:
@@ -47,6 +73,8 @@ services:
       MYSQL_HOST: mysql
     depends_on:
       - migrate
+      - minio
+      - minio-init
     command: sh ./docker/api/script/local/command.sh
     ports:
       - 8080:8080
@@ -69,3 +97,6 @@ services:
       - 3000:3000
     volumes:
       - ./frontend:/frontend
+
+volumes:
+  minio_data:

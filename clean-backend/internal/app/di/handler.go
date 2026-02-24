@@ -12,6 +12,7 @@ type handlers struct {
 	sns         *handler.SnsHandler
 	salesSite   *handler.SalesSiteHandler
 	skillMarket *handler.SkillMarketHandler
+	creator     *handler.CreatorHandler
 	contact     *handler.ContactHandler
 	user        *handler.UserHandler
 }
@@ -30,6 +31,7 @@ func newHandlers(ucs *usecases) (*handlers, error) {
 		sns:         handler.NewSnsHandler(ucs.sns),
 		salesSite:   handler.NewSalesSiteHandler(ucs.salesSite),
 		skillMarket: handler.NewSkillMarketHandler(ucs.skillMarket),
+		creator:     handler.NewCreatorHandler(ucs.creator),
 		contact:     handler.NewContactHandler(ucs.contact),
 		user:        handler.NewUserHandler(ucs.user),
 	}

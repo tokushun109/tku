@@ -16,6 +16,7 @@ func NewRouter(
 	snsHandler *handler.SnsHandler,
 	salesSiteHandler *handler.SalesSiteHandler,
 	skillMarketHandler *handler.SkillMarketHandler,
+	creatorHandler *handler.CreatorHandler,
 	contactHandler *handler.ContactHandler,
 	userHandler *handler.UserHandler,
 	auth *middleware.AuthMiddleware,
@@ -67,6 +68,12 @@ func NewRouter(
 	r.Handle("/api/skill_market", requireAdmin(skillMarketHandler.Create)).Methods(http.MethodPost)
 	r.Handle("/api/skill_market/{skill_market_uuid}", requireAdmin(skillMarketHandler.Update)).Methods(http.MethodPut)
 	r.Handle("/api/skill_market/{skill_market_uuid}", requireAdmin(skillMarketHandler.Delete)).Methods(http.MethodDelete)
+
+	// creator
+	r.HandleFunc("/api/creator", creatorHandler.Get).Methods(http.MethodGet)
+	r.Handle("/api/creator", requireAdmin(creatorHandler.Update)).Methods(http.MethodPut)
+	r.Handle("/api/creator/logo", requireAdmin(creatorHandler.UpdateLogo)).Methods(http.MethodPut)
+	r.HandleFunc("/api/creator/logo/{logo_file}/blob", creatorHandler.GetLogoBlob).Methods(http.MethodGet)
 
 	// contact
 	r.Handle("/api/contact", requireAdmin(contactHandler.List)).Methods(http.MethodGet)
