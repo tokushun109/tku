@@ -29,7 +29,7 @@ func (s *stubUserRepo) FindByEmail(ctx context.Context, email primitive.Email) (
 	return s.userByEmail, nil
 }
 
-func (s *stubUserRepo) FindByID(ctx context.Context, id uint) (*domainUser.User, error) {
+func (s *stubUserRepo) FindByID(ctx context.Context, id primitive.ID) (*domainUser.User, error) {
 	if s.userByIDErr != nil {
 		return nil, s.userByIDErr
 	}
@@ -47,7 +47,7 @@ type stubSessionRepo struct {
 	deleteByUUIDErr error
 	deleteByUserErr error
 	created         *domainSession.Session
-	deletedUserID   uint
+	deletedUserID   primitive.ID
 }
 
 func (s *stubSessionRepo) Create(ctx context.Context, sess *domainSession.Session) error {
@@ -69,7 +69,7 @@ func (s *stubSessionRepo) DeleteByUUID(ctx context.Context, uuid primitive.UUID)
 	return s.deleteByUUIDErr
 }
 
-func (s *stubSessionRepo) DeleteByUserID(ctx context.Context, userID uint) error {
+func (s *stubSessionRepo) DeleteByUserID(ctx context.Context, userID primitive.ID) error {
 	s.deletedUserID = userID
 	return s.deleteByUserErr
 }
@@ -165,8 +165,8 @@ func TestLogin(t *testing.T) {
 		if sess == nil || sess.UUID().String() != testUUID {
 			t.Fatalf("unexpected session: %+v", sess)
 		}
-		if sessionRepo.deletedUserID != 1 {
-			t.Fatalf("expected deleted user id=1, got %d", sessionRepo.deletedUserID)
+		if sessionRepo.deletedUserID.Uint() != 1 {
+			t.Fatalf("expected deleted user id=1, got %d", sessionRepo.deletedUserID.Uint())
 		}
 		if sessionRepo.created == nil {
 			t.Fatalf("expected session create called")
@@ -237,7 +237,7 @@ func TestGetBySessionToken(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if u == nil || u.ID() != 1 {
+		if u == nil || u.ID().Uint() != 1 {
 			t.Fatalf("unexpected user: %+v", u)
 		}
 	})

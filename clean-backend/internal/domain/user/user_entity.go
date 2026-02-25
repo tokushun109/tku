@@ -3,7 +3,7 @@ package user
 import "github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
 
 type User struct {
-	id           uint
+	id           primitive.ID
 	uuid         primitive.UUID
 	name         UserName
 	email        primitive.Email
@@ -27,14 +27,15 @@ func Rebuild(
 	passwordHash string,
 	isAdmin bool,
 ) (*User, error) {
-	if id == 0 {
+	parsedID, err := primitive.NewID(id)
+	if err != nil {
 		return nil, ErrInvalidID
 	}
 	user, err := newWithValidatedValues(rawUUID, name, email, passwordHash, isAdmin)
 	if err != nil {
 		return nil, err
 	}
-	user.id = id
+	user.id = parsedID
 	return user, nil
 }
 
@@ -65,7 +66,7 @@ func newWithValidatedValues(rawUUID string, name string, email string, passwordH
 	}, nil
 }
 
-func (u *User) ID() uint {
+func (u *User) ID() primitive.ID {
 	return u.id
 }
 

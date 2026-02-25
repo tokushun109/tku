@@ -28,8 +28,12 @@ func BuildServer() (*config.Config, http.Handler, error) {
 	if err != nil {
 		return nil, nil, fmt.Errorf("build repositories: %w", err)
 	}
+	qrs, err := newQueries(db)
+	if err != nil {
+		return nil, nil, fmt.Errorf("build queries: %w", err)
+	}
 
-	ucs, err := newUsecases(repos, cfg, txManager)
+	ucs, err := newUsecases(repos, qrs, cfg, txManager)
 	if err != nil {
 		return nil, nil, fmt.Errorf("build usecases: %w", err)
 	}
@@ -54,6 +58,7 @@ func BuildServer() (*config.Config, http.Handler, error) {
 		handlers.skillMarket,
 		handlers.creator,
 		handlers.contact,
+		handlers.product,
 		handlers.user,
 		middlewares.auth,
 		middlewares.admin,

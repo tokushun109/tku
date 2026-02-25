@@ -8,6 +8,8 @@ import (
 	"github.com/jmoiron/sqlx"
 
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/creator"
+	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
+	"github.com/tokushun109/tku/clean-backend/internal/infra/db/mysql/mysqlutil"
 	"github.com/tokushun109/tku/clean-backend/internal/shared/optional"
 )
 
@@ -52,7 +54,7 @@ func (r *CreatorRepository) UpdateProfile(ctx context.Context, c *domain.Creator
 		`UPDATE creator SET name = ?, introduction = ?, updated_at = NOW() WHERE id = ? AND deleted_at IS NULL`,
 		c.Name().String(),
 		introduction,
-		c.ID(),
+		c.ID().Uint(),
 	)
 	if err != nil {
 		return false, err
@@ -67,7 +69,7 @@ func (r *CreatorRepository) UpdateProfile(ctx context.Context, c *domain.Creator
 
 func (r *CreatorRepository) UpdateLogo(
 	ctx context.Context,
-	creatorID uint,
+	creatorID primitive.ID,
 	mimeType domain.CreatorLogoMimeType,
 	logoPath domain.CreatorLogoPath,
 ) (bool, error) {
@@ -76,7 +78,7 @@ func (r *CreatorRepository) UpdateLogo(
 		`UPDATE creator SET mime_type = ?, logo = ?, updated_at = NOW() WHERE id = ? AND deleted_at IS NULL`,
 		mimeType.String(),
 		logoPath.String(),
-		creatorID,
+		creatorID.Uint(),
 	)
 	if err != nil {
 		return false, err
@@ -90,18 +92,9 @@ func (r *CreatorRepository) UpdateLogo(
 }
 
 func toDomainCreator(row creatorRow) (*domain.Creator, error) {
-	introductionRaw := ""
-	if row.Introduction.Valid {
-		introductionRaw = row.Introduction.String
-	}
-	mimeTypeRaw := ""
-	if row.MimeType.Valid {
-		mimeTypeRaw = row.MimeType.String
-	}
-	logoPathRaw := ""
-	if row.Logo.Valid {
-		logoPathRaw = row.Logo.String
-	}
+	introductionRaw := mysqlutil.NullStringOrEmpty(row.Introduction)
+	mimeTypeRaw := mysqlutil.NullStringOrEmpty(row.MimeType)
+	logoPathRaw := mysqlutil.NullStringOrEmpty(row.Logo)
 
 	creator, err := domain.Rebuild(
 		row.ID,

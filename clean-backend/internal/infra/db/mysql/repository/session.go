@@ -62,7 +62,7 @@ func (r *SessionRepository) DeleteByUUID(ctx context.Context, uuid primitive.UUI
 	return err
 }
 
-func (r *SessionRepository) DeleteByUserID(ctx context.Context, userID uint) error {
-	_, err := getExecutor(ctx, r.db).ExecContext(ctx, `DELETE FROM session WHERE user_id = ?`, userID)
+func (r *SessionRepository) DeleteByUserID(ctx context.Context, userID primitive.ID) error {
+	_, err := getExecutor(ctx, r.db).ExecContext(ctx, `DELETE FROM session WHERE user_id = ?`, userID.Uint())
 	return err
 }

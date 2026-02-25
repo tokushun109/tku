@@ -1,9 +1,12 @@
 package creator
 
-import "github.com/tokushun109/tku/clean-backend/internal/shared/optional"
+import (
+	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
+	"github.com/tokushun109/tku/clean-backend/internal/shared/optional"
+)
 
 type Creator struct {
-	id           uint
+	id           primitive.ID
 	name         CreatorName
 	introduction *CreatorIntroduction
 	logoMimeType *CreatorLogoMimeType
@@ -25,14 +28,15 @@ func Rebuild(
 	logoMimeType string,
 	logoPath string,
 ) (*Creator, error) {
-	if id == 0 {
+	parsedID, err := primitive.NewID(id)
+	if err != nil {
 		return nil, ErrInvalidID
 	}
 	creator, err := newWithValidatedValues(name, introduction, logoMimeType, logoPath)
 	if err != nil {
 		return nil, err
 	}
-	creator.id = id
+	creator.id = parsedID
 	return creator, nil
 }
 
@@ -62,7 +66,7 @@ func newWithValidatedValues(name string, introduction string, logoMimeType strin
 	}, nil
 }
 
-func (c *Creator) ID() uint {
+func (c *Creator) ID() primitive.ID {
 	return c.id
 }
 

@@ -4,7 +4,7 @@ import "github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
 
 // お問い合わせ通知の送信先ユーザー情報
 type ContactNotificationUser struct {
-	id    uint
+	id    primitive.ID
 	name  UserName
 	email primitive.Email
 }
@@ -25,18 +25,19 @@ func NewContactNotificationUser(name string, email string) (*ContactNotification
 }
 
 func RebuildContactNotificationUser(id uint, name string, email string) (*ContactNotificationUser, error) {
-	if id == 0 {
+	parsedID, err := primitive.NewID(id)
+	if err != nil {
 		return nil, ErrInvalidID
 	}
 	user, err := NewContactNotificationUser(name, email)
 	if err != nil {
 		return nil, err
 	}
-	user.id = id
+	user.id = parsedID
 	return user, nil
 }
 
-func (u *ContactNotificationUser) ID() uint {
+func (u *ContactNotificationUser) ID() primitive.ID {
 	return u.id
 }
 

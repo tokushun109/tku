@@ -3,7 +3,7 @@ package target
 import "github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
 
 type Target struct {
-	id   uint
+	id   primitive.ID
 	uuid primitive.UUID
 	name TargetName
 }
@@ -17,14 +17,15 @@ func New(rawUUID string, name string) (*Target, error) {
 }
 
 func Rebuild(id uint, rawUUID string, name string) (*Target, error) {
-	if id == 0 {
+	parsedID, err := primitive.NewID(id)
+	if err != nil {
 		return nil, ErrInvalidID
 	}
 	target, err := newWithValidatedValues(rawUUID, name)
 	if err != nil {
 		return nil, err
 	}
-	target.id = id
+	target.id = parsedID
 	return target, nil
 }
 
@@ -43,7 +44,7 @@ func newWithValidatedValues(rawUUID string, name string) (*Target, error) {
 	}, nil
 }
 
-func (t *Target) ID() uint {
+func (t *Target) ID() primitive.ID {
 	return t.id
 }
 

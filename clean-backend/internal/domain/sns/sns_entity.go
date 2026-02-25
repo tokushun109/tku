@@ -3,7 +3,7 @@ package sns
 import "github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
 
 type Sns struct {
-	id   uint
+	id   primitive.ID
 	uuid primitive.UUID
 	name SnsName
 	url  primitive.URL
@@ -19,14 +19,15 @@ func New(rawUUID string, name string, rawURL string, icon string) (*Sns, error) 
 }
 
 func Rebuild(id uint, rawUUID string, name string, rawURL string, icon string) (*Sns, error) {
-	if id == 0 {
+	parsedID, err := primitive.NewID(id)
+	if err != nil {
 		return nil, ErrInvalidID
 	}
 	sns, err := newWithValidatedValues(rawUUID, name, rawURL, icon)
 	if err != nil {
 		return nil, err
 	}
-	sns.id = id
+	sns.id = parsedID
 	return sns, nil
 }
 
@@ -51,7 +52,7 @@ func newWithValidatedValues(rawUUID string, name string, rawURL string, icon str
 	}, nil
 }
 
-func (s *Sns) ID() uint {
+func (s *Sns) ID() primitive.ID {
 	return s.id
 }
 
