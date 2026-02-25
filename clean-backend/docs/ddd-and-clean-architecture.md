@@ -135,6 +135,37 @@ tku/clean-backend/
   - infra 側で `UUIDGenerator` を実装して DI する
 - 文字列や数値の制約は VO に寄せる（Entity に生データを持たせない）
 
+### Entity の公開範囲と生成ルール（合意）
+
+- Entity のフィールドは原則 **非公開**（lower camel）にする
+- 値の取得は getter 経由に統一する
+  - メソッド名はフィールド名のアッパーキャメル（例: `UUID()`, `Name()`, `ID()`）
+- Entity は原則として永続化ID（`id`）を持つ
+  - `id` はDB内部の関連付けに利用し、外部公開識別子（例: `uuid`）とは用途を分ける
+- 初期化は公開コンストラクタ `New(...)` を使う
+  - usecase / repository で Entity を構造体リテラルで直接初期化しない
+- 更新は `ChangeName(...)` のような振る舞いメソッド経由で行う
+  - 外部からの直接代入（`entity.field = ...`）は許可しない
+- UUID を持つ Entity は `New(uuid, ...)` のように UUID を引数で受ける
+  - 生成後に UUID を後付けする二段階初期化を避ける
+
+### 復元（DB Read）で `Rebuild` を使う判断基準
+
+- DB から Entity を復元するときは **原則 `Rebuild(...)`** を使う
+- `Rebuild(...)` は `id` を含む永続化済み値を受け取り、復元専用の入口にする
+- `New(...)` は新規作成（未永続化）専用とする
+- `Rebuild(...)` は repository からの利用を想定し、不正な復元値（例: `id == 0`）は弾く
+
+### Contact の方針（現行合意）
+
+- 作成時は `New(name, company, phoneNumber, email, content)` を使う
+  - 引数は string を受け取り、Entity 内で VO 化・バリデーションする
+- DB 復元時は `Rebuild(id, nameVO, companyVO, phoneVO, emailVO, contentVO, createdAt)` を使う
+- `Contact` には次の API を持たせる
+  - `ID() uint`
+  - `HasID() bool`（`id != 0`）
+- ID を変更する公開 setter は作らない
+
 ### 命名規則（ファイル名）
 
 - Entity: `<domain>_entity.go`
@@ -255,10 +286,10 @@ type ProductResponse struct {
 ```go
 func ToProductResponse(p *product.Product) *response.ProductResponse {
     return &response.ProductResponse{
-        ID:          p.ID,
-        Name:        p.Name,
-        Description: p.Description,
-        Price:       p.Price,
+        ID:          p.ID(),
+        Name:        p.Name(),
+        Description: p.Description(),
+        Price:       p.Price(),
     }
 }
 ```
@@ -540,10 +571,10 @@ func NewDB(cfg *config.Config) (*sqlx.DB, error) {
 ```go
 type Repository interface {
     Create(ctx context.Context, p *Product) error
-    FindByID(ctx context.Context, id string) (*Product, error)
+    FindByUUID(ctx context.Context, uuid primitive.UUID) (*Product, error)
     ExistsByName(ctx context.Context, name string) (bool, error)
     Update(ctx context.Context, p *Product) error
-    Delete(ctx context.Context, id string) error
+    Delete(ctx context.Context, uuid primitive.UUID) error
 }
 ```
 
@@ -562,17 +593,28 @@ func (r *ProductRepository) Create(ctx context.Context, p *product.Product) erro
     _, err := r.db.ExecContext(
         ctx,
         `INSERT INTO product (uuid, name, price, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())`,
-        p.ID, p.Name, p.Price,
+        p.UUID().String(), p.Name().String(), p.Price(),
     )
     return err
 }
 
-func (r *ProductRepository) FindByID(ctx context.Context, id string) (*product.Product, error) {
-    var p product.Product
-    if err := r.db.GetContext(ctx, &p, `SELECT uuid, name, price FROM product WHERE uuid = ?`, id); err != nil {
+func (r *ProductRepository) FindByUUID(ctx context.Context, uuid primitive.UUID) (*product.Product, error) {
+    type row struct {
+        ID    uint   `db:"id"`
+        UUID  string `db:"uuid"`
+        Name  string `db:"name"`
+        Price int    `db:"price"`
+    }
+    var rr row
+    if err := r.db.GetContext(ctx, &rr, `SELECT id, uuid, name, price FROM product WHERE uuid = ?`, uuid.String()); err != nil {
         return nil, err
     }
-    return &p, nil
+    parsedUUID, err := primitive.NewUUID(rr.UUID)
+    if err != nil {
+        return nil, err
+    }
+    // DB 復元は Rebuild(...) を利用する
+    return product.Rebuild(rr.ID, parsedUUID, rr.Name, rr.Price)
 }
 
 func (r *ProductRepository) ExistsByName(ctx context.Context, name string) (bool, error) {
@@ -587,13 +629,13 @@ func (r *ProductRepository) Update(ctx context.Context, p *product.Product) erro
     _, err := r.db.ExecContext(
         ctx,
         `UPDATE product SET name = ?, price = ?, updated_at = NOW() WHERE uuid = ?`,
-        p.Name, p.Price, p.ID,
+        p.Name().String(), p.Price(), p.UUID().String(),
     )
     return err
 }
 
-func (r *ProductRepository) Delete(ctx context.Context, id string) error {
-    _, err := r.db.ExecContext(ctx, `UPDATE product SET deleted_at = NOW() WHERE uuid = ?`, id)
+func (r *ProductRepository) Delete(ctx context.Context, uuid primitive.UUID) error {
+    _, err := r.db.ExecContext(ctx, `UPDATE product SET deleted_at = NOW() WHERE uuid = ?`, uuid.String())
     return err
 }
 ```
