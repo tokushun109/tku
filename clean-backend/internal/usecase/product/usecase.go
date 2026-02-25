@@ -421,10 +421,6 @@ func (s *Service) GetProductImageBlob(ctx context.Context, productImageUUID stri
 }
 
 func (s *Service) CreateProductImages(ctx context.Context, productUUID string, files []ProductImageUploadFile, isChanged bool, orderMap map[int]int) error {
-	if len(files) == 0 {
-		return nil
-	}
-
 	uuid, err := primitive.NewUUID(productUUID)
 	if err != nil {
 		return usecase.NewAppError(usecase.ErrInvalidInput)
@@ -435,6 +431,9 @@ func (s *Service) CreateProductImages(ctx context.Context, productUUID string, f
 	}
 	if product == nil {
 		return usecase.NewAppError(usecase.ErrNotFound)
+	}
+	if len(files) == 0 {
+		return nil
 	}
 
 	uploadedPaths := make([]string, 0, len(files))
