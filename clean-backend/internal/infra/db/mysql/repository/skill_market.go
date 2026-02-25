@@ -9,6 +9,7 @@ import (
 
 	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/skill_market"
+	"github.com/tokushun109/tku/clean-backend/internal/infra/db/mysql/mysqlutil"
 )
 
 type SkillMarketRepository struct {
@@ -105,10 +106,7 @@ func (r *SkillMarketRepository) Delete(ctx context.Context, uuid primitive.UUID)
 }
 
 func toDomainSkillMarket(id uint, uuidStr, nameStr, urlStr string, icon sql.NullString) (*domain.SkillMarket, error) {
-	iconValue := ""
-	if icon.Valid {
-		iconValue = icon.String
-	}
+	iconValue := mysqlutil.NullStringOrEmpty(icon)
 
 	skillMarket, err := domain.Rebuild(id, uuidStr, nameStr, urlStr, iconValue)
 	if err != nil {

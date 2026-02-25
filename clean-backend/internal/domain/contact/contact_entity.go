@@ -8,7 +8,7 @@ import (
 )
 
 type Contact struct {
-	id          uint
+	id          primitive.ID
 	name        ContactName
 	company     *ContactCompany
 	phoneNumber *primitive.PhoneNumber
@@ -34,14 +34,15 @@ func Rebuild(
 	content string,
 	createdAt time.Time,
 ) (*Contact, error) {
-	if id == 0 {
+	parsedID, err := primitive.NewID(id)
+	if err != nil {
 		return nil, ErrInvalidID
 	}
 	contact, err := newWithValidatedValues(name, company, phoneNumber, email, content)
 	if err != nil {
 		return nil, err
 	}
-	contact.id = id
+	contact.id = parsedID
 	contact.createdAt = createdAt
 	return contact, nil
 }
@@ -77,12 +78,8 @@ func newWithValidatedValues(name, company, phoneNumber, email, content string) (
 	}, nil
 }
 
-func (c *Contact) ID() uint {
+func (c *Contact) ID() primitive.ID {
 	return c.id
-}
-
-func (c *Contact) HasID() bool {
-	return c.id != 0
 }
 
 func (c *Contact) Name() ContactName {

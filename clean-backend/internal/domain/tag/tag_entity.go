@@ -3,7 +3,7 @@ package tag
 import "github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
 
 type Tag struct {
-	id   uint
+	id   primitive.ID
 	uuid primitive.UUID
 	name TagName
 }
@@ -17,14 +17,15 @@ func New(rawUUID string, name string) (*Tag, error) {
 }
 
 func Rebuild(id uint, rawUUID string, name string) (*Tag, error) {
-	if id == 0 {
+	parsedID, err := primitive.NewID(id)
+	if err != nil {
 		return nil, ErrInvalidID
 	}
 	tag, err := newWithValidatedValues(rawUUID, name)
 	if err != nil {
 		return nil, err
 	}
-	tag.id = id
+	tag.id = parsedID
 	return tag, nil
 }
 
@@ -43,7 +44,7 @@ func newWithValidatedValues(rawUUID string, name string) (*Tag, error) {
 	}, nil
 }
 
-func (t *Tag) ID() uint {
+func (t *Tag) ID() primitive.ID {
 	return t.id
 }
 

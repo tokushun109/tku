@@ -7,9 +7,9 @@ import (
 )
 
 type Session struct {
-	id        uint
+	id        primitive.ID
 	uuid      primitive.UUID
-	userID    uint
+	userID    primitive.ID
 	createdAt time.Time
 }
 
@@ -22,14 +22,15 @@ func New(rawUUID string, userID uint, createdAt time.Time) (*Session, error) {
 }
 
 func Rebuild(id uint, rawUUID string, userID uint, createdAt time.Time) (*Session, error) {
-	if id == 0 {
+	parsedID, err := primitive.NewID(id)
+	if err != nil {
 		return nil, ErrInvalidID
 	}
 	session, err := newWithValidatedValues(rawUUID, userID, createdAt)
 	if err != nil {
 		return nil, err
 	}
-	session.id = id
+	session.id = parsedID
 	return session, nil
 }
 
@@ -38,7 +39,8 @@ func newWithValidatedValues(rawUUID string, userID uint, createdAt time.Time) (*
 	if err != nil {
 		return nil, err
 	}
-	if userID == 0 {
+	parsedUserID, err := primitive.NewID(userID)
+	if err != nil {
 		return nil, ErrInvalidUserID
 	}
 	if createdAt.IsZero() {
@@ -46,12 +48,12 @@ func newWithValidatedValues(rawUUID string, userID uint, createdAt time.Time) (*
 	}
 	return &Session{
 		uuid:      uuid,
-		userID:    userID,
+		userID:    parsedUserID,
 		createdAt: createdAt,
 	}, nil
 }
 
-func (s *Session) ID() uint {
+func (s *Session) ID() primitive.ID {
 	return s.id
 }
 
@@ -60,7 +62,7 @@ func (s *Session) UUID() primitive.UUID {
 }
 
 func (s *Session) UserID() uint {
-	return s.userID
+	return s.userID.Uint()
 }
 
 func (s *Session) CreatedAt() time.Time {

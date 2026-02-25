@@ -19,7 +19,7 @@ type stubRepo struct {
 	err       error
 	createErr error
 	deleteErr error
-	userID    uint
+	userID    primitive.ID
 	created   *domain.Session
 }
 
@@ -42,7 +42,7 @@ func (s *stubRepo) DeleteByUUID(ctx context.Context, uuid primitive.UUID) error 
 	return s.deleteErr
 }
 
-func (s *stubRepo) DeleteByUserID(ctx context.Context, userID uint) error {
+func (s *stubRepo) DeleteByUserID(ctx context.Context, userID primitive.ID) error {
 	s.userID = userID
 	return s.deleteErr
 }

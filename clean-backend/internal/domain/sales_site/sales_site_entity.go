@@ -3,7 +3,7 @@ package sales_site
 import "github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
 
 type SalesSite struct {
-	id   uint
+	id   primitive.ID
 	uuid primitive.UUID
 	name SalesSiteName
 	url  primitive.URL
@@ -19,14 +19,15 @@ func New(rawUUID string, name string, rawURL string, icon string) (*SalesSite, e
 }
 
 func Rebuild(id uint, rawUUID string, name string, rawURL string, icon string) (*SalesSite, error) {
-	if id == 0 {
+	parsedID, err := primitive.NewID(id)
+	if err != nil {
 		return nil, ErrInvalidID
 	}
 	salesSite, err := newWithValidatedValues(rawUUID, name, rawURL, icon)
 	if err != nil {
 		return nil, err
 	}
-	salesSite.id = id
+	salesSite.id = parsedID
 	return salesSite, nil
 }
 
@@ -51,7 +52,7 @@ func newWithValidatedValues(rawUUID string, name string, rawURL string, icon str
 	}, nil
 }
 
-func (s *SalesSite) ID() uint {
+func (s *SalesSite) ID() primitive.ID {
 	return s.id
 }
 

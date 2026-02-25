@@ -23,7 +23,7 @@ type stubCreatorRepository struct {
 
 	updateLogoRes       bool
 	updateLogoErr       error
-	updateLogoCreatorID uint
+	updateLogoCreatorID primitive.ID
 	updateLogoMimeType  domain.CreatorLogoMimeType
 	updateLogoPath      domain.CreatorLogoPath
 }
@@ -37,7 +37,7 @@ func (s *stubCreatorRepository) UpdateProfile(ctx context.Context, c *domain.Cre
 	return s.updateProfileRes, s.updateProfileErr
 }
 
-func (s *stubCreatorRepository) UpdateLogo(ctx context.Context, creatorID uint, mimeType domain.CreatorLogoMimeType, logoPath domain.CreatorLogoPath) (bool, error) {
+func (s *stubCreatorRepository) UpdateLogo(ctx context.Context, creatorID primitive.ID, mimeType domain.CreatorLogoMimeType, logoPath domain.CreatorLogoPath) (bool, error) {
 	s.updateLogoCreatorID = creatorID
 	s.updateLogoMimeType = mimeType
 	s.updateLogoPath = logoPath
@@ -138,7 +138,7 @@ func TestServiceUpdate(t *testing.T) {
 			updatedProfile:      nil,
 			updateLogoRes:       false,
 			updateLogoErr:       nil,
-			updateLogoCreatorID: 0,
+			updateLogoCreatorID: primitive.ID(0),
 		}
 		svc := New(repo, &stubLogoStorage{}, &stubUUIDGenerator{})
 
@@ -184,8 +184,8 @@ func TestServiceUpdateLogo(t *testing.T) {
 		if repo.updateLogoPath.String() != expectedPath {
 			t.Fatalf("unexpected updated logo path: %s", repo.updateLogoPath.String())
 		}
-		if repo.updateLogoCreatorID != 10 {
-			t.Fatalf("unexpected creator id: %d", repo.updateLogoCreatorID)
+		if repo.updateLogoCreatorID.Uint() != 10 {
+			t.Fatalf("unexpected creator id: %d", repo.updateLogoCreatorID.Uint())
 		}
 		if len(storage.deletedKeys) != 1 || storage.deletedKeys[0] != "img/logo/o/l/old.jpg" {
 			t.Fatalf("unexpected deleted keys: %#v", storage.deletedKeys)

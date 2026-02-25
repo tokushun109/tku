@@ -14,6 +14,7 @@ import (
 	usecaseContact "github.com/tokushun109/tku/clean-backend/internal/usecase/contact"
 	usecaseCreator "github.com/tokushun109/tku/clean-backend/internal/usecase/creator"
 	usecaseHealth "github.com/tokushun109/tku/clean-backend/internal/usecase/health"
+	usecaseProduct "github.com/tokushun109/tku/clean-backend/internal/usecase/product"
 	usecaseSalesSite "github.com/tokushun109/tku/clean-backend/internal/usecase/sales_site"
 	usecaseSession "github.com/tokushun109/tku/clean-backend/internal/usecase/session"
 	usecaseSkillMarket "github.com/tokushun109/tku/clean-backend/internal/usecase/skill_market"
@@ -35,11 +36,15 @@ type usecases struct {
 	contact     usecaseContact.Usecase
 	session     usecaseSession.Usecase
 	user        usecaseUser.Usecase
+	product     usecaseProduct.Usecase
 }
 
-func newUsecases(repos *repositories, cfg *config.Config, txManager usecase.TxManager) (*usecases, error) {
+func newUsecases(repos *repositories, qrs *queries, cfg *config.Config, txManager usecase.TxManager) (*usecases, error) {
 	// 入力側の依存関係のチェック
 	if err := requireStructFieldsNonNil("repositories", repos); err != nil {
+		return nil, err
+	}
+	if err := requireStructFieldsNonNil("queries", qrs); err != nil {
 		return nil, err
 	}
 	if err := requireNonNil("config", cfg); err != nil {
@@ -96,6 +101,19 @@ func newUsecases(repos *repositories, cfg *config.Config, txManager usecase.TxMa
 		contact:     usecaseContact.New(repos.contact, contactNotifier),
 		session:     sessionUC,
 		user:        usecaseUser.New(repos.user, repos.session, sessionUC, passwordHasher, uuidGen, clock, txManager),
+		product: usecaseProduct.New(
+			repos.product,
+			repos.productImage,
+			repos.siteDetail,
+			repos.category,
+			repos.target,
+			repos.tag,
+			repos.salesSite,
+			qrs.product,
+			storage,
+			uuidGen,
+			txManager,
+		),
 	}
 
 	// 出力側の依存関係のチェック

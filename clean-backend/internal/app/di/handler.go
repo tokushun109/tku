@@ -15,6 +15,7 @@ type handlers struct {
 	creator     *handler.CreatorHandler
 	contact     *handler.ContactHandler
 	user        *handler.UserHandler
+	product     *handler.ProductHandler
 }
 
 func newHandlers(ucs *usecases) (*handlers, error) {
@@ -34,6 +35,7 @@ func newHandlers(ucs *usecases) (*handlers, error) {
 		creator:     handler.NewCreatorHandler(ucs.creator),
 		contact:     handler.NewContactHandler(ucs.contact),
 		user:        handler.NewUserHandler(ucs.user),
+		product:     handler.NewProductHandler(ucs.product),
 	}
 
 	// 出力側の依存関係のチェック

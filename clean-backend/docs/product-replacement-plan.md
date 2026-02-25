@@ -52,7 +52,7 @@
 
 ### 3.1 Domain（Entity/VO）
 
-`product` と `product_image` は同一ディレクトリ内でファイル分割する。
+`product` と `product_image` は同一ディレクトリ内でファイル分割し、`site_detail` は別ドメインとして分離する。
 
 ```text
 internal/domain/product/
@@ -63,8 +63,6 @@ internal/domain/product/
   product_name_vo.go
   product_description_vo.go
   product_price_vo.go
-  product_is_active_vo.go
-  product_is_recommend_vo.go
 
   product_image_name_vo.go
   product_image_mime_type_vo.go
@@ -73,14 +71,22 @@ internal/domain/product/
 
   product_repo.go
   product_image_repo.go
+
+internal/domain/site_detail/
+  site_detail_entity.go
+  site_detail_error.go
+  site_detail_detail_url_vo.go
+  site_detail_repo.go
 ```
 
 補足:
 
 - UUID は既存方針どおり `internal/domain/primitive/uuid_vo.go` を利用する。
 - Product Entity は `id` と `uuid` の両方を保持する。
+- `is_active` / `is_recommend` は `bool` で扱い、初期実装では専用VOを作らない。
 - Repository の read 実装では `SELECT id, uuid, ...` で取得し、`Rebuild(id, uuid, ...)` で復元する。
-- `site_detail` は商品配下で扱うが、必要に応じて Value Object を追加する（detail URL 等）。
+- `site_detail` は `internal/domain/site_detail` に分離し、detail URL などの制約は同ドメインで管理する。
+- Product Usecase から `site_detail` Repository を呼び出し、`WithinTransaction` 内で `product` 更新と同時に整合性を保つ。
 
 ### 3.2 Usecase（Command / Query）
 
@@ -113,6 +119,7 @@ internal/infra/db/mysql/
   repository/
     product.go                   # Command側リポジトリ実装
     product_image.go             # Command側リポジトリ実装
+    site_detail.go               # Command側リポジトリ実装
   query/
     product_query.go             # Query側実装(sqlx)
 ```

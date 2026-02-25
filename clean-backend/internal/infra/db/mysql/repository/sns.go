@@ -9,6 +9,7 @@ import (
 
 	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/sns"
+	"github.com/tokushun109/tku/clean-backend/internal/infra/db/mysql/mysqlutil"
 )
 
 type SnsRepository struct {
@@ -105,10 +106,7 @@ func (r *SnsRepository) Delete(ctx context.Context, uuid primitive.UUID) (bool, 
 }
 
 func toDomainSns(id uint, uuidStr, nameStr, urlStr string, icon sql.NullString) (*domain.Sns, error) {
-	iconValue := ""
-	if icon.Valid {
-		iconValue = icon.String
-	}
+	iconValue := mysqlutil.NullStringOrEmpty(icon)
 
 	sns, err := domain.Rebuild(id, uuidStr, nameStr, urlStr, iconValue)
 	if err != nil {

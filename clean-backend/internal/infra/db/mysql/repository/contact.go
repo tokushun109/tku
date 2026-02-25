@@ -9,6 +9,7 @@ import (
 	"github.com/jmoiron/sqlx"
 
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/contact"
+	"github.com/tokushun109/tku/clean-backend/internal/infra/db/mysql/mysqlutil"
 	"github.com/tokushun109/tku/clean-backend/internal/shared/optional"
 )
 
@@ -74,14 +75,8 @@ func toDomainContact(r contactRow) (*domain.Contact, error) {
 		createdAt = r.CreatedAt.Time
 	}
 
-	company := ""
-	if r.Company.Valid {
-		company = r.Company.String
-	}
-	phoneNumber := ""
-	if r.PhoneNumber.Valid {
-		phoneNumber = r.PhoneNumber.String
-	}
+	company := mysqlutil.NullStringOrEmpty(r.Company)
+	phoneNumber := mysqlutil.NullStringOrEmpty(r.PhoneNumber)
 
 	contact, err := domain.Rebuild(
 		r.ID,

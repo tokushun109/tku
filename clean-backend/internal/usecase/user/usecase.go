@@ -75,7 +75,7 @@ func (s *Service) Login(ctx context.Context, email string, password string) (*do
 
 	sessionUUID := s.uuidGen.New()
 
-	sess, err := domainSession.New(sessionUUID, u.ID(), s.clock.Now())
+	sess, err := domainSession.New(sessionUUID, u.ID().Uint(), s.clock.Now())
 	if err != nil {
 		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
@@ -100,7 +100,12 @@ func (s *Service) GetBySessionToken(ctx context.Context, token string) (*domainU
 		return nil, err
 	}
 
-	u, err := s.userRepo.FindByID(ctx, sess.UserID())
+	sessionUserID, err := primitive.NewID(sess.UserID())
+	if err != nil {
+		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
+	}
+
+	u, err := s.userRepo.FindByID(ctx, sessionUserID)
 	if err != nil {
 		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}

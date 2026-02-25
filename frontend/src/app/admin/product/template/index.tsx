@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { getCategories } from '@/apis/category'
-import { createProduct, deleteProduct, duplicateProductFromCreema, getProducts, updateProduct, uploadProductImage } from '@/apis/product'
+import { createProduct, deleteProduct, duplicateProductFromCreema, getProducts, updateProduct, uploadProductImages } from '@/apis/product'
 import { getSalesSiteList } from '@/apis/salesSite'
 import { getTags } from '@/apis/tag'
 import { getTargets } from '@/apis/target'
@@ -220,7 +220,7 @@ export const AdminProductTemplate = ({
                     order: uploadFileOrder,
                 }
 
-                await uploadProductImage(productUuid, data.uploadImages, orderParams)
+                await uploadProductImages(productUuid, data.uploadImages, orderParams)
             }
 
             setIsDialogOpen(false)

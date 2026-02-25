@@ -9,6 +9,7 @@ import (
 
 	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/sales_site"
+	"github.com/tokushun109/tku/clean-backend/internal/infra/db/mysql/mysqlutil"
 )
 
 type SalesSiteRepository struct {
@@ -124,10 +125,7 @@ func (r *SalesSiteRepository) Delete(ctx context.Context, uuid primitive.UUID) (
 }
 
 func toDomainSalesSite(id uint, uuidStr, nameStr, urlStr string, icon sql.NullString) (*domain.SalesSite, error) {
-	iconValue := ""
-	if icon.Valid {
-		iconValue = icon.String
-	}
+	iconValue := mysqlutil.NullStringOrEmpty(icon)
 
 	salesSite, err := domain.Rebuild(id, uuidStr, nameStr, urlStr, iconValue)
 	if err != nil {

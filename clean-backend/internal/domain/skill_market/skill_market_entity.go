@@ -3,7 +3,7 @@ package skill_market
 import "github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
 
 type SkillMarket struct {
-	id   uint
+	id   primitive.ID
 	uuid primitive.UUID
 	name SkillMarketName
 	url  primitive.URL
@@ -19,14 +19,15 @@ func New(rawUUID string, name string, rawURL string, icon string) (*SkillMarket,
 }
 
 func Rebuild(id uint, rawUUID string, name string, rawURL string, icon string) (*SkillMarket, error) {
-	if id == 0 {
+	parsedID, err := primitive.NewID(id)
+	if err != nil {
 		return nil, ErrInvalidID
 	}
 	skillMarket, err := newWithValidatedValues(rawUUID, name, rawURL, icon)
 	if err != nil {
 		return nil, err
 	}
-	skillMarket.id = id
+	skillMarket.id = parsedID
 	return skillMarket, nil
 }
 
@@ -51,7 +52,7 @@ func newWithValidatedValues(rawUUID string, name string, rawURL string, icon str
 	}, nil
 }
 
-func (s *SkillMarket) ID() uint {
+func (s *SkillMarket) ID() primitive.ID {
 	return s.id
 }
 

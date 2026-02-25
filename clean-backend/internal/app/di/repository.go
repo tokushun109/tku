@@ -6,17 +6,20 @@ import (
 )
 
 type repositories struct {
-	health      *mysqlRepo.HealthRepository
-	category    *mysqlRepo.CategoryRepository
-	target      *mysqlRepo.TargetRepository
-	tag         *mysqlRepo.TagRepository
-	sns         *mysqlRepo.SnsRepository
-	salesSite   *mysqlRepo.SalesSiteRepository
-	skillMarket *mysqlRepo.SkillMarketRepository
-	creator     *mysqlRepo.CreatorRepository
-	contact     *mysqlRepo.ContactRepository
-	session     *mysqlRepo.SessionRepository
-	user        *mysqlRepo.UserRepository
+	health       *mysqlRepo.HealthRepository
+	category     *mysqlRepo.CategoryRepository
+	target       *mysqlRepo.TargetRepository
+	tag          *mysqlRepo.TagRepository
+	sns          *mysqlRepo.SnsRepository
+	salesSite    *mysqlRepo.SalesSiteRepository
+	skillMarket  *mysqlRepo.SkillMarketRepository
+	creator      *mysqlRepo.CreatorRepository
+	contact      *mysqlRepo.ContactRepository
+	session      *mysqlRepo.SessionRepository
+	user         *mysqlRepo.UserRepository
+	product      *mysqlRepo.ProductRepository
+	productImage *mysqlRepo.ProductImageRepository
+	siteDetail   *mysqlRepo.SiteDetailRepository
 }
 
 func newRepositories(db *sqlx.DB) (*repositories, error) {
@@ -26,17 +29,20 @@ func newRepositories(db *sqlx.DB) (*repositories, error) {
 	}
 
 	repos := &repositories{
-		health:      mysqlRepo.NewHealthRepository(db),
-		category:    mysqlRepo.NewCategoryRepository(db),
-		target:      mysqlRepo.NewTargetRepository(db),
-		tag:         mysqlRepo.NewTagRepository(db),
-		sns:         mysqlRepo.NewSnsRepository(db),
-		salesSite:   mysqlRepo.NewSalesSiteRepository(db),
-		skillMarket: mysqlRepo.NewSkillMarketRepository(db),
-		creator:     mysqlRepo.NewCreatorRepository(db),
-		contact:     mysqlRepo.NewContactRepository(db),
-		session:     mysqlRepo.NewSessionRepository(db),
-		user:        mysqlRepo.NewUserRepository(db),
+		health:       mysqlRepo.NewHealthRepository(db),
+		category:     mysqlRepo.NewCategoryRepository(db),
+		target:       mysqlRepo.NewTargetRepository(db),
+		tag:          mysqlRepo.NewTagRepository(db),
+		sns:          mysqlRepo.NewSnsRepository(db),
+		salesSite:    mysqlRepo.NewSalesSiteRepository(db),
+		skillMarket:  mysqlRepo.NewSkillMarketRepository(db),
+		creator:      mysqlRepo.NewCreatorRepository(db),
+		contact:      mysqlRepo.NewContactRepository(db),
+		session:      mysqlRepo.NewSessionRepository(db),
+		user:         mysqlRepo.NewUserRepository(db),
+		product:      mysqlRepo.NewProductRepository(db),
+		productImage: mysqlRepo.NewProductImageRepository(db),
+		siteDetail:   mysqlRepo.NewSiteDetailRepository(db),
 	}
 
 	// 出力側の依存関係のチェック

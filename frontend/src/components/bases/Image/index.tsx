@@ -19,7 +19,7 @@ export const Image = ({ src, alt }: Props) => {
     }, [src])
 
     // 一時的にローカルの画像APIではグレースケール画像を表示
-    const isLocalApi = process.env.NODE_ENV === 'development' && src.includes('http://localhost:8080/api/product_image')
+    const isLocalApi = process.env.NODE_ENV === 'development' && src.includes('http://localhost')
 
     return (
         <div className={styles['container']}>

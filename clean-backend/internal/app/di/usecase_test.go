@@ -18,7 +18,28 @@ func (s *stubTxManager) WithinTransaction(ctx context.Context, fn func(ctx conte
 func TestNewUsecasesNilRepositories(t *testing.T) {
 	t.Run("repositoriesがnilならエラーを返す", func(t *testing.T) {
 
-		ucs, err := newUsecases(nil, &config.Config{}, &stubTxManager{})
+		ucs, err := newUsecases(nil, &queries{}, &config.Config{}, &stubTxManager{})
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+		if !errors.Is(err, ErrNilDependency) {
+			t.Fatalf("expected ErrNilDependency, got %v", err)
+		}
+		if ucs != nil {
+			t.Fatalf("expected nil usecases, got %#v", ucs)
+		}
+	})
+
+}
+
+func TestNewUsecasesNilQueries(t *testing.T) {
+	t.Run("queriesがnilならエラーを返す", func(t *testing.T) {
+		repos, err := newRepositories(&sqlx.DB{})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		ucs, err := newUsecases(repos, nil, &config.Config{}, &stubTxManager{})
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}
@@ -39,8 +60,12 @@ func TestNewUsecasesNilConfig(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
+		qrs, err := newQueries(&sqlx.DB{})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
-		ucs, err := newUsecases(repos, nil, &stubTxManager{})
+		ucs, err := newUsecases(repos, qrs, nil, &stubTxManager{})
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}
@@ -61,8 +86,12 @@ func TestNewUsecasesNilTxManager(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
+		qrs, err := newQueries(&sqlx.DB{})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
-		ucs, err := newUsecases(repos, &config.Config{}, nil)
+		ucs, err := newUsecases(repos, qrs, &config.Config{}, nil)
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}

@@ -8,7 +8,7 @@ import (
 
 func ToContactResponse(contact *domain.Contact) *response.ContactResponse {
 	return &response.ContactResponse{
-		ID:          contact.ID(),
+		ID:          contact.ID().Uint(),
 		Name:        contact.Name().String(),
 		Company:     optional.ToStringPtr(contact.Company()),
 		PhoneNumber: optional.ToStringPtr(contact.PhoneNumber()),
