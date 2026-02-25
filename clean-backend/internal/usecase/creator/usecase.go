@@ -13,6 +13,7 @@ import (
 
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/creator"
 	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
+	"github.com/tokushun109/tku/clean-backend/internal/shared/optional"
 	"github.com/tokushun109/tku/clean-backend/internal/usecase"
 )
 
@@ -87,7 +88,7 @@ func (s *Service) Update(ctx context.Context, name string, introduction string) 
 		}
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
-	creatorIntroduction, err := domain.NewCreatorIntroduction(introduction)
+	creatorIntroduction, err := optional.ParseOptionalString(introduction, domain.NewCreatorIntroduction)
 	if err != nil {
 		if errors.Is(err, domain.ErrInvalidIntroduction) {
 			return usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error())

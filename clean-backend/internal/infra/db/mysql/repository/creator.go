@@ -9,6 +9,7 @@ import (
 	"github.com/jmoiron/sqlx"
 
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/creator"
+	"github.com/tokushun109/tku/clean-backend/internal/shared/optional"
 )
 
 type CreatorRepository struct {
@@ -45,11 +46,13 @@ func (r *CreatorRepository) Find(ctx context.Context) (*domain.Creator, error) {
 }
 
 func (r *CreatorRepository) UpdateProfile(ctx context.Context, c *domain.Creator) (bool, error) {
+	introduction := optional.ToStringPtr(c.Introduction)
+
 	result, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`UPDATE creator SET name = ?, introduction = ?, updated_at = NOW() WHERE id = ? AND deleted_at IS NULL`,
 		c.Name.String(),
-		c.Introduction.String(),
+		introduction,
 		c.ID,
 	)
 	if err != nil {
@@ -97,7 +100,7 @@ func toDomainCreator(row creatorRow) (*domain.Creator, error) {
 	if row.Introduction.Valid {
 		introductionRaw = row.Introduction.String
 	}
-	introduction, err := domain.NewCreatorIntroductionForRead(introductionRaw)
+	introduction, err := optional.ParseOptionalString(introductionRaw, domain.NewCreatorIntroduction)
 	if err != nil {
 		return nil, fmt.Errorf("invalid creator introduction: %w", err)
 	}

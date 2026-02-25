@@ -10,6 +10,7 @@ import (
 
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/creator"
 	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
+	"github.com/tokushun109/tku/clean-backend/internal/shared/optional"
 	"github.com/tokushun109/tku/clean-backend/internal/usecase"
 )
 
@@ -239,7 +240,7 @@ func mustCreator(id uint, name, introduction, mimeType, logoPath string) *domain
 	if err != nil {
 		panic(err)
 	}
-	i, err := domain.NewCreatorIntroductionForRead(introduction)
+	i, err := optional.ParseOptionalString(introduction, domain.NewCreatorIntroduction)
 	if err != nil {
 		panic(err)
 	}

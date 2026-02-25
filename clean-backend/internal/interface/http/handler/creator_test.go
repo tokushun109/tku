@@ -13,6 +13,7 @@ import (
 	"github.com/gorilla/mux"
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/creator"
 	"github.com/tokushun109/tku/clean-backend/internal/interface/http/response"
+	"github.com/tokushun109/tku/clean-backend/internal/shared/optional"
 	usecaseCreator "github.com/tokushun109/tku/clean-backend/internal/usecase/creator"
 )
 
@@ -60,9 +61,12 @@ func TestCreatorGet(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		introduction, err := domain.NewCreatorIntroductionForRead("ハンドメイド作品を制作")
+		introduction, err := optional.ParseOptionalString("ハンドメイド作品を制作", domain.NewCreatorIntroduction)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
+		}
+		if introduction == nil {
+			t.Fatalf("unexpected nil introduction")
 		}
 
 		h := NewCreatorHandler(&stubCreatorUC{

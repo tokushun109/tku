@@ -20,15 +20,3 @@ func TestNewCreatorIntroduction(t *testing.T) {
 		}
 	})
 }
-
-func TestNewCreatorIntroductionForRead(t *testing.T) {
-	t.Run("空文字の紹介文でも取得用途なら生成に成功する", func(t *testing.T) {
-		introduction, err := NewCreatorIntroductionForRead("")
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		if introduction.String() != "" {
-			t.Fatalf("unexpected introduction: %s", introduction.String())
-		}
-	})
-}

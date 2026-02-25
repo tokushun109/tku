@@ -4,6 +4,7 @@ import (
 	usecaseCreator "github.com/tokushun109/tku/clean-backend/internal/usecase/creator"
 
 	"github.com/tokushun109/tku/clean-backend/internal/interface/http/response"
+	"github.com/tokushun109/tku/clean-backend/internal/shared/optional"
 )
 
 func ToCreatorResponse(detail *usecaseCreator.CreatorDetail) *response.CreatorResponse {
@@ -23,7 +24,7 @@ func ToCreatorResponse(detail *usecaseCreator.CreatorDetail) *response.CreatorRe
 
 	return &response.CreatorResponse{
 		Name:         detail.Creator.Name.String(),
-		Introduction: detail.Creator.Introduction.String(),
+		Introduction: optional.ToTrimmedStringOrEmpty(detail.Creator.Introduction),
 		MimeType:     mimeType,
 		Logo:         logoPath,
 		APIPath:      detail.APIPath,
