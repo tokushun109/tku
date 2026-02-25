@@ -15,6 +15,8 @@ import (
 	usecaseProduct "github.com/tokushun109/tku/clean-backend/internal/usecase/product"
 )
 
+const maxProductImageSize = 20 << 20 // 20MB
+
 type ProductHandler struct {
 	productUC usecaseProduct.Usecase
 }
@@ -149,10 +151,14 @@ func (h *ProductHandler) CreateImage(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		fileBytes, err := io.ReadAll(file)
+		fileBytes, err := io.ReadAll(io.LimitReader(file, maxProductImageSize+1))
 		_ = file.Close()
 		if err != nil {
 			response.WriteAppError(w, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error()))
+			return
+		}
+		if len(fileBytes) == 0 || len(fileBytes) > maxProductImageSize {
+			response.WriteAppError(w, usecase.NewAppError(usecase.ErrInvalidInput))
 			return
 		}
 
