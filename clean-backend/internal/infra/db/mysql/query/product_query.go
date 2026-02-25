@@ -283,7 +283,7 @@ func (r *ProductQueryReader) loadSiteDetails(ctx context.Context, productIDs []u
 		 FROM site_detail sd
 		 INNER JOIN sales_site ss ON ss.id = sd.sales_site_id AND ss.deleted_at IS NULL
 		 WHERE sd.deleted_at IS NULL AND sd.product_id IN (?)
-		 ORDER BY sd.detail_url DESC, sd.id ASC`,
+		 ORDER BY sd.detail_url ASC, sd.id ASC`,
 		productIDs,
 	)
 	if err != nil {

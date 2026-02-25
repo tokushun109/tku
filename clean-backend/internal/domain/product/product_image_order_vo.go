@@ -5,6 +5,7 @@ const (
 	productImageOrderMax = 100000
 )
 
+// NOTE: 値が大きいほど、表示優先度が高い
 type ProductImageOrder int
 
 func NewProductImageOrder(v int) (ProductImageOrder, error) {
