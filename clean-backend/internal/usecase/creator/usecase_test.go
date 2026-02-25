@@ -128,6 +128,33 @@ func TestServiceGet(t *testing.T) {
 	})
 }
 
+func TestServiceUpdate(t *testing.T) {
+	t.Run("紹介文が空白のみなら紹介文をクリアして更新に成功する", func(t *testing.T) {
+		creator := mustCreator(1, "作家", "既存の紹介文", "", "")
+		repo := &stubCreatorRepository{
+			findRes:             creator,
+			updateProfileRes:    true,
+			updateProfileErr:    nil,
+			updatedProfile:      nil,
+			updateLogoRes:       false,
+			updateLogoErr:       nil,
+			updateLogoCreatorID: 0,
+		}
+		svc := New(repo, &stubLogoStorage{}, &stubUUIDGenerator{})
+
+		err := svc.Update(context.Background(), "作家", "   ")
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if repo.updatedProfile == nil {
+			t.Fatalf("expected updated profile to be set")
+		}
+		if repo.updatedProfile.Introduction() != nil {
+			t.Fatalf("expected introduction to be nil, got %#v", repo.updatedProfile.Introduction())
+		}
+	})
+}
+
 func TestServiceUpdateLogo(t *testing.T) {
 	t.Run("有効な画像を渡したとき新規保存とDB更新に成功する", func(t *testing.T) {
 		creator := mustCreator(10, "作家", "紹介", "image/jpeg", "img/logo/o/l/old.jpg")

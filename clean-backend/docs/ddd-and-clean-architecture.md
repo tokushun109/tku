@@ -160,7 +160,7 @@ tku/clean-backend/
 
 - 作成時は `New(name, company, phoneNumber, email, content)` を使う
   - 引数は string を受け取り、Entity 内で VO 化・バリデーションする
-- DB 復元時は `Rebuild(id, nameVO, companyVO, phoneVO, emailVO, contentVO, createdAt)` を使う
+- DB 復元時は `Rebuild(id, name, company, phoneNumber, email, content, createdAt)` を使う
 - `Contact` には次の API を持たせる
   - `ID() uint`
   - `HasID() bool`（`id != 0`）

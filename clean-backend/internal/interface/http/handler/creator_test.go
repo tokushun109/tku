@@ -115,6 +115,22 @@ func TestCreatorPut(t *testing.T) {
 			t.Fatalf("unexpected update args: %+v", uc.updateReq)
 		}
 	})
+
+	t.Run("紹介文が空文字のときも更新に成功し空文字がusecaseに渡る", func(t *testing.T) {
+		uc := &stubCreatorUC{}
+		h := NewCreatorHandler(uc)
+		req := httptest.NewRequest(http.MethodPut, "/api/creator", bytes.NewBufferString(`{"name":"とこりり","introduction":""}`))
+		rr := httptest.NewRecorder()
+
+		h.Update(rr, req)
+
+		if rr.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d", rr.Code)
+		}
+		if uc.updateReq.name != "とこりり" || uc.updateReq.introduction != "" {
+			t.Fatalf("unexpected update args: %+v", uc.updateReq)
+		}
+	})
 }
 
 func TestCreatorLogoPut(t *testing.T) {
