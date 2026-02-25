@@ -56,21 +56,14 @@ func (s *stubCreatorUC) GetLogoBlob(ctx context.Context, requestLogoFile string)
 
 func TestCreatorGet(t *testing.T) {
 	t.Run("有効な入力を渡したとき製作者情報の取得に成功する", func(t *testing.T) {
-		creatorName, err := domain.NewCreatorName("とこりり")
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		introduction, err := domain.NewCreatorIntroductionForRead("ハンドメイド作品を制作")
+		creator, err := domain.Rebuild(1, "とこりり", "ハンドメイド作品を制作", "", "")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
 		h := NewCreatorHandler(&stubCreatorUC{
 			getRes: &usecaseCreator.CreatorDetail{
-				Creator: &domain.Creator{
-					Name:         creatorName,
-					Introduction: introduction,
-				},
+				Creator: creator,
 				APIPath: "http://localhost:8081/api/creator/logo/logo.png/blob",
 			},
 		})
@@ -119,6 +112,22 @@ func TestCreatorPut(t *testing.T) {
 			t.Fatalf("expected 200, got %d", rr.Code)
 		}
 		if uc.updateReq.name != "とこりり" || uc.updateReq.introduction != "紹介文" {
+			t.Fatalf("unexpected update args: %+v", uc.updateReq)
+		}
+	})
+
+	t.Run("紹介文が空文字のときも更新に成功し空文字がusecaseに渡る", func(t *testing.T) {
+		uc := &stubCreatorUC{}
+		h := NewCreatorHandler(uc)
+		req := httptest.NewRequest(http.MethodPut, "/api/creator", bytes.NewBufferString(`{"name":"とこりり","introduction":""}`))
+		rr := httptest.NewRecorder()
+
+		h.Update(rr, req)
+
+		if rr.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d", rr.Code)
+		}
+		if uc.updateReq.name != "とこりり" || uc.updateReq.introduction != "" {
 			t.Fatalf("unexpected update args: %+v", uc.updateReq)
 		}
 	})

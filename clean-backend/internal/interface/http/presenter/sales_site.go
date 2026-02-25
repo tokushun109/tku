@@ -7,10 +7,10 @@ import (
 
 func ToSalesSiteResponse(s *domain.SalesSite) *response.SalesSiteResponse {
 	return &response.SalesSiteResponse{
-		UUID: s.UUID.String(),
-		Name: s.Name.String(),
-		URL:  s.URL.String(),
-		Icon: s.Icon,
+		UUID: s.UUID().String(),
+		Name: s.Name().String(),
+		URL:  s.URL().String(),
+		Icon: s.Icon(),
 	}
 }
 

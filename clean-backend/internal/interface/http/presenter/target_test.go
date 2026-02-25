@@ -20,7 +20,11 @@ func TestToTargetResponse(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		res := ToTargetResponse(&domain.Target{UUID: u, Name: n})
+		target, err := domain.Rebuild(1, u.String(), n.String())
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		res := ToTargetResponse(target)
 		if res.UUID != u.String() || res.Name != n.String() {
 			t.Fatalf("unexpected response: %+v", res)
 		}
@@ -48,10 +52,15 @@ func TestToTargetResponses(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		res := ToTargetResponses([]*domain.Target{
-			{UUID: u1, Name: n1},
-			{UUID: u2, Name: n2},
-		})
+		target1, err := domain.Rebuild(1, u1.String(), n1.String())
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		target2, err := domain.Rebuild(2, u2.String(), n2.String())
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		res := ToTargetResponses([]*domain.Target{target1, target2})
 		if len(res) != 2 {
 			t.Fatalf("expected 2, got %d", len(res))
 		}

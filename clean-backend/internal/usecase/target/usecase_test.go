@@ -12,7 +12,6 @@ import (
 )
 
 var testUUID = id.GenerateUUID()
-var testUUIDVO = mustNewUUID(testUUID)
 
 type stubRepo struct {
 	findAll     []*domain.Target
@@ -32,12 +31,11 @@ type stubRepo struct {
 }
 
 type stubUUIDGen struct {
-	uuid primitive.UUID
-	err  error
+	uuid string
 }
 
-func (g *stubUUIDGen) New() (primitive.UUID, error) {
-	return g.uuid, g.err
+func (g *stubUUIDGen) New() string {
+	return g.uuid
 }
 
 func (s *stubRepo) Create(ctx context.Context, t *domain.Target) error {
@@ -92,7 +90,7 @@ func TestListTargets(t *testing.T) {
 
 		tg := mustTarget(testUUID, "a")
 		repo := &stubRepo{findAll: []*domain.Target{tg}}
-		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID})
 
 		res, err := uc.List(context.Background(), "all")
 		if err != nil {
@@ -106,7 +104,7 @@ func TestListTargets(t *testing.T) {
 
 		tg := mustTarget(testUUID, "a")
 		repo := &stubRepo{findUsed: []*domain.Target{tg}}
-		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID})
 
 		res, err := uc.List(context.Background(), "used")
 		if err != nil {
@@ -119,7 +117,7 @@ func TestListTargets(t *testing.T) {
 	t.Run("モードが不正なときバリデーションエラーで失敗する", func(t *testing.T) {
 
 		repo := &stubRepo{}
-		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID})
 
 		_, err := uc.List(context.Background(), "bad")
 		if err == nil {
@@ -135,7 +133,7 @@ func TestCreateTarget(t *testing.T) {
 	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
 
 		repo := &stubRepo{}
-		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID})
 
 		if err := uc.Create(context.Background(), "new"); err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -143,24 +141,14 @@ func TestCreateTarget(t *testing.T) {
 		if repo.created == nil {
 			t.Fatalf("expected target created")
 		}
-		if repo.created.UUID.String() != testUUIDVO.String() {
-			t.Fatalf("expected uuid %s, got %s", testUUIDVO.String(), repo.created.UUID.String())
-		}
-	})
-	t.Run("UUID生成でエラーが発生したなら内部エラーを返す", func(t *testing.T) {
-
-		repo := &stubRepo{}
-		uc := New(repo, &stubUUIDGen{err: errors.New("gen error")})
-
-		err := uc.Create(context.Background(), "new")
-		if err == nil || !errors.Is(err, usecase.ErrInternal) {
-			t.Fatalf("expected ErrInternal, got %v", err)
+		if repo.created.UUID().String() != testUUID {
+			t.Fatalf("expected uuid %s, got %s", testUUID, repo.created.UUID().String())
 		}
 	})
 	t.Run("名前が重複しているなら重複エラーを返す", func(t *testing.T) {
 
 		repo := &stubRepo{exists: true}
-		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID})
 
 		err := uc.Create(context.Background(), "dup")
 		if err == nil {
@@ -173,7 +161,7 @@ func TestCreateTarget(t *testing.T) {
 	t.Run("名前が不正なときバリデーションエラーで失敗する", func(t *testing.T) {
 
 		repo := &stubRepo{}
-		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID})
 
 		err := uc.Create(context.Background(), "")
 		if err == nil {
@@ -186,7 +174,7 @@ func TestCreateTarget(t *testing.T) {
 	t.Run("リポジトリでエラーが発生したなら内部エラーを返す", func(t *testing.T) {
 
 		repo := &stubRepo{existsErr: errors.New("db error")}
-		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID})
 
 		err := uc.Create(context.Background(), "ok")
 		if err == nil {
@@ -199,7 +187,7 @@ func TestCreateTarget(t *testing.T) {
 	t.Run("作成処理でエラーが発生したなら内部エラーを返す", func(t *testing.T) {
 
 		repo := &stubRepo{createErr: errors.New("db error")}
-		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID})
 
 		err := uc.Create(context.Background(), "ok")
 		if err == nil {
@@ -218,7 +206,7 @@ func TestUpdateTarget(t *testing.T) {
 			findByUUID: mustTarget(testUUID, "old"),
 			updateOK:   true,
 		}
-		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID})
 
 		if err := uc.Update(context.Background(), testUUID, "new"); err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -227,7 +215,7 @@ func TestUpdateTarget(t *testing.T) {
 	t.Run("UUIDが不正なときバリデーションエラーで失敗する", func(t *testing.T) {
 
 		repo := &stubRepo{}
-		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID})
 
 		err := uc.Update(context.Background(), "bad-uuid", "new")
 		if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
@@ -237,7 +225,7 @@ func TestUpdateTarget(t *testing.T) {
 	t.Run("名前が不正なときバリデーションエラーで失敗する", func(t *testing.T) {
 
 		repo := &stubRepo{findByUUID: mustTarget(testUUID, "old")}
-		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID})
 
 		err := uc.Update(context.Background(), testUUID, "")
 		if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
@@ -247,7 +235,7 @@ func TestUpdateTarget(t *testing.T) {
 	t.Run("対象が見つからないならNotFoundエラーを返す", func(t *testing.T) {
 
 		repo := &stubRepo{findByUUID: nil}
-		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID})
 
 		err := uc.Update(context.Background(), testUUID, "new")
 		if err == nil || !errors.Is(err, usecase.ErrNotFound) {
@@ -260,7 +248,7 @@ func TestUpdateTarget(t *testing.T) {
 			findByUUID: mustTarget(testUUID, "old"),
 			exists:     true,
 		}
-		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID})
 
 		err := uc.Update(context.Background(), testUUID, "new")
 		if err == nil || !errors.Is(err, usecase.ErrConflict) {
@@ -273,7 +261,7 @@ func TestUpdateTarget(t *testing.T) {
 			findByUUID: mustTarget(testUUID, "old"),
 			updateErr:  errors.New("db error"),
 		}
-		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID})
 
 		err := uc.Update(context.Background(), testUUID, "new")
 		if err == nil || !errors.Is(err, usecase.ErrInternal) {
@@ -286,7 +274,7 @@ func TestDeleteTarget(t *testing.T) {
 	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
 
 		repo := &stubRepo{deleteOK: true}
-		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID})
 
 		if err := uc.Delete(context.Background(), testUUID); err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -295,7 +283,7 @@ func TestDeleteTarget(t *testing.T) {
 	t.Run("UUIDが不正なときバリデーションエラーで失敗する", func(t *testing.T) {
 
 		repo := &stubRepo{}
-		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID})
 
 		err := uc.Delete(context.Background(), "bad-uuid")
 		if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
@@ -305,7 +293,7 @@ func TestDeleteTarget(t *testing.T) {
 	t.Run("対象が見つからないならNotFoundエラーを返す", func(t *testing.T) {
 
 		repo := &stubRepo{deleteOK: false}
-		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID})
 
 		err := uc.Delete(context.Background(), testUUID)
 		if err == nil || !errors.Is(err, usecase.ErrNotFound) {
@@ -315,7 +303,7 @@ func TestDeleteTarget(t *testing.T) {
 	t.Run("リポジトリでエラーが発生したなら内部エラーを返す", func(t *testing.T) {
 
 		repo := &stubRepo{deleteErr: errors.New("db error")}
-		uc := New(repo, &stubUUIDGen{uuid: testUUIDVO})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID})
 
 		err := uc.Delete(context.Background(), testUUID)
 		if err == nil || !errors.Is(err, usecase.ErrInternal) {
@@ -325,21 +313,9 @@ func TestDeleteTarget(t *testing.T) {
 }
 
 func mustTarget(uuidStr, name string) *domain.Target {
-	u, err := primitive.NewUUID(uuidStr)
+	target, err := domain.Rebuild(1, uuidStr, name)
 	if err != nil {
 		panic(err)
 	}
-	n, err := domain.NewTargetName(name)
-	if err != nil {
-		panic(err)
-	}
-	return &domain.Target{UUID: u, Name: n}
-}
-
-func mustNewUUID(s string) primitive.UUID {
-	u, err := primitive.NewUUID(s)
-	if err != nil {
-		panic(err)
-	}
-	return u
+	return target
 }

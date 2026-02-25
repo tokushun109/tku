@@ -23,23 +23,24 @@ func (r *TargetRepository) Create(ctx context.Context, t *domain.Target) error {
 	_, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`INSERT INTO target (uuid, name, created_at, updated_at) VALUES (?, ?, NOW(), NOW())`,
-		t.UUID.String(), t.Name.String(),
+		t.UUID().String(), t.Name().String(),
 	)
 	return err
 }
 
 func (r *TargetRepository) FindAll(ctx context.Context) ([]*domain.Target, error) {
 	type row struct {
+		ID   uint   `db:"id"`
 		UUID string `db:"uuid"`
 		Name string `db:"name"`
 	}
 	var rows []row
-	if err := getExecutor(ctx, r.db).SelectContext(ctx, &rows, `SELECT uuid, name FROM target WHERE deleted_at IS NULL`); err != nil {
+	if err := getExecutor(ctx, r.db).SelectContext(ctx, &rows, `SELECT id, uuid, name FROM target WHERE deleted_at IS NULL`); err != nil {
 		return nil, err
 	}
 	res := make([]*domain.Target, 0, len(rows))
 	for _, r := range rows {
-		t, err := toDomainTarget(r.UUID, r.Name)
+		t, err := toDomainTarget(r.ID, r.UUID, r.Name)
 		if err != nil {
 			return nil, err
 		}
@@ -50,12 +51,13 @@ func (r *TargetRepository) FindAll(ctx context.Context) ([]*domain.Target, error
 
 func (r *TargetRepository) FindUsed(ctx context.Context) ([]*domain.Target, error) {
 	type row struct {
+		ID   uint   `db:"id"`
 		UUID string `db:"uuid"`
 		Name string `db:"name"`
 	}
 	var rows []row
 	query := `
-		SELECT DISTINCT t.uuid, t.name
+		SELECT DISTINCT t.id, t.uuid, t.name
 		FROM target t
 		INNER JOIN product p ON p.target_id = t.id
 		WHERE t.deleted_at IS NULL AND p.deleted_at IS NULL
@@ -65,7 +67,7 @@ func (r *TargetRepository) FindUsed(ctx context.Context) ([]*domain.Target, erro
 	}
 	res := make([]*domain.Target, 0, len(rows))
 	for _, r := range rows {
-		t, err := toDomainTarget(r.UUID, r.Name)
+		t, err := toDomainTarget(r.ID, r.UUID, r.Name)
 		if err != nil {
 			return nil, err
 		}
@@ -76,17 +78,18 @@ func (r *TargetRepository) FindUsed(ctx context.Context) ([]*domain.Target, erro
 
 func (r *TargetRepository) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domain.Target, error) {
 	type row struct {
+		ID   uint   `db:"id"`
 		UUID string `db:"uuid"`
 		Name string `db:"name"`
 	}
 	var rrow row
-	if err := getExecutor(ctx, r.db).GetContext(ctx, &rrow, `SELECT uuid, name FROM target WHERE uuid = ? AND deleted_at IS NULL`, uuid.String()); err != nil {
+	if err := getExecutor(ctx, r.db).GetContext(ctx, &rrow, `SELECT id, uuid, name FROM target WHERE uuid = ? AND deleted_at IS NULL`, uuid.String()); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
 		return nil, err
 	}
-	return toDomainTarget(rrow.UUID, rrow.Name)
+	return toDomainTarget(rrow.ID, rrow.UUID, rrow.Name)
 }
 
 func (r *TargetRepository) ExistsByName(ctx context.Context, name domain.TargetName) (bool, error) {
@@ -101,8 +104,8 @@ func (r *TargetRepository) Update(ctx context.Context, t *domain.Target) (bool, 
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`UPDATE target SET name = ?, updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`,
-		t.Name.String(),
-		t.UUID.String(),
+		t.Name().String(),
+		t.UUID().String(),
 	)
 	if err != nil {
 		return false, err
@@ -149,14 +152,10 @@ func (r *TargetRepository) Delete(ctx context.Context, uuid primitive.UUID) (boo
 	return affected > 0, nil
 }
 
-func toDomainTarget(uuidStr, nameStr string) (*domain.Target, error) {
-	uuid, err := primitive.NewUUID(uuidStr)
+func toDomainTarget(id uint, uuidStr, nameStr string) (*domain.Target, error) {
+	target, err := domain.Rebuild(id, uuidStr, nameStr)
 	if err != nil {
-		return nil, fmt.Errorf("invalid target uuid: %w", err)
+		return nil, fmt.Errorf("invalid target row: %w", err)
 	}
-	name, err := domain.NewTargetName(nameStr)
-	if err != nil {
-		return nil, fmt.Errorf("invalid target name: %w", err)
-	}
-	return &domain.Target{UUID: uuid, Name: name}, nil
+	return target, nil
 }

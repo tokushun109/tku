@@ -10,7 +10,6 @@ import (
 
 	"github.com/gorilla/mux"
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/category"
-	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
 	"github.com/tokushun109/tku/clean-backend/internal/interface/http/response"
 	"github.com/tokushun109/tku/clean-backend/internal/shared/id"
 )
@@ -195,13 +194,9 @@ func TestCategoryDelete(t *testing.T) {
 }
 
 func mustCategory(uuidStr, name string) *domain.Category {
-	u, err := primitive.NewUUID(uuidStr)
+	category, err := domain.Rebuild(1, uuidStr, name)
 	if err != nil {
 		panic(err)
 	}
-	n, err := domain.NewCategoryName(name)
-	if err != nil {
-		panic(err)
-	}
-	return &domain.Category{UUID: u, Name: n}
+	return category
 }

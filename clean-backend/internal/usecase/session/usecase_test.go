@@ -83,7 +83,7 @@ func TestValidate(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected uuid parse error: %v", err)
 		}
-		sess := &domain.Session{UUID: u, UserID: 1, CreatedAt: time.Now()}
+		sess := mustSession(u.String(), 1, time.Now())
 		uc := New(&stubRepo{sess: sess}, 24*time.Hour, &stubClock{now: time.Now()})
 		if err := uc.Validate(context.Background(), testUUID); err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -96,7 +96,7 @@ func TestValidate(t *testing.T) {
 			t.Fatalf("unexpected uuid parse error: %v", err)
 		}
 		now := time.Date(2026, 2, 15, 12, 0, 0, 0, time.UTC)
-		sess := &domain.Session{UUID: u, UserID: 1, CreatedAt: now.Add(-25 * time.Hour)}
+		sess := mustSession(u.String(), 1, now.Add(-25*time.Hour))
 		uc := New(&stubRepo{sess: sess}, 24*time.Hour, &stubClock{now: now})
 		if err := uc.Validate(context.Background(), testUUID); err == nil || !errors.Is(err, usecase.ErrUnauthorized) {
 			t.Fatalf("expected ErrUnauthorized, got %v", err)
@@ -109,7 +109,7 @@ func TestValidate(t *testing.T) {
 			t.Fatalf("unexpected uuid parse error: %v", err)
 		}
 		now := time.Date(2026, 2, 15, 12, 0, 0, 0, time.UTC)
-		sess := &domain.Session{UUID: u, UserID: 1, CreatedAt: now.Add(-23 * time.Hour)}
+		sess := mustSession(u.String(), 1, now.Add(-23*time.Hour))
 		uc := New(&stubRepo{sess: sess}, 24*time.Hour, &stubClock{now: now})
 		if err := uc.Validate(context.Background(), testUUID); err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -122,7 +122,7 @@ func TestValidate(t *testing.T) {
 			t.Fatalf("unexpected uuid parse error: %v", err)
 		}
 		now := time.Date(2026, 2, 15, 12, 0, 0, 0, time.UTC)
-		sess := &domain.Session{UUID: u, UserID: 1, CreatedAt: now.Add(-25 * time.Hour)}
+		sess := mustSession(u.String(), 1, now.Add(-25*time.Hour))
 		uc := New(&stubRepo{sess: sess, deleteErr: errors.New("delete error")}, 24*time.Hour, &stubClock{now: now})
 		if err := uc.Validate(context.Background(), testUUID); err == nil || !errors.Is(err, usecase.ErrInternal) {
 			t.Fatalf("expected ErrInternal, got %v", err)
@@ -137,13 +137,13 @@ func TestResolve(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected uuid parse error: %v", err)
 		}
-		sess := &domain.Session{UUID: u, UserID: 1, CreatedAt: time.Now()}
+		sess := mustSession(u.String(), 1, time.Now())
 		uc := New(&stubRepo{sess: sess}, 24*time.Hour, &stubClock{now: time.Now()})
 		got, err := uc.Resolve(context.Background(), testUUID)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if got == nil || got.UserID != 1 {
+		if got == nil || got.UserID() != 1 {
 			t.Fatalf("unexpected session: %+v", got)
 		}
 	})
@@ -157,11 +157,19 @@ func TestDelete(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected uuid parse error: %v", err)
 		}
-		sess := &domain.Session{UUID: u, UserID: 1, CreatedAt: time.Now()}
+		sess := mustSession(u.String(), 1, time.Now())
 		uc := New(&stubRepo{sess: sess}, 24*time.Hour, &stubClock{now: time.Now()})
 		if err := uc.Delete(context.Background(), testUUID); err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
 
+}
+
+func mustSession(uuidStr string, userID uint, createdAt time.Time) *domain.Session {
+	sess, err := domain.Rebuild(1, uuidStr, userID, createdAt)
+	if err != nil {
+		panic(err)
+	}
+	return sess
 }

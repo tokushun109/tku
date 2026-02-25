@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/gorilla/mux"
-	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/tag"
 	"github.com/tokushun109/tku/clean-backend/internal/interface/http/response"
 	"github.com/tokushun109/tku/clean-backend/internal/shared/id"
@@ -182,13 +181,9 @@ func TestTagDelete(t *testing.T) {
 }
 
 func mustTag(uuidStr, name string) *domain.Tag {
-	u, err := primitive.NewUUID(uuidStr)
+	tag, err := domain.Rebuild(1, uuidStr, name)
 	if err != nil {
 		panic(err)
 	}
-	n, err := domain.NewTagName(name)
-	if err != nil {
-		panic(err)
-	}
-	return &domain.Tag{UUID: u, Name: n}
+	return tag
 }

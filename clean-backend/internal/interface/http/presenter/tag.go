@@ -7,8 +7,8 @@ import (
 
 func ToTagResponse(t *domain.Tag) *response.TagResponse {
 	return &response.TagResponse{
-		UUID: t.UUID.String(),
-		Name: t.Name.String(),
+		UUID: t.UUID().String(),
+		Name: t.Name().String(),
 	}
 }
 

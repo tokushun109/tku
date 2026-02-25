@@ -66,6 +66,7 @@ func (r *UserRepository) FindByID(ctx context.Context, id uint) (*domain.User, e
 
 func (r *UserRepository) FindContactNotificationUsers(ctx context.Context) ([]*domain.ContactNotificationUser, error) {
 	type row struct {
+		ID    uint   `db:"id"`
 		Name  string `db:"name"`
 		Email string `db:"email"`
 	}
@@ -74,7 +75,7 @@ func (r *UserRepository) FindContactNotificationUsers(ctx context.Context) ([]*d
 	err := getExecutor(ctx, r.db).SelectContext(
 		ctx,
 		&rows,
-		`SELECT name, email FROM user WHERE is_admin = TRUE AND deleted_at IS NULL`,
+		`SELECT id, name, email FROM user WHERE is_admin = TRUE AND deleted_at IS NULL`,
 	)
 	if err != nil {
 		return nil, err
@@ -82,47 +83,27 @@ func (r *UserRepository) FindContactNotificationUsers(ctx context.Context) ([]*d
 
 	res := make([]*domain.ContactNotificationUser, 0, len(rows))
 	for _, row := range rows {
-		name, err := domain.NewUserName(row.Name)
+		user, err := domain.RebuildContactNotificationUser(row.ID, row.Name, row.Email)
 		if err != nil {
-			return nil, fmt.Errorf("invalid admin name: %w", err)
+			return nil, fmt.Errorf("invalid admin user row: %w", err)
 		}
-		email, err := primitive.NewEmail(row.Email)
-		if err != nil {
-			return nil, fmt.Errorf("invalid admin email: %w", err)
-		}
-		res = append(res, &domain.ContactNotificationUser{
-			Name:  name,
-			Email: email,
-		})
+		res = append(res, user)
 	}
 
 	return res, nil
 }
 
 func toDomainUser(rrow userRow) (*domain.User, error) {
-	uuid, err := primitive.NewUUID(rrow.UUID)
+	user, err := domain.Rebuild(
+		rrow.ID,
+		rrow.UUID,
+		rrow.Name,
+		rrow.Email,
+		rrow.Password,
+		rrow.IsAdmin,
+	)
 	if err != nil {
-		return nil, fmt.Errorf("invalid user uuid: %w", err)
+		return nil, fmt.Errorf("invalid user row: %w", err)
 	}
-	name, err := domain.NewUserName(rrow.Name)
-	if err != nil {
-		return nil, fmt.Errorf("invalid user name: %w", err)
-	}
-	passwordHash, err := domain.NewUserPasswordHash(rrow.Password)
-	if err != nil {
-		return nil, fmt.Errorf("invalid user password hash: %w", err)
-	}
-	email, err := primitive.NewEmail(rrow.Email)
-	if err != nil {
-		return nil, fmt.Errorf("invalid user email: %w", err)
-	}
-
-	return &domain.User{
-		ID:           rrow.ID,
-		UUID:         uuid,
-		Name:         name,
-		Email:        email,
-		PasswordHash: passwordHash,
-		IsAdmin:      rrow.IsAdmin,
-	}, nil
+	return user, nil
 }

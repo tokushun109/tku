@@ -4,6 +4,7 @@ import (
 	usecaseCreator "github.com/tokushun109/tku/clean-backend/internal/usecase/creator"
 
 	"github.com/tokushun109/tku/clean-backend/internal/interface/http/response"
+	"github.com/tokushun109/tku/clean-backend/internal/shared/optional"
 )
 
 func ToCreatorResponse(detail *usecaseCreator.CreatorDetail) *response.CreatorResponse {
@@ -12,18 +13,18 @@ func ToCreatorResponse(detail *usecaseCreator.CreatorDetail) *response.CreatorRe
 	}
 
 	mimeType := ""
-	if detail.Creator.LogoMimeType != nil {
-		mimeType = detail.Creator.LogoMimeType.String()
+	if detail.Creator.LogoMimeType() != nil {
+		mimeType = detail.Creator.LogoMimeType().String()
 	}
 
 	logoPath := ""
-	if detail.Creator.LogoPath != nil {
-		logoPath = detail.Creator.LogoPath.String()
+	if detail.Creator.LogoPath() != nil {
+		logoPath = detail.Creator.LogoPath().String()
 	}
 
 	return &response.CreatorResponse{
-		Name:         detail.Creator.Name.String(),
-		Introduction: detail.Creator.Introduction.String(),
+		Name:         detail.Creator.Name().String(),
+		Introduction: optional.ToTrimmedStringOrEmpty(detail.Creator.Introduction()),
 		MimeType:     mimeType,
 		Logo:         logoPath,
 		APIPath:      detail.APIPath,

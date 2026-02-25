@@ -21,15 +21,6 @@ func NewCreatorIntroduction(v string) (CreatorIntroduction, error) {
 	return CreatorIntroduction(trimmed), nil
 }
 
-func NewCreatorIntroductionForRead(v string) (CreatorIntroduction, error) {
-	trimmed := strings.TrimSpace(v)
-	length := utf8.RuneCountInString(trimmed)
-	if length > creatorIntroductionMaxLen {
-		return "", ErrInvalidIntroduction
-	}
-	return CreatorIntroduction(trimmed), nil
-}
-
 func (i CreatorIntroduction) String() string {
 	return string(i)
 }

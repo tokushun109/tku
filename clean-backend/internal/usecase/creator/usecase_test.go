@@ -87,12 +87,11 @@ func (s *stubLogoStorage) PresignGet(ctx context.Context, key string, expires ti
 }
 
 type stubUUIDGenerator struct {
-	uuid primitive.UUID
-	err  error
+	uuid string
 }
 
-func (s *stubUUIDGenerator) New() (primitive.UUID, error) {
-	return s.uuid, s.err
+func (s *stubUUIDGenerator) New() string {
+	return s.uuid
 }
 
 func TestServiceGet(t *testing.T) {
@@ -129,6 +128,33 @@ func TestServiceGet(t *testing.T) {
 	})
 }
 
+func TestServiceUpdate(t *testing.T) {
+	t.Run("紹介文が空白のみなら紹介文をクリアして更新に成功する", func(t *testing.T) {
+		creator := mustCreator(1, "作家", "既存の紹介文", "", "")
+		repo := &stubCreatorRepository{
+			findRes:             creator,
+			updateProfileRes:    true,
+			updateProfileErr:    nil,
+			updatedProfile:      nil,
+			updateLogoRes:       false,
+			updateLogoErr:       nil,
+			updateLogoCreatorID: 0,
+		}
+		svc := New(repo, &stubLogoStorage{}, &stubUUIDGenerator{})
+
+		err := svc.Update(context.Background(), "作家", "   ")
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if repo.updatedProfile == nil {
+			t.Fatalf("expected updated profile to be set")
+		}
+		if repo.updatedProfile.Introduction() != nil {
+			t.Fatalf("expected introduction to be nil, got %#v", repo.updatedProfile.Introduction())
+		}
+	})
+}
+
 func TestServiceUpdateLogo(t *testing.T) {
 	t.Run("有効な画像を渡したとき新規保存とDB更新に成功する", func(t *testing.T) {
 		creator := mustCreator(10, "作家", "紹介", "image/jpeg", "img/logo/o/l/old.jpg")
@@ -142,7 +168,7 @@ func TestServiceUpdateLogo(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected uuid error: %v", err)
 		}
-		uuidGen := &stubUUIDGenerator{uuid: uuid}
+		uuidGen := &stubUUIDGenerator{uuid: uuid.String()}
 		svc := New(repo, storage, uuidGen)
 
 		pngBinary := []byte{0x89, 'P', 'N', 'G', '\r', '\n', 0x1a, '\n', 0, 0, 0, 0}
@@ -235,33 +261,9 @@ func TestServiceGetLogoBlob(t *testing.T) {
 }
 
 func mustCreator(id uint, name, introduction, mimeType, logoPath string) *domain.Creator {
-	n, err := domain.NewCreatorName(name)
+	creator, err := domain.Rebuild(id, name, introduction, mimeType, logoPath)
 	if err != nil {
 		panic(err)
-	}
-	i, err := domain.NewCreatorIntroductionForRead(introduction)
-	if err != nil {
-		panic(err)
-	}
-
-	creator := &domain.Creator{
-		ID:           id,
-		Name:         n,
-		Introduction: i,
-	}
-	if mimeType != "" {
-		m, err := domain.NewCreatorLogoMimeType(mimeType)
-		if err != nil {
-			panic(err)
-		}
-		creator.LogoMimeType = &m
-	}
-	if logoPath != "" {
-		p, err := domain.NewCreatorLogoPath(logoPath)
-		if err != nil {
-			panic(err)
-		}
-		creator.LogoPath = &p
 	}
 	return creator
 }

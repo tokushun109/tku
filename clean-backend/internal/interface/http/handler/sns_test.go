@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/gorilla/mux"
-	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/sns"
 	"github.com/tokushun109/tku/clean-backend/internal/interface/http/response"
 	"github.com/tokushun109/tku/clean-backend/internal/shared/id"
@@ -184,17 +183,9 @@ func TestSnsDelete(t *testing.T) {
 }
 
 func mustSns(uuidStr, name, rawURL, icon string) *domain.Sns {
-	u, err := primitive.NewUUID(uuidStr)
+	sns, err := domain.Rebuild(1, uuidStr, name, rawURL, icon)
 	if err != nil {
 		panic(err)
 	}
-	n, err := domain.NewSnsName(name)
-	if err != nil {
-		panic(err)
-	}
-	u2, err := primitive.NewURL(rawURL)
-	if err != nil {
-		panic(err)
-	}
-	return &domain.Sns{UUID: u, Name: n, URL: u2, Icon: icon}
+	return sns
 }

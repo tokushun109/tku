@@ -10,7 +10,6 @@ import (
 	"time"
 
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/contact"
-	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
 	"github.com/tokushun109/tku/clean-backend/internal/interface/http/response"
 )
 
@@ -41,39 +40,21 @@ type contactResp struct {
 
 func TestContactGet(t *testing.T) {
 	t.Run("有効な入力を渡したときお問い合わせ一覧の取得に成功する", func(t *testing.T) {
-		name, err := domain.NewContactName("山田太郎")
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		company, err := domain.NewContactCompany("株式会社サンプル")
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		phoneNumber, err := primitive.NewPhoneNumber("09012345678")
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		email, err := primitive.NewEmail("test@example.com")
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		content, err := domain.NewContactContent("お問い合わせ内容")
+		contact, err := domain.Rebuild(
+			1,
+			"山田太郎",
+			"株式会社サンプル",
+			"09012345678",
+			"test@example.com",
+			"お問い合わせ内容",
+			time.Date(2026, 2, 19, 10, 0, 0, 0, time.UTC),
+		)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
 		h := NewContactHandler(&stubContactUC{
-			listRes: []*domain.Contact{
-				{
-					ID:          1,
-					Name:        name,
-					Company:     &company,
-					PhoneNumber: &phoneNumber,
-					Email:       email,
-					Content:     content,
-					CreatedAt:   time.Date(2026, 2, 19, 10, 0, 0, 0, time.UTC),
-				},
-			},
+			listRes: []*domain.Contact{contact},
 		})
 
 		req := httptest.NewRequest(http.MethodGet, "/api/contact", nil)

@@ -46,11 +46,7 @@ func (s *stubNotificationUserRepo) FindContactNotificationUsers(ctx context.Cont
 
 func TestContactNotifierNotifyContactCreated(t *testing.T) {
 	t.Run("送信先管理者が存在するなら自動返信と管理者通知を送信する", func(t *testing.T) {
-		adminName, err := domainUser.NewUserName("管理者")
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		adminEmail, err := primitive.NewEmail("admin@example.com")
+		notificationUser, err := domainUser.RebuildContactNotificationUser(1, "管理者", "admin@example.com")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -58,10 +54,7 @@ func TestContactNotifierNotifyContactCreated(t *testing.T) {
 		mailer := &stubMailer{}
 		repo := &stubNotificationUserRepo{
 			users: []*domainUser.ContactNotificationUser{
-				{
-					Name:  adminName,
-					Email: adminEmail,
-				},
+				notificationUser,
 			},
 		}
 		notifier := NewContactNotifier(mailer, repo, "")

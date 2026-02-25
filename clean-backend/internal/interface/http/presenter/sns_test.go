@@ -24,7 +24,11 @@ func TestToSnsResponse(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		res := ToSnsResponse(&domain.Sns{UUID: u, Name: n, URL: snsURL, Icon: "icon"})
+		sns, err := domain.Rebuild(1, u.String(), n.String(), snsURL.String(), "icon")
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		res := ToSnsResponse(sns)
 		if res.UUID != u.String() || res.Name != n.String() || res.URL != snsURL.String() || res.Icon != "icon" {
 			t.Fatalf("unexpected response: %+v", res)
 		}
@@ -60,10 +64,15 @@ func TestToSnsResponses(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		res := ToSnsResponses([]*domain.Sns{
-			{UUID: u1, Name: n1, URL: url1, Icon: "icon1"},
-			{UUID: u2, Name: n2, URL: url2, Icon: "icon2"},
-		})
+		sns1, err := domain.Rebuild(1, u1.String(), n1.String(), url1.String(), "icon1")
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		sns2, err := domain.Rebuild(2, u2.String(), n2.String(), url2.String(), "icon2")
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		res := ToSnsResponses([]*domain.Sns{sns1, sns2})
 		if len(res) != 2 {
 			t.Fatalf("expected 2, got %d", len(res))
 		}

@@ -23,23 +23,24 @@ func (r *TagRepository) Create(ctx context.Context, t *domain.Tag) error {
 	_, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`INSERT INTO tag (uuid, name, created_at, updated_at) VALUES (?, ?, NOW(), NOW())`,
-		t.UUID.String(), t.Name.String(),
+		t.UUID().String(), t.Name().String(),
 	)
 	return err
 }
 
 func (r *TagRepository) FindAll(ctx context.Context) ([]*domain.Tag, error) {
 	type row struct {
+		ID   uint   `db:"id"`
 		UUID string `db:"uuid"`
 		Name string `db:"name"`
 	}
 	var rows []row
-	if err := getExecutor(ctx, r.db).SelectContext(ctx, &rows, `SELECT uuid, name FROM tag WHERE deleted_at IS NULL`); err != nil {
+	if err := getExecutor(ctx, r.db).SelectContext(ctx, &rows, `SELECT id, uuid, name FROM tag WHERE deleted_at IS NULL`); err != nil {
 		return nil, err
 	}
 	res := make([]*domain.Tag, 0, len(rows))
 	for _, r := range rows {
-		t, err := toDomainTag(r.UUID, r.Name)
+		t, err := toDomainTag(r.ID, r.UUID, r.Name)
 		if err != nil {
 			return nil, err
 		}
@@ -50,17 +51,18 @@ func (r *TagRepository) FindAll(ctx context.Context) ([]*domain.Tag, error) {
 
 func (r *TagRepository) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domain.Tag, error) {
 	type row struct {
+		ID   uint   `db:"id"`
 		UUID string `db:"uuid"`
 		Name string `db:"name"`
 	}
 	var rrow row
-	if err := getExecutor(ctx, r.db).GetContext(ctx, &rrow, `SELECT uuid, name FROM tag WHERE uuid = ? AND deleted_at IS NULL`, uuid.String()); err != nil {
+	if err := getExecutor(ctx, r.db).GetContext(ctx, &rrow, `SELECT id, uuid, name FROM tag WHERE uuid = ? AND deleted_at IS NULL`, uuid.String()); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
 		return nil, err
 	}
-	return toDomainTag(rrow.UUID, rrow.Name)
+	return toDomainTag(rrow.ID, rrow.UUID, rrow.Name)
 }
 
 func (r *TagRepository) ExistsByName(ctx context.Context, name domain.TagName) (bool, error) {
@@ -75,8 +77,8 @@ func (r *TagRepository) Update(ctx context.Context, t *domain.Tag) (bool, error)
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`UPDATE tag SET name = ?, updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`,
-		t.Name.String(),
-		t.UUID.String(),
+		t.Name().String(),
+		t.UUID().String(),
 	)
 	if err != nil {
 		return false, err
@@ -123,14 +125,10 @@ func (r *TagRepository) Delete(ctx context.Context, uuid primitive.UUID) (bool, 
 	return affected > 0, nil
 }
 
-func toDomainTag(uuidStr, nameStr string) (*domain.Tag, error) {
-	uuid, err := primitive.NewUUID(uuidStr)
+func toDomainTag(id uint, uuidStr, nameStr string) (*domain.Tag, error) {
+	tag, err := domain.Rebuild(id, uuidStr, nameStr)
 	if err != nil {
-		return nil, fmt.Errorf("invalid tag uuid: %w", err)
+		return nil, fmt.Errorf("invalid tag row: %w", err)
 	}
-	name, err := domain.NewTagName(nameStr)
-	if err != nil {
-		return nil, fmt.Errorf("invalid tag name: %w", err)
-	}
-	return &domain.Tag{UUID: uuid, Name: name}, nil
+	return tag, nil
 }

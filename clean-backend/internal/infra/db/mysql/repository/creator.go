@@ -4,11 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"strings"
 
 	"github.com/jmoiron/sqlx"
 
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/creator"
+	"github.com/tokushun109/tku/clean-backend/internal/shared/optional"
 )
 
 type CreatorRepository struct {
@@ -45,12 +45,14 @@ func (r *CreatorRepository) Find(ctx context.Context) (*domain.Creator, error) {
 }
 
 func (r *CreatorRepository) UpdateProfile(ctx context.Context, c *domain.Creator) (bool, error) {
+	introduction := optional.ToStringPtr(c.Introduction())
+
 	result, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`UPDATE creator SET name = ?, introduction = ?, updated_at = NOW() WHERE id = ? AND deleted_at IS NULL`,
-		c.Name.String(),
-		c.Introduction.String(),
-		c.ID,
+		c.Name().String(),
+		introduction,
+		c.ID(),
 	)
 	if err != nil {
 		return false, err
@@ -88,43 +90,28 @@ func (r *CreatorRepository) UpdateLogo(
 }
 
 func toDomainCreator(row creatorRow) (*domain.Creator, error) {
-	name, err := domain.NewCreatorName(row.Name)
-	if err != nil {
-		return nil, fmt.Errorf("invalid creator name: %w", err)
-	}
-
 	introductionRaw := ""
 	if row.Introduction.Valid {
 		introductionRaw = row.Introduction.String
 	}
-	introduction, err := domain.NewCreatorIntroductionForRead(introductionRaw)
+	mimeTypeRaw := ""
+	if row.MimeType.Valid {
+		mimeTypeRaw = row.MimeType.String
+	}
+	logoPathRaw := ""
+	if row.Logo.Valid {
+		logoPathRaw = row.Logo.String
+	}
+
+	creator, err := domain.Rebuild(
+		row.ID,
+		row.Name,
+		introductionRaw,
+		mimeTypeRaw,
+		logoPathRaw,
+	)
 	if err != nil {
-		return nil, fmt.Errorf("invalid creator introduction: %w", err)
+		return nil, fmt.Errorf("invalid creator row: %w", err)
 	}
-
-	var mimeType *domain.CreatorLogoMimeType
-	if row.MimeType.Valid && strings.TrimSpace(row.MimeType.String) != "" {
-		v, err := domain.NewCreatorLogoMimeType(row.MimeType.String)
-		if err != nil {
-			return nil, fmt.Errorf("invalid creator logo mime type: %w", err)
-		}
-		mimeType = &v
-	}
-
-	var logoPath *domain.CreatorLogoPath
-	if row.Logo.Valid && strings.TrimSpace(row.Logo.String) != "" {
-		v, err := domain.NewCreatorLogoPath(row.Logo.String)
-		if err != nil {
-			return nil, fmt.Errorf("invalid creator logo path: %w", err)
-		}
-		logoPath = &v
-	}
-
-	return &domain.Creator{
-		ID:           row.ID,
-		Name:         name,
-		Introduction: introduction,
-		LogoMimeType: mimeType,
-		LogoPath:     logoPath,
-	}, nil
+	return creator, nil
 }

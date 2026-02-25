@@ -39,6 +39,15 @@
 - 初回リリースから除外する。
 - 後続フェーズで `infra` 側に外部依存（スクレイピング/HTTP）を隔離して実装する。
 
+### 2.4 Entity の `id` 利用方針（商品系）
+
+- 商品系Entityは原則として `id`（DB内部識別子）を持つ
+- API入力/出力の識別子は `uuid` を使い、内部関連では `id` を使う
+  - 例: `product_to_tag`, `site_detail`, `product_image` などの関連テーブル連携
+- DB からの復元は `Rebuild(...)` を使う
+  - `New(...)` は新規作成（未永続化）専用
+  - `Rebuild(...)` は `id` を受け取り、`id == 0` は不正として扱う
+
 ## 3. ディレクトリ構成方針
 
 ### 3.1 Domain（Entity/VO）
@@ -69,6 +78,8 @@ internal/domain/product/
 補足:
 
 - UUID は既存方針どおり `internal/domain/primitive/uuid_vo.go` を利用する。
+- Product Entity は `id` と `uuid` の両方を保持する。
+- Repository の read 実装では `SELECT id, uuid, ...` で取得し、`Rebuild(id, uuid, ...)` で復元する。
 - `site_detail` は商品配下で扱うが、必要に応じて Value Object を追加する（detail URL 等）。
 
 ### 3.2 Usecase（Command / Query）

@@ -65,7 +65,7 @@ func (s *Service) Login(ctx context.Context, email string, password string) (*do
 		return nil, usecase.NewAppError(usecase.ErrUnauthorized)
 	}
 
-	ok, err := s.passwordHasher.Verify(password, u.PasswordHash)
+	ok, err := s.passwordHasher.Verify(password, u.PasswordHash())
 	if err != nil {
 		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
@@ -73,18 +73,14 @@ func (s *Service) Login(ctx context.Context, email string, password string) (*do
 		return nil, usecase.NewAppError(usecase.ErrUnauthorized)
 	}
 
-	sessionUUID, err := s.uuidGen.New()
+	sessionUUID := s.uuidGen.New()
+
+	sess, err := domainSession.New(sessionUUID, u.ID(), s.clock.Now())
 	if err != nil {
 		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
-
-	sess := &domainSession.Session{
-		UUID:      sessionUUID,
-		UserID:    u.ID,
-		CreatedAt: s.clock.Now(),
-	}
 	if err := s.txManager.WithinTransaction(ctx, func(txCtx context.Context) error {
-		if err := s.sessionRepo.DeleteByUserID(txCtx, u.ID); err != nil {
+		if err := s.sessionRepo.DeleteByUserID(txCtx, u.ID()); err != nil {
 			return err
 		}
 		if err := s.sessionRepo.Create(txCtx, sess); err != nil {
@@ -104,7 +100,7 @@ func (s *Service) GetBySessionToken(ctx context.Context, token string) (*domainU
 		return nil, err
 	}
 
-	u, err := s.userRepo.FindByID(ctx, sess.UserID)
+	u, err := s.userRepo.FindByID(ctx, sess.UserID())
 	if err != nil {
 		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
