@@ -7,10 +7,10 @@ import (
 
 func ToSnsResponse(s *domain.Sns) *response.SnsResponse {
 	return &response.SnsResponse{
-		UUID: s.UUID.String(),
-		Name: s.Name.String(),
-		URL:  s.URL.String(),
-		Icon: s.Icon,
+		UUID: s.UUID().String(),
+		Name: s.Name().String(),
+		URL:  s.URL().String(),
+		Icon: s.Icon(),
 	}
 }
 

@@ -23,23 +23,24 @@ func (r *CategoryRepository) Create(ctx context.Context, c *domain.Category) err
 	_, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`INSERT INTO category (uuid, name, created_at, updated_at) VALUES (?, ?, NOW(), NOW())`,
-		c.UUID.String(), c.Name.String(),
+		c.UUID().String(), c.Name().String(),
 	)
 	return err
 }
 
 func (r *CategoryRepository) FindAll(ctx context.Context) ([]*domain.Category, error) {
 	type row struct {
+		ID   uint   `db:"id"`
 		UUID string `db:"uuid"`
 		Name string `db:"name"`
 	}
 	var rows []row
-	if err := getExecutor(ctx, r.db).SelectContext(ctx, &rows, `SELECT uuid, name FROM category WHERE deleted_at IS NULL`); err != nil {
+	if err := getExecutor(ctx, r.db).SelectContext(ctx, &rows, `SELECT id, uuid, name FROM category WHERE deleted_at IS NULL`); err != nil {
 		return nil, err
 	}
 	res := make([]*domain.Category, 0, len(rows))
 	for _, r := range rows {
-		c, err := toDomainCategory(r.UUID, r.Name)
+		c, err := toDomainCategory(r.ID, r.UUID, r.Name)
 		if err != nil {
 			return nil, err
 		}
@@ -50,12 +51,13 @@ func (r *CategoryRepository) FindAll(ctx context.Context) ([]*domain.Category, e
 
 func (r *CategoryRepository) FindUsed(ctx context.Context) ([]*domain.Category, error) {
 	type row struct {
+		ID   uint   `db:"id"`
 		UUID string `db:"uuid"`
 		Name string `db:"name"`
 	}
 	var rows []row
 	query := `
-		SELECT DISTINCT c.uuid, c.name
+		SELECT DISTINCT c.id, c.uuid, c.name
 		FROM category c
 		INNER JOIN product p ON p.category_id = c.id
 		WHERE c.deleted_at IS NULL AND p.deleted_at IS NULL
@@ -65,7 +67,7 @@ func (r *CategoryRepository) FindUsed(ctx context.Context) ([]*domain.Category, 
 	}
 	res := make([]*domain.Category, 0, len(rows))
 	for _, r := range rows {
-		c, err := toDomainCategory(r.UUID, r.Name)
+		c, err := toDomainCategory(r.ID, r.UUID, r.Name)
 		if err != nil {
 			return nil, err
 		}
@@ -76,17 +78,18 @@ func (r *CategoryRepository) FindUsed(ctx context.Context) ([]*domain.Category, 
 
 func (r *CategoryRepository) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domain.Category, error) {
 	type row struct {
+		ID   uint   `db:"id"`
 		UUID string `db:"uuid"`
 		Name string `db:"name"`
 	}
 	var rrow row
-	if err := getExecutor(ctx, r.db).GetContext(ctx, &rrow, `SELECT uuid, name FROM category WHERE uuid = ? AND deleted_at IS NULL`, uuid.String()); err != nil {
+	if err := getExecutor(ctx, r.db).GetContext(ctx, &rrow, `SELECT id, uuid, name FROM category WHERE uuid = ? AND deleted_at IS NULL`, uuid.String()); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
 		return nil, err
 	}
-	return toDomainCategory(rrow.UUID, rrow.Name)
+	return toDomainCategory(rrow.ID, rrow.UUID, rrow.Name)
 }
 
 func (r *CategoryRepository) ExistsByName(ctx context.Context, name domain.CategoryName) (bool, error) {
@@ -101,8 +104,8 @@ func (r *CategoryRepository) Update(ctx context.Context, c *domain.Category) (bo
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`UPDATE category SET name = ?, updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`,
-		c.Name.String(),
-		c.UUID.String(),
+		c.Name().String(),
+		c.UUID().String(),
 	)
 	if err != nil {
 		return false, err
@@ -149,14 +152,10 @@ func (r *CategoryRepository) Delete(ctx context.Context, uuid primitive.UUID) (b
 	return affected > 0, nil
 }
 
-func toDomainCategory(uuidStr, nameStr string) (*domain.Category, error) {
-	uuid, err := primitive.NewUUID(uuidStr)
+func toDomainCategory(id uint, uuidStr, nameStr string) (*domain.Category, error) {
+	category, err := domain.Rebuild(id, uuidStr, nameStr)
 	if err != nil {
-		return nil, fmt.Errorf("invalid category uuid: %w", err)
+		return nil, fmt.Errorf("invalid category row: %w", err)
 	}
-	name, err := domain.NewCategoryName(nameStr)
-	if err != nil {
-		return nil, fmt.Errorf("invalid category name: %w", err)
-	}
-	return &domain.Category{UUID: uuid, Name: name}, nil
+	return category, nil
 }

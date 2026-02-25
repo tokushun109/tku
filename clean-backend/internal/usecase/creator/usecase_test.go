@@ -10,7 +10,6 @@ import (
 
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/creator"
 	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
-	"github.com/tokushun109/tku/clean-backend/internal/shared/optional"
 	"github.com/tokushun109/tku/clean-backend/internal/usecase"
 )
 
@@ -88,12 +87,11 @@ func (s *stubLogoStorage) PresignGet(ctx context.Context, key string, expires ti
 }
 
 type stubUUIDGenerator struct {
-	uuid primitive.UUID
-	err  error
+	uuid string
 }
 
-func (s *stubUUIDGenerator) New() (primitive.UUID, error) {
-	return s.uuid, s.err
+func (s *stubUUIDGenerator) New() string {
+	return s.uuid
 }
 
 func TestServiceGet(t *testing.T) {
@@ -143,7 +141,7 @@ func TestServiceUpdateLogo(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected uuid error: %v", err)
 		}
-		uuidGen := &stubUUIDGenerator{uuid: uuid}
+		uuidGen := &stubUUIDGenerator{uuid: uuid.String()}
 		svc := New(repo, storage, uuidGen)
 
 		pngBinary := []byte{0x89, 'P', 'N', 'G', '\r', '\n', 0x1a, '\n', 0, 0, 0, 0}
@@ -236,33 +234,9 @@ func TestServiceGetLogoBlob(t *testing.T) {
 }
 
 func mustCreator(id uint, name, introduction, mimeType, logoPath string) *domain.Creator {
-	n, err := domain.NewCreatorName(name)
+	creator, err := domain.Rebuild(id, name, introduction, mimeType, logoPath)
 	if err != nil {
 		panic(err)
-	}
-	i, err := optional.ParseOptionalString(introduction, domain.NewCreatorIntroduction)
-	if err != nil {
-		panic(err)
-	}
-
-	creator := &domain.Creator{
-		ID:           id,
-		Name:         n,
-		Introduction: i,
-	}
-	if mimeType != "" {
-		m, err := domain.NewCreatorLogoMimeType(mimeType)
-		if err != nil {
-			panic(err)
-		}
-		creator.LogoMimeType = &m
-	}
-	if logoPath != "" {
-		p, err := domain.NewCreatorLogoPath(logoPath)
-		if err != nil {
-			panic(err)
-		}
-		creator.LogoPath = &p
 	}
 	return creator
 }

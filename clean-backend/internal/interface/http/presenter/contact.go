@@ -8,13 +8,13 @@ import (
 
 func ToContactResponse(contact *domain.Contact) *response.ContactResponse {
 	return &response.ContactResponse{
-		ID:          contact.ID,
-		Name:        contact.Name.String(),
-		Company:     optional.ToStringPtr(contact.Company),
-		PhoneNumber: optional.ToStringPtr(contact.PhoneNumber),
-		Email:       contact.Email.String(),
-		Content:     contact.Content.String(),
-		CreatedAt:   contact.CreatedAt,
+		ID:          contact.ID(),
+		Name:        contact.Name().String(),
+		Company:     optional.ToStringPtr(contact.Company()),
+		PhoneNumber: optional.ToStringPtr(contact.PhoneNumber()),
+		Email:       contact.Email().String(),
+		Content:     contact.Content().String(),
+		CreatedAt:   contact.CreatedAt(),
 	}
 }
 

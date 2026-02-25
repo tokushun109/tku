@@ -20,7 +20,11 @@ func TestToTagResponse(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		res := ToTagResponse(&domain.Tag{UUID: u, Name: n})
+		tag, err := domain.Rebuild(1, u.String(), n.String())
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		res := ToTagResponse(tag)
 		if res.UUID != u.String() || res.Name != n.String() {
 			t.Fatalf("unexpected response: %+v", res)
 		}
@@ -48,10 +52,15 @@ func TestToTagResponses(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		res := ToTagResponses([]*domain.Tag{
-			{UUID: u1, Name: n1},
-			{UUID: u2, Name: n2},
-		})
+		tag1, err := domain.Rebuild(1, u1.String(), n1.String())
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		tag2, err := domain.Rebuild(2, u2.String(), n2.String())
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		res := ToTagResponses([]*domain.Tag{tag1, tag2})
 		if len(res) != 2 {
 			t.Fatalf("expected 2, got %d", len(res))
 		}

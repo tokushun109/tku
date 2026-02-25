@@ -12,8 +12,6 @@ import (
 	"time"
 
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/creator"
-	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
-	"github.com/tokushun109/tku/clean-backend/internal/shared/optional"
 	"github.com/tokushun109/tku/clean-backend/internal/usecase"
 )
 
@@ -66,8 +64,8 @@ func (s *Service) Get(ctx context.Context) (*CreatorDetail, error) {
 	}
 
 	logoAPIPath := ""
-	if current.LogoPath != nil {
-		url, err := s.storage.PresignGet(ctx, current.LogoPath.String(), defaultLogoPresignTTL)
+	if current.LogoPath() != nil {
+		url, err := s.storage.PresignGet(ctx, current.LogoPath().String(), defaultLogoPresignTTL)
 		if err != nil {
 			return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 		}
@@ -81,21 +79,6 @@ func (s *Service) Get(ctx context.Context) (*CreatorDetail, error) {
 }
 
 func (s *Service) Update(ctx context.Context, name string, introduction string) error {
-	creatorName, err := domain.NewCreatorName(name)
-	if err != nil {
-		if errors.Is(err, domain.ErrInvalidName) {
-			return usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error())
-		}
-		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
-	}
-	creatorIntroduction, err := optional.ParseOptionalString(introduction, domain.NewCreatorIntroduction)
-	if err != nil {
-		if errors.Is(err, domain.ErrInvalidIntroduction) {
-			return usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error())
-		}
-		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
-	}
-
 	current, err := s.repo.Find(ctx)
 	if err != nil {
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
@@ -104,13 +87,14 @@ func (s *Service) Update(ctx context.Context, name string, introduction string) 
 		return usecase.NewAppErrorWithMessage(usecase.ErrNotFound, domain.ErrCreatorRecordMissing.Error())
 	}
 
-	updated, err := s.repo.UpdateProfile(ctx, &domain.Creator{
-		ID:           current.ID,
-		Name:         creatorName,
-		Introduction: creatorIntroduction,
-		LogoMimeType: current.LogoMimeType,
-		LogoPath:     current.LogoPath,
-	})
+	if err := current.ChangeProfile(name, introduction); err != nil {
+		if errors.Is(err, domain.ErrInvalidName) || errors.Is(err, domain.ErrInvalidIntroduction) {
+			return usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error())
+		}
+		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
+	}
+
+	updated, err := s.repo.UpdateProfile(ctx, current)
 	if err != nil {
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
@@ -143,10 +127,7 @@ func (s *Service) UpdateLogo(ctx context.Context, logoBytes []byte) error {
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 
-	newUUID, err := s.uuidGen.New()
-	if err != nil {
-		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
-	}
+	newUUID := s.uuidGen.New()
 
 	newLogoPath, err := buildCreatorLogoPath(newUUID, logoMimeType)
 	if err != nil {
@@ -157,7 +138,7 @@ func (s *Service) UpdateLogo(ctx context.Context, logoBytes []byte) error {
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 
-	updated, err := s.repo.UpdateLogo(ctx, current.ID, logoMimeType, newLogoPath)
+	updated, err := s.repo.UpdateLogo(ctx, current.ID(), logoMimeType, newLogoPath)
 	if err != nil {
 		if delErr := s.storage.Delete(ctx, newLogoPath.String()); delErr != nil {
 			log.Printf("[WARN] creator update logo rollback delete failed: path=%s err=%v", newLogoPath.String(), delErr)
@@ -172,9 +153,9 @@ func (s *Service) UpdateLogo(ctx context.Context, logoBytes []byte) error {
 	}
 
 	// DB の更新後に旧ファイルを削除する。削除失敗は orphan を許容して成功扱いにする。
-	if current.LogoPath != nil && current.LogoPath.String() != newLogoPath.String() {
-		if delErr := s.storage.Delete(ctx, current.LogoPath.String()); delErr != nil {
-			log.Printf("[WARN] creator update logo old file delete failed: path=%s err=%v", current.LogoPath.String(), delErr)
+	if current.LogoPath() != nil && current.LogoPath().String() != newLogoPath.String() {
+		if delErr := s.storage.Delete(ctx, current.LogoPath().String()); delErr != nil {
+			log.Printf("[WARN] creator update logo old file delete failed: path=%s err=%v", current.LogoPath().String(), delErr)
 		}
 	}
 
@@ -194,16 +175,16 @@ func (s *Service) GetLogoBlob(ctx context.Context, requestLogoFile string) (*Log
 	if current == nil {
 		return nil, usecase.NewAppErrorWithMessage(usecase.ErrNotFound, domain.ErrCreatorRecordMissing.Error())
 	}
-	if current.LogoPath == nil || current.LogoMimeType == nil {
+	if current.LogoPath() == nil || current.LogoMimeType() == nil {
 		return nil, usecase.NewAppError(usecase.ErrNotFound)
 	}
 
-	savedLogoFile := path.Base(current.LogoPath.String())
+	savedLogoFile := path.Base(current.LogoPath().String())
 	if savedLogoFile != logoFile {
 		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, domain.ErrInvalidLogoFileName.Error())
 	}
 
-	logoBody, err := s.storage.Get(ctx, current.LogoPath.String())
+	logoBody, err := s.storage.Get(ctx, current.LogoPath().String())
 	if err != nil {
 		if errors.Is(err, usecase.ErrStorageNotFound) {
 			return nil, usecase.NewAppError(usecase.ErrNotFound)
@@ -212,13 +193,12 @@ func (s *Service) GetLogoBlob(ctx context.Context, requestLogoFile string) (*Log
 	}
 
 	return &LogoBlob{
-		ContentType: current.LogoMimeType.String(),
+		ContentType: current.LogoMimeType().String(),
 		Body:        logoBody,
 	}, nil
 }
 
-func buildCreatorLogoPath(uuid primitive.UUID, mimeType domain.CreatorLogoMimeType) (domain.CreatorLogoPath, error) {
-	uuidStr := uuid.String()
+func buildCreatorLogoPath(uuidStr string, mimeType domain.CreatorLogoMimeType) (domain.CreatorLogoPath, error) {
 	if len(uuidStr) < 2 {
 		return "", fmt.Errorf("invalid uuid length: %d", len(uuidStr))
 	}

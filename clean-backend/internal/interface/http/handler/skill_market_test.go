@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/gorilla/mux"
-	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/skill_market"
 	"github.com/tokushun109/tku/clean-backend/internal/interface/http/response"
 	"github.com/tokushun109/tku/clean-backend/internal/shared/id"
@@ -184,17 +183,9 @@ func TestSkillMarketDelete(t *testing.T) {
 }
 
 func mustSkillMarket(uuidStr, name, rawURL, icon string) *domain.SkillMarket {
-	u, err := primitive.NewUUID(uuidStr)
+	skillMarket, err := domain.Rebuild(1, uuidStr, name, rawURL, icon)
 	if err != nil {
 		panic(err)
 	}
-	n, err := domain.NewSkillMarketName(name)
-	if err != nil {
-		panic(err)
-	}
-	u2, err := primitive.NewURL(rawURL)
-	if err != nil {
-		panic(err)
-	}
-	return &domain.SkillMarket{UUID: u, Name: n, URL: u2, Icon: icon}
+	return skillMarket
 }

@@ -50,7 +50,9 @@ func (s *Service) List(ctx context.Context, mode string) ([]*domain.Category, er
 }
 
 func (s *Service) Create(ctx context.Context, name string) error {
-	c, err := domain.New(name)
+	newUUID := s.uuidGen.New()
+
+	c, err := domain.New(newUUID, name)
 	if err != nil {
 		if errors.Is(err, domain.ErrInvalidName) {
 			return usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error())
@@ -58,7 +60,7 @@ func (s *Service) Create(ctx context.Context, name string) error {
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 
-	exists, err := s.repo.ExistsByName(ctx, c.Name)
+	exists, err := s.repo.ExistsByName(ctx, c.Name())
 	if err != nil {
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
@@ -66,11 +68,6 @@ func (s *Service) Create(ctx context.Context, name string) error {
 		return usecase.NewAppErrorWithMessage(usecase.ErrConflict, domain.ErrNameDuplicated.Error())
 	}
 
-	newUUID, err := s.uuidGen.New()
-	if err != nil {
-		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
-	}
-	c.UUID = newUUID
 	if err := s.repo.Create(ctx, c); err != nil {
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
@@ -98,7 +95,7 @@ func (s *Service) Update(ctx context.Context, uuidStr string, name string) error
 		return usecase.NewAppError(usecase.ErrNotFound)
 	}
 
-	if current.Name.String() != newName.String() {
+	if current.Name().String() != newName.String() {
 		exists, err := s.repo.ExistsByName(ctx, newName)
 		if err != nil {
 			return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
@@ -108,7 +105,11 @@ func (s *Service) Update(ctx context.Context, uuidStr string, name string) error
 		}
 	}
 
-	updated, err := s.repo.Update(ctx, &domain.Category{UUID: uuid, Name: newName})
+	if err := current.ChangeName(name); err != nil {
+		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
+	}
+
+	updated, err := s.repo.Update(ctx, current)
 	if err != nil {
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}

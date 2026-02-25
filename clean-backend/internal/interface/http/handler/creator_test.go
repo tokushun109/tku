@@ -13,7 +13,6 @@ import (
 	"github.com/gorilla/mux"
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/creator"
 	"github.com/tokushun109/tku/clean-backend/internal/interface/http/response"
-	"github.com/tokushun109/tku/clean-backend/internal/shared/optional"
 	usecaseCreator "github.com/tokushun109/tku/clean-backend/internal/usecase/creator"
 )
 
@@ -57,24 +56,14 @@ func (s *stubCreatorUC) GetLogoBlob(ctx context.Context, requestLogoFile string)
 
 func TestCreatorGet(t *testing.T) {
 	t.Run("有効な入力を渡したとき製作者情報の取得に成功する", func(t *testing.T) {
-		creatorName, err := domain.NewCreatorName("とこりり")
+		creator, err := domain.Rebuild(1, "とこりり", "ハンドメイド作品を制作", "", "")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
-		}
-		introduction, err := optional.ParseOptionalString("ハンドメイド作品を制作", domain.NewCreatorIntroduction)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		if introduction == nil {
-			t.Fatalf("unexpected nil introduction")
 		}
 
 		h := NewCreatorHandler(&stubCreatorUC{
 			getRes: &usecaseCreator.CreatorDetail{
-				Creator: &domain.Creator{
-					Name:         creatorName,
-					Introduction: introduction,
-				},
+				Creator: creator,
 				APIPath: "http://localhost:8081/api/creator/logo/logo.png/blob",
 			},
 		})

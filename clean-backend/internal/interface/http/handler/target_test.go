@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/gorilla/mux"
-	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/target"
 	"github.com/tokushun109/tku/clean-backend/internal/interface/http/response"
 	"github.com/tokushun109/tku/clean-backend/internal/shared/id"
@@ -195,13 +194,9 @@ func TestTargetDelete(t *testing.T) {
 }
 
 func mustTarget(uuidStr, name string) *domain.Target {
-	u, err := primitive.NewUUID(uuidStr)
+	target, err := domain.Rebuild(1, uuidStr, name)
 	if err != nil {
 		panic(err)
 	}
-	n, err := domain.NewTargetName(name)
-	if err != nil {
-		panic(err)
-	}
-	return &domain.Target{UUID: u, Name: n}
+	return target
 }

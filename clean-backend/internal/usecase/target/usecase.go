@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	domain "github.com/tokushun109/tku/clean-backend/internal/domain/target"
 	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
+	domain "github.com/tokushun109/tku/clean-backend/internal/domain/target"
 	"github.com/tokushun109/tku/clean-backend/internal/usecase"
 )
 
@@ -50,7 +50,9 @@ func (s *Service) List(ctx context.Context, mode string) ([]*domain.Target, erro
 }
 
 func (s *Service) Create(ctx context.Context, name string) error {
-	t, err := domain.New(name)
+	newUUID := s.uuidGen.New()
+
+	t, err := domain.New(newUUID, name)
 	if err != nil {
 		if errors.Is(err, domain.ErrInvalidName) {
 			return usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error())
@@ -58,7 +60,7 @@ func (s *Service) Create(ctx context.Context, name string) error {
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 
-	exists, err := s.repo.ExistsByName(ctx, t.Name)
+	exists, err := s.repo.ExistsByName(ctx, t.Name())
 	if err != nil {
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
@@ -66,11 +68,6 @@ func (s *Service) Create(ctx context.Context, name string) error {
 		return usecase.NewAppErrorWithMessage(usecase.ErrConflict, domain.ErrNameDuplicated.Error())
 	}
 
-	newUUID, err := s.uuidGen.New()
-	if err != nil {
-		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
-	}
-	t.UUID = newUUID
 	if err := s.repo.Create(ctx, t); err != nil {
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
@@ -98,7 +95,7 @@ func (s *Service) Update(ctx context.Context, uuidStr string, name string) error
 		return usecase.NewAppError(usecase.ErrNotFound)
 	}
 
-	if current.Name.String() != newName.String() {
+	if current.Name().String() != newName.String() {
 		exists, err := s.repo.ExistsByName(ctx, newName)
 		if err != nil {
 			return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
@@ -108,7 +105,11 @@ func (s *Service) Update(ctx context.Context, uuidStr string, name string) error
 		}
 	}
 
-	updated, err := s.repo.Update(ctx, &domain.Target{UUID: uuid, Name: newName})
+	if err := current.ChangeName(name); err != nil {
+		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
+	}
+
+	updated, err := s.repo.Update(ctx, current)
 	if err != nil {
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}

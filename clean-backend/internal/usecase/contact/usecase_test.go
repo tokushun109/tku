@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 	"testing"
+	"time"
 
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/contact"
-	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
 	"github.com/tokushun109/tku/clean-backend/internal/usecase"
 )
 
@@ -44,20 +44,12 @@ func (s *stubNotifier) NotifyContactCreated(ctx context.Context, contact *domain
 
 func TestListContact(t *testing.T) {
 	t.Run("有効な入力を渡したときお問い合わせ一覧の取得に成功する", func(t *testing.T) {
-		name, err := domain.NewContactName("山田太郎")
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		email, err := primitive.NewEmail("test@example.com")
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		content, err := domain.NewContactContent("お問い合わせ内容")
+		contact, err := domain.Rebuild(1, "山田太郎", "", "", "test@example.com", "お問い合わせ内容", time.Now())
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		repo := &stubRepo{findAll: []*domain.Contact{{ID: 1, Name: name, Email: email, Content: content}}}
+		repo := &stubRepo{findAll: []*domain.Contact{contact}}
 		uc := New(repo, &stubNotifier{})
 
 		res, err := uc.List(context.Background())

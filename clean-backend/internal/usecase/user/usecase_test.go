@@ -14,7 +14,6 @@ import (
 )
 
 var testUUID = id.GenerateUUID()
-var testUUIDVO = mustNewUUID(testUUID)
 
 type stubUserRepo struct {
 	userByEmail    *domainUser.User
@@ -113,15 +112,11 @@ func (s *stubPasswordHasher) Verify(plain string, hash domainUser.UserPasswordHa
 }
 
 type stubUUIDGen struct {
-	uuid primitive.UUID
-	err  error
+	uuid string
 }
 
-func (s *stubUUIDGen) New() (primitive.UUID, error) {
-	if s.err != nil {
-		return "", s.err
-	}
-	return s.uuid, nil
+func (s *stubUUIDGen) New() string {
+	return s.uuid
 }
 
 type stubClock struct {
@@ -161,13 +156,13 @@ func TestLogin(t *testing.T) {
 		clock := &stubClock{now: time.Date(2026, 2, 17, 10, 0, 0, 0, time.UTC)}
 		txManager := &stubTxManager{}
 
-		uc := New(userRepo, sessionRepo, sessionUC, hasher, &stubUUIDGen{uuid: testUUIDVO}, clock, txManager)
+		uc := New(userRepo, sessionRepo, sessionUC, hasher, &stubUUIDGen{uuid: testUUID}, clock, txManager)
 
 		sess, err := uc.Login(context.Background(), "mail@example.com", "password")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if sess == nil || sess.UUID.String() != testUUID {
+		if sess == nil || sess.UUID().String() != testUUID {
 			t.Fatalf("unexpected session: %+v", sess)
 		}
 		if sessionRepo.deletedUserID != 1 {
@@ -183,7 +178,7 @@ func TestLogin(t *testing.T) {
 	t.Run("ユーザーが見つからないなら未認証エラーを返す", func(t *testing.T) {
 
 		userRepo := &stubUserRepo{userByEmail: nil}
-		uc := New(userRepo, &stubSessionRepo{}, &stubSessionUC{}, &stubPasswordHasher{verifyOK: true}, &stubUUIDGen{uuid: testUUIDVO}, &stubClock{now: time.Now()}, &stubTxManager{})
+		uc := New(userRepo, &stubSessionRepo{}, &stubSessionUC{}, &stubPasswordHasher{verifyOK: true}, &stubUUIDGen{uuid: testUUID}, &stubClock{now: time.Now()}, &stubTxManager{})
 
 		_, err := uc.Login(context.Background(), "mail@example.com", "password")
 		if err == nil || !errors.Is(err, usecase.ErrUnauthorized) {
@@ -197,7 +192,7 @@ func TestLogin(t *testing.T) {
 			t.Fatalf("unexpected hash error: %v", err)
 		}
 		userRepo := &stubUserRepo{userByEmail: mustUser(1, testUUID, "name", "mail@example.com", hash, true)}
-		uc := New(userRepo, &stubSessionRepo{}, &stubSessionUC{}, &stubPasswordHasher{verifyOK: false}, &stubUUIDGen{uuid: testUUIDVO}, &stubClock{now: time.Now()}, &stubTxManager{})
+		uc := New(userRepo, &stubSessionRepo{}, &stubSessionUC{}, &stubPasswordHasher{verifyOK: false}, &stubUUIDGen{uuid: testUUID}, &stubClock{now: time.Now()}, &stubTxManager{})
 
 		_, err = uc.Login(context.Background(), "mail@example.com", "bad")
 		if err == nil || !errors.Is(err, usecase.ErrUnauthorized) {
@@ -216,7 +211,7 @@ func TestLogin(t *testing.T) {
 			&stubSessionRepo{},
 			&stubSessionUC{},
 			&stubPasswordHasher{verifyOK: true},
-			&stubUUIDGen{uuid: testUUIDVO},
+			&stubUUIDGen{uuid: testUUID},
 			&stubClock{now: time.Now()},
 			&stubTxManager{err: errors.New("tx failed")},
 		)
@@ -235,21 +230,21 @@ func TestGetBySessionToken(t *testing.T) {
 			t.Fatalf("unexpected hash error: %v", err)
 		}
 		userRepo := &stubUserRepo{userByID: mustUser(1, testUUID, "name", "mail@example.com", hash, true)}
-		sessionUC := &stubSessionUC{resolveRes: &domainSession.Session{UserID: 1}}
-		uc := New(userRepo, &stubSessionRepo{}, sessionUC, &stubPasswordHasher{verifyOK: true}, &stubUUIDGen{uuid: testUUIDVO}, &stubClock{now: time.Now()}, &stubTxManager{})
+		sessionUC := &stubSessionUC{resolveRes: mustSession(1, testUUID, 1, time.Now())}
+		uc := New(userRepo, &stubSessionRepo{}, sessionUC, &stubPasswordHasher{verifyOK: true}, &stubUUIDGen{uuid: testUUID}, &stubClock{now: time.Now()}, &stubTxManager{})
 
 		u, err := uc.GetBySessionToken(context.Background(), testUUID)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if u == nil || u.ID != 1 {
+		if u == nil || u.ID() != 1 {
 			t.Fatalf("unexpected user: %+v", u)
 		}
 	})
 	t.Run("認証情報がないなら未認証エラーを返す", func(t *testing.T) {
 
 		sessionUC := &stubSessionUC{resolveErr: usecase.NewAppError(usecase.ErrUnauthorized)}
-		uc := New(&stubUserRepo{}, &stubSessionRepo{}, sessionUC, &stubPasswordHasher{verifyOK: true}, &stubUUIDGen{uuid: testUUIDVO}, &stubClock{now: time.Now()}, &stubTxManager{})
+		uc := New(&stubUserRepo{}, &stubSessionRepo{}, sessionUC, &stubPasswordHasher{verifyOK: true}, &stubUUIDGen{uuid: testUUID}, &stubClock{now: time.Now()}, &stubTxManager{})
 
 		_, err := uc.GetBySessionToken(context.Background(), "bad")
 		if err == nil || !errors.Is(err, usecase.ErrUnauthorized) {
@@ -262,7 +257,7 @@ func TestLogout(t *testing.T) {
 	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
 
 		sessionUC := &stubSessionUC{}
-		uc := New(&stubUserRepo{}, &stubSessionRepo{}, sessionUC, &stubPasswordHasher{verifyOK: true}, &stubUUIDGen{uuid: testUUIDVO}, &stubClock{now: time.Now()}, &stubTxManager{})
+		uc := New(&stubUserRepo{}, &stubSessionRepo{}, sessionUC, &stubPasswordHasher{verifyOK: true}, &stubUUIDGen{uuid: testUUID}, &stubClock{now: time.Now()}, &stubTxManager{})
 
 		if err := uc.Logout(context.Background(), testUUID); err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -272,40 +267,24 @@ func TestLogout(t *testing.T) {
 }
 
 func mustUser(id uint, uuidStr string, name string, email string, hash domainUser.UserPasswordHash, isAdmin bool) *domainUser.User {
-	uuid, err := primitive.NewUUID(uuidStr)
+	user, err := domainUser.Rebuild(
+		id,
+		uuidStr,
+		name,
+		email,
+		hash.String(),
+		isAdmin,
+	)
 	if err != nil {
 		panic(err)
 	}
-	return &domainUser.User{
-		ID:           id,
-		UUID:         uuid,
-		Name:         mustName(name),
-		Email:        mustEmail(email),
-		PasswordHash: hash,
-		IsAdmin:      isAdmin,
-	}
+	return user
 }
 
-func mustEmail(s string) primitive.Email {
-	email, err := primitive.NewEmail(s)
+func mustSession(id uint, uuidStr string, userID uint, createdAt time.Time) *domainSession.Session {
+	sess, err := domainSession.Rebuild(id, uuidStr, userID, createdAt)
 	if err != nil {
 		panic(err)
 	}
-	return email
-}
-
-func mustName(s string) domainUser.UserName {
-	name, err := domainUser.NewUserName(s)
-	if err != nil {
-		panic(err)
-	}
-	return name
-}
-
-func mustNewUUID(s string) primitive.UUID {
-	u, err := primitive.NewUUID(s)
-	if err != nil {
-		panic(err)
-	}
-	return u
+	return sess
 }

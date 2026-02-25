@@ -7,10 +7,10 @@ import (
 
 func ToSkillMarketResponse(s *domain.SkillMarket) *response.SkillMarketResponse {
 	return &response.SkillMarketResponse{
-		UUID: s.UUID.String(),
-		Name: s.Name.String(),
-		URL:  s.URL.String(),
-		Icon: s.Icon,
+		UUID: s.UUID().String(),
+		Name: s.Name().String(),
+		URL:  s.URL().String(),
+		Icon: s.Icon(),
 	}
 }
 

@@ -3,6 +3,7 @@ package creator
 import "errors"
 
 var (
+	ErrInvalidID            = errors.New("invalid creator id")
 	ErrInvalidName          = errors.New("invalid creator name")
 	ErrInvalidIntroduction  = errors.New("invalid creator introduction")
 	ErrInvalidLogoMimeType  = errors.New("invalid creator logo mime type")

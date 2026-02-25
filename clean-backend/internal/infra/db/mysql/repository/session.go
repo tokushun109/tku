@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -20,15 +21,15 @@ func NewSessionRepository(db *sqlx.DB) *SessionRepository {
 }
 
 func (r *SessionRepository) Create(ctx context.Context, s *domain.Session) error {
-	createdAt := s.CreatedAt
+	createdAt := s.CreatedAt()
 	if createdAt.IsZero() {
 		createdAt = time.Now()
 	}
 	_, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`INSERT INTO session (uuid, user_id, created_at) VALUES (?, ?, ?)`,
-		s.UUID.String(),
-		s.UserID,
+		s.UUID().String(),
+		s.UserID(),
 		createdAt,
 	)
 	return err
@@ -36,23 +37,24 @@ func (r *SessionRepository) Create(ctx context.Context, s *domain.Session) error
 
 func (r *SessionRepository) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domain.Session, error) {
 	type row struct {
+		ID        uint      `db:"id"`
 		UUID      string    `db:"uuid"`
 		UserID    uint      `db:"user_id"`
 		CreatedAt time.Time `db:"created_at"`
 	}
 	var rrow row
-	err := getExecutor(ctx, r.db).GetContext(ctx, &rrow, `SELECT uuid, user_id, created_at FROM session WHERE uuid = ?`, uuid.String())
+	err := getExecutor(ctx, r.db).GetContext(ctx, &rrow, `SELECT id, uuid, user_id, created_at FROM session WHERE uuid = ?`, uuid.String())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
 		return nil, err
 	}
-	parsed, err := primitive.NewUUID(rrow.UUID)
+	sess, err := domain.Rebuild(rrow.ID, rrow.UUID, rrow.UserID, rrow.CreatedAt)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("invalid session row: %w", err)
 	}
-	return &domain.Session{UUID: parsed, UserID: rrow.UserID, CreatedAt: rrow.CreatedAt}, nil
+	return sess, nil
 }
 
 func (r *SessionRepository) DeleteByUUID(ctx context.Context, uuid primitive.UUID) error {

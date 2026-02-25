@@ -67,7 +67,11 @@ func TestAuthMiddleware(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected uuid error: %v", err)
 		}
-		auth := NewAuthMiddleware(&stubUserUC{user: &domainUser.User{ID: 1, UUID: uuid, Name: mustName("admin"), Email: mustEmail("admin@example.com"), IsAdmin: true}})
+		user, err := domainUser.Rebuild(1, uuid.String(), "admin", "admin@example.com", "hash", true)
+		if err != nil {
+			t.Fatalf("unexpected user rebuild error: %v", err)
+		}
+		auth := NewAuthMiddleware(&stubUserUC{user: user})
 		h := auth.RequireSession(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			authUser, ok := AuthenticatedUserFromContext(r.Context())
 			if !ok {
@@ -91,20 +95,4 @@ func TestAuthMiddleware(t *testing.T) {
 			t.Fatalf("expected 200, got %d", rr.Code)
 		}
 	})
-}
-
-func mustEmail(s string) primitive.Email {
-	email, err := primitive.NewEmail(s)
-	if err != nil {
-		panic(err)
-	}
-	return email
-}
-
-func mustName(s string) domainUser.UserName {
-	name, err := domainUser.NewUserName(s)
-	if err != nil {
-		panic(err)
-	}
-	return name
 }

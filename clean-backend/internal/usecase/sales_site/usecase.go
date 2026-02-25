@@ -34,7 +34,9 @@ func (s *Service) List(ctx context.Context) ([]*domain.SalesSite, error) {
 }
 
 func (s *Service) Create(ctx context.Context, name string, rawURL string, icon string) error {
-	salesSite, err := domain.New(name, rawURL, icon)
+	newUUID := s.uuidGen.New()
+
+	salesSite, err := domain.New(newUUID, name, rawURL, icon)
 	if err != nil {
 		if errors.Is(err, domain.ErrInvalidName) || errors.Is(err, primitive.ErrInvalidURL) {
 			return usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error())
@@ -42,11 +44,6 @@ func (s *Service) Create(ctx context.Context, name string, rawURL string, icon s
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 
-	newUUID, err := s.uuidGen.New()
-	if err != nil {
-		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
-	}
-	salesSite.UUID = newUUID
 	if err := s.repo.Create(ctx, salesSite); err != nil {
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
@@ -58,21 +55,6 @@ func (s *Service) Update(ctx context.Context, uuidStr string, name string, rawUR
 	if err != nil {
 		return usecase.NewAppError(usecase.ErrInvalidInput)
 	}
-	newName, err := domain.NewSalesSiteName(name)
-	if err != nil {
-		if errors.Is(err, domain.ErrInvalidName) {
-			return usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error())
-		}
-		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
-	}
-	newURL, err := primitive.NewURL(rawURL)
-	if err != nil {
-		if errors.Is(err, primitive.ErrInvalidURL) {
-			return usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error())
-		}
-		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
-	}
-
 	current, err := s.repo.FindByUUID(ctx, uuid)
 	if err != nil {
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
@@ -81,7 +63,14 @@ func (s *Service) Update(ctx context.Context, uuidStr string, name string, rawUR
 		return usecase.NewAppError(usecase.ErrNotFound)
 	}
 
-	updated, err := s.repo.Update(ctx, &domain.SalesSite{UUID: uuid, Name: newName, URL: newURL, Icon: icon})
+	if err := current.Change(name, rawURL, icon); err != nil {
+		if errors.Is(err, domain.ErrInvalidName) || errors.Is(err, primitive.ErrInvalidURL) {
+			return usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error())
+		}
+		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
+	}
+
+	updated, err := s.repo.Update(ctx, current)
 	if err != nil {
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}

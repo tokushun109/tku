@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
 	domainSession "github.com/tokushun109/tku/clean-backend/internal/domain/session"
@@ -64,7 +65,7 @@ func TestUserLogin(t *testing.T) {
 	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
 
 		uuid := id.GenerateUUID()
-		h := NewUserHandler(&stubUserUC{loginRes: &domainSession.Session{UUID: mustUUID(uuid)}})
+		h := NewUserHandler(&stubUserUC{loginRes: mustSession(uuid, 1)})
 
 		reqBody := bytes.NewBufferString(`{"Email":"admin@example.com","Password":"pass"}`)
 		req := httptest.NewRequest(http.MethodPost, "/api/user/login", reqBody)
@@ -184,4 +185,13 @@ func mustUUID(s string) primitive.UUID {
 		panic(err)
 	}
 	return u
+}
+
+func mustSession(uuidStr string, userID uint) *domainSession.Session {
+	uuid := mustUUID(uuidStr)
+	sess, err := domainSession.New(uuid.String(), userID, time.Now())
+	if err != nil {
+		panic(err)
+	}
+	return sess
 }

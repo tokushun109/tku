@@ -8,13 +8,13 @@ import (
 
 func ToLoginUserResponse(u *domainUser.User) *response.LoginUserResponse {
 	return &response.LoginUserResponse{
-		UUID:    u.UUID.String(),
-		Name:    u.Name.String(),
-		Email:   u.Email.String(),
-		IsAdmin: u.IsAdmin,
+		UUID:    u.UUID().String(),
+		Name:    u.Name().String(),
+		Email:   u.Email().String(),
+		IsAdmin: u.IsAdmin(),
 	}
 }
 
 func ToLoginSessionResponse(s *domainSession.Session) *response.LoginSessionResponse {
-	return &response.LoginSessionResponse{UUID: s.UUID.String()}
+	return &response.LoginSessionResponse{UUID: s.UUID().String()}
 }

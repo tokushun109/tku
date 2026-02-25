@@ -13,14 +13,14 @@ func TestNewContact(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		if contact.Name.String() != "山田太郎" {
-			t.Fatalf("unexpected name: %s", contact.Name.String())
+		if contact.Name().String() != "山田太郎" {
+			t.Fatalf("unexpected name: %s", contact.Name().String())
 		}
-		if contact.Company != nil {
-			t.Fatalf("expected company nil, got %v", contact.Company.String())
+		if contact.Company() != nil {
+			t.Fatalf("expected company nil, got %v", contact.Company().String())
 		}
-		if contact.PhoneNumber != nil {
-			t.Fatalf("expected phone number nil, got %v", contact.PhoneNumber.String())
+		if contact.PhoneNumber() != nil {
+			t.Fatalf("expected phone number nil, got %v", contact.PhoneNumber().String())
 		}
 	})
 

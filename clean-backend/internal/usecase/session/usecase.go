@@ -42,10 +42,10 @@ func (s *Service) Resolve(ctx context.Context, token string) (*domain.Session, e
 	if sess == nil {
 		return nil, usecase.NewAppError(usecase.ErrUnauthorized)
 	}
-	if sess.CreatedAt.IsZero() {
+	if sess.CreatedAt().IsZero() {
 		return nil, usecase.NewAppError(usecase.ErrUnauthorized)
 	}
-	if s.ttl > 0 && s.clock.Now().After(sess.CreatedAt.Add(s.ttl)) {
+	if s.ttl > 0 && s.clock.Now().After(sess.CreatedAt().Add(s.ttl)) {
 		if err := s.repo.DeleteByUUID(ctx, uuid); err != nil {
 			return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 		}
@@ -59,7 +59,7 @@ func (s *Service) Delete(ctx context.Context, token string) error {
 	if err != nil {
 		return err
 	}
-	if err := s.repo.DeleteByUUID(ctx, sess.UUID); err != nil {
+	if err := s.repo.DeleteByUUID(ctx, sess.UUID()); err != nil {
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 	return nil
