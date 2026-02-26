@@ -2,18 +2,18 @@ package presenter
 
 import (
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/contact"
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 	"github.com/tokushun109/tku/clean-backend/internal/interface/http/response"
-	"github.com/tokushun109/tku/clean-backend/internal/shared/optional"
 )
 
 func ToContactResponse(contact *domain.Contact) *response.ContactResponse {
 	return &response.ContactResponse{
-		ID:          contact.ID().Uint(),
-		Name:        contact.Name().String(),
-		Company:     optional.ToStringPtr(contact.Company()),
-		PhoneNumber: optional.ToStringPtr(contact.PhoneNumber()),
-		Email:       contact.Email().String(),
-		Content:     contact.Content().String(),
+		ID:          contact.ID().Value(),
+		Name:        contact.Name().Value(),
+		Company:     domainVO.ToValuePtr(contact.Company()),
+		PhoneNumber: domainVO.ToValuePtr(contact.PhoneNumber()),
+		Email:       contact.Email().Value(),
+		Content:     contact.Content().Value(),
 		CreatedAt:   contact.CreatedAt(),
 	}
 }

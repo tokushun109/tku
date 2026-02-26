@@ -3,6 +3,8 @@ package contact
 import (
 	"strings"
 	"unicode/utf8"
+
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 )
 
 const (
@@ -11,6 +13,8 @@ const (
 )
 
 type ContactName string
+
+var _ domainVO.ValueObject[string] = ContactName("")
 
 func NewContactName(v string) (ContactName, error) {
 	trimmed := strings.TrimSpace(v)
@@ -21,6 +25,10 @@ func NewContactName(v string) (ContactName, error) {
 	return ContactName(trimmed), nil
 }
 
-func (n ContactName) String() string {
+func (n ContactName) Value() string {
 	return string(n)
+}
+
+func (n ContactName) String() string {
+	return n.Value()
 }

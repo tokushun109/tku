@@ -24,7 +24,7 @@ func (r *SkillMarketRepository) Create(ctx context.Context, s *domain.SkillMarke
 	_, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`INSERT INTO skill_market (uuid, name, url, icon, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())`,
-		s.UUID().String(), s.Name().String(), s.URL().String(), s.Icon(),
+		s.UUID().Value(), s.Name().Value(), s.URL().Value(), s.Icon(),
 	)
 	return err
 }
@@ -61,7 +61,7 @@ func (r *SkillMarketRepository) FindByUUID(ctx context.Context, uuid primitive.U
 		Icon sql.NullString `db:"icon"`
 	}
 	var rrow row
-	if err := getExecutor(ctx, r.db).GetContext(ctx, &rrow, `SELECT id, uuid, name, url, icon FROM skill_market WHERE uuid = ? AND deleted_at IS NULL`, uuid.String()); err != nil {
+	if err := getExecutor(ctx, r.db).GetContext(ctx, &rrow, `SELECT id, uuid, name, url, icon FROM skill_market WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value()); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
@@ -74,10 +74,10 @@ func (r *SkillMarketRepository) Update(ctx context.Context, s *domain.SkillMarke
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`UPDATE skill_market SET name = ?, url = ?, icon = ?, updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`,
-		s.Name().String(),
-		s.URL().String(),
+		s.Name().Value(),
+		s.URL().Value(),
 		s.Icon(),
-		s.UUID().String(),
+		s.UUID().Value(),
 	)
 	if err != nil {
 		return false, err
@@ -93,7 +93,7 @@ func (r *SkillMarketRepository) Delete(ctx context.Context, uuid primitive.UUID)
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`UPDATE skill_market SET deleted_at = NOW(), updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`,
-		uuid.String(),
+		uuid.Value(),
 	)
 	if err != nil {
 		return false, err

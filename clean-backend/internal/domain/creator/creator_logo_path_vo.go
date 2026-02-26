@@ -4,11 +4,15 @@ import (
 	"path"
 	"strings"
 	"unicode/utf8"
+
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 )
 
 const creatorLogoPathMaxLen = 255
 
 type CreatorLogoPath string
+
+var _ domainVO.ValueObject[string] = CreatorLogoPath("")
 
 func NewCreatorLogoPath(v string) (CreatorLogoPath, error) {
 	trimmed := strings.TrimSpace(v)
@@ -22,6 +26,10 @@ func NewCreatorLogoPath(v string) (CreatorLogoPath, error) {
 	return CreatorLogoPath(cleaned), nil
 }
 
-func (p CreatorLogoPath) String() string {
+func (p CreatorLogoPath) Value() string {
 	return string(p)
+}
+
+func (p CreatorLogoPath) String() string {
+	return p.Value()
 }

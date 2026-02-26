@@ -20,12 +20,12 @@ func TestToTagResponse(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		tag, err := domain.Rebuild(1, u.String(), n.String())
+		tag, err := domain.Rebuild(1, u.Value(), n.Value())
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 		res := ToTagResponse(tag)
-		if res.UUID != u.String() || res.Name != n.String() {
+		if res.UUID != u.Value() || res.Name != n.Value() {
 			t.Fatalf("unexpected response: %+v", res)
 		}
 	})
@@ -52,11 +52,11 @@ func TestToTagResponses(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		tag1, err := domain.Rebuild(1, u1.String(), n1.String())
+		tag1, err := domain.Rebuild(1, u1.Value(), n1.Value())
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		tag2, err := domain.Rebuild(2, u2.String(), n2.String())
+		tag2, err := domain.Rebuild(2, u2.Value(), n2.Value())
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}

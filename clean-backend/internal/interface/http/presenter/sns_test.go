@@ -24,12 +24,12 @@ func TestToSnsResponse(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		sns, err := domain.Rebuild(1, u.String(), n.String(), snsURL.String(), "icon")
+		sns, err := domain.Rebuild(1, u.Value(), n.Value(), snsURL.Value(), "icon")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 		res := ToSnsResponse(sns)
-		if res.UUID != u.String() || res.Name != n.String() || res.URL != snsURL.String() || res.Icon != "icon" {
+		if res.UUID != u.Value() || res.Name != n.Value() || res.URL != snsURL.Value() || res.Icon != "icon" {
 			t.Fatalf("unexpected response: %+v", res)
 		}
 	})
@@ -64,11 +64,11 @@ func TestToSnsResponses(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		sns1, err := domain.Rebuild(1, u1.String(), n1.String(), url1.String(), "icon1")
+		sns1, err := domain.Rebuild(1, u1.Value(), n1.Value(), url1.Value(), "icon1")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		sns2, err := domain.Rebuild(2, u2.String(), n2.String(), url2.String(), "icon2")
+		sns2, err := domain.Rebuild(2, u2.Value(), n2.Value(), url2.Value(), "icon2")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}

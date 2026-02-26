@@ -3,6 +3,8 @@ package creator
 import (
 	"strings"
 	"unicode/utf8"
+
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 )
 
 const (
@@ -11,6 +13,8 @@ const (
 )
 
 type CreatorIntroduction string
+
+var _ domainVO.ValueObject[string] = CreatorIntroduction("")
 
 func NewCreatorIntroduction(v string) (CreatorIntroduction, error) {
 	trimmed := strings.TrimSpace(v)
@@ -21,6 +25,10 @@ func NewCreatorIntroduction(v string) (CreatorIntroduction, error) {
 	return CreatorIntroduction(trimmed), nil
 }
 
-func (i CreatorIntroduction) String() string {
+func (i CreatorIntroduction) Value() string {
 	return string(i)
+}
+
+func (i CreatorIntroduction) String() string {
+	return i.Value()
 }

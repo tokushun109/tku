@@ -70,9 +70,9 @@ func (s *SiteDetail) DetailURL() SiteDetailDetailURL {
 }
 
 func (s *SiteDetail) ProductID() uint {
-	return s.productID.Uint()
+	return s.productID.Value()
 }
 
 func (s *SiteDetail) SalesSiteID() uint {
-	return s.salesSiteID.Uint()
+	return s.salesSiteID.Value()
 }

@@ -7,8 +7,8 @@ import (
 
 func ToTargetResponse(t *domain.Target) *response.TargetResponse {
 	return &response.TargetResponse{
-		UUID: t.UUID().String(),
-		Name: t.Name().String(),
+		UUID: t.UUID().Value(),
+		Name: t.Name().Value(),
 	}
 }
 

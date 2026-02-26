@@ -3,6 +3,8 @@ package category
 import (
 	"strings"
 	"unicode/utf8"
+
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 )
 
 const (
@@ -11,6 +13,8 @@ const (
 )
 
 type CategoryName string
+
+var _ domainVO.ValueObject[string] = CategoryName("")
 
 func NewCategoryName(v string) (CategoryName, error) {
 	trimmed := strings.TrimSpace(v)
@@ -21,6 +25,10 @@ func NewCategoryName(v string) (CategoryName, error) {
 	return CategoryName(trimmed), nil
 }
 
-func (n CategoryName) String() string {
+func (n CategoryName) Value() string {
 	return string(n)
+}
+
+func (n CategoryName) String() string {
+	return n.Value()
 }

@@ -8,8 +8,8 @@ func TestNewCreatorLogoPath(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if logoPath.String() != "img/logo/a/b/test.png" {
-			t.Fatalf("unexpected logo path: %s", logoPath.String())
+		if logoPath.Value() != "img/logo/a/b/test.png" {
+			t.Fatalf("unexpected logo path: %s", logoPath.Value())
 		}
 	})
 

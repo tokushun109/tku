@@ -9,8 +9,8 @@ import (
 
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/creator"
 	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 	"github.com/tokushun109/tku/clean-backend/internal/infra/db/mysql/mysqlutil"
-	"github.com/tokushun109/tku/clean-backend/internal/shared/optional"
 )
 
 type CreatorRepository struct {
@@ -47,14 +47,14 @@ func (r *CreatorRepository) Find(ctx context.Context) (*domain.Creator, error) {
 }
 
 func (r *CreatorRepository) UpdateProfile(ctx context.Context, c *domain.Creator) (bool, error) {
-	introduction := optional.ToStringPtr(c.Introduction())
+	introduction := domainVO.ToValuePtr(c.Introduction())
 
 	result, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`UPDATE creator SET name = ?, introduction = ?, updated_at = NOW() WHERE id = ? AND deleted_at IS NULL`,
-		c.Name().String(),
+		c.Name().Value(),
 		introduction,
-		c.ID().Uint(),
+		c.ID().Value(),
 	)
 	if err != nil {
 		return false, err
@@ -76,9 +76,9 @@ func (r *CreatorRepository) UpdateLogo(
 	result, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`UPDATE creator SET mime_type = ?, logo = ?, updated_at = NOW() WHERE id = ? AND deleted_at IS NULL`,
-		mimeType.String(),
-		logoPath.String(),
-		creatorID.Uint(),
+		mimeType.Value(),
+		logoPath.Value(),
+		creatorID.Value(),
 	)
 	if err != nil {
 		return false, err

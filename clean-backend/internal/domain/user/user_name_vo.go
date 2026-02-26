@@ -3,6 +3,8 @@ package user
 import (
 	"strings"
 	"unicode/utf8"
+
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 )
 
 const (
@@ -11,6 +13,8 @@ const (
 )
 
 type UserName string
+
+var _ domainVO.ValueObject[string] = UserName("")
 
 func NewUserName(v string) (UserName, error) {
 	trimmed := strings.TrimSpace(v)
@@ -21,6 +25,10 @@ func NewUserName(v string) (UserName, error) {
 	return UserName(trimmed), nil
 }
 
-func (n UserName) String() string {
+func (n UserName) Value() string {
 	return string(n)
+}
+
+func (n UserName) String() string {
+	return n.Value()
 }

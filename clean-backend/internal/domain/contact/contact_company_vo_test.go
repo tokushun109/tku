@@ -8,8 +8,8 @@ func TestNewContactCompany(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if company.String() != "株式会社サンプル" {
-			t.Fatalf("unexpected company: %s", company.String())
+		if company.Value() != "株式会社サンプル" {
+			t.Fatalf("unexpected company: %s", company.Value())
 		}
 	})
 

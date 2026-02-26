@@ -106,8 +106,8 @@ func TestCreateSalesSite(t *testing.T) {
 		if repo.created == nil {
 			t.Fatalf("expected sales site created")
 		}
-		if repo.created.UUID().String() != testUUID {
-			t.Fatalf("expected uuid %s, got %s", testUUID, repo.created.UUID().String())
+		if repo.created.UUID().Value() != testUUID {
+			t.Fatalf("expected uuid %s, got %s", testUUID, repo.created.UUID().Value())
 		}
 	})
 	t.Run("名前が不正なときバリデーションエラーで失敗する", func(t *testing.T) {

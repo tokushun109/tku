@@ -14,8 +14,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/gorilla/mux"
 	"github.com/go-playground/validator/v10"
+	"github.com/gorilla/mux"
 )
 
 // 商品に紐づく商品画像に画像取得用のapiをつける

@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
-	"github.com/tokushun109/tku/clean-backend/internal/shared/optional"
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 )
 
 type Contact struct {
@@ -52,11 +52,11 @@ func newWithValidatedValues(name, company, phoneNumber, email, content string) (
 	if err != nil {
 		return nil, err
 	}
-	validCompany, err := optional.ParseOptionalString(company, NewContactCompany)
+	validCompany, err := domainVO.ParseOptionalValue(&company, NewContactCompany)
 	if err != nil {
 		return nil, err
 	}
-	validPhoneNumber, err := optional.ParseOptionalString(phoneNumber, primitive.NewPhoneNumber)
+	validPhoneNumber, err := domainVO.ParseOptionalValue(&phoneNumber, primitive.NewPhoneNumber)
 	if err != nil {
 		return nil, err
 	}

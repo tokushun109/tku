@@ -9,8 +9,8 @@ func TestNewURL(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if u.String() != "https://www.creema.jp/items/123" {
-			t.Fatalf("expected value, got %q", u.String())
+		if u.Value() != "https://www.creema.jp/items/123" {
+			t.Fatalf("expected value, got %q", u.Value())
 		}
 	})
 	t.Run("値が短すぎるときバリデーションエラーで失敗する", func(t *testing.T) {
@@ -49,8 +49,8 @@ func TestNewURL(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if u.String() != "mailto:test@example.com" {
-			t.Fatalf("expected value, got %q", u.String())
+		if u.Value() != "mailto:test@example.com" {
+			t.Fatalf("expected value, got %q", u.Value())
 		}
 	})
 	t.Run("値の前後に空白を含むときバリデーションエラーで失敗する", func(t *testing.T) {
@@ -69,8 +69,8 @@ func TestNewURL(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if u.String() != "file:///tmp/file.txt" {
-			t.Fatalf("expected value, got %q", u.String())
+		if u.Value() != "file:///tmp/file.txt" {
+			t.Fatalf("expected value, got %q", u.Value())
 		}
 	})
 	t.Run("fileスキームでルートのみのときバリデーションエラーで失敗する", func(t *testing.T) {

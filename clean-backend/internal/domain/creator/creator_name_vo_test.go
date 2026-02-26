@@ -11,8 +11,8 @@ func TestNewCreatorName(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if name.String() != "とこりり" {
-			t.Fatalf("unexpected name: %s", name.String())
+		if name.Value() != "とこりり" {
+			t.Fatalf("unexpected name: %s", name.Value())
 		}
 	})
 
@@ -22,8 +22,8 @@ func TestNewCreatorName(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if name.String() != raw {
-			t.Fatalf("unexpected name: %s", name.String())
+		if name.Value() != raw {
+			t.Fatalf("unexpected name: %s", name.Value())
 		}
 	})
 

@@ -281,7 +281,7 @@ func (s *Service) Update(ctx context.Context, productUUID string, input UpdatePr
 		}
 		imageMap := make(map[string]*domainProduct.ProductImage, len(currentImages))
 		for _, image := range currentImages {
-			imageMap[image.UUID().String()] = image
+			imageMap[image.UUID().Value()] = image
 		}
 
 		for imageUUID, order := range requestedImageOrders {
@@ -299,7 +299,7 @@ func (s *Service) Update(ctx context.Context, productUUID string, input UpdatePr
 		}
 
 		for _, image := range currentImages {
-			if _, keep := requestedImageOrders[image.UUID().String()]; keep {
+			if _, keep := requestedImageOrders[image.UUID().Value()]; keep {
 				continue
 			}
 			deleted, err := s.productImageRepo.DeleteByUUID(txCtx, image.UUID())
@@ -307,7 +307,7 @@ func (s *Service) Update(ctx context.Context, productUUID string, input UpdatePr
 				return err
 			}
 			if deleted {
-				deletedImagePaths = append(deletedImagePaths, image.Path().String())
+				deletedImagePaths = append(deletedImagePaths, image.Path().Value())
 			}
 		}
 
@@ -357,7 +357,7 @@ func (s *Service) Delete(ctx context.Context, productUUID string) error {
 				return err
 			}
 			if deleted {
-				deletedImagePaths = append(deletedImagePaths, image.Path().String())
+				deletedImagePaths = append(deletedImagePaths, image.Path().Value())
 			}
 		}
 
@@ -406,7 +406,7 @@ func (s *Service) GetProductImageBlob(ctx context.Context, productImageUUID stri
 		return nil, usecase.NewAppError(usecase.ErrNotFound)
 	}
 
-	body, err := s.storage.Get(ctx, image.Path().String())
+	body, err := s.storage.Get(ctx, image.Path().Value())
 	if err != nil {
 		if errors.Is(err, usecase.ErrStorageNotFound) {
 			return nil, usecase.NewAppError(usecase.ErrNotFound)
@@ -415,7 +415,7 @@ func (s *Service) GetProductImageBlob(ctx context.Context, productImageUUID stri
 	}
 
 	return &ProductImageBlob{
-		ContentType: image.MimeType().String(),
+		ContentType: image.MimeType().Value(),
 		Body:        body,
 	}, nil
 }
@@ -451,10 +451,10 @@ func (s *Service) CreateProductImages(ctx context.Context, productUUID string, f
 				return err
 			}
 
-			if err := s.storage.Put(txCtx, imagePath.String(), imageMimeType.String(), file.Data); err != nil {
+			if err := s.storage.Put(txCtx, imagePath.Value(), imageMimeType.Value(), file.Data); err != nil {
 				return err
 			}
-			uploadedPaths = append(uploadedPaths, imagePath.String())
+			uploadedPaths = append(uploadedPaths, imagePath.Value())
 
 			order := 0
 			if isChanged {
@@ -464,10 +464,10 @@ func (s *Service) CreateProductImages(ctx context.Context, productUUID string, f
 			image, err := domainProduct.NewProductImage(
 				imageUUID,
 				file.Name,
-				imageMimeType.String(),
-				imagePath.String(),
+				imageMimeType.Value(),
+				imagePath.Value(),
 				order,
-				product.ID().Uint(),
+				product.ID().Value(),
 			)
 			if err != nil {
 				return err
@@ -519,7 +519,7 @@ func (s *Service) DeleteProductImage(ctx context.Context, productUUID string, pr
 	if image == nil {
 		return usecase.NewAppError(usecase.ErrNotFound)
 	}
-	if image.ProductID() != product.ID().Uint() {
+	if image.ProductID() != product.ID().Value() {
 		return usecase.NewAppError(usecase.ErrNotFound)
 	}
 
@@ -539,8 +539,8 @@ func (s *Service) DeleteProductImage(ctx context.Context, productUUID string, pr
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 
-	if delErr := s.storage.Delete(ctx, image.Path().String()); delErr != nil {
-		log.Printf("[WARN] product image delete object failed: path=%s err=%v", image.Path().String(), delErr)
+	if delErr := s.storage.Delete(ctx, image.Path().Value()); delErr != nil {
+		log.Printf("[WARN] product image delete object failed: path=%s err=%v", image.Path().Value(), delErr)
 	}
 
 	return nil
@@ -565,7 +565,7 @@ func (s *Service) resolveCategoryID(ctx context.Context, rawUUID string) (*uint,
 		return nil, usecase.NewAppError(usecase.ErrInvalidInput)
 	}
 
-	id := category.ID().Uint()
+	id := category.ID().Value()
 	return &id, nil
 }
 
@@ -588,7 +588,7 @@ func (s *Service) resolveTargetID(ctx context.Context, rawUUID string) (*uint, e
 		return nil, usecase.NewAppError(usecase.ErrInvalidInput)
 	}
 
-	id := target.ID().Uint()
+	id := target.ID().Value()
 	return &id, nil
 }
 
@@ -645,8 +645,8 @@ func (s *Service) buildSiteDetails(ctx context.Context, productID primitive.ID, 
 		siteDetail, err := domainSiteDetail.New(
 			s.uuidGen.New(),
 			input.DetailURL,
-			productID.Uint(),
-			salesSite.ID().Uint(),
+			productID.Value(),
+			salesSite.ID().Value(),
 		)
 		if err != nil {
 			return nil, err

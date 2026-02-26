@@ -12,7 +12,7 @@ import (
 
 	domainContact "github.com/tokushun109/tku/clean-backend/internal/domain/contact"
 	domainUser "github.com/tokushun109/tku/clean-backend/internal/domain/user"
-	"github.com/tokushun109/tku/clean-backend/internal/shared/optional"
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 	usecase "github.com/tokushun109/tku/clean-backend/internal/usecase"
 )
 
@@ -95,8 +95,8 @@ func (n *notifier) NotifyContactCreated(ctx context.Context, contact *domainCont
 			continue
 		}
 		recipients = append(recipients, usecase.MailAddress{
-			Name:  user.Name().String(),
-			Email: user.Email().String(),
+			Name:  user.Name().Value(),
+			Email: user.Email().Value(),
 		})
 	}
 	if len(recipients) == 0 {
@@ -123,8 +123,8 @@ func (n *notifier) sendAutoReply(ctx context.Context, contact *domainContact.Con
 	return n.mailer.Send(ctx, &usecase.MailMessage{
 		To: []usecase.MailAddress{
 			{
-				Name:  contact.Name().String(),
-				Email: contact.Email().String(),
+				Name:  contact.Name().Value(),
+				Email: contact.Email().Value(),
 			},
 		},
 		Subject:  autoReplySubject,
@@ -155,11 +155,11 @@ func (n *notifier) sendAdminNotification(ctx context.Context, contact *domainCon
 func (n *notifier) newMailTemplateData(title string, contact *domainContact.Contact) mailTemplateData {
 	return mailTemplateData{
 		Title:        title,
-		Name:         contact.Name().String(),
-		Company:      optional.ToTrimmedStringOrEmpty(contact.Company()),
-		PhoneNumber:  optional.ToTrimmedStringOrEmpty(contact.PhoneNumber()),
-		Email:        contact.Email().String(),
-		Content:      contact.Content().String(),
+		Name:         contact.Name().Value(),
+		Company:      domainVO.ToValueOrEmpty(contact.Company()),
+		PhoneNumber:  domainVO.ToValueOrEmpty(contact.PhoneNumber()),
+		Email:        contact.Email().Value(),
+		Content:      contact.Content().Value(),
 		SupportEmail: n.supportEmail,
 	}
 }

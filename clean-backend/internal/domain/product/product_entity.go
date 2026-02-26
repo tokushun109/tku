@@ -2,7 +2,7 @@ package product
 
 import (
 	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
-	"github.com/tokushun109/tku/clean-backend/internal/shared/optional"
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 )
 
 type Product struct {
@@ -75,7 +75,7 @@ func newWithValidatedValues(
 	if err != nil {
 		return nil, err
 	}
-	productDescription, err := optional.ParseOptionalString(description, NewProductDescription)
+	productDescription, err := domainVO.ParseOptionalValue(&description, NewProductDescription)
 	if err != nil {
 		return nil, err
 	}
@@ -83,11 +83,11 @@ func newWithValidatedValues(
 	if err != nil {
 		return nil, err
 	}
-	parsedCategoryID, err := primitive.NewOptionalID(categoryID)
+	parsedCategoryID, err := domainVO.ParseOptionalValue(categoryID, primitive.NewID)
 	if err != nil {
 		return nil, ErrInvalidCategoryID
 	}
-	parsedTargetID, err := primitive.NewOptionalID(targetID)
+	parsedTargetID, err := domainVO.ParseOptionalValue(targetID, primitive.NewID)
 	if err != nil {
 		return nil, ErrInvalidTargetID
 	}
@@ -153,7 +153,7 @@ func (p *Product) ChangeProduct(
 	if err != nil {
 		return err
 	}
-	productDescription, err := optional.ParseOptionalString(description, NewProductDescription)
+	productDescription, err := domainVO.ParseOptionalValue(&description, NewProductDescription)
 	if err != nil {
 		return err
 	}
@@ -161,11 +161,11 @@ func (p *Product) ChangeProduct(
 	if err != nil {
 		return err
 	}
-	parsedCategoryID, err := primitive.NewOptionalID(categoryID)
+	parsedCategoryID, err := domainVO.ParseOptionalValue(categoryID, primitive.NewID)
 	if err != nil {
 		return ErrInvalidCategoryID
 	}
-	parsedTargetID, err := primitive.NewOptionalID(targetID)
+	parsedTargetID, err := domainVO.ParseOptionalValue(targetID, primitive.NewID)
 	if err != nil {
 		return ErrInvalidTargetID
 	}

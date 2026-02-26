@@ -3,6 +3,8 @@ package tag
 import (
 	"strings"
 	"unicode/utf8"
+
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 )
 
 const (
@@ -11,6 +13,8 @@ const (
 )
 
 type TagName string
+
+var _ domainVO.ValueObject[string] = TagName("")
 
 func NewTagName(v string) (TagName, error) {
 	trimmed := strings.TrimSpace(v)
@@ -21,6 +25,10 @@ func NewTagName(v string) (TagName, error) {
 	return TagName(trimmed), nil
 }
 
-func (n TagName) String() string {
+func (n TagName) Value() string {
 	return string(n)
+}
+
+func (n TagName) String() string {
+	return n.Value()
 }

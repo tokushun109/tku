@@ -18,7 +18,7 @@ func NewSiteDetailRepository(db *sqlx.DB) *SiteDetailRepository {
 }
 
 func (r *SiteDetailRepository) ReplaceByProductID(ctx context.Context, productID primitive.ID, details []*domain.SiteDetail) error {
-	if _, err := getExecutor(ctx, r.db).ExecContext(ctx, `DELETE FROM site_detail WHERE product_id = ?`, productID.Uint()); err != nil {
+	if _, err := getExecutor(ctx, r.db).ExecContext(ctx, `DELETE FROM site_detail WHERE product_id = ?`, productID.Value()); err != nil {
 		return err
 	}
 	if len(details) == 0 {
@@ -30,8 +30,8 @@ func (r *SiteDetailRepository) ReplaceByProductID(ctx context.Context, productID
 			ctx,
 			`INSERT INTO site_detail (uuid, detail_url, product_id, sales_site_id, created_at, updated_at)
 			 VALUES (?, ?, ?, ?, NOW(), NOW())`,
-			detail.UUID().String(),
-			detail.DetailURL().String(),
+			detail.UUID().Value(),
+			detail.DetailURL().Value(),
 			detail.ProductID(),
 			detail.SalesSiteID(),
 		); err != nil {
@@ -42,6 +42,6 @@ func (r *SiteDetailRepository) ReplaceByProductID(ctx context.Context, productID
 }
 
 func (r *SiteDetailRepository) DeleteByProductID(ctx context.Context, productID primitive.ID) error {
-	_, err := getExecutor(ctx, r.db).ExecContext(ctx, `DELETE FROM site_detail WHERE product_id = ?`, productID.Uint())
+	_, err := getExecutor(ctx, r.db).ExecContext(ctx, `DELETE FROM site_detail WHERE product_id = ?`, productID.Value())
 	return err
 }

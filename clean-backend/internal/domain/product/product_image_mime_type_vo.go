@@ -1,8 +1,14 @@
 package product
 
-import "strings"
+import (
+	"strings"
+
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
+)
 
 type ProductImageMimeType string
+
+var _ domainVO.ValueObject[string] = ProductImageMimeType("")
 
 var productImageExtensionMap = map[ProductImageMimeType]string{
 	"image/jpeg": ".jpg",
@@ -21,8 +27,12 @@ func NewProductImageMimeType(v string) (ProductImageMimeType, error) {
 	return mimeType, nil
 }
 
-func (m ProductImageMimeType) String() string {
+func (m ProductImageMimeType) Value() string {
 	return string(m)
+}
+
+func (m ProductImageMimeType) String() string {
+	return m.Value()
 }
 
 func (m ProductImageMimeType) Extension() string {

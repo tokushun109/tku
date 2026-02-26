@@ -189,7 +189,7 @@ func mustUUID(s string) primitive.UUID {
 
 func mustSession(uuidStr string, userID uint) *domainSession.Session {
 	uuid := mustUUID(uuidStr)
-	sess, err := domainSession.New(uuid.String(), userID, time.Now())
+	sess, err := domainSession.New(uuid.Value(), userID, time.Now())
 	if err != nil {
 		panic(err)
 	}

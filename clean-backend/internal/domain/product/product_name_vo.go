@@ -3,6 +3,8 @@ package product
 import (
 	"strings"
 	"unicode/utf8"
+
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 )
 
 const (
@@ -11,6 +13,8 @@ const (
 )
 
 type ProductName string
+
+var _ domainVO.ValueObject[string] = ProductName("")
 
 func NewProductName(v string) (ProductName, error) {
 	trimmed := strings.TrimSpace(v)
@@ -21,6 +25,10 @@ func NewProductName(v string) (ProductName, error) {
 	return ProductName(trimmed), nil
 }
 
-func (n ProductName) String() string {
+func (n ProductName) Value() string {
 	return string(n)
+}
+
+func (n ProductName) String() string {
+	return n.Value()
 }

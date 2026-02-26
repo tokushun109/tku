@@ -8,8 +8,8 @@ func TestNewEmail(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if email.String() != "test@example.com" {
-			t.Fatalf("unexpected email: %s", email.String())
+		if email.Value() != "test@example.com" {
+			t.Fatalf("unexpected email: %s", email.Value())
 		}
 	})
 
@@ -18,8 +18,8 @@ func TestNewEmail(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if email.String() != "test@example.com" {
-			t.Fatalf("unexpected email: %s", email.String())
+		if email.Value() != "test@example.com" {
+			t.Fatalf("unexpected email: %s", email.Value())
 		}
 	})
 

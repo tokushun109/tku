@@ -1,6 +1,10 @@
 package creator
 
-import "strings"
+import (
+	"strings"
+
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
+)
 
 var creatorLogoMimeTypeToExtension = map[string]string{
 	"image/jpeg": ".jpg",
@@ -11,6 +15,8 @@ var creatorLogoMimeTypeToExtension = map[string]string{
 
 type CreatorLogoMimeType string
 
+var _ domainVO.ValueObject[string] = CreatorLogoMimeType("")
+
 func NewCreatorLogoMimeType(v string) (CreatorLogoMimeType, error) {
 	normalized := strings.ToLower(strings.TrimSpace(v))
 	if _, ok := creatorLogoMimeTypeToExtension[normalized]; !ok {
@@ -19,10 +25,14 @@ func NewCreatorLogoMimeType(v string) (CreatorLogoMimeType, error) {
 	return CreatorLogoMimeType(normalized), nil
 }
 
-func (m CreatorLogoMimeType) String() string {
+func (m CreatorLogoMimeType) Value() string {
 	return string(m)
 }
 
+func (m CreatorLogoMimeType) String() string {
+	return m.Value()
+}
+
 func (m CreatorLogoMimeType) Extension() string {
-	return creatorLogoMimeTypeToExtension[m.String()]
+	return creatorLogoMimeTypeToExtension[m.Value()]
 }

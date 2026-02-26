@@ -168,7 +168,7 @@ func TestServiceUpdateLogo(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected uuid error: %v", err)
 		}
-		uuidGen := &stubUUIDGenerator{uuid: uuid.String()}
+		uuidGen := &stubUUIDGenerator{uuid: uuid.Value()}
 		svc := New(repo, storage, uuidGen)
 
 		pngBinary := []byte{0x89, 'P', 'N', 'G', '\r', '\n', 0x1a, '\n', 0, 0, 0, 0}
@@ -181,11 +181,11 @@ func TestServiceUpdateLogo(t *testing.T) {
 		if storage.putKey != expectedPath {
 			t.Fatalf("unexpected save path: %s", storage.putKey)
 		}
-		if repo.updateLogoPath.String() != expectedPath {
-			t.Fatalf("unexpected updated logo path: %s", repo.updateLogoPath.String())
+		if repo.updateLogoPath.Value() != expectedPath {
+			t.Fatalf("unexpected updated logo path: %s", repo.updateLogoPath.Value())
 		}
-		if repo.updateLogoCreatorID.Uint() != 10 {
-			t.Fatalf("unexpected creator id: %d", repo.updateLogoCreatorID.Uint())
+		if repo.updateLogoCreatorID.Value() != 10 {
+			t.Fatalf("unexpected creator id: %d", repo.updateLogoCreatorID.Value())
 		}
 		if len(storage.deletedKeys) != 1 || storage.deletedKeys[0] != "img/logo/o/l/old.jpg" {
 			t.Fatalf("unexpected deleted keys: %#v", storage.deletedKeys)

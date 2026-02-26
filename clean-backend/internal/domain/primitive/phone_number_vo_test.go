@@ -8,8 +8,8 @@ func TestNewPhoneNumber(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if phoneNumber.String() != "09012345678" {
-			t.Fatalf("unexpected phone number: %s", phoneNumber.String())
+		if phoneNumber.Value() != "09012345678" {
+			t.Fatalf("unexpected phone number: %s", phoneNumber.Value())
 		}
 	})
 
@@ -18,8 +18,8 @@ func TestNewPhoneNumber(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if phoneNumber.String() != "09012345678" {
-			t.Fatalf("unexpected phone number: %s", phoneNumber.String())
+		if phoneNumber.Value() != "09012345678" {
+			t.Fatalf("unexpected phone number: %s", phoneNumber.Value())
 		}
 	})
 

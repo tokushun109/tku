@@ -3,6 +3,8 @@ package sns
 import (
 	"strings"
 	"unicode/utf8"
+
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 )
 
 const (
@@ -11,6 +13,8 @@ const (
 )
 
 type SnsName string
+
+var _ domainVO.ValueObject[string] = SnsName("")
 
 func NewSnsName(v string) (SnsName, error) {
 	trimmed := strings.TrimSpace(v)
@@ -21,6 +25,10 @@ func NewSnsName(v string) (SnsName, error) {
 	return SnsName(trimmed), nil
 }
 
-func (n SnsName) String() string {
+func (n SnsName) Value() string {
 	return string(n)
+}
+
+func (n SnsName) String() string {
+	return n.Value()
 }
