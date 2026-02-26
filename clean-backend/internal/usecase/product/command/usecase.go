@@ -337,15 +337,6 @@ func (s *Service) UploadCSV(ctx context.Context, rows []usecaseProduct.ProductCS
 		targetCache := make(map[string]*domainTarget.Target)
 
 		for _, row := range normalizedRows {
-			categoryEntity, err := s.findOrCreateCategoryByName(txCtx, row.categoryName, categoryCache)
-			if err != nil {
-				return err
-			}
-			targetEntity, err := s.findOrCreateTargetByName(txCtx, row.targetName, targetCache)
-			if err != nil {
-				return err
-			}
-
 			productID, err := primitive.NewID(row.id)
 			if err != nil {
 				return fmt.Errorf("product id is invalid: id=%d: %w", row.id, usecase.ErrInvalidInput)
@@ -359,8 +350,25 @@ func (s *Service) UploadCSV(ctx context.Context, rows []usecaseProduct.ProductCS
 				return fmt.Errorf("product not found: id=%d: %w", row.id, usecase.ErrInvalidInput)
 			}
 
-			categoryID := categoryEntity.ID().Value()
-			targetID := targetEntity.ID().Value()
+			var categoryID *uint
+			if row.categoryName != nil {
+				categoryEntity, err := s.findOrCreateCategoryByName(txCtx, *row.categoryName, categoryCache)
+				if err != nil {
+					return err
+				}
+				categoryIDValue := categoryEntity.ID().Value()
+				categoryID = &categoryIDValue
+			}
+
+			var targetID *uint
+			if row.targetName != nil {
+				targetEntity, err := s.findOrCreateTargetByName(txCtx, *row.targetName, targetCache)
+				if err != nil {
+					return err
+				}
+				targetIDValue := targetEntity.ID().Value()
+				targetID = &targetIDValue
+			}
 
 			description := ""
 			if current.Description() != nil {
@@ -373,8 +381,8 @@ func (s *Service) UploadCSV(ctx context.Context, rows []usecaseProduct.ProductCS
 				row.price,
 				current.IsActive(),
 				current.IsRecommend(),
-				&categoryID,
-				&targetID,
+				categoryID,
+				targetID,
 			); err != nil {
 				return fmt.Errorf("row update failed: id=%d: %w", row.id, err)
 			}

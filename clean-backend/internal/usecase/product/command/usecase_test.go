@@ -394,6 +394,73 @@ func TestUploadCSV(t *testing.T) {
 		}
 	})
 
+	t.Run("分類名が空欄のとき分類IDをNULLに更新する", func(t *testing.T) {
+		currentCategoryID := uint(10)
+		currentTargetID := uint(20)
+		product, err := domainProduct.Rebuild(
+			1,
+			id.GenerateUUID(),
+			"old product",
+			"",
+			1000,
+			true,
+			false,
+			&currentCategoryID,
+			&currentTargetID,
+		)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		productRepo := &stubProductRepoForCSV{
+			productsByID: map[uint]*domainProduct.Product{
+				1: product,
+			},
+		}
+		categoryRepo := &stubCategoryRepoForCSV{}
+		targetRepo := &stubTargetRepoForCSV{}
+		tx := &stubTxManager{}
+
+		s := &Service{
+			productRepo:  productRepo,
+			categoryRepo: categoryRepo,
+			targetRepo:   targetRepo,
+			uuidGen:      &stubUUIDGenForCSV{},
+			txManager:    tx,
+		}
+
+		err = s.UploadCSV(context.Background(), []usecaseProduct.ProductCSVInputRow{
+			{
+				ID:           1,
+				Name:         "new product",
+				Price:        2500,
+				CategoryName: "",
+				TargetName:   "",
+			},
+		})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !tx.called {
+			t.Fatalf("expected transaction called")
+		}
+		if product.CategoryID() != nil {
+			t.Fatalf("expected category id cleared")
+		}
+		if product.TargetID() != nil {
+			t.Fatalf("expected target id cleared")
+		}
+		if len(productRepo.updated) != 1 {
+			t.Fatalf("expected one update call, got %d", len(productRepo.updated))
+		}
+		if len(categoryRepo.byName) != 0 {
+			t.Fatalf("expected category not created")
+		}
+		if len(targetRepo.byName) != 0 {
+			t.Fatalf("expected target not created")
+		}
+	})
+
 	t.Run("対象の商品IDが存在しないときバリデーションエラーで失敗する", func(t *testing.T) {
 		tx := &stubTxManager{}
 		s := &Service{

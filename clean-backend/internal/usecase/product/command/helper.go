@@ -95,8 +95,8 @@ type normalizedProductCSVRow struct {
 	id           uint
 	name         string
 	price        int
-	categoryName string
-	targetName   string
+	categoryName *string
+	targetName   *string
 }
 
 func normalizeProductCSVRows(rows []usecaseProduct.ProductCSVInputRow) ([]normalizedProductCSVRow, error) {
@@ -116,22 +116,32 @@ func normalizeProductCSVRows(rows []usecaseProduct.ProductCSVInputRow) ([]normal
 			return nil, fmt.Errorf("row %d: %w", i+1, err)
 		}
 
-		categoryName, err := domainCategory.NewCategoryName(row.CategoryName)
-		if err != nil {
-			return nil, fmt.Errorf("row %d: %w", i+1, err)
+		var categoryName *string
+		if strings.TrimSpace(row.CategoryName) != "" {
+			parsedCategoryName, err := domainCategory.NewCategoryName(row.CategoryName)
+			if err != nil {
+				return nil, fmt.Errorf("row %d: %w", i+1, err)
+			}
+			parsedCategoryNameValue := parsedCategoryName.Value()
+			categoryName = &parsedCategoryNameValue
 		}
 
-		targetName, err := domainTarget.NewTargetName(row.TargetName)
-		if err != nil {
-			return nil, fmt.Errorf("row %d: %w", i+1, err)
+		var targetName *string
+		if strings.TrimSpace(row.TargetName) != "" {
+			parsedTargetName, err := domainTarget.NewTargetName(row.TargetName)
+			if err != nil {
+				return nil, fmt.Errorf("row %d: %w", i+1, err)
+			}
+			parsedTargetNameValue := parsedTargetName.Value()
+			targetName = &parsedTargetNameValue
 		}
 
 		result = append(result, normalizedProductCSVRow{
 			id:           row.ID,
 			name:         productName.Value(),
 			price:        productPrice.Value(),
-			categoryName: categoryName.Value(),
-			targetName:   targetName.Value(),
+			categoryName: categoryName,
+			targetName:   targetName,
 		})
 	}
 

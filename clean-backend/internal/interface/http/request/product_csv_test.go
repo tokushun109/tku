@@ -38,4 +38,20 @@ func TestParseProductCSV(t *testing.T) {
 			t.Fatalf("expected error")
 		}
 	})
+
+	t.Run("categoryNameとtargetNameが空欄でもパースに成功する", func(t *testing.T) {
+		rows, err := ParseProductCSV(strings.NewReader("id,name,price,categoryName,targetName\n1,product,1200,,\n"))
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if len(rows) != 1 {
+			t.Fatalf("expected 1 row, got %d", len(rows))
+		}
+		if rows[0].CategoryName != "" {
+			t.Fatalf("unexpected category name: %s", rows[0].CategoryName)
+		}
+		if rows[0].TargetName != "" {
+			t.Fatalf("unexpected target name: %s", rows[0].TargetName)
+		}
+	})
 }

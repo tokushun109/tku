@@ -91,7 +91,7 @@ func parseProductCSVRecord(record []string, columnMap map[string]int, lineNo int
 	categoryName := getCSVColumn(record, columnMap["categoryname"])
 	targetName := getCSVColumn(record, columnMap["targetname"])
 
-	if name == "" || categoryName == "" || targetName == "" {
+	if name == "" {
 		return ProductCSVRow{}, fmt.Errorf("%w: line=%d", errInvalidCSVRecord, lineNo)
 	}
 
