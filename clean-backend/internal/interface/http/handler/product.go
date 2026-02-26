@@ -1,8 +1,12 @@
 package handler
 
 import (
+	"bytes"
+	"encoding/csv"
 	"encoding/json"
+	"io"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/tokushun109/tku/clean-backend/internal/interface/http/presenter"
@@ -11,6 +15,8 @@ import (
 	"github.com/tokushun109/tku/clean-backend/internal/usecase"
 	usecaseProduct "github.com/tokushun109/tku/clean-backend/internal/usecase/product"
 )
+
+const maxProductCSVSize = 5 << 20 // 5MB
 
 type ProductHandler struct {
 	productUC usecaseProduct.Usecase
@@ -52,6 +58,44 @@ func (h *ProductHandler) ListByCategory(w http.ResponseWriter, r *http.Request) 
 
 	res := presenter.ToCategoryProductsResponses(categoryProducts)
 	response.WriteJSON(w, http.StatusOK, res)
+}
+
+func (h *ProductHandler) ExportCSV(w http.ResponseWriter, r *http.Request) {
+	rows, err := h.productUC.ExportCSV(r.Context())
+	if err != nil {
+		response.WriteAppError(w, err)
+		return
+	}
+
+	var csvBuffer bytes.Buffer
+	csvWriter := csv.NewWriter(&csvBuffer)
+
+	if err := csvWriter.Write([]string{"ID", "Name", "Price", "CategoryName", "TargetName"}); err != nil {
+		response.WriteAppError(w, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error()))
+		return
+	}
+
+	for _, row := range rows {
+		if err := csvWriter.Write([]string{
+			strconv.FormatUint(uint64(row.ID), 10),
+			row.Name,
+			strconv.Itoa(row.Price),
+			row.CategoryName,
+			row.TargetName,
+		}); err != nil {
+			response.WriteAppError(w, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error()))
+			return
+		}
+	}
+	csvWriter.Flush()
+	if err := csvWriter.Error(); err != nil {
+		response.WriteAppError(w, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error()))
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/csv; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	_, _ = w.Write(csvBuffer.Bytes())
 }
 
 func (h *ProductHandler) ListCarousel(w http.ResponseWriter, r *http.Request) {
@@ -121,6 +165,51 @@ func (h *ProductHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	productUUID := vars["product_uuid"]
 
 	if err := h.productUC.Delete(r.Context(), productUUID); err != nil {
+		response.WriteAppError(w, err)
+		return
+	}
+
+	response.WriteSuccess(w)
+}
+
+func (h *ProductHandler) UploadCSV(w http.ResponseWriter, r *http.Request) {
+	file, _, err := r.FormFile("csv")
+	if err != nil {
+		response.WriteAppError(w, usecase.NewAppError(usecase.ErrInvalidInput))
+		return
+	}
+	defer func() {
+		_ = file.Close()
+	}()
+
+	csvBytes, err := io.ReadAll(io.LimitReader(file, maxProductCSVSize+1))
+	if err != nil {
+		response.WriteAppError(w, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error()))
+		return
+	}
+	if len(csvBytes) == 0 || len(csvBytes) > maxProductCSVSize {
+		response.WriteAppError(w, usecase.NewAppError(usecase.ErrInvalidInput))
+		return
+	}
+
+	rows, err := request.ParseProductCSV(bytes.NewReader(csvBytes))
+	if err != nil {
+		response.WriteAppError(w, usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error()))
+		return
+	}
+
+	inputRows := make([]usecaseProduct.ProductCSVInputRow, 0, len(rows))
+	for _, row := range rows {
+		inputRows = append(inputRows, usecaseProduct.ProductCSVInputRow{
+			ID:           row.ID,
+			Name:         row.Name,
+			Price:        row.Price,
+			CategoryName: row.CategoryName,
+			TargetName:   row.TargetName,
+		})
+	}
+
+	if err := h.productUC.UploadCSV(r.Context(), inputRows); err != nil {
 		response.WriteAppError(w, err)
 		return
 	}

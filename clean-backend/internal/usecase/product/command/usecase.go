@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -21,6 +22,7 @@ type Usecase interface {
 	Create(ctx context.Context, input usecaseProduct.CreateProductInput) (primitive.UUID, error)
 	Update(ctx context.Context, productUUID string, input usecaseProduct.UpdateProductInput) error
 	Delete(ctx context.Context, productUUID string) error
+	UploadCSV(ctx context.Context, rows []usecaseProduct.ProductCSVInputRow) error
 	GetProductImageBlob(ctx context.Context, productImageUUID string) (*usecaseProduct.ProductImageBlob, error)
 	CreateProductImages(ctx context.Context, productUUID string, files []usecaseProduct.ProductImageUploadFile, isChanged bool, orderMap map[int]int) error
 	DeleteProductImage(ctx context.Context, productUUID string, productImageUUID string) error
@@ -319,6 +321,91 @@ func (s *Service) Delete(ctx context.Context, productUUID string) error {
 		if delErr := s.storage.Delete(ctx, path); delErr != nil {
 			log.Printf("[WARN] product delete delete image object failed: path=%s err=%v", path, delErr)
 		}
+	}
+
+	return nil
+}
+
+func (s *Service) UploadCSV(ctx context.Context, rows []usecaseProduct.ProductCSVInputRow) error {
+	normalizedRows, err := normalizeProductCSVRows(rows)
+	if err != nil {
+		return usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error())
+	}
+
+	if err := s.txManager.WithinTransaction(ctx, func(txCtx context.Context) error {
+		categoryCache := make(map[string]*domainCategory.Category)
+		targetCache := make(map[string]*domainTarget.Target)
+
+		for _, row := range normalizedRows {
+			productID, err := primitive.NewID(row.id)
+			if err != nil {
+				return fmt.Errorf("product id is invalid: id=%d: %w", row.id, usecase.ErrInvalidInput)
+			}
+
+			current, err := s.productRepo.FindByID(txCtx, productID)
+			if err != nil {
+				return err
+			}
+			if current == nil {
+				return fmt.Errorf("product not found: id=%d: %w", row.id, usecase.ErrInvalidInput)
+			}
+
+			var categoryID *uint
+			if row.categoryName != nil {
+				categoryEntity, err := s.findOrCreateCategoryByName(txCtx, *row.categoryName, categoryCache)
+				if err != nil {
+					return err
+				}
+				categoryIDValue := categoryEntity.ID().Value()
+				categoryID = &categoryIDValue
+			}
+
+			var targetID *uint
+			if row.targetName != nil {
+				targetEntity, err := s.findOrCreateTargetByName(txCtx, *row.targetName, targetCache)
+				if err != nil {
+					return err
+				}
+				targetIDValue := targetEntity.ID().Value()
+				targetID = &targetIDValue
+			}
+
+			description := ""
+			if current.Description() != nil {
+				description = current.Description().Value()
+			}
+
+			if err := current.ChangeProduct(
+				row.name,
+				description,
+				row.price,
+				current.IsActive(),
+				current.IsRecommend(),
+				categoryID,
+				targetID,
+			); err != nil {
+				return fmt.Errorf("row update failed: id=%d: %w", row.id, err)
+			}
+
+			updated, err := s.productRepo.Update(txCtx, current)
+			if err != nil {
+				return err
+			}
+			if !updated {
+				return fmt.Errorf("product update failed: id=%d: %w", row.id, usecase.ErrInvalidInput)
+			}
+		}
+
+		return nil
+	}); err != nil {
+		if errors.Is(err, usecase.ErrInvalidInput) ||
+			errors.Is(err, domainCategory.ErrInvalidName) ||
+			errors.Is(err, domainTarget.ErrInvalidName) ||
+			isInvalidProductInputError(err) {
+			return usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error())
+		}
+
+		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 
 	return nil

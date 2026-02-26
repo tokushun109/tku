@@ -19,13 +19,26 @@ func NewCategoryRepository(db *sqlx.DB) *CategoryRepository {
 	return &CategoryRepository{db: db}
 }
 
-func (r *CategoryRepository) Create(ctx context.Context, c *domain.Category) error {
-	_, err := getExecutor(ctx, r.db).ExecContext(
+func (r *CategoryRepository) Create(ctx context.Context, c *domain.Category) (*domain.Category, error) {
+	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`INSERT INTO category (uuid, name, created_at, updated_at) VALUES (?, ?, NOW(), NOW())`,
 		c.UUID().Value(), c.Name().Value(),
 	)
-	return err
+	if err != nil {
+		return nil, err
+	}
+
+	lastID, err := res.LastInsertId()
+	if err != nil {
+		return nil, err
+	}
+
+	created, err := domain.Rebuild(uint(lastID), c.UUID().Value(), c.Name().Value())
+	if err != nil {
+		return nil, fmt.Errorf("invalid category row: %w", err)
+	}
+	return created, nil
 }
 
 func (r *CategoryRepository) FindAll(ctx context.Context) ([]*domain.Category, error) {
@@ -89,6 +102,28 @@ func (r *CategoryRepository) FindByUUID(ctx context.Context, uuid primitive.UUID
 		}
 		return nil, err
 	}
+	return toDomainCategory(rrow.ID, rrow.UUID, rrow.Name)
+}
+
+func (r *CategoryRepository) FindByName(ctx context.Context, name domain.CategoryName) (*domain.Category, error) {
+	type row struct {
+		ID   uint   `db:"id"`
+		UUID string `db:"uuid"`
+		Name string `db:"name"`
+	}
+	var rrow row
+	if err := getExecutor(ctx, r.db).GetContext(
+		ctx,
+		&rrow,
+		`SELECT id, uuid, name FROM category WHERE name = ? AND deleted_at IS NULL LIMIT 1`,
+		name.Value(),
+	); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+
 	return toDomainCategory(rrow.ID, rrow.UUID, rrow.Name)
 }
 

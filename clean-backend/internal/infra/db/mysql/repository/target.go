@@ -19,13 +19,26 @@ func NewTargetRepository(db *sqlx.DB) *TargetRepository {
 	return &TargetRepository{db: db}
 }
 
-func (r *TargetRepository) Create(ctx context.Context, t *domain.Target) error {
-	_, err := getExecutor(ctx, r.db).ExecContext(
+func (r *TargetRepository) Create(ctx context.Context, t *domain.Target) (*domain.Target, error) {
+	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`INSERT INTO target (uuid, name, created_at, updated_at) VALUES (?, ?, NOW(), NOW())`,
 		t.UUID().Value(), t.Name().Value(),
 	)
-	return err
+	if err != nil {
+		return nil, err
+	}
+
+	lastID, err := res.LastInsertId()
+	if err != nil {
+		return nil, err
+	}
+
+	created, err := domain.Rebuild(uint(lastID), t.UUID().Value(), t.Name().Value())
+	if err != nil {
+		return nil, fmt.Errorf("invalid target row: %w", err)
+	}
+	return created, nil
 }
 
 func (r *TargetRepository) FindAll(ctx context.Context) ([]*domain.Target, error) {
@@ -89,6 +102,28 @@ func (r *TargetRepository) FindByUUID(ctx context.Context, uuid primitive.UUID) 
 		}
 		return nil, err
 	}
+	return toDomainTarget(rrow.ID, rrow.UUID, rrow.Name)
+}
+
+func (r *TargetRepository) FindByName(ctx context.Context, name domain.TargetName) (*domain.Target, error) {
+	type row struct {
+		ID   uint   `db:"id"`
+		UUID string `db:"uuid"`
+		Name string `db:"name"`
+	}
+	var rrow row
+	if err := getExecutor(ctx, r.db).GetContext(
+		ctx,
+		&rrow,
+		`SELECT id, uuid, name FROM target WHERE name = ? AND deleted_at IS NULL LIMIT 1`,
+		name.Value(),
+	); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+
 	return toDomainTarget(rrow.ID, rrow.UUID, rrow.Name)
 }
 

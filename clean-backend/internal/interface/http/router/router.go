@@ -86,6 +86,8 @@ func NewRouter(
 	r.Handle("/api/product", requireAdmin(productHandler.Create)).Methods(http.MethodPost)
 	r.Handle("/api/product/{product_uuid}", requireAdmin(productHandler.Update)).Methods(http.MethodPut)
 	r.Handle("/api/product/{product_uuid}", requireAdmin(productHandler.Delete)).Methods(http.MethodDelete)
+	r.Handle("/api/csv/product", requireAdmin(productHandler.ExportCSV)).Methods(http.MethodGet)
+	r.Handle("/api/csv/product", requireAdmin(productHandler.UploadCSV)).Methods(http.MethodPost)
 
 	// product image
 	r.HandleFunc("/api/product_image/{product_image_uuid}/blob", productImageHandler.GetBlob).Methods(http.MethodGet)

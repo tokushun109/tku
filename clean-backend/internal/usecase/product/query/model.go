@@ -49,3 +49,11 @@ type CarouselItem struct {
 	Product *Product
 	APIPath string
 }
+
+type ProductCSVRow struct {
+	ID           uint
+	Name         string
+	Price        int
+	CategoryName string
+	TargetName   string
+}
