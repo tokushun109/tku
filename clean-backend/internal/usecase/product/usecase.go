@@ -124,16 +124,13 @@ func (s *Service) ListByCategory(ctx context.Context, mode string, category stri
 		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 
-	products := make([]*usecaseProductQuery.Product, 0)
 	for _, group := range categoryProducts {
 		if group == nil {
 			continue
 		}
-		products = append(products, group.Products...)
-	}
-
-	if err := s.attachPresignedImageURLs(ctx, products); err != nil {
-		return nil, err
+		if err := s.attachPresignedImageURLs(ctx, group.Products); err != nil {
+			return nil, err
+		}
 	}
 
 	return categoryProducts, nil
