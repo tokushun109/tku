@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { toast } from 'sonner'
 
 import { downloadProductCsv, uploadProductCsv } from '@/apis/csv'
 import { Button } from '@/components/bases/Button'
@@ -13,14 +14,14 @@ import styles from './styles.module.scss'
 export const AdminCsvTemplate = () => {
     const [uploadFile, setUploadFile] = useState<File | null>(null)
     const [isDialogVisible, setIsDialogVisible] = useState<boolean>(false)
-    const [successMessage, setSuccessMessage] = useState<string>('')
     const [errorMessage, setErrorMessage] = useState<string>('')
 
     const handleDownload = async () => {
         try {
             await downloadProductCsv()
+            toast.success('CSVをダウンロードしました')
         } catch (error) {
-            setErrorMessage(error instanceof Error ? error.message : 'CSVダウンロードに失敗しました')
+            toast.error(error instanceof Error ? error.message : 'CSVダウンロードに失敗しました')
         }
     }
 
@@ -38,7 +39,7 @@ export const AdminCsvTemplate = () => {
         try {
             await uploadProductCsv(uploadFile)
 
-            setSuccessMessage('アップロードを完了しました')
+            toast.success('アップロードを完了しました')
             setIsDialogVisible(false)
             setUploadFile(null)
             setErrorMessage('')
@@ -93,12 +94,6 @@ export const AdminCsvTemplate = () => {
                     <FileInput accept=".csv" label="CSVファイル" onChange={setUploadFile} required value={uploadFile} />
                 </div>
             </Dialog>
-
-            {successMessage && (
-                <Message className={styles['success-message']} type={MessageType.Success}>
-                    {successMessage}
-                </Message>
-            )}
         </div>
     )
 }
