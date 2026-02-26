@@ -95,8 +95,8 @@ type normalizedProductCSVRow struct {
 	id           uint
 	name         string
 	price        int
-	categoryName *string
-	targetName   *string
+	categoryName *domainCategory.CategoryName
+	targetName   *domainTarget.TargetName
 }
 
 func normalizeProductCSVRows(rows []usecaseProduct.ProductCSVInputRow) ([]normalizedProductCSVRow, error) {
@@ -116,24 +116,22 @@ func normalizeProductCSVRows(rows []usecaseProduct.ProductCSVInputRow) ([]normal
 			return nil, fmt.Errorf("row %d: %w", i+1, err)
 		}
 
-		var categoryName *string
+		var categoryName *domainCategory.CategoryName
 		if strings.TrimSpace(row.CategoryName) != "" {
 			parsedCategoryName, err := domainCategory.NewCategoryName(row.CategoryName)
 			if err != nil {
 				return nil, fmt.Errorf("row %d: %w", i+1, err)
 			}
-			parsedCategoryNameValue := parsedCategoryName.Value()
-			categoryName = &parsedCategoryNameValue
+			categoryName = &parsedCategoryName
 		}
 
-		var targetName *string
+		var targetName *domainTarget.TargetName
 		if strings.TrimSpace(row.TargetName) != "" {
 			parsedTargetName, err := domainTarget.NewTargetName(row.TargetName)
 			if err != nil {
 				return nil, fmt.Errorf("row %d: %w", i+1, err)
 			}
-			parsedTargetNameValue := parsedTargetName.Value()
-			targetName = &parsedTargetNameValue
+			targetName = &parsedTargetName
 		}
 
 		result = append(result, normalizedProductCSVRow{
@@ -150,13 +148,9 @@ func normalizeProductCSVRows(rows []usecaseProduct.ProductCSVInputRow) ([]normal
 
 func (s *Service) findOrCreateCategoryByName(
 	ctx context.Context,
-	rawName string,
+	name domainCategory.CategoryName,
 	cache map[string]*domainCategory.Category,
 ) (*domainCategory.Category, error) {
-	name, err := domainCategory.NewCategoryName(rawName)
-	if err != nil {
-		return nil, err
-	}
 	key := name.Value()
 
 	if cached, ok := cache[key]; ok {
@@ -176,11 +170,7 @@ func (s *Service) findOrCreateCategoryByName(
 	if err != nil {
 		return nil, err
 	}
-	if err := s.categoryRepo.Create(ctx, newCategory); err != nil {
-		return nil, err
-	}
-
-	created, err := s.categoryRepo.FindByUUID(ctx, newCategory.UUID())
+	created, err := s.categoryRepo.Create(ctx, newCategory)
 	if err != nil {
 		return nil, err
 	}
@@ -194,13 +184,9 @@ func (s *Service) findOrCreateCategoryByName(
 
 func (s *Service) findOrCreateTargetByName(
 	ctx context.Context,
-	rawName string,
+	name domainTarget.TargetName,
 	cache map[string]*domainTarget.Target,
 ) (*domainTarget.Target, error) {
-	name, err := domainTarget.NewTargetName(rawName)
-	if err != nil {
-		return nil, err
-	}
 	key := name.Value()
 
 	if cached, ok := cache[key]; ok {
@@ -220,11 +206,7 @@ func (s *Service) findOrCreateTargetByName(
 	if err != nil {
 		return nil, err
 	}
-	if err := s.targetRepo.Create(ctx, newTarget); err != nil {
-		return nil, err
-	}
-
-	created, err := s.targetRepo.FindByUUID(ctx, newTarget.UUID())
+	created, err := s.targetRepo.Create(ctx, newTarget)
 	if err != nil {
 		return nil, err
 	}

@@ -7,7 +7,7 @@ import (
 )
 
 type Repository interface {
-	Create(ctx context.Context, c *Category) error
+	Create(ctx context.Context, c *Category) (*Category, error)
 	FindAll(ctx context.Context) ([]*Category, error)
 	FindUsed(ctx context.Context) ([]*Category, error)
 	FindByUUID(ctx context.Context, uuid primitive.UUID) (*Category, error)

@@ -19,13 +19,26 @@ func NewTargetRepository(db *sqlx.DB) *TargetRepository {
 	return &TargetRepository{db: db}
 }
 
-func (r *TargetRepository) Create(ctx context.Context, t *domain.Target) error {
-	_, err := getExecutor(ctx, r.db).ExecContext(
+func (r *TargetRepository) Create(ctx context.Context, t *domain.Target) (*domain.Target, error) {
+	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`INSERT INTO target (uuid, name, created_at, updated_at) VALUES (?, ?, NOW(), NOW())`,
 		t.UUID().Value(), t.Name().Value(),
 	)
-	return err
+	if err != nil {
+		return nil, err
+	}
+
+	lastID, err := res.LastInsertId()
+	if err != nil {
+		return nil, err
+	}
+
+	created, err := domain.Rebuild(uint(lastID), t.UUID().Value(), t.Name().Value())
+	if err != nil {
+		return nil, fmt.Errorf("invalid target row: %w", err)
+	}
+	return created, nil
 }
 
 func (r *TargetRepository) FindAll(ctx context.Context) ([]*domain.Target, error) {

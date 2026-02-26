@@ -96,7 +96,7 @@ type stubCategoryRepoForCSV struct {
 	byUUID map[string]*domainCategory.Category
 }
 
-func (s *stubCategoryRepoForCSV) Create(ctx context.Context, c *domainCategory.Category) error {
+func (s *stubCategoryRepoForCSV) Create(ctx context.Context, c *domainCategory.Category) (*domainCategory.Category, error) {
 	if s.byName == nil {
 		s.byName = map[string]*domainCategory.Category{}
 	}
@@ -106,11 +106,11 @@ func (s *stubCategoryRepoForCSV) Create(ctx context.Context, c *domainCategory.C
 
 	rebuilt, err := domainCategory.Rebuild(uint(len(s.byName)+1), c.UUID().Value(), c.Name().Value())
 	if err != nil {
-		return err
+		return nil, err
 	}
 	s.byName[rebuilt.Name().Value()] = rebuilt
 	s.byUUID[rebuilt.UUID().Value()] = rebuilt
-	return nil
+	return rebuilt, nil
 }
 
 func (s *stubCategoryRepoForCSV) FindAll(ctx context.Context) ([]*domainCategory.Category, error) {
@@ -156,7 +156,7 @@ type stubTargetRepoForCSV struct {
 	byUUID map[string]*domainTarget.Target
 }
 
-func (s *stubTargetRepoForCSV) Create(ctx context.Context, t *domainTarget.Target) error {
+func (s *stubTargetRepoForCSV) Create(ctx context.Context, t *domainTarget.Target) (*domainTarget.Target, error) {
 	if s.byName == nil {
 		s.byName = map[string]*domainTarget.Target{}
 	}
@@ -166,11 +166,11 @@ func (s *stubTargetRepoForCSV) Create(ctx context.Context, t *domainTarget.Targe
 
 	rebuilt, err := domainTarget.Rebuild(uint(len(s.byName)+1), t.UUID().Value(), t.Name().Value())
 	if err != nil {
-		return err
+		return nil, err
 	}
 	s.byName[rebuilt.Name().Value()] = rebuilt
 	s.byUUID[rebuilt.UUID().Value()] = rebuilt
-	return nil
+	return rebuilt, nil
 }
 
 func (s *stubTargetRepoForCSV) FindAll(ctx context.Context) ([]*domainTarget.Target, error) {
