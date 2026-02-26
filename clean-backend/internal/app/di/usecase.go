@@ -15,6 +15,8 @@ import (
 	usecaseCreator "github.com/tokushun109/tku/clean-backend/internal/usecase/creator"
 	usecaseHealth "github.com/tokushun109/tku/clean-backend/internal/usecase/health"
 	usecaseProduct "github.com/tokushun109/tku/clean-backend/internal/usecase/product"
+	usecaseProductCommand "github.com/tokushun109/tku/clean-backend/internal/usecase/product/command"
+	usecaseProductQuery "github.com/tokushun109/tku/clean-backend/internal/usecase/product/query"
 	usecaseSalesSite "github.com/tokushun109/tku/clean-backend/internal/usecase/sales_site"
 	usecaseSession "github.com/tokushun109/tku/clean-backend/internal/usecase/session"
 	usecaseSkillMarket "github.com/tokushun109/tku/clean-backend/internal/usecase/skill_market"
@@ -88,6 +90,26 @@ func newUsecases(repos *repositories, qrs *queries, cfg *config.Config, txManage
 	if err := requireNonNil("sessionUsecase", sessionUC); err != nil {
 		return nil, err
 	}
+	productQueryUC := usecaseProductQuery.New(qrs.product, storage)
+	if err := requireNonNil("productQueryUsecase", productQueryUC); err != nil {
+		return nil, err
+	}
+	productCommandUC := usecaseProductCommand.New(
+		repos.product,
+		repos.productImage,
+		repos.siteDetail,
+		repos.category,
+		repos.target,
+		repos.tag,
+		repos.salesSite,
+		qrs.product,
+		storage,
+		uuidGen,
+		txManager,
+	)
+	if err := requireNonNil("productCommandUsecase", productCommandUC); err != nil {
+		return nil, err
+	}
 
 	ucs := &usecases{
 		health:      usecaseHealth.New(repos.health),
@@ -101,19 +123,7 @@ func newUsecases(repos *repositories, qrs *queries, cfg *config.Config, txManage
 		contact:     usecaseContact.New(repos.contact, contactNotifier),
 		session:     sessionUC,
 		user:        usecaseUser.New(repos.user, repos.session, sessionUC, passwordHasher, uuidGen, clock, txManager),
-		product: usecaseProduct.New(
-			repos.product,
-			repos.productImage,
-			repos.siteDetail,
-			repos.category,
-			repos.target,
-			repos.tag,
-			repos.salesSite,
-			qrs.product,
-			storage,
-			uuidGen,
-			txManager,
-		),
+		product:     usecaseProduct.New(productQueryUC, productCommandUC),
 	}
 
 	// 出力側の依存関係のチェック

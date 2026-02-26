@@ -21,6 +21,10 @@ type stubProductUC struct {
 		target   string
 	}
 
+	listCarouselErr    error
+	listCarouselRes    []*usecaseProductQuery.CarouselItem
+	listCarouselCalled bool
+
 	createProductImagesErr    error
 	createProductImagesCalled bool
 	createProductImagesReq    struct {
@@ -49,6 +53,14 @@ func (s *stubProductUC) ListByCategory(
 		return nil, s.listByCategoryErr
 	}
 	return s.listByCategoryRes, nil
+}
+
+func (s *stubProductUC) ListCarousel(ctx context.Context) ([]*usecaseProductQuery.CarouselItem, error) {
+	s.listCarouselCalled = true
+	if s.listCarouselErr != nil {
+		return nil, s.listCarouselErr
+	}
+	return s.listCarouselRes, nil
 }
 
 func (s *stubProductUC) Get(ctx context.Context, productUUID string) (*usecaseProductQuery.Product, error) {
@@ -150,6 +162,74 @@ func TestProductListByCategory(t *testing.T) {
 		}
 		if category["uuid"] != "category-uuid" {
 			t.Fatalf("unexpected category uuid: %v", category["uuid"])
+		}
+	})
+}
+
+func TestProductListCarousel(t *testing.T) {
+	t.Run("ユースケースがエラーを返したとき内部エラーで失敗する", func(t *testing.T) {
+		uc := &stubProductUC{listCarouselErr: context.DeadlineExceeded}
+		h := NewProductHandler(uc)
+
+		req := httptest.NewRequest(http.MethodGet, "/api/carousel_image", nil)
+		rr := httptest.NewRecorder()
+
+		h.ListCarousel(rr, req)
+
+		if rr.Code != http.StatusInternalServerError {
+			t.Fatalf("expected 500, got %d", rr.Code)
+		}
+		if !uc.listCarouselCalled {
+			t.Fatalf("usecase should be called")
+		}
+	})
+
+	t.Run("有効な入力を渡したときカルーセル一覧を返す", func(t *testing.T) {
+		uc := &stubProductUC{
+			listCarouselRes: []*usecaseProductQuery.CarouselItem{
+				{
+					APIPath: "https://signed.example.com/carousel.png",
+					Product: &usecaseProductQuery.Product{
+						UUID: "product-uuid",
+						Name: "product name",
+						Target: usecaseProductQuery.Classification{
+							UUID: "target-uuid",
+							Name: "target",
+						},
+					},
+				},
+			},
+		}
+		h := NewProductHandler(uc)
+
+		req := httptest.NewRequest(http.MethodGet, "/api/carousel_image", nil)
+		rr := httptest.NewRecorder()
+
+		h.ListCarousel(rr, req)
+
+		if rr.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d", rr.Code)
+		}
+		if !uc.listCarouselCalled {
+			t.Fatalf("usecase should be called")
+		}
+
+		var res []map[string]any
+		if err := json.NewDecoder(rr.Body).Decode(&res); err != nil {
+			t.Fatalf("unexpected decode error: %v", err)
+		}
+		if len(res) != 1 {
+			t.Fatalf("expected 1 item, got %d", len(res))
+		}
+		if res[0]["apiPath"] != "https://signed.example.com/carousel.png" {
+			t.Fatalf("unexpected apiPath: %v", res[0]["apiPath"])
+		}
+		product, ok := res[0]["product"].(map[string]any)
+		if !ok {
+			t.Fatalf("expected product object")
+		}
+		if product["uuid"] != "product-uuid" {
+			t.Fatalf("unexpected product uuid: %v", product["uuid"])
 		}
 	})
 }

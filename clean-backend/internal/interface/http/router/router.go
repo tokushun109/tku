@@ -78,6 +78,7 @@ func NewRouter(
 	r.HandleFunc("/api/creator/logo/{logo_file}/blob", creatorHandler.GetLogoBlob).Methods(http.MethodGet)
 
 	// product
+	r.HandleFunc("/api/carousel_image", productHandler.ListCarousel).Methods(http.MethodGet)
 	r.HandleFunc("/api/category/product", productHandler.ListByCategory).Methods(http.MethodGet)
 	// TODO: requireAdminを一覧につけるようにする(フロントエンドの対応も必要)
 	r.HandleFunc("/api/product", productHandler.List).Methods(http.MethodGet)

@@ -41,3 +41,8 @@ type CategoryProductsResponse struct {
 	Category ProductClassificationResponse `json:"category"`
 	Products []*ProductResponse            `json:"products"`
 }
+
+type CarouselItemResponse struct {
+	Product *ProductResponse `json:"product"`
+	APIPath string           `json:"apiPath"`
+}

@@ -54,6 +54,17 @@ func (h *ProductHandler) ListByCategory(w http.ResponseWriter, r *http.Request) 
 	response.WriteJSON(w, http.StatusOK, res)
 }
 
+func (h *ProductHandler) ListCarousel(w http.ResponseWriter, r *http.Request) {
+	carouselItems, err := h.productUC.ListCarousel(r.Context())
+	if err != nil {
+		response.WriteAppError(w, err)
+		return
+	}
+
+	res := presenter.ToCarouselItemResponses(carouselItems)
+	response.WriteJSON(w, http.StatusOK, res)
+}
+
 func (h *ProductHandler) Get(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	productUUID := vars["product_uuid"]
