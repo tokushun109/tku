@@ -198,9 +198,6 @@ func (r *ProductQueryReader) ListCarouselItems(ctx context.Context, q usecasePro
 
 	items := make([]*usecaseProductQuery.CarouselItem, 0, len(products))
 	for _, product := range products {
-		if len(product.ProductImages) == 0 {
-			continue
-		}
 		items = append(items, &usecaseProductQuery.CarouselItem{Product: product})
 	}
 
