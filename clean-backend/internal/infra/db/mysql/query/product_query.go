@@ -369,10 +369,11 @@ func (r *ProductQueryReader) loadSiteDetails(ctx context.Context, productIDs []u
 func (r *ProductQueryReader) listUsedCategories(ctx context.Context) ([]usecaseProductQuery.Classification, error) {
 	rows := []categoryRow{}
 	query := `
-		SELECT DISTINCT c.uuid, c.name
+		SELECT c.uuid, c.name
 		FROM category c
 		INNER JOIN product p ON p.category_id = c.id AND p.deleted_at IS NULL
 		WHERE c.deleted_at IS NULL
+		GROUP BY c.id, c.uuid, c.name
 		ORDER BY c.id ASC
 	`
 	if err := r.db.SelectContext(ctx, &rows, query); err != nil {
