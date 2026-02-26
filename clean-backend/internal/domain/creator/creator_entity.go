@@ -2,7 +2,7 @@ package creator
 
 import (
 	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
-	"github.com/tokushun109/tku/clean-backend/internal/shared/optional"
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 )
 
 type Creator struct {
@@ -45,15 +45,15 @@ func newWithValidatedValues(name string, introduction string, logoMimeType strin
 	if err != nil {
 		return nil, err
 	}
-	creatorIntroduction, err := optional.ParseOptionalString(introduction, NewCreatorIntroduction)
+	creatorIntroduction, err := domainVO.ParseOptionalValue(&introduction, NewCreatorIntroduction)
 	if err != nil {
 		return nil, err
 	}
-	parsedLogoMimeType, err := optional.ParseOptionalString(logoMimeType, NewCreatorLogoMimeType)
+	parsedLogoMimeType, err := domainVO.ParseOptionalValue(&logoMimeType, NewCreatorLogoMimeType)
 	if err != nil {
 		return nil, err
 	}
-	parsedLogoPath, err := optional.ParseOptionalString(logoPath, NewCreatorLogoPath)
+	parsedLogoPath, err := domainVO.ParseOptionalValue(&logoPath, NewCreatorLogoPath)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +91,7 @@ func (c *Creator) ChangeProfile(name string, introduction string) error {
 	if err != nil {
 		return err
 	}
-	creatorIntroduction, err := optional.ParseOptionalString(introduction, NewCreatorIntroduction)
+	creatorIntroduction, err := domainVO.ParseOptionalValue(&introduction, NewCreatorIntroduction)
 	if err != nil {
 		return err
 	}

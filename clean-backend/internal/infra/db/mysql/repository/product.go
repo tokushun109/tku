@@ -9,8 +9,8 @@ import (
 
 	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/product"
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 	"github.com/tokushun109/tku/clean-backend/internal/infra/db/mysql/mysqlutil"
-	"github.com/tokushun109/tku/clean-backend/internal/shared/optional"
 )
 
 type ProductRepository struct {
@@ -40,7 +40,7 @@ func (r *ProductRepository) Create(ctx context.Context, p *domain.Product) (prim
 		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
 		p.UUID().Value(),
 		p.Name().Value(),
-		optional.ToStringPtr(p.Description()),
+		domainVO.ToValuePtr(p.Description()),
 		p.Price().Value(),
 		p.IsActive(),
 		p.IsRecommend(),
@@ -92,7 +92,7 @@ func (r *ProductRepository) Update(ctx context.Context, p *domain.Product) (bool
 		 SET name = ?, description = ?, price = ?, is_active = ?, is_recommend = ?, category_id = ?, target_id = ?, updated_at = NOW()
 		 WHERE uuid = ? AND deleted_at IS NULL`,
 		p.Name().Value(),
-		optional.ToStringPtr(p.Description()),
+		domainVO.ToValuePtr(p.Description()),
 		p.Price().Value(),
 		p.IsActive(),
 		p.IsRecommend(),

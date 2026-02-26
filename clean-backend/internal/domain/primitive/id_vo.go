@@ -16,18 +16,6 @@ func NewID(v uint) (ID, error) {
 	return ID(v), nil
 }
 
-func NewOptionalID(v *uint) (*ID, error) {
-	if v == nil {
-		return nil, nil
-	}
-
-	parsed, err := NewID(*v)
-	if err != nil {
-		return nil, err
-	}
-	return &parsed, nil
-}
-
 func (id ID) Value() uint {
 	return uint(id)
 }

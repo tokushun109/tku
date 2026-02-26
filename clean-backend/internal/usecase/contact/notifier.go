@@ -12,7 +12,7 @@ import (
 
 	domainContact "github.com/tokushun109/tku/clean-backend/internal/domain/contact"
 	domainUser "github.com/tokushun109/tku/clean-backend/internal/domain/user"
-	"github.com/tokushun109/tku/clean-backend/internal/shared/optional"
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 	usecase "github.com/tokushun109/tku/clean-backend/internal/usecase"
 )
 
@@ -156,8 +156,8 @@ func (n *notifier) newMailTemplateData(title string, contact *domainContact.Cont
 	return mailTemplateData{
 		Title:        title,
 		Name:         contact.Name().Value(),
-		Company:      optional.ToTrimmedStringOrEmpty(contact.Company()),
-		PhoneNumber:  optional.ToTrimmedStringOrEmpty(contact.PhoneNumber()),
+		Company:      domainVO.ToValueOrEmpty(contact.Company()),
+		PhoneNumber:  domainVO.ToValueOrEmpty(contact.PhoneNumber()),
 		Email:        contact.Email().Value(),
 		Content:      contact.Content().Value(),
 		SupportEmail: n.supportEmail,

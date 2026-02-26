@@ -9,8 +9,8 @@ import (
 
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/creator"
 	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 	"github.com/tokushun109/tku/clean-backend/internal/infra/db/mysql/mysqlutil"
-	"github.com/tokushun109/tku/clean-backend/internal/shared/optional"
 )
 
 type CreatorRepository struct {
@@ -47,7 +47,7 @@ func (r *CreatorRepository) Find(ctx context.Context) (*domain.Creator, error) {
 }
 
 func (r *CreatorRepository) UpdateProfile(ctx context.Context, c *domain.Creator) (bool, error) {
-	introduction := optional.ToStringPtr(c.Introduction())
+	introduction := domainVO.ToValuePtr(c.Introduction())
 
 	result, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,

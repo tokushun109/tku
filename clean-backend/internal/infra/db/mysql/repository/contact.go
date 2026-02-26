@@ -9,8 +9,8 @@ import (
 	"github.com/jmoiron/sqlx"
 
 	domain "github.com/tokushun109/tku/clean-backend/internal/domain/contact"
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 	"github.com/tokushun109/tku/clean-backend/internal/infra/db/mysql/mysqlutil"
-	"github.com/tokushun109/tku/clean-backend/internal/shared/optional"
 )
 
 type ContactRepository struct {
@@ -54,8 +54,8 @@ func (r *ContactRepository) FindAll(ctx context.Context) ([]*domain.Contact, err
 }
 
 func (r *ContactRepository) Create(ctx context.Context, contact *domain.Contact) error {
-	company := optional.ToStringPtr(contact.Company())
-	phoneNumber := optional.ToStringPtr(contact.PhoneNumber())
+	company := domainVO.ToValuePtr(contact.Company())
+	phoneNumber := domainVO.ToValuePtr(contact.PhoneNumber())
 
 	_, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
