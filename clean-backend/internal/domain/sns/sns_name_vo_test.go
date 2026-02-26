@@ -9,8 +9,8 @@ func TestNewSnsName(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if name.String() != "Instagram" {
-			t.Fatalf("expected trimmed value, got %q", name.String())
+		if name.Value() != "Instagram" {
+			t.Fatalf("expected trimmed value, got %q", name.Value())
 		}
 	})
 	t.Run("日本語30文字の有効値を渡したとき有効な値の生成に成功する", func(t *testing.T) {
@@ -19,8 +19,8 @@ func TestNewSnsName(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if name.String() != "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほ" {
-			t.Fatalf("expected value, got %q", name.String())
+		if name.Value() != "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほ" {
+			t.Fatalf("expected value, got %q", name.Value())
 		}
 	})
 	t.Run("値が短すぎるときバリデーションエラーで失敗する", func(t *testing.T) {

@@ -11,8 +11,8 @@ func TestNewContactName(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if name.String() != "山田太郎" {
-			t.Fatalf("unexpected name: %s", name.String())
+		if name.Value() != "山田太郎" {
+			t.Fatalf("unexpected name: %s", name.Value())
 		}
 	})
 
@@ -29,8 +29,8 @@ func TestNewContactName(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if name.String() != maxLenName {
-			t.Fatalf("unexpected name: %s", name.String())
+		if name.Value() != maxLenName {
+			t.Fatalf("unexpected name: %s", name.Value())
 		}
 	})
 

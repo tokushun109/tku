@@ -11,8 +11,8 @@ func TestNewContactContent(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if content.String() != "お問い合わせ内容です" {
-			t.Fatalf("unexpected content: %s", content.String())
+		if content.Value() != "お問い合わせ内容です" {
+			t.Fatalf("unexpected content: %s", content.Value())
 		}
 	})
 

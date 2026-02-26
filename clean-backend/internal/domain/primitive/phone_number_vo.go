@@ -1,12 +1,15 @@
 package primitive
 
 import (
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 	"strings"
 )
 
 const phoneNumberMaxLen = 20
 
 type PhoneNumber string
+
+var _ domainVO.ValueObject[string] = PhoneNumber("")
 
 func NewPhoneNumber(v string) (PhoneNumber, error) {
 	trimmed := strings.TrimSpace(v)
@@ -23,6 +26,10 @@ func NewPhoneNumber(v string) (PhoneNumber, error) {
 	return PhoneNumber(trimmed), nil
 }
 
-func (p PhoneNumber) String() string {
+func (p PhoneNumber) Value() string {
 	return string(p)
+}
+
+func (p PhoneNumber) String() string {
+	return p.Value()
 }

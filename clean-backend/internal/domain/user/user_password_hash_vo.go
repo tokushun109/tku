@@ -1,8 +1,13 @@
 package user
 
-import "strings"
+import (
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
+	"strings"
+)
 
 type UserPasswordHash string
+
+var _ domainVO.ValueObject[string] = UserPasswordHash("")
 
 func NewUserPasswordHash(v string) (UserPasswordHash, error) {
 	if strings.TrimSpace(v) == "" {
@@ -11,6 +16,10 @@ func NewUserPasswordHash(v string) (UserPasswordHash, error) {
 	return UserPasswordHash(v), nil
 }
 
-func (h UserPasswordHash) String() string {
+func (h UserPasswordHash) Value() string {
 	return string(h)
+}
+
+func (h UserPasswordHash) String() string {
+	return h.Value()
 }

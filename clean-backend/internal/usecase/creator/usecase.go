@@ -65,7 +65,7 @@ func (s *Service) Get(ctx context.Context) (*CreatorDetail, error) {
 
 	logoAPIPath := ""
 	if current.LogoPath() != nil {
-		url, err := s.storage.PresignGet(ctx, current.LogoPath().String(), defaultLogoPresignTTL)
+		url, err := s.storage.PresignGet(ctx, current.LogoPath().Value(), defaultLogoPresignTTL)
 		if err != nil {
 			return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 		}
@@ -134,28 +134,28 @@ func (s *Service) UpdateLogo(ctx context.Context, logoBytes []byte) error {
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 
-	if err := s.storage.Put(ctx, newLogoPath.String(), logoMimeType.String(), logoBytes); err != nil {
+	if err := s.storage.Put(ctx, newLogoPath.Value(), logoMimeType.Value(), logoBytes); err != nil {
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 
 	updated, err := s.repo.UpdateLogo(ctx, current.ID(), logoMimeType, newLogoPath)
 	if err != nil {
-		if delErr := s.storage.Delete(ctx, newLogoPath.String()); delErr != nil {
-			log.Printf("[WARN] creator update logo rollback delete failed: path=%s err=%v", newLogoPath.String(), delErr)
+		if delErr := s.storage.Delete(ctx, newLogoPath.Value()); delErr != nil {
+			log.Printf("[WARN] creator update logo rollback delete failed: path=%s err=%v", newLogoPath.Value(), delErr)
 		}
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 	if !updated {
-		if delErr := s.storage.Delete(ctx, newLogoPath.String()); delErr != nil {
-			log.Printf("[WARN] creator update logo rollback delete failed: path=%s err=%v", newLogoPath.String(), delErr)
+		if delErr := s.storage.Delete(ctx, newLogoPath.Value()); delErr != nil {
+			log.Printf("[WARN] creator update logo rollback delete failed: path=%s err=%v", newLogoPath.Value(), delErr)
 		}
 		return usecase.NewAppErrorWithMessage(usecase.ErrNotFound, domain.ErrCreatorRecordMissing.Error())
 	}
 
 	// DB の更新後に旧ファイルを削除する。削除失敗は orphan を許容して成功扱いにする。
-	if current.LogoPath() != nil && current.LogoPath().String() != newLogoPath.String() {
-		if delErr := s.storage.Delete(ctx, current.LogoPath().String()); delErr != nil {
-			log.Printf("[WARN] creator update logo old file delete failed: path=%s err=%v", current.LogoPath().String(), delErr)
+	if current.LogoPath() != nil && *current.LogoPath() != newLogoPath {
+		if delErr := s.storage.Delete(ctx, current.LogoPath().Value()); delErr != nil {
+			log.Printf("[WARN] creator update logo old file delete failed: path=%s err=%v", current.LogoPath().Value(), delErr)
 		}
 	}
 
@@ -179,12 +179,12 @@ func (s *Service) GetLogoBlob(ctx context.Context, requestLogoFile string) (*Log
 		return nil, usecase.NewAppError(usecase.ErrNotFound)
 	}
 
-	savedLogoFile := path.Base(current.LogoPath().String())
+	savedLogoFile := path.Base(current.LogoPath().Value())
 	if savedLogoFile != logoFile {
 		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, domain.ErrInvalidLogoFileName.Error())
 	}
 
-	logoBody, err := s.storage.Get(ctx, current.LogoPath().String())
+	logoBody, err := s.storage.Get(ctx, current.LogoPath().Value())
 	if err != nil {
 		if errors.Is(err, usecase.ErrStorageNotFound) {
 			return nil, usecase.NewAppError(usecase.ErrNotFound)
@@ -193,7 +193,7 @@ func (s *Service) GetLogoBlob(ctx context.Context, requestLogoFile string) (*Log
 	}
 
 	return &LogoBlob{
-		ContentType: current.LogoMimeType().String(),
+		ContentType: current.LogoMimeType().Value(),
 		Body:        logoBody,
 	}, nil
 }

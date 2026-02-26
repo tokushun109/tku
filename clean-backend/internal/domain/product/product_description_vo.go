@@ -1,13 +1,22 @@
 package product
 
-import "strings"
+import (
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
+	"strings"
+)
 
 type ProductDescription string
+
+var _ domainVO.ValueObject[string] = ProductDescription("")
 
 func NewProductDescription(v string) (ProductDescription, error) {
 	return ProductDescription(strings.TrimSpace(v)), nil
 }
 
-func (d ProductDescription) String() string {
+func (d ProductDescription) Value() string {
 	return string(d)
+}
+
+func (d ProductDescription) String() string {
+	return d.Value()
 }

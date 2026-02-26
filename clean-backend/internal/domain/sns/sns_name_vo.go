@@ -1,6 +1,7 @@
 package sns
 
 import (
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 	"strings"
 	"unicode/utf8"
 )
@@ -12,6 +13,8 @@ const (
 
 type SnsName string
 
+var _ domainVO.ValueObject[string] = SnsName("")
+
 func NewSnsName(v string) (SnsName, error) {
 	trimmed := strings.TrimSpace(v)
 	length := utf8.RuneCountInString(trimmed)
@@ -21,6 +24,10 @@ func NewSnsName(v string) (SnsName, error) {
 	return SnsName(trimmed), nil
 }
 
-func (n SnsName) String() string {
+func (n SnsName) Value() string {
 	return string(n)
+}
+
+func (n SnsName) String() string {
+	return n.Value()
 }

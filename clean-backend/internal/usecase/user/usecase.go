@@ -75,7 +75,7 @@ func (s *Service) Login(ctx context.Context, email string, password string) (*do
 
 	sessionUUID := s.uuidGen.New()
 
-	sess, err := domainSession.New(sessionUUID, u.ID().Uint(), s.clock.Now())
+	sess, err := domainSession.New(sessionUUID, u.ID().Value(), s.clock.Now())
 	if err != nil {
 		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}

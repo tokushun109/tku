@@ -67,7 +67,7 @@ func TestAuthMiddleware(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected uuid error: %v", err)
 		}
-		user, err := domainUser.Rebuild(1, uuid.String(), "admin", "admin@example.com", "hash", true)
+		user, err := domainUser.Rebuild(1, uuid.Value(), "admin", "admin@example.com", "hash", true)
 		if err != nil {
 			t.Fatalf("unexpected user rebuild error: %v", err)
 		}

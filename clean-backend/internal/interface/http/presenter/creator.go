@@ -14,16 +14,16 @@ func ToCreatorResponse(detail *usecaseCreator.CreatorDetail) *response.CreatorRe
 
 	mimeType := ""
 	if detail.Creator.LogoMimeType() != nil {
-		mimeType = detail.Creator.LogoMimeType().String()
+		mimeType = detail.Creator.LogoMimeType().Value()
 	}
 
 	logoPath := ""
 	if detail.Creator.LogoPath() != nil {
-		logoPath = detail.Creator.LogoPath().String()
+		logoPath = detail.Creator.LogoPath().Value()
 	}
 
 	return &response.CreatorResponse{
-		Name:         detail.Creator.Name().String(),
+		Name:         detail.Creator.Name().Value(),
 		Introduction: optional.ToTrimmedStringOrEmpty(detail.Creator.Introduction()),
 		MimeType:     mimeType,
 		Logo:         logoPath,

@@ -60,11 +60,11 @@ func (r *ContactRepository) Create(ctx context.Context, contact *domain.Contact)
 	_, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`INSERT INTO contact (name, company, phone_number, email, content, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())`,
-		contact.Name().String(),
+		contact.Name().Value(),
 		company,
 		phoneNumber,
-		contact.Email().String(),
-		contact.Content().String(),
+		contact.Email().Value(),
+		contact.Content().Value(),
 	)
 	return err
 }

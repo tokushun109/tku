@@ -1,6 +1,7 @@
 package primitive
 
 import (
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 	"net/mail"
 	"strings"
 	"unicode/utf8"
@@ -12,6 +13,8 @@ const (
 )
 
 type Email string
+
+var _ domainVO.ValueObject[string] = Email("")
 
 func NewEmail(v string) (Email, error) {
 	trimmed := strings.TrimSpace(v)
@@ -28,6 +31,10 @@ func NewEmail(v string) (Email, error) {
 	return Email(trimmed), nil
 }
 
-func (e Email) String() string {
+func (e Email) Value() string {
 	return string(e)
+}
+
+func (e Email) String() string {
+	return e.Value()
 }

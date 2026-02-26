@@ -1,6 +1,13 @@
 package primitive
 
+import (
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
+	"strconv"
+)
+
 type ID uint
+
+var _ domainVO.ValueObject[uint] = ID(0)
 
 func NewID(v uint) (ID, error) {
 	if v == 0 {
@@ -21,8 +28,12 @@ func NewOptionalID(v *uint) (*ID, error) {
 	return &parsed, nil
 }
 
-func (id ID) Uint() uint {
+func (id ID) Value() uint {
 	return uint(id)
+}
+
+func (id ID) String() string {
+	return strconv.FormatUint(uint64(id.Value()), 10)
 }
 
 func (id ID) IsDefined() bool {

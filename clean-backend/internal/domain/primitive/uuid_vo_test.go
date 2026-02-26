@@ -9,8 +9,8 @@ func TestNewUUID(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if u.String() != "31637057-4c42-4d6c-b3ad-080b018a1844" {
-			t.Fatalf("unexpected uuid: %s", u.String())
+		if u.Value() != "31637057-4c42-4d6c-b3ad-080b018a1844" {
+			t.Fatalf("unexpected uuid: %s", u.Value())
 		}
 	})
 	t.Run("値が不正なときバリデーションエラーで失敗する", func(t *testing.T) {

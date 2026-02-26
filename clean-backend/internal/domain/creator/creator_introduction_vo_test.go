@@ -8,8 +8,8 @@ func TestNewCreatorIntroduction(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if introduction.String() != "handmade" {
-			t.Fatalf("unexpected introduction: %s", introduction.String())
+		if introduction.Value() != "handmade" {
+			t.Fatalf("unexpected introduction: %s", introduction.Value())
 		}
 	})
 

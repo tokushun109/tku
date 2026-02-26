@@ -8,8 +8,8 @@ func TestNewID(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if id.Uint() != 1 {
-			t.Fatalf("unexpected id: %d", id.Uint())
+		if id.Value() != 1 {
+			t.Fatalf("unexpected id: %d", id.Value())
 		}
 		if !id.IsDefined() {
 			t.Fatal("expected id to be defined")
@@ -43,8 +43,8 @@ func TestNewOptionalID(t *testing.T) {
 		if id == nil {
 			t.Fatal("expected non-nil id")
 		}
-		if id.Uint() != 10 {
-			t.Fatalf("unexpected id: %d", id.Uint())
+		if id.Value() != 10 {
+			t.Fatalf("unexpected id: %d", id.Value())
 		}
 	})
 

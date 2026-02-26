@@ -23,7 +23,7 @@ func (r *TagRepository) Create(ctx context.Context, t *domain.Tag) error {
 	_, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`INSERT INTO tag (uuid, name, created_at, updated_at) VALUES (?, ?, NOW(), NOW())`,
-		t.UUID().String(), t.Name().String(),
+		t.UUID().Value(), t.Name().Value(),
 	)
 	return err
 }
@@ -56,7 +56,7 @@ func (r *TagRepository) FindByUUID(ctx context.Context, uuid primitive.UUID) (*d
 		Name string `db:"name"`
 	}
 	var rrow row
-	if err := getExecutor(ctx, r.db).GetContext(ctx, &rrow, `SELECT id, uuid, name FROM tag WHERE uuid = ? AND deleted_at IS NULL`, uuid.String()); err != nil {
+	if err := getExecutor(ctx, r.db).GetContext(ctx, &rrow, `SELECT id, uuid, name FROM tag WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value()); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
@@ -67,7 +67,7 @@ func (r *TagRepository) FindByUUID(ctx context.Context, uuid primitive.UUID) (*d
 
 func (r *TagRepository) ExistsByName(ctx context.Context, name domain.TagName) (bool, error) {
 	var count int64
-	if err := getExecutor(ctx, r.db).GetContext(ctx, &count, `SELECT COUNT(1) FROM tag WHERE name = ? AND deleted_at IS NULL`, name.String()); err != nil {
+	if err := getExecutor(ctx, r.db).GetContext(ctx, &count, `SELECT COUNT(1) FROM tag WHERE name = ? AND deleted_at IS NULL`, name.Value()); err != nil {
 		return false, err
 	}
 	return count > 0, nil
@@ -77,8 +77,8 @@ func (r *TagRepository) Update(ctx context.Context, t *domain.Tag) (bool, error)
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`UPDATE tag SET name = ?, updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`,
-		t.Name().String(),
-		t.UUID().String(),
+		t.Name().Value(),
+		t.UUID().Value(),
 	)
 	if err != nil {
 		return false, err
@@ -100,7 +100,7 @@ func (r *TagRepository) Delete(ctx context.Context, uuid primitive.UUID) (bool, 
 	}()
 
 	var tagID int64
-	if err := tx.GetContext(ctx, &tagID, `SELECT id FROM tag WHERE uuid = ? AND deleted_at IS NULL`, uuid.String()); err != nil {
+	if err := tx.GetContext(ctx, &tagID, `SELECT id FROM tag WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value()); err != nil {
 		if err == sql.ErrNoRows {
 			return false, nil
 		}

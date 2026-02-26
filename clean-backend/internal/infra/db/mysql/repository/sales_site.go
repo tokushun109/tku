@@ -24,7 +24,7 @@ func (r *SalesSiteRepository) Create(ctx context.Context, s *domain.SalesSite) e
 	_, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`INSERT INTO sales_site (uuid, name, url, icon, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())`,
-		s.UUID().String(), s.Name().String(), s.URL().String(), s.Icon(),
+		s.UUID().Value(), s.Name().Value(), s.URL().Value(), s.Icon(),
 	)
 	return err
 }
@@ -61,7 +61,7 @@ func (r *SalesSiteRepository) FindByUUID(ctx context.Context, uuid primitive.UUI
 		Icon sql.NullString `db:"icon"`
 	}
 	var rrow row
-	if err := getExecutor(ctx, r.db).GetContext(ctx, &rrow, `SELECT id, uuid, name, url, icon FROM sales_site WHERE uuid = ? AND deleted_at IS NULL`, uuid.String()); err != nil {
+	if err := getExecutor(ctx, r.db).GetContext(ctx, &rrow, `SELECT id, uuid, name, url, icon FROM sales_site WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value()); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
@@ -74,10 +74,10 @@ func (r *SalesSiteRepository) Update(ctx context.Context, s *domain.SalesSite) (
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`UPDATE sales_site SET name = ?, url = ?, icon = ?, updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`,
-		s.Name().String(),
-		s.URL().String(),
+		s.Name().Value(),
+		s.URL().Value(),
 		s.Icon(),
-		s.UUID().String(),
+		s.UUID().Value(),
 	)
 	if err != nil {
 		return false, err
@@ -99,7 +99,7 @@ func (r *SalesSiteRepository) Delete(ctx context.Context, uuid primitive.UUID) (
 	}()
 
 	var salesSiteID int64
-	if err := tx.GetContext(ctx, &salesSiteID, `SELECT id FROM sales_site WHERE uuid = ? AND deleted_at IS NULL`, uuid.String()); err != nil {
+	if err := tx.GetContext(ctx, &salesSiteID, `SELECT id FROM sales_site WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value()); err != nil {
 		if err == sql.ErrNoRows {
 			return false, nil
 		}

@@ -24,12 +24,12 @@ func TestToSkillMarketResponse(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		skillMarket, err := domain.Rebuild(1, u.String(), n.String(), skillMarketURL.String(), "icon")
+		skillMarket, err := domain.Rebuild(1, u.Value(), n.Value(), skillMarketURL.Value(), "icon")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 		res := ToSkillMarketResponse(skillMarket)
-		if res.UUID != u.String() || res.Name != n.String() || res.URL != skillMarketURL.String() || res.Icon != "icon" {
+		if res.UUID != u.Value() || res.Name != n.Value() || res.URL != skillMarketURL.Value() || res.Icon != "icon" {
 			t.Fatalf("unexpected response: %+v", res)
 		}
 	})
@@ -64,11 +64,11 @@ func TestToSkillMarketResponses(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		skillMarket1, err := domain.Rebuild(1, u1.String(), n1.String(), url1.String(), "icon1")
+		skillMarket1, err := domain.Rebuild(1, u1.Value(), n1.Value(), url1.Value(), "icon1")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		skillMarket2, err := domain.Rebuild(2, u2.String(), n2.String(), url2.String(), "icon2")
+		skillMarket2, err := domain.Rebuild(2, u2.Value(), n2.Value(), url2.Value(), "icon2")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}

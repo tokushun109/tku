@@ -1,11 +1,14 @@
 package primitive
 
 import (
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 	"net/url"
 	"strings"
 )
 
 type URL string
+
+var _ domainVO.ValueObject[string] = URL("")
 
 func NewURL(s string) (URL, error) {
 	normalized := strings.ToLower(s)
@@ -27,6 +30,10 @@ func NewURL(s string) (URL, error) {
 	return URL(s), nil
 }
 
-func (u URL) String() string {
+func (u URL) Value() string {
 	return string(u)
+}
+
+func (u URL) String() string {
+	return u.Value()
 }

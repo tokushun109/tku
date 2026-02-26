@@ -62,7 +62,7 @@ func (s *Session) UUID() primitive.UUID {
 }
 
 func (s *Session) UserID() uint {
-	return s.userID.Uint()
+	return s.userID.Value()
 }
 
 func (s *Session) CreatedAt() time.Time {

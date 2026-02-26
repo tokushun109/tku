@@ -34,11 +34,11 @@ func (r *ProductImageRepository) Create(ctx context.Context, image *domain.Produ
 		ctx,
 		"INSERT INTO product_image (uuid, name, mime_type, path, `order`, product_id, created_at, updated_at) "+
 			"VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())",
-		image.UUID().String(),
-		image.Name().String(),
-		image.MimeType().String(),
-		image.Path().String(),
-		image.Order().Int(),
+		image.UUID().Value(),
+		image.Name().Value(),
+		image.MimeType().Value(),
+		image.Path().Value(),
+		image.Order().Value(),
 		image.ProductID(),
 	)
 	return err
@@ -52,7 +52,7 @@ func (r *ProductImageRepository) FindByUUID(ctx context.Context, uuid primitive.
 		"SELECT id, uuid, name, mime_type, path, `order`, product_id "+
 			"FROM product_image "+
 			"WHERE uuid = ? AND deleted_at IS NULL",
-		uuid.String(),
+		uuid.Value(),
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -73,7 +73,7 @@ func (r *ProductImageRepository) FindByProductID(ctx context.Context, productID 
 			"FROM product_image "+
 			"WHERE product_id = ? AND deleted_at IS NULL "+
 			"ORDER BY `order` DESC, id ASC",
-		productID.Uint(),
+		productID.Value(),
 	)
 	if err != nil {
 		return nil, err
@@ -99,8 +99,8 @@ func (r *ProductImageRepository) UpdateOrder(ctx context.Context, uuid primitive
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		"UPDATE product_image SET `order` = ?, updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL",
-		validatedOrder.Int(),
-		uuid.String(),
+		validatedOrder.Value(),
+		uuid.Value(),
 	)
 	if err != nil {
 		return false, err
@@ -117,7 +117,7 @@ func (r *ProductImageRepository) DeleteByUUID(ctx context.Context, uuid primitiv
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`UPDATE product_image SET deleted_at = NOW(), updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`,
-		uuid.String(),
+		uuid.Value(),
 	)
 	if err != nil {
 		return false, err
@@ -134,7 +134,7 @@ func (r *ProductImageRepository) DeleteByProductID(ctx context.Context, productI
 	_, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`UPDATE product_image SET deleted_at = NOW(), updated_at = NOW() WHERE product_id = ? AND deleted_at IS NULL`,
-		productID.Uint(),
+		productID.Value(),
 	)
 	return err
 }

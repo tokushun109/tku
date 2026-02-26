@@ -34,7 +34,7 @@ func (r *UserRepository) FindByEmail(ctx context.Context, email primitive.Email)
 		ctx,
 		&rrow,
 		`SELECT id, uuid, name, email, password, is_admin FROM user WHERE email = ? AND deleted_at IS NULL LIMIT 1`,
-		email.String(),
+		email.Value(),
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -52,7 +52,7 @@ func (r *UserRepository) FindByID(ctx context.Context, id primitive.ID) (*domain
 		ctx,
 		&rrow,
 		`SELECT id, uuid, name, email, password, is_admin FROM user WHERE id = ? AND deleted_at IS NULL LIMIT 1`,
-		id.Uint(),
+		id.Value(),
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {

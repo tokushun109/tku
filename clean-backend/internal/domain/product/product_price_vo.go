@@ -1,11 +1,18 @@
 package product
 
+import (
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
+	"strconv"
+)
+
 const (
 	productPriceMin = 1
 	productPriceMax = 1000000
 )
 
 type ProductPrice int
+
+var _ domainVO.ValueObject[int] = ProductPrice(0)
 
 func NewProductPrice(v int) (ProductPrice, error) {
 	if v < productPriceMin || v > productPriceMax {
@@ -14,6 +21,10 @@ func NewProductPrice(v int) (ProductPrice, error) {
 	return ProductPrice(v), nil
 }
 
-func (p ProductPrice) Int() int {
+func (p ProductPrice) Value() int {
 	return int(p)
+}
+
+func (p ProductPrice) String() string {
+	return strconv.Itoa(p.Value())
 }

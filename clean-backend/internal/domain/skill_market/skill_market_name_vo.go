@@ -1,6 +1,7 @@
 package skill_market
 
 import (
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 	"strings"
 	"unicode/utf8"
 )
@@ -12,6 +13,8 @@ const (
 
 type SkillMarketName string
 
+var _ domainVO.ValueObject[string] = SkillMarketName("")
+
 func NewSkillMarketName(v string) (SkillMarketName, error) {
 	trimmed := strings.TrimSpace(v)
 	length := utf8.RuneCountInString(trimmed)
@@ -21,6 +24,10 @@ func NewSkillMarketName(v string) (SkillMarketName, error) {
 	return SkillMarketName(trimmed), nil
 }
 
-func (n SkillMarketName) String() string {
+func (n SkillMarketName) Value() string {
 	return string(n)
+}
+
+func (n SkillMarketName) String() string {
+	return n.Value()
 }

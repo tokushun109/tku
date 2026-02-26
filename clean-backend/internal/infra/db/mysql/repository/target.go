@@ -23,7 +23,7 @@ func (r *TargetRepository) Create(ctx context.Context, t *domain.Target) error {
 	_, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`INSERT INTO target (uuid, name, created_at, updated_at) VALUES (?, ?, NOW(), NOW())`,
-		t.UUID().String(), t.Name().String(),
+		t.UUID().Value(), t.Name().Value(),
 	)
 	return err
 }
@@ -83,7 +83,7 @@ func (r *TargetRepository) FindByUUID(ctx context.Context, uuid primitive.UUID) 
 		Name string `db:"name"`
 	}
 	var rrow row
-	if err := getExecutor(ctx, r.db).GetContext(ctx, &rrow, `SELECT id, uuid, name FROM target WHERE uuid = ? AND deleted_at IS NULL`, uuid.String()); err != nil {
+	if err := getExecutor(ctx, r.db).GetContext(ctx, &rrow, `SELECT id, uuid, name FROM target WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value()); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
@@ -94,7 +94,7 @@ func (r *TargetRepository) FindByUUID(ctx context.Context, uuid primitive.UUID) 
 
 func (r *TargetRepository) ExistsByName(ctx context.Context, name domain.TargetName) (bool, error) {
 	var count int64
-	if err := getExecutor(ctx, r.db).GetContext(ctx, &count, `SELECT COUNT(1) FROM target WHERE name = ? AND deleted_at IS NULL`, name.String()); err != nil {
+	if err := getExecutor(ctx, r.db).GetContext(ctx, &count, `SELECT COUNT(1) FROM target WHERE name = ? AND deleted_at IS NULL`, name.Value()); err != nil {
 		return false, err
 	}
 	return count > 0, nil
@@ -104,8 +104,8 @@ func (r *TargetRepository) Update(ctx context.Context, t *domain.Target) (bool, 
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`UPDATE target SET name = ?, updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`,
-		t.Name().String(),
-		t.UUID().String(),
+		t.Name().Value(),
+		t.UUID().Value(),
 	)
 	if err != nil {
 		return false, err
@@ -127,7 +127,7 @@ func (r *TargetRepository) Delete(ctx context.Context, uuid primitive.UUID) (boo
 	}()
 
 	var targetID int64
-	if err := tx.GetContext(ctx, &targetID, `SELECT id FROM target WHERE uuid = ? AND deleted_at IS NULL`, uuid.String()); err != nil {
+	if err := tx.GetContext(ctx, &targetID, `SELECT id FROM target WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value()); err != nil {
 		if err == sql.ErrNoRows {
 			return false, nil
 		}

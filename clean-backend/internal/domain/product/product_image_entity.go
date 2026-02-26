@@ -116,7 +116,7 @@ func (p *ProductImage) Order() ProductImageOrder {
 }
 
 func (p *ProductImage) ProductID() uint {
-	return p.productID.Uint()
+	return p.productID.Value()
 }
 
 func (p *ProductImage) ChangeOrder(order int) error {

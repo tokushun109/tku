@@ -1,6 +1,7 @@
 package contact
 
 import (
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 	"strings"
 	"unicode/utf8"
 )
@@ -9,6 +10,8 @@ const contentMinLen = 1
 const contentMaxLen = 1000
 
 type ContactContent string
+
+var _ domainVO.ValueObject[string] = ContactContent("")
 
 func NewContactContent(v string) (ContactContent, error) {
 	trimmed := strings.TrimSpace(v)
@@ -19,6 +22,10 @@ func NewContactContent(v string) (ContactContent, error) {
 	return ContactContent(trimmed), nil
 }
 
-func (c ContactContent) String() string {
+func (c ContactContent) Value() string {
 	return string(c)
+}
+
+func (c ContactContent) String() string {
+	return c.Value()
 }

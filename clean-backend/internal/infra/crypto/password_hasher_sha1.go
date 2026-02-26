@@ -24,5 +24,5 @@ func (h *PasswordHasherSHA1) Verify(plain string, hash domainUser.UserPasswordHa
 	if err != nil {
 		return false, err
 	}
-	return hashed.String() == hash.String(), nil
+	return hashed == hash, nil
 }

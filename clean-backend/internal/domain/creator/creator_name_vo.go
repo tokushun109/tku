@@ -1,6 +1,7 @@
 package creator
 
 import (
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 	"strings"
 	"unicode/utf8"
 )
@@ -12,6 +13,8 @@ const (
 
 type CreatorName string
 
+var _ domainVO.ValueObject[string] = CreatorName("")
+
 func NewCreatorName(v string) (CreatorName, error) {
 	trimmed := strings.TrimSpace(v)
 	length := utf8.RuneCountInString(trimmed)
@@ -21,6 +24,10 @@ func NewCreatorName(v string) (CreatorName, error) {
 	return CreatorName(trimmed), nil
 }
 
-func (n CreatorName) String() string {
+func (n CreatorName) Value() string {
 	return string(n)
+}
+
+func (n CreatorName) String() string {
+	return n.Value()
 }

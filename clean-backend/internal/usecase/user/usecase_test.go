@@ -162,11 +162,11 @@ func TestLogin(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if sess == nil || sess.UUID().String() != testUUID {
+		if sess == nil || sess.UUID().Value() != testUUID {
 			t.Fatalf("unexpected session: %+v", sess)
 		}
-		if sessionRepo.deletedUserID.Uint() != 1 {
-			t.Fatalf("expected deleted user id=1, got %d", sessionRepo.deletedUserID.Uint())
+		if sessionRepo.deletedUserID.Value() != 1 {
+			t.Fatalf("expected deleted user id=1, got %d", sessionRepo.deletedUserID.Value())
 		}
 		if sessionRepo.created == nil {
 			t.Fatalf("expected session create called")
@@ -237,7 +237,7 @@ func TestGetBySessionToken(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if u == nil || u.ID().Uint() != 1 {
+		if u == nil || u.ID().Value() != 1 {
 			t.Fatalf("unexpected user: %+v", u)
 		}
 	})
@@ -272,7 +272,7 @@ func mustUser(id uint, uuidStr string, name string, email string, hash domainUse
 		uuidStr,
 		name,
 		email,
-		hash.String(),
+		hash.Value(),
 		isAdmin,
 	)
 	if err != nil {

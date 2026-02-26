@@ -141,8 +141,8 @@ func TestCreateTarget(t *testing.T) {
 		if repo.created == nil {
 			t.Fatalf("expected target created")
 		}
-		if repo.created.UUID().String() != testUUID {
-			t.Fatalf("expected uuid %s, got %s", testUUID, repo.created.UUID().String())
+		if repo.created.UUID().Value() != testUUID {
+			t.Fatalf("expected uuid %s, got %s", testUUID, repo.created.UUID().Value())
 		}
 	})
 	t.Run("名前が重複しているなら重複エラーを返す", func(t *testing.T) {

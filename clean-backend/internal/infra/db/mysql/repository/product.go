@@ -38,10 +38,10 @@ func (r *ProductRepository) Create(ctx context.Context, p *domain.Product) (prim
 		ctx,
 		`INSERT INTO product (uuid, name, description, price, is_active, is_recommend, category_id, target_id, created_at, updated_at)
 		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
-		p.UUID().String(),
-		p.Name().String(),
+		p.UUID().Value(),
+		p.Name().Value(),
 		optional.ToStringPtr(p.Description()),
-		p.Price().Int(),
+		p.Price().Value(),
 		p.IsActive(),
 		p.IsRecommend(),
 		toUintPtrFromPrimitiveID(p.CategoryID()),
@@ -73,7 +73,7 @@ func (r *ProductRepository) FindByUUID(ctx context.Context, uuid primitive.UUID)
 		`SELECT id, uuid, name, description, price, is_active, is_recommend, category_id, target_id
 		 FROM product
 		 WHERE uuid = ? AND deleted_at IS NULL`,
-		uuid.String(),
+		uuid.Value(),
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -91,14 +91,14 @@ func (r *ProductRepository) Update(ctx context.Context, p *domain.Product) (bool
 		`UPDATE product
 		 SET name = ?, description = ?, price = ?, is_active = ?, is_recommend = ?, category_id = ?, target_id = ?, updated_at = NOW()
 		 WHERE uuid = ? AND deleted_at IS NULL`,
-		p.Name().String(),
+		p.Name().Value(),
 		optional.ToStringPtr(p.Description()),
-		p.Price().Int(),
+		p.Price().Value(),
 		p.IsActive(),
 		p.IsRecommend(),
 		toUintPtrFromPrimitiveID(p.CategoryID()),
 		toUintPtrFromPrimitiveID(p.TargetID()),
-		p.UUID().String(),
+		p.UUID().Value(),
 	)
 	if err != nil {
 		return false, err
@@ -115,7 +115,7 @@ func (r *ProductRepository) Delete(ctx context.Context, uuid primitive.UUID) (bo
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`UPDATE product SET deleted_at = NOW(), updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`,
-		uuid.String(),
+		uuid.Value(),
 	)
 	if err != nil {
 		return false, err
@@ -129,7 +129,7 @@ func (r *ProductRepository) Delete(ctx context.Context, uuid primitive.UUID) (bo
 }
 
 func (r *ProductRepository) ReplaceTags(ctx context.Context, productID primitive.ID, tagIDs []primitive.ID) error {
-	if _, err := getExecutor(ctx, r.db).ExecContext(ctx, `DELETE FROM product_to_tag WHERE product_id = ?`, productID.Uint()); err != nil {
+	if _, err := getExecutor(ctx, r.db).ExecContext(ctx, `DELETE FROM product_to_tag WHERE product_id = ?`, productID.Value()); err != nil {
 		return err
 	}
 	if len(tagIDs) == 0 {
@@ -140,8 +140,8 @@ func (r *ProductRepository) ReplaceTags(ctx context.Context, productID primitive
 		if _, err := getExecutor(ctx, r.db).ExecContext(
 			ctx,
 			`INSERT INTO product_to_tag (product_id, tag_id, created_at, updated_at) VALUES (?, ?, NOW(), NOW())`,
-			productID.Uint(),
-			tagID.Uint(),
+			productID.Value(),
+			tagID.Value(),
 		); err != nil {
 			return err
 		}
@@ -185,6 +185,6 @@ func toUintPtrFromPrimitiveID(v *primitive.ID) *uint {
 	if v == nil {
 		return nil
 	}
-	id := v.Uint()
+	id := v.Value()
 	return &id
 }

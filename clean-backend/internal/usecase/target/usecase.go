@@ -95,7 +95,7 @@ func (s *Service) Update(ctx context.Context, uuidStr string, name string) error
 		return usecase.NewAppError(usecase.ErrNotFound)
 	}
 
-	if current.Name().String() != newName.String() {
+	if current.Name() != newName {
 		exists, err := s.repo.ExistsByName(ctx, newName)
 		if err != nil {
 			return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())

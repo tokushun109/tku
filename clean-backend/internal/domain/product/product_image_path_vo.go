@@ -1,10 +1,15 @@
 package product
 
-import "strings"
+import (
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
+	"strings"
+)
 
 const productImagePathMaxLen = 255
 
 type ProductImagePath string
+
+var _ domainVO.ValueObject[string] = ProductImagePath("")
 
 func NewProductImagePath(v string) (ProductImagePath, error) {
 	trimmed := strings.TrimSpace(v)
@@ -14,6 +19,10 @@ func NewProductImagePath(v string) (ProductImagePath, error) {
 	return ProductImagePath(trimmed), nil
 }
 
-func (p ProductImagePath) String() string {
+func (p ProductImagePath) Value() string {
 	return string(p)
+}
+
+func (p ProductImagePath) String() string {
+	return p.Value()
 }
