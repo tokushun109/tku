@@ -1,8 +1,9 @@
 package primitive
 
 import (
-	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 	"strings"
+
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 )
 
 const phoneNumberMaxLen = 20

@@ -1,9 +1,10 @@
 package primitive
 
 import (
-	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 	"net/url"
 	"strings"
+
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 )
 
 type URL string

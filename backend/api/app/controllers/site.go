@@ -8,8 +8,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/go-playground/validator/v10"
+	"github.com/gorilla/mux"
 )
 
 // 販売サイト一覧を取得

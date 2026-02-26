@@ -1,10 +1,11 @@
 package creator
 
 import (
-	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 	"path"
 	"strings"
 	"unicode/utf8"
+
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 )
 
 const creatorLogoPathMaxLen = 255

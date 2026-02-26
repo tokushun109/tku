@@ -13,9 +13,9 @@ import (
 	"net/http"
 	text_tmpl "text/template"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
-	"github.com/go-playground/validator/v10"
 )
 
 // お問い合わせ一覧を取得

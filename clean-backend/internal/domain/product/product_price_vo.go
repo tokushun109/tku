@@ -1,8 +1,9 @@
 package product
 
 import (
-	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 	"strconv"
+
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 )
 
 const (

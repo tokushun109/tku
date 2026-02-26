@@ -1,8 +1,9 @@
 package primitive
 
 import (
-	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 	"strconv"
+
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 )
 
 type ID uint

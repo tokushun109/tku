@@ -1,8 +1,9 @@
 package creator
 
 import (
-	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 	"strings"
+
+	domainVO "github.com/tokushun109/tku/clean-backend/internal/domain/vo"
 )
 
 var creatorLogoMimeTypeToExtension = map[string]string{
