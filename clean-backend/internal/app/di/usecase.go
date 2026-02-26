@@ -102,7 +102,6 @@ func newUsecases(repos *repositories, qrs *queries, cfg *config.Config, txManage
 		repos.target,
 		repos.tag,
 		repos.salesSite,
-		qrs.product,
 		storage,
 		uuidGen,
 		txManager,

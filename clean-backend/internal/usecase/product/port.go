@@ -3,6 +3,7 @@ package product
 import (
 	"context"
 
+	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
 	usecaseProductQuery "github.com/tokushun109/tku/clean-backend/internal/usecase/product/query"
 )
 
@@ -19,7 +20,7 @@ type QueryUsecase interface {
 }
 
 type CommandUsecase interface {
-	Create(ctx context.Context, input CreateProductInput) (*usecaseProductQuery.Product, error)
+	Create(ctx context.Context, input CreateProductInput) (primitive.UUID, error)
 	Update(ctx context.Context, productUUID string, input UpdateProductInput) error
 	Delete(ctx context.Context, productUUID string) error
 	GetProductImageBlob(ctx context.Context, productImageUUID string) (*ProductImageBlob, error)
@@ -62,7 +63,7 @@ func (s *Service) Get(ctx context.Context, productUUID string) (*usecaseProductQ
 	return s.queryUC.Get(ctx, productUUID)
 }
 
-func (s *Service) Create(ctx context.Context, input CreateProductInput) (*usecaseProductQuery.Product, error) {
+func (s *Service) Create(ctx context.Context, input CreateProductInput) (primitive.UUID, error) {
 	return s.commandUC.Create(ctx, input)
 }
 

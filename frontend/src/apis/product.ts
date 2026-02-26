@@ -99,7 +99,7 @@ export const getProducts = async (params: IGetProductsParams): Promise<IProduct[
 }
 
 /** 商品を作成 */
-export const createProduct = async (product: Omit<IProduct, 'uuid'>): Promise<IProduct> => {
+export const createProduct = async (product: Omit<IProduct, 'uuid'>): Promise<{ uuid: string }> => {
     try {
         const res = await fetch(`${process.env.API_BASE_URL}/product`, {
             headers: {
@@ -122,7 +122,7 @@ export const createProduct = async (product: Omit<IProduct, 'uuid'>): Promise<IP
 }
 
 /** 商品を更新 */
-export const updateProduct = async (uuid: string, product: IProduct): Promise<IProduct> => {
+export const updateProduct = async (uuid: string, product: IProduct): Promise<void> => {
     try {
         const res = await fetch(`${process.env.API_BASE_URL}/product/${uuid}`, {
             headers: {

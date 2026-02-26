@@ -5,17 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
 	domainProduct "github.com/tokushun109/tku/clean-backend/internal/domain/product"
 	domainSiteDetail "github.com/tokushun109/tku/clean-backend/internal/domain/site_detail"
 	"github.com/tokushun109/tku/clean-backend/internal/usecase"
 	usecaseProduct "github.com/tokushun109/tku/clean-backend/internal/usecase/product"
-	usecaseProductQuery "github.com/tokushun109/tku/clean-backend/internal/usecase/product/query"
 )
-
-const defaultProductImagePresignTTL = 30 * time.Minute
 
 func (s *Service) resolveCategoryID(ctx context.Context, rawUUID string) (*uint, error) {
 	trimmed := strings.TrimSpace(rawUUID)
@@ -125,22 +121,6 @@ func (s *Service) buildSiteDetails(ctx context.Context, productID primitive.ID, 
 		details = append(details, siteDetail)
 	}
 	return details, nil
-}
-
-func (s *Service) attachPresignedImageURLs(ctx context.Context, products []*usecaseProductQuery.Product) error {
-	for _, product := range products {
-		for i := range product.ProductImages {
-			if strings.TrimSpace(product.ProductImages[i].Path) == "" {
-				continue
-			}
-			url, err := s.storage.PresignGet(ctx, product.ProductImages[i].Path, defaultProductImagePresignTTL)
-			if err != nil {
-				return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
-			}
-			product.ProductImages[i].APIPath = url
-		}
-	}
-	return nil
 }
 
 func buildProductImagePath(uuidStr string, mimeType domainProduct.ProductImageMimeType) (domainProduct.ProductImagePath, error) {

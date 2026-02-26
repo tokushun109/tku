@@ -15,11 +15,10 @@ import (
 	domainTarget "github.com/tokushun109/tku/clean-backend/internal/domain/target"
 	"github.com/tokushun109/tku/clean-backend/internal/usecase"
 	usecaseProduct "github.com/tokushun109/tku/clean-backend/internal/usecase/product"
-	usecaseProductQuery "github.com/tokushun109/tku/clean-backend/internal/usecase/product/query"
 )
 
 type Usecase interface {
-	Create(ctx context.Context, input usecaseProduct.CreateProductInput) (*usecaseProductQuery.Product, error)
+	Create(ctx context.Context, input usecaseProduct.CreateProductInput) (primitive.UUID, error)
 	Update(ctx context.Context, productUUID string, input usecaseProduct.UpdateProductInput) error
 	Delete(ctx context.Context, productUUID string) error
 	GetProductImageBlob(ctx context.Context, productImageUUID string) (*usecaseProduct.ProductImageBlob, error)
@@ -35,7 +34,6 @@ type Service struct {
 	targetRepo       domainTarget.Repository
 	tagRepo          domainTag.Repository
 	salesSiteRepo    domainSalesSite.Repository
-	queryReader      usecaseProductQuery.Reader
 	storage          usecase.Storage
 	uuidGen          usecase.UUIDGenerator
 	txManager        usecase.TxManager
@@ -51,7 +49,6 @@ func New(
 	targetRepo domainTarget.Repository,
 	tagRepo domainTag.Repository,
 	salesSiteRepo domainSalesSite.Repository,
-	queryReader usecaseProductQuery.Reader,
 	storage usecase.Storage,
 	uuidGen usecase.UUIDGenerator,
 	txManager usecase.TxManager,
@@ -64,21 +61,20 @@ func New(
 		targetRepo:       targetRepo,
 		tagRepo:          tagRepo,
 		salesSiteRepo:    salesSiteRepo,
-		queryReader:      queryReader,
 		storage:          storage,
 		uuidGen:          uuidGen,
 		txManager:        txManager,
 	}
 }
 
-func (s *Service) Create(ctx context.Context, input usecaseProduct.CreateProductInput) (*usecaseProductQuery.Product, error) {
+func (s *Service) Create(ctx context.Context, input usecaseProduct.CreateProductInput) (primitive.UUID, error) {
 	categoryID, err := s.resolveCategoryID(ctx, input.CategoryUUID)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	targetID, err := s.resolveTargetID(ctx, input.TargetUUID)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	newUUID := s.uuidGen.New()
@@ -94,14 +90,14 @@ func (s *Service) Create(ctx context.Context, input usecaseProduct.CreateProduct
 	)
 	if err != nil {
 		if isInvalidProductInputError(err) {
-			return nil, usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error())
+			return "", usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error())
 		}
-		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
+		return "", usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 
 	tagIDs, err := s.resolveTagIDs(ctx, input.TagUUIDs)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	if err := s.txManager.WithinTransaction(ctx, func(txCtx context.Context) error {
@@ -124,24 +120,12 @@ func (s *Service) Create(ctx context.Context, input usecaseProduct.CreateProduct
 		return nil
 	}); err != nil {
 		if errors.Is(err, usecase.ErrInvalidInput) || isInvalidProductInputError(err) {
-			return nil, usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error())
+			return "", usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error())
 		}
-		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
+		return "", usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 
-	product, err := s.queryReader.GetProductByUUID(ctx, newUUID)
-	if err != nil {
-		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
-	}
-	if product == nil {
-		return nil, usecase.NewAppError(usecase.ErrNotFound)
-	}
-
-	if err := s.attachPresignedImageURLs(ctx, []*usecaseProductQuery.Product{product}); err != nil {
-		return nil, err
-	}
-
-	return product, nil
+	return newProduct.UUID(), nil
 }
 
 func (s *Service) Update(ctx context.Context, productUUID string, input usecaseProduct.UpdateProductInput) error {

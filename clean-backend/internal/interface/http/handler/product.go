@@ -86,13 +86,15 @@ func (h *ProductHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	createdProduct, err := h.productUC.Create(r.Context(), toCreateProductInput(req))
+	createdProductUUID, err := h.productUC.Create(r.Context(), toCreateProductInput(req))
 	if err != nil {
 		response.WriteAppError(w, err)
 		return
 	}
 
-	res := presenter.ToProductResponse(createdProduct)
+	res := response.CreateProductResponse{
+		UUID: createdProductUUID.Value(),
+	}
 	response.WriteJSON(w, http.StatusOK, res)
 }
 
