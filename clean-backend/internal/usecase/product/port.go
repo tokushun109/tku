@@ -17,12 +17,14 @@ type QueryUsecase interface {
 	ListByCategory(ctx context.Context, mode string, category string, target string) ([]*usecaseProductQuery.CategoryProducts, error)
 	ListCarousel(ctx context.Context) ([]*usecaseProductQuery.CarouselItem, error)
 	Get(ctx context.Context, productUUID string) (*usecaseProductQuery.Product, error)
+	ExportCSV(ctx context.Context) ([]*usecaseProductQuery.ProductCSVRow, error)
 }
 
 type CommandUsecase interface {
 	Create(ctx context.Context, input CreateProductInput) (primitive.UUID, error)
 	Update(ctx context.Context, productUUID string, input UpdateProductInput) error
 	Delete(ctx context.Context, productUUID string) error
+	UploadCSV(ctx context.Context, rows []ProductCSVInputRow) error
 	GetProductImageBlob(ctx context.Context, productImageUUID string) (*ProductImageBlob, error)
 	CreateProductImages(ctx context.Context, productUUID string, files []ProductImageUploadFile, isChanged bool, orderMap map[int]int) error
 	DeleteProductImage(ctx context.Context, productUUID string, productImageUUID string) error
@@ -63,6 +65,10 @@ func (s *Service) Get(ctx context.Context, productUUID string) (*usecaseProductQ
 	return s.queryUC.Get(ctx, productUUID)
 }
 
+func (s *Service) ExportCSV(ctx context.Context) ([]*usecaseProductQuery.ProductCSVRow, error) {
+	return s.queryUC.ExportCSV(ctx)
+}
+
 func (s *Service) Create(ctx context.Context, input CreateProductInput) (primitive.UUID, error) {
 	return s.commandUC.Create(ctx, input)
 }
@@ -73,6 +79,10 @@ func (s *Service) Update(ctx context.Context, productUUID string, input UpdatePr
 
 func (s *Service) Delete(ctx context.Context, productUUID string) error {
 	return s.commandUC.Delete(ctx, productUUID)
+}
+
+func (s *Service) UploadCSV(ctx context.Context, rows []ProductCSVInputRow) error {
+	return s.commandUC.UploadCSV(ctx, rows)
 }
 
 func (s *Service) GetProductImageBlob(ctx context.Context, productImageUUID string) (*ProductImageBlob, error) {

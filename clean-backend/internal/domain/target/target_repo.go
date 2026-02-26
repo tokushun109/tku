@@ -11,6 +11,7 @@ type Repository interface {
 	FindAll(ctx context.Context) ([]*Target, error)
 	FindUsed(ctx context.Context) ([]*Target, error)
 	FindByUUID(ctx context.Context, uuid primitive.UUID) (*Target, error)
+	FindByName(ctx context.Context, name TargetName) (*Target, error)
 	ExistsByName(ctx context.Context, name TargetName) (bool, error)
 	Update(ctx context.Context, t *Target) (bool, error)
 	Delete(ctx context.Context, uuid primitive.UUID) (bool, error)

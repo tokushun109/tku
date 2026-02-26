@@ -92,6 +92,28 @@ func (r *CategoryRepository) FindByUUID(ctx context.Context, uuid primitive.UUID
 	return toDomainCategory(rrow.ID, rrow.UUID, rrow.Name)
 }
 
+func (r *CategoryRepository) FindByName(ctx context.Context, name domain.CategoryName) (*domain.Category, error) {
+	type row struct {
+		ID   uint   `db:"id"`
+		UUID string `db:"uuid"`
+		Name string `db:"name"`
+	}
+	var rrow row
+	if err := getExecutor(ctx, r.db).GetContext(
+		ctx,
+		&rrow,
+		`SELECT id, uuid, name FROM category WHERE name = ? AND deleted_at IS NULL LIMIT 1`,
+		name.Value(),
+	); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return toDomainCategory(rrow.ID, rrow.UUID, rrow.Name)
+}
+
 func (r *CategoryRepository) ExistsByName(ctx context.Context, name domain.CategoryName) (bool, error) {
 	var count int64
 	if err := getExecutor(ctx, r.db).GetContext(ctx, &count, `SELECT COUNT(1) FROM category WHERE name = ? AND deleted_at IS NULL`, name.Value()); err != nil {

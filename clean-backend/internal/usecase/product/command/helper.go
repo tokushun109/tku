@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"strings"
 
+	domainCategory "github.com/tokushun109/tku/clean-backend/internal/domain/category"
 	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
 	domainProduct "github.com/tokushun109/tku/clean-backend/internal/domain/product"
 	domainSiteDetail "github.com/tokushun109/tku/clean-backend/internal/domain/site_detail"
+	domainTarget "github.com/tokushun109/tku/clean-backend/internal/domain/target"
 	"github.com/tokushun109/tku/clean-backend/internal/usecase"
 	usecaseProduct "github.com/tokushun109/tku/clean-backend/internal/usecase/product"
 )
@@ -87,6 +89,141 @@ func (s *Service) resolveTagIDs(ctx context.Context, rawUUIDs []string) ([]primi
 		tagIDs = append(tagIDs, tagID)
 	}
 	return tagIDs, nil
+}
+
+type normalizedProductCSVRow struct {
+	id           uint
+	name         string
+	price        int
+	categoryName string
+	targetName   string
+}
+
+func normalizeProductCSVRows(rows []usecaseProduct.ProductCSVInputRow) ([]normalizedProductCSVRow, error) {
+	result := make([]normalizedProductCSVRow, 0, len(rows))
+	for i, row := range rows {
+		if _, err := primitive.NewID(row.ID); err != nil {
+			return nil, fmt.Errorf("row %d: product id is invalid", i+1)
+		}
+
+		productName, err := domainProduct.NewProductName(row.Name)
+		if err != nil {
+			return nil, fmt.Errorf("row %d: %w", i+1, err)
+		}
+
+		productPrice, err := domainProduct.NewProductPrice(row.Price)
+		if err != nil {
+			return nil, fmt.Errorf("row %d: %w", i+1, err)
+		}
+
+		categoryName, err := domainCategory.NewCategoryName(row.CategoryName)
+		if err != nil {
+			return nil, fmt.Errorf("row %d: %w", i+1, err)
+		}
+
+		targetName, err := domainTarget.NewTargetName(row.TargetName)
+		if err != nil {
+			return nil, fmt.Errorf("row %d: %w", i+1, err)
+		}
+
+		result = append(result, normalizedProductCSVRow{
+			id:           row.ID,
+			name:         productName.Value(),
+			price:        productPrice.Value(),
+			categoryName: categoryName.Value(),
+			targetName:   targetName.Value(),
+		})
+	}
+
+	return result, nil
+}
+
+func (s *Service) findOrCreateCategoryByName(
+	ctx context.Context,
+	rawName string,
+	cache map[string]*domainCategory.Category,
+) (*domainCategory.Category, error) {
+	name, err := domainCategory.NewCategoryName(rawName)
+	if err != nil {
+		return nil, err
+	}
+	key := name.Value()
+
+	if cached, ok := cache[key]; ok {
+		return cached, nil
+	}
+
+	found, err := s.categoryRepo.FindByName(ctx, name)
+	if err != nil {
+		return nil, err
+	}
+	if found != nil {
+		cache[key] = found
+		return found, nil
+	}
+
+	newCategory, err := domainCategory.New(s.uuidGen.New(), key)
+	if err != nil {
+		return nil, err
+	}
+	if err := s.categoryRepo.Create(ctx, newCategory); err != nil {
+		return nil, err
+	}
+
+	created, err := s.categoryRepo.FindByUUID(ctx, newCategory.UUID())
+	if err != nil {
+		return nil, err
+	}
+	if created == nil {
+		return nil, fmt.Errorf("created category was not found")
+	}
+
+	cache[key] = created
+	return created, nil
+}
+
+func (s *Service) findOrCreateTargetByName(
+	ctx context.Context,
+	rawName string,
+	cache map[string]*domainTarget.Target,
+) (*domainTarget.Target, error) {
+	name, err := domainTarget.NewTargetName(rawName)
+	if err != nil {
+		return nil, err
+	}
+	key := name.Value()
+
+	if cached, ok := cache[key]; ok {
+		return cached, nil
+	}
+
+	found, err := s.targetRepo.FindByName(ctx, name)
+	if err != nil {
+		return nil, err
+	}
+	if found != nil {
+		cache[key] = found
+		return found, nil
+	}
+
+	newTarget, err := domainTarget.New(s.uuidGen.New(), key)
+	if err != nil {
+		return nil, err
+	}
+	if err := s.targetRepo.Create(ctx, newTarget); err != nil {
+		return nil, err
+	}
+
+	created, err := s.targetRepo.FindByUUID(ctx, newTarget.UUID())
+	if err != nil {
+		return nil, err
+	}
+	if created == nil {
+		return nil, fmt.Errorf("created target was not found")
+	}
+
+	cache[key] = created
+	return created, nil
 }
 
 func (s *Service) buildSiteDetails(ctx context.Context, productID primitive.ID, inputs []usecaseProduct.SiteDetailInput) ([]*domainSiteDetail.SiteDetail, error) {

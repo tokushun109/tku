@@ -56,6 +56,14 @@ type categoryRow struct {
 	Name string `db:"name"`
 }
 
+type productCSVRow struct {
+	ID           uint           `db:"id"`
+	Name         string         `db:"name"`
+	Price        int            `db:"price"`
+	CategoryName sql.NullString `db:"category_name"`
+	TargetName   sql.NullString `db:"target_name"`
+}
+
 func NewProductQueryReader(db *sqlx.DB) *ProductQueryReader {
 	return &ProductQueryReader{db: db}
 }
@@ -242,6 +250,42 @@ func (r *ProductQueryReader) GetProductByUUID(ctx context.Context, productUUID s
 	}
 
 	return products[0], nil
+}
+
+func (r *ProductQueryReader) ExportProductsCSV(
+	ctx context.Context,
+	_ usecaseProductQuery.ExportProductsCSVQuery,
+) ([]*usecaseProductQuery.ProductCSVRow, error) {
+	rows := []productCSVRow{}
+	query := `
+		SELECT
+			p.id,
+			p.name,
+			p.price,
+			c.name AS category_name,
+			t.name AS target_name
+		FROM product p
+		LEFT JOIN category c ON c.id = p.category_id AND c.deleted_at IS NULL
+		LEFT JOIN target t ON t.id = p.target_id AND t.deleted_at IS NULL
+		WHERE p.deleted_at IS NULL
+		ORDER BY p.created_at DESC, p.id DESC
+	`
+	if err := r.db.SelectContext(ctx, &rows, query); err != nil {
+		return nil, err
+	}
+
+	result := make([]*usecaseProductQuery.ProductCSVRow, 0, len(rows))
+	for _, row := range rows {
+		result = append(result, &usecaseProductQuery.ProductCSVRow{
+			ID:           row.ID,
+			Name:         row.Name,
+			Price:        row.Price,
+			CategoryName: mysqlutil.NullStringOrEmpty(row.CategoryName),
+			TargetName:   mysqlutil.NullStringOrEmpty(row.TargetName),
+		})
+	}
+
+	return result, nil
 }
 
 func buildProductsFromRows(rows []productBaseRow) []*usecaseProductQuery.Product {

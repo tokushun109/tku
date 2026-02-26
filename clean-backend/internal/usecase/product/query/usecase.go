@@ -23,6 +23,7 @@ type Usecase interface {
 	ListByCategory(ctx context.Context, mode string, category string, target string) ([]*CategoryProducts, error)
 	ListCarousel(ctx context.Context) ([]*CarouselItem, error)
 	Get(ctx context.Context, productUUID string) (*Product, error)
+	ExportCSV(ctx context.Context) ([]*ProductCSVRow, error)
 }
 
 type Service struct {
@@ -142,6 +143,15 @@ func (s *Service) Get(ctx context.Context, productUUID string) (*Product, error)
 	}
 
 	return product, nil
+}
+
+func (s *Service) ExportCSV(ctx context.Context) ([]*ProductCSVRow, error) {
+	rows, err := s.queryReader.ExportProductsCSV(ctx, ExportProductsCSVQuery{})
+	if err != nil {
+		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
+	}
+
+	return rows, nil
 }
 
 func (s *Service) attachPresignedImageURLs(ctx context.Context, products []*Product) error {

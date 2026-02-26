@@ -22,6 +22,8 @@ type stubQueryReader struct {
 	listCarouselQuery  ListCarouselQuery
 	getRes             *Product
 	getErr             error
+	exportCSVRes       []*ProductCSVRow
+	exportCSVErr       error
 }
 
 func (s *stubQueryReader) ListProducts(ctx context.Context, q ListProductsQuery) ([]*Product, error) {
@@ -52,6 +54,13 @@ func (s *stubQueryReader) GetProductByUUID(ctx context.Context, productUUID stri
 		return nil, s.getErr
 	}
 	return s.getRes, nil
+}
+
+func (s *stubQueryReader) ExportProductsCSV(ctx context.Context, q ExportProductsCSVQuery) ([]*ProductCSVRow, error) {
+	if s.exportCSVErr != nil {
+		return nil, s.exportCSVErr
+	}
+	return s.exportCSVRes, nil
 }
 
 type stubStorage struct {
@@ -381,6 +390,46 @@ func TestGetProduct(t *testing.T) {
 		}
 		if product.ProductImages[0].APIPath != "https://signed.example.com/detail" {
 			t.Fatalf("unexpected api path: %s", product.ProductImages[0].APIPath)
+		}
+	})
+}
+
+func TestExportCSV(t *testing.T) {
+	t.Run("query readerがエラーを返したとき内部エラーを返す", func(t *testing.T) {
+		s := &Service{
+			queryReader: &stubQueryReader{exportCSVErr: errors.New("db error")},
+		}
+
+		_, err := s.ExportCSV(context.Background())
+		if err == nil || !errors.Is(err, usecase.ErrInternal) {
+			t.Fatalf("expected ErrInternal, got %v", err)
+		}
+	})
+
+	t.Run("有効な入力を渡したときCSV出力データを返す", func(t *testing.T) {
+		s := &Service{
+			queryReader: &stubQueryReader{
+				exportCSVRes: []*ProductCSVRow{
+					{
+						ID:           1,
+						Name:         "product",
+						Price:        1000,
+						CategoryName: "cat",
+						TargetName:   "target",
+					},
+				},
+			},
+		}
+
+		rows, err := s.ExportCSV(context.Background())
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if len(rows) != 1 {
+			t.Fatalf("expected 1 row, got %d", len(rows))
+		}
+		if rows[0].Name != "product" {
+			t.Fatalf("unexpected name: %s", rows[0].Name)
 		}
 	})
 }

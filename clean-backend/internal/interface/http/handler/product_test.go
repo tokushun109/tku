@@ -1,8 +1,11 @@
 package handler
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
+	"io"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -30,6 +33,13 @@ type stubProductUC struct {
 	createErr    error
 	createRes    primitive.UUID
 	createCalled bool
+
+	exportCSVErr error
+	exportCSVRes []*usecaseProductQuery.ProductCSVRow
+
+	uploadCSVErr    error
+	uploadCSVCalled bool
+	uploadCSVRows   []usecaseProduct.ProductCSVInputRow
 
 	createProductImagesErr    error
 	createProductImagesCalled bool
@@ -87,6 +97,19 @@ func (s *stubProductUC) Update(ctx context.Context, productUUID string, input us
 
 func (s *stubProductUC) Delete(ctx context.Context, productUUID string) error {
 	return nil
+}
+
+func (s *stubProductUC) ExportCSV(ctx context.Context) ([]*usecaseProductQuery.ProductCSVRow, error) {
+	if s.exportCSVErr != nil {
+		return nil, s.exportCSVErr
+	}
+	return s.exportCSVRes, nil
+}
+
+func (s *stubProductUC) UploadCSV(ctx context.Context, rows []usecaseProduct.ProductCSVInputRow) error {
+	s.uploadCSVCalled = true
+	s.uploadCSVRows = rows
+	return s.uploadCSVErr
 }
 
 func (s *stubProductUC) GetProductImageBlob(ctx context.Context, productImageUUID string) (*usecaseProduct.ProductImageBlob, error) {
@@ -299,4 +322,125 @@ func TestProductCreate(t *testing.T) {
 			t.Fatalf("unexpected uuid: %v", res["uuid"])
 		}
 	})
+}
+
+func TestProductExportCSV(t *testing.T) {
+	t.Run("ユースケースがエラーを返したとき内部エラーで失敗する", func(t *testing.T) {
+		uc := &stubProductUC{exportCSVErr: context.DeadlineExceeded}
+		h := NewProductHandler(uc)
+
+		req := httptest.NewRequest(http.MethodGet, "/api/csv/product", nil)
+		rr := httptest.NewRecorder()
+
+		h.ExportCSV(rr, req)
+
+		if rr.Code != http.StatusInternalServerError {
+			t.Fatalf("expected 500, got %d", rr.Code)
+		}
+	})
+
+	t.Run("有効な入力を渡したときCSVを返す", func(t *testing.T) {
+		uc := &stubProductUC{
+			exportCSVRes: []*usecaseProductQuery.ProductCSVRow{
+				{
+					ID:           1,
+					Name:         "product",
+					Price:        1200,
+					CategoryName: "category",
+					TargetName:   "target",
+				},
+			},
+		}
+		h := NewProductHandler(uc)
+
+		req := httptest.NewRequest(http.MethodGet, "/api/csv/product", nil)
+		rr := httptest.NewRecorder()
+
+		h.ExportCSV(rr, req)
+
+		if rr.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d", rr.Code)
+		}
+		if contentType := rr.Header().Get("Content-Type"); contentType != "text/csv; charset=utf-8" {
+			t.Fatalf("unexpected content type: %s", contentType)
+		}
+		got := rr.Body.String()
+		if !strings.Contains(got, "ID,Name,Price,CategoryName,TargetName") {
+			t.Fatalf("unexpected csv header: %s", got)
+		}
+		if !strings.Contains(got, "1,product,1200,category,target") {
+			t.Fatalf("unexpected csv body: %s", got)
+		}
+	})
+}
+
+func TestProductUploadCSV(t *testing.T) {
+	t.Run("csvファイルがないときバリデーションエラーで失敗する", func(t *testing.T) {
+		uc := &stubProductUC{}
+		h := NewProductHandler(uc)
+
+		req := httptest.NewRequest(http.MethodPost, "/api/csv/product", nil)
+		rr := httptest.NewRecorder()
+
+		h.UploadCSV(rr, req)
+
+		if rr.Code != http.StatusBadRequest {
+			t.Fatalf("expected 400, got %d", rr.Code)
+		}
+		if uc.uploadCSVCalled {
+			t.Fatalf("usecase should not be called")
+		}
+	})
+
+	t.Run("有効なcsvを渡したときCSVアップロードに成功する", func(t *testing.T) {
+		uc := &stubProductUC{}
+		h := NewProductHandler(uc)
+
+		req := newProductCSVUploadRequest(
+			t,
+			"products.csv",
+			[]byte("id,name,price,categoryName,targetName\n1,new product,1200,new category,new target\n"),
+		)
+		rr := httptest.NewRecorder()
+
+		h.UploadCSV(rr, req)
+
+		if rr.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d", rr.Code)
+		}
+		if !uc.uploadCSVCalled {
+			t.Fatalf("usecase should be called")
+		}
+		if len(uc.uploadCSVRows) != 1 {
+			t.Fatalf("expected 1 row, got %d", len(uc.uploadCSVRows))
+		}
+		if uc.uploadCSVRows[0].ID != 1 {
+			t.Fatalf("unexpected id: %d", uc.uploadCSVRows[0].ID)
+		}
+		if uc.uploadCSVRows[0].CategoryName != "new category" {
+			t.Fatalf("unexpected category name: %s", uc.uploadCSVRows[0].CategoryName)
+		}
+	})
+}
+
+func newProductCSVUploadRequest(t *testing.T, fileName string, fileData []byte) *http.Request {
+	t.Helper()
+
+	var body bytes.Buffer
+	writer := multipart.NewWriter(&body)
+
+	part, err := writer.CreateFormFile("csv", fileName)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if _, err := io.Copy(part, bytes.NewReader(fileData)); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if err := writer.Close(); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	req := httptest.NewRequest(http.MethodPost, "/api/csv/product", &body)
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+	return req
 }

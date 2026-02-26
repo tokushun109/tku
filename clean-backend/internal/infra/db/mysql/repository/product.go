@@ -85,6 +85,26 @@ func (r *ProductRepository) FindByUUID(ctx context.Context, uuid primitive.UUID)
 	return toDomainProduct(row)
 }
 
+func (r *ProductRepository) FindByID(ctx context.Context, id primitive.ID) (*domain.Product, error) {
+	var row productRow
+	err := getExecutor(ctx, r.db).GetContext(
+		ctx,
+		&row,
+		`SELECT id, uuid, name, description, price, is_active, is_recommend, category_id, target_id
+		 FROM product
+		 WHERE id = ? AND deleted_at IS NULL`,
+		id.Value(),
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return toDomainProduct(row)
+}
+
 func (r *ProductRepository) Update(ctx context.Context, p *domain.Product) (bool, error) {
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,

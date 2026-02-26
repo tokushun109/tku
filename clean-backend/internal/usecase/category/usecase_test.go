@@ -71,6 +71,10 @@ func (s *stubRepo) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domain
 	return s.findByUUID, nil
 }
 
+func (s *stubRepo) FindByName(ctx context.Context, name domain.CategoryName) (*domain.Category, error) {
+	return nil, nil
+}
+
 func (s *stubRepo) Update(ctx context.Context, c *domain.Category) (bool, error) {
 	if s.updateErr != nil {
 		return false, s.updateErr
