@@ -29,6 +29,7 @@ const (
 
 type Usecase interface {
 	List(ctx context.Context, mode string, category string, target string) ([]*usecaseProductQuery.Product, error)
+	ListByCategory(ctx context.Context, mode string, category string, target string) ([]*usecaseProductQuery.CategoryProducts, error)
 	Get(ctx context.Context, productUUID string) (*usecaseProductQuery.Product, error)
 	Create(ctx context.Context, input CreateProductInput) (*usecaseProductQuery.Product, error)
 	Update(ctx context.Context, productUUID string, input UpdateProductInput) error
@@ -101,6 +102,38 @@ func (s *Service) List(ctx context.Context, mode string, category string, target
 	}
 
 	return products, nil
+}
+
+func (s *Service) ListByCategory(ctx context.Context, mode string, category string, target string) ([]*usecaseProductQuery.CategoryProducts, error) {
+	trimmedCategory := strings.TrimSpace(category)
+	trimmedTarget := strings.TrimSpace(target)
+
+	if !isValidListMode(mode) || trimmedCategory == "" || trimmedTarget == "" {
+		return nil, usecase.NewAppError(usecase.ErrInvalidInput)
+	}
+
+	categoryProducts, err := s.queryReader.ListCategoryProducts(ctx, usecaseProductQuery.ListCategoryProductsQuery{
+		Mode:     mode,
+		Category: trimmedCategory,
+		Target:   trimmedTarget,
+	})
+	if err != nil {
+		if errors.Is(err, usecaseProductQuery.ErrCategoryNotFound) {
+			return nil, usecase.NewAppError(usecase.ErrNotFound)
+		}
+		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
+	}
+
+	for _, group := range categoryProducts {
+		if group == nil {
+			continue
+		}
+		if err := s.attachPresignedImageURLs(ctx, group.Products); err != nil {
+			return nil, err
+		}
+	}
+
+	return categoryProducts, nil
 }
 
 func (s *Service) Get(ctx context.Context, productUUID string) (*usecaseProductQuery.Product, error) {

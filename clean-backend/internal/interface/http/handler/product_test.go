@@ -1,20 +1,26 @@
 package handler
 
 import (
-	"bytes"
 	"context"
-	"io"
-	"mime/multipart"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gorilla/mux"
 	usecaseProduct "github.com/tokushun109/tku/clean-backend/internal/usecase/product"
 	usecaseProductQuery "github.com/tokushun109/tku/clean-backend/internal/usecase/product/query"
 )
 
 type stubProductUC struct {
+	listByCategoryErr    error
+	listByCategoryRes    []*usecaseProductQuery.CategoryProducts
+	listByCategoryCalled bool
+	listByCategoryReq    struct {
+		mode     string
+		category string
+		target   string
+	}
+
 	createProductImagesErr    error
 	createProductImagesCalled bool
 	createProductImagesReq    struct {
@@ -27,6 +33,22 @@ type stubProductUC struct {
 
 func (s *stubProductUC) List(ctx context.Context, mode string, category string, target string) ([]*usecaseProductQuery.Product, error) {
 	return nil, nil
+}
+
+func (s *stubProductUC) ListByCategory(
+	ctx context.Context,
+	mode string,
+	category string,
+	target string,
+) ([]*usecaseProductQuery.CategoryProducts, error) {
+	s.listByCategoryCalled = true
+	s.listByCategoryReq.mode = mode
+	s.listByCategoryReq.category = category
+	s.listByCategoryReq.target = target
+	if s.listByCategoryErr != nil {
+		return nil, s.listByCategoryErr
+	}
+	return s.listByCategoryRes, nil
 }
 
 func (s *stubProductUC) Get(ctx context.Context, productUUID string) (*usecaseProductQuery.Product, error) {
@@ -68,89 +90,66 @@ func (s *stubProductUC) DeleteProductImage(ctx context.Context, productUUID stri
 	return nil
 }
 
-func TestProductCreateImage(t *testing.T) {
-	t.Run("空ファイルを渡したときバリデーションエラーで失敗する", func(t *testing.T) {
+func TestProductListByCategory(t *testing.T) {
+	t.Run("クエリが不正なときバリデーションエラーで失敗する", func(t *testing.T) {
 		uc := &stubProductUC{}
 		h := NewProductHandler(uc)
 
-		req := newProductImageUploadRequest(t, "empty.png", []byte{})
+		req := httptest.NewRequest(http.MethodGet, "/api/category/product?mode=invalid&category=all&target=all", nil)
 		rr := httptest.NewRecorder()
 
-		h.CreateImage(rr, req)
+		h.ListByCategory(rr, req)
 
 		if rr.Code != http.StatusBadRequest {
 			t.Fatalf("expected 400, got %d", rr.Code)
 		}
-		if uc.createProductImagesCalled {
-			t.Fatalf("usecase should not be called when file is empty")
+		if uc.listByCategoryCalled {
+			t.Fatalf("usecase should not be called on invalid query")
 		}
 	})
 
-	t.Run("20MBを超える画像ファイルを渡したときバリデーションエラーで失敗する", func(t *testing.T) {
-		uc := &stubProductUC{}
+	t.Run("有効なクエリを渡したときカテゴリ別一覧を返す", func(t *testing.T) {
+		uc := &stubProductUC{
+			listByCategoryRes: []*usecaseProductQuery.CategoryProducts{
+				{
+					Category: usecaseProductQuery.Classification{
+						UUID: "category-uuid",
+						Name: "Category",
+					},
+					Products: []*usecaseProductQuery.Product{},
+				},
+			},
+		}
 		h := NewProductHandler(uc)
 
-		req := newProductImageUploadRequest(t, "too-large.png", bytes.Repeat([]byte("a"), maxProductImageSize+1))
+		req := httptest.NewRequest(http.MethodGet, "/api/category/product?mode=active&category=all&target=all", nil)
 		rr := httptest.NewRecorder()
 
-		h.CreateImage(rr, req)
-
-		if rr.Code != http.StatusBadRequest {
-			t.Fatalf("expected 400, got %d", rr.Code)
-		}
-		if uc.createProductImagesCalled {
-			t.Fatalf("usecase should not be called when payload is too large")
-		}
-	})
-
-	t.Run("有効な画像ファイルを渡したとき画像追加に成功する", func(t *testing.T) {
-		uc := &stubProductUC{}
-		h := NewProductHandler(uc)
-
-		req := newProductImageUploadRequest(t, "valid.png", []byte{0x89, 'P', 'N', 'G', '\r', '\n', 0x1a, '\n'})
-		rr := httptest.NewRecorder()
-
-		h.CreateImage(rr, req)
+		h.ListByCategory(rr, req)
 
 		if rr.Code != http.StatusOK {
 			t.Fatalf("expected 200, got %d", rr.Code)
 		}
-		if !uc.createProductImagesCalled {
+		if !uc.listByCategoryCalled {
 			t.Fatalf("usecase should be called")
 		}
-		if uc.createProductImagesReq.productUUID != "product-uuid" {
-			t.Fatalf("unexpected product uuid: %s", uc.createProductImagesReq.productUUID)
+		if uc.listByCategoryReq.mode != "active" || uc.listByCategoryReq.category != "all" || uc.listByCategoryReq.target != "all" {
+			t.Fatalf("unexpected query args: %+v", uc.listByCategoryReq)
 		}
-		if len(uc.createProductImagesReq.files) != 1 {
-			t.Fatalf("expected 1 file, got %d", len(uc.createProductImagesReq.files))
+
+		var res []map[string]any
+		if err := json.NewDecoder(rr.Body).Decode(&res); err != nil {
+			t.Fatalf("unexpected decode error: %v", err)
 		}
-		if uc.createProductImagesReq.files[0].Name != "valid.png" {
-			t.Fatalf("unexpected file name: %s", uc.createProductImagesReq.files[0].Name)
+		if len(res) != 1 {
+			t.Fatalf("expected 1 category, got %d", len(res))
 		}
-		if len(uc.createProductImagesReq.files[0].Data) == 0 {
-			t.Fatalf("expected non-empty file bytes")
+		category, ok := res[0]["category"].(map[string]any)
+		if !ok {
+			t.Fatalf("expected category object")
+		}
+		if category["uuid"] != "category-uuid" {
+			t.Fatalf("unexpected category uuid: %v", category["uuid"])
 		}
 	})
-}
-
-func newProductImageUploadRequest(t *testing.T, fileName string, fileData []byte) *http.Request {
-	t.Helper()
-
-	var body bytes.Buffer
-	writer := multipart.NewWriter(&body)
-	part, err := writer.CreateFormFile("file0", fileName)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if _, err := io.Copy(part, bytes.NewReader(fileData)); err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if err := writer.Close(); err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-
-	req := httptest.NewRequest(http.MethodPost, "/api/product/product-uuid/product_image", &body)
-	req.Header.Set("Content-Type", writer.FormDataContentType())
-	req = mux.SetURLVars(req, map[string]string{"product_uuid": "product-uuid"})
-	return req
 }

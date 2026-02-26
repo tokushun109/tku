@@ -19,6 +19,7 @@ func NewRouter(
 	creatorHandler *handler.CreatorHandler,
 	contactHandler *handler.ContactHandler,
 	productHandler *handler.ProductHandler,
+	productImageHandler *handler.ProductImageHandler,
 	userHandler *handler.UserHandler,
 	auth *middleware.AuthMiddleware,
 	admin *middleware.AdminMiddleware,
@@ -77,6 +78,7 @@ func NewRouter(
 	r.HandleFunc("/api/creator/logo/{logo_file}/blob", creatorHandler.GetLogoBlob).Methods(http.MethodGet)
 
 	// product
+	r.HandleFunc("/api/category/product", productHandler.ListByCategory).Methods(http.MethodGet)
 	// TODO: requireAdminを一覧につけるようにする(フロントエンドの対応も必要)
 	r.HandleFunc("/api/product", productHandler.List).Methods(http.MethodGet)
 	r.HandleFunc("/api/product/{product_uuid}", productHandler.Get).Methods(http.MethodGet)
@@ -85,9 +87,9 @@ func NewRouter(
 	r.Handle("/api/product/{product_uuid}", requireAdmin(productHandler.Delete)).Methods(http.MethodDelete)
 
 	// product image
-	r.HandleFunc("/api/product_image/{product_image_uuid}/blob", productHandler.GetImageBlob).Methods(http.MethodGet)
-	r.Handle("/api/product/{product_uuid}/product_image", requireAdmin(productHandler.CreateImage)).Methods(http.MethodPost)
-	r.Handle("/api/product/{product_uuid}/product_image/{product_image_uuid}", requireAdmin(productHandler.DeleteImage)).Methods(http.MethodDelete)
+	r.HandleFunc("/api/product_image/{product_image_uuid}/blob", productImageHandler.GetBlob).Methods(http.MethodGet)
+	r.Handle("/api/product/{product_uuid}/product_image", requireAdmin(productImageHandler.Create)).Methods(http.MethodPost)
+	r.Handle("/api/product/{product_uuid}/product_image/{product_image_uuid}", requireAdmin(productImageHandler.Delete)).Methods(http.MethodDelete)
 
 	// contact
 	r.Handle("/api/contact", requireAdmin(contactHandler.List)).Methods(http.MethodGet)

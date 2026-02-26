@@ -59,6 +59,7 @@ func BuildServer() (*config.Config, http.Handler, error) {
 		handlers.creator,
 		handlers.contact,
 		handlers.product,
+		handlers.productImage,
 		handlers.user,
 		middlewares.auth,
 		middlewares.admin,
