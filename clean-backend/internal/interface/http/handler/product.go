@@ -47,6 +47,23 @@ func (h *ProductHandler) List(w http.ResponseWriter, r *http.Request) {
 	response.WriteJSON(w, http.StatusOK, res)
 }
 
+func (h *ProductHandler) ListByCategory(w http.ResponseWriter, r *http.Request) {
+	q, err := request.ParseListCategoryProductQuery(r)
+	if err != nil {
+		response.WriteAppError(w, usecase.NewAppError(usecase.ErrInvalidInput))
+		return
+	}
+
+	categoryProducts, err := h.productUC.ListByCategory(r.Context(), q.Mode, q.Category, q.Target)
+	if err != nil {
+		response.WriteAppError(w, err)
+		return
+	}
+
+	res := presenter.ToCategoryProductsResponses(categoryProducts)
+	response.WriteJSON(w, http.StatusOK, res)
+}
+
 func (h *ProductHandler) Get(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	productUUID := vars["product_uuid"]

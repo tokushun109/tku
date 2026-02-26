@@ -51,6 +51,11 @@ type productSiteDetailRow struct {
 	SalesSiteName string `db:"sales_site_name"`
 }
 
+type categoryRow struct {
+	UUID string `db:"uuid"`
+	Name string `db:"name"`
+}
+
 func NewProductQueryReader(db *sqlx.DB) *ProductQueryReader {
 	return &ProductQueryReader{db: db}
 }
@@ -103,6 +108,57 @@ func (r *ProductQueryReader) ListProducts(ctx context.Context, q usecaseProductQ
 	}
 
 	return products, nil
+}
+
+func (r *ProductQueryReader) ListCategoryProducts(ctx context.Context, q usecaseProductQuery.ListCategoryProductsQuery) ([]*usecaseProductQuery.CategoryProducts, error) {
+	products, err := r.ListProducts(ctx, usecaseProductQuery.ListProductsQuery{
+		Mode:     q.Mode,
+		Category: q.Category,
+		Target:   q.Target,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if q.Category != "all" {
+		foundCategory, found, err := r.findCategoryByUUID(ctx, q.Category)
+		if err != nil {
+			return nil, err
+		}
+		if !found {
+			return nil, usecaseProductQuery.ErrCategoryNotFound
+		}
+
+		return []*usecaseProductQuery.CategoryProducts{
+			{
+				Category: foundCategory,
+				Products: products,
+			},
+		}, nil
+	}
+
+	categories, err := r.listUsedCategories(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if len(categories) == 0 {
+		return []*usecaseProductQuery.CategoryProducts{}, nil
+	}
+
+	productsByCategoryUUID := make(map[string][]*usecaseProductQuery.Product, len(categories))
+	for _, product := range products {
+		productsByCategoryUUID[product.Category.UUID] = append(productsByCategoryUUID[product.Category.UUID], product)
+	}
+
+	result := make([]*usecaseProductQuery.CategoryProducts, 0, len(categories))
+	for _, category := range categories {
+		result = append(result, &usecaseProductQuery.CategoryProducts{
+			Category: category,
+			Products: productsByCategoryUUID[category.UUID],
+		})
+	}
+
+	return result, nil
 }
 
 func (r *ProductQueryReader) GetProductByUUID(ctx context.Context, productUUID string) (*usecaseProductQuery.Product, error) {
@@ -308,4 +364,48 @@ func (r *ProductQueryReader) loadSiteDetails(ctx context.Context, productIDs []u
 		})
 	}
 	return result, nil
+}
+
+func (r *ProductQueryReader) listUsedCategories(ctx context.Context) ([]usecaseProductQuery.Classification, error) {
+	rows := []categoryRow{}
+	query := `
+		SELECT DISTINCT c.uuid, c.name
+		FROM category c
+		INNER JOIN product p ON p.category_id = c.id AND p.deleted_at IS NULL
+		WHERE c.deleted_at IS NULL
+		ORDER BY c.id ASC
+	`
+	if err := r.db.SelectContext(ctx, &rows, query); err != nil {
+		return nil, err
+	}
+
+	categories := make([]usecaseProductQuery.Classification, 0, len(rows))
+	for _, row := range rows {
+		categories = append(categories, usecaseProductQuery.Classification{
+			UUID: row.UUID,
+			Name: row.Name,
+		})
+	}
+
+	return categories, nil
+}
+
+func (r *ProductQueryReader) findCategoryByUUID(ctx context.Context, categoryUUID string) (usecaseProductQuery.Classification, bool, error) {
+	row := categoryRow{}
+	if err := r.db.GetContext(
+		ctx,
+		&row,
+		`SELECT c.uuid, c.name FROM category c WHERE c.uuid = ? AND c.deleted_at IS NULL LIMIT 1`,
+		categoryUUID,
+	); err != nil {
+		if err == sql.ErrNoRows {
+			return usecaseProductQuery.Classification{}, false, nil
+		}
+		return usecaseProductQuery.Classification{}, false, err
+	}
+
+	return usecaseProductQuery.Classification{
+		UUID: row.UUID,
+		Name: row.Name,
+	}, true, nil
 }

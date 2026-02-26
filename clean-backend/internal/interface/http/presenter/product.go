@@ -65,3 +65,28 @@ func ToProductResponses(products []*usecaseProductQuery.Product) []*response.Pro
 	}
 	return result
 }
+
+func ToCategoryProductsResponse(categoryProducts *usecaseProductQuery.CategoryProducts) *response.CategoryProductsResponse {
+	if categoryProducts == nil {
+		return &response.CategoryProductsResponse{
+			Category: response.ProductClassificationResponse{},
+			Products: []*response.ProductResponse{},
+		}
+	}
+
+	return &response.CategoryProductsResponse{
+		Category: response.ProductClassificationResponse{
+			UUID: categoryProducts.Category.UUID,
+			Name: categoryProducts.Category.Name,
+		},
+		Products: ToProductResponses(categoryProducts.Products),
+	}
+}
+
+func ToCategoryProductsResponses(categoryProductsList []*usecaseProductQuery.CategoryProducts) []*response.CategoryProductsResponse {
+	result := make([]*response.CategoryProductsResponse, 0, len(categoryProductsList))
+	for _, categoryProducts := range categoryProductsList {
+		result = append(result, ToCategoryProductsResponse(categoryProducts))
+	}
+	return result
+}

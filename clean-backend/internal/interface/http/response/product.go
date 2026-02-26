@@ -36,3 +36,8 @@ type ProductResponse struct {
 	ProductImages []ProductImageResponse          `json:"productImages"`
 	SiteDetails   []ProductSiteDetailResponse     `json:"siteDetails"`
 }
+
+type CategoryProductsResponse struct {
+	Category ProductClassificationResponse `json:"category"`
+	Products []*ProductResponse            `json:"products"`
+}

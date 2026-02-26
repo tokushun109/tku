@@ -39,3 +39,8 @@ type Product struct {
 	ProductImages []ProductImage
 	SiteDetails   []SiteDetail
 }
+
+type CategoryProducts struct {
+	Category Classification
+	Products []*Product
+}

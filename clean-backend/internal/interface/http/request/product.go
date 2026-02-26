@@ -64,6 +64,12 @@ type ListProductQuery struct {
 	Target   string
 }
 
+type ListCategoryProductQuery struct {
+	Mode     string
+	Category string
+	Target   string
+}
+
 func ParseListProductQuery(r *http.Request) (ListProductQuery, error) {
 	q := r.URL.Query()
 	mode := strings.TrimSpace(q.Get("mode"))
@@ -78,5 +84,22 @@ func ParseListProductQuery(r *http.Request) (ListProductQuery, error) {
 		return ListProductQuery{Mode: mode, Category: category, Target: target}, nil
 	default:
 		return ListProductQuery{}, errors.New("invalid mode")
+	}
+}
+
+func ParseListCategoryProductQuery(r *http.Request) (ListCategoryProductQuery, error) {
+	q := r.URL.Query()
+	mode := strings.TrimSpace(q.Get("mode"))
+	category := strings.TrimSpace(q.Get("category"))
+	target := strings.TrimSpace(q.Get("target"))
+
+	switch mode {
+	case usecaseProduct.ListModeAll, usecaseProduct.ListModeActive:
+		if category == "" || target == "" {
+			return ListCategoryProductQuery{}, errors.New("invalid query")
+		}
+		return ListCategoryProductQuery{Mode: mode, Category: category, Target: target}, nil
+	default:
+		return ListCategoryProductQuery{}, errors.New("invalid mode")
 	}
 }
