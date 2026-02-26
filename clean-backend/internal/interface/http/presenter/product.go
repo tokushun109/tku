@@ -90,3 +90,24 @@ func ToCategoryProductsResponses(categoryProductsList []*usecaseProductQuery.Cat
 	}
 	return result
 }
+
+func ToCarouselItemResponse(item *usecaseProductQuery.CarouselItem) *response.CarouselItemResponse {
+	if item == nil {
+		return &response.CarouselItemResponse{
+			Product: &response.ProductResponse{},
+		}
+	}
+
+	return &response.CarouselItemResponse{
+		Product: ToProductResponse(item.Product),
+		APIPath: item.APIPath,
+	}
+}
+
+func ToCarouselItemResponses(items []*usecaseProductQuery.CarouselItem) []*response.CarouselItemResponse {
+	result := make([]*response.CarouselItemResponse, 0, len(items))
+	for _, item := range items {
+		result = append(result, ToCarouselItemResponse(item))
+	}
+	return result
+}

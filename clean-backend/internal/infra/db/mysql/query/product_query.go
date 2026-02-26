@@ -161,6 +161,49 @@ func (r *ProductQueryReader) ListCategoryProducts(ctx context.Context, q usecase
 	return result, nil
 }
 
+func (r *ProductQueryReader) ListCarouselItems(ctx context.Context, q usecaseProductQuery.ListCarouselQuery) ([]*usecaseProductQuery.CarouselItem, error) {
+	if q.Limit <= 0 {
+		return []*usecaseProductQuery.CarouselItem{}, nil
+	}
+
+	recommendedRows, err := r.listCarouselBaseRows(ctx, q.Limit, true, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	baseRows := recommendedRows
+	if len(baseRows) < q.Limit {
+		remain := q.Limit - len(baseRows)
+
+		excludeProductIDs := make([]uint, 0, len(baseRows))
+		for _, row := range baseRows {
+			excludeProductIDs = append(excludeProductIDs, row.ID)
+		}
+
+		newRows, err := r.listCarouselBaseRows(ctx, remain, false, excludeProductIDs)
+		if err != nil {
+			return nil, err
+		}
+		baseRows = append(baseRows, newRows...)
+	}
+
+	products := buildProductsFromRows(baseRows)
+	if len(products) == 0 {
+		return []*usecaseProductQuery.CarouselItem{}, nil
+	}
+
+	if err := r.fillChildren(ctx, products); err != nil {
+		return nil, err
+	}
+
+	items := make([]*usecaseProductQuery.CarouselItem, 0, len(products))
+	for _, product := range products {
+		items = append(items, &usecaseProductQuery.CarouselItem{Product: product})
+	}
+
+	return items, nil
+}
+
 func (r *ProductQueryReader) GetProductByUUID(ctx context.Context, productUUID string) (*usecaseProductQuery.Product, error) {
 	row := productBaseRow{}
 	err := r.db.GetContext(
@@ -409,4 +452,66 @@ func (r *ProductQueryReader) findCategoryByUUID(ctx context.Context, categoryUUI
 		UUID: row.UUID,
 		Name: row.Name,
 	}, true, nil
+}
+
+func (r *ProductQueryReader) listCarouselBaseRows(
+	ctx context.Context,
+	limit int,
+	recommendOnly bool,
+	excludeProductIDs []uint,
+) ([]productBaseRow, error) {
+	if limit <= 0 {
+		return []productBaseRow{}, nil
+	}
+
+	query := `
+		SELECT
+			p.id,
+			p.uuid,
+			p.name,
+			p.description,
+			p.price,
+			p.is_active,
+			p.is_recommend,
+			c.uuid AS category_uuid,
+			c.name AS category_name,
+			t.uuid AS target_uuid,
+			t.name AS target_name
+		FROM product p
+		LEFT JOIN category c ON c.id = p.category_id AND c.deleted_at IS NULL
+		LEFT JOIN target t ON t.id = p.target_id AND t.deleted_at IS NULL
+		WHERE p.deleted_at IS NULL
+		  AND p.is_active = 1
+		  AND EXISTS (
+		      SELECT 1
+		      FROM product_image pi
+		      WHERE pi.product_id = p.id AND pi.deleted_at IS NULL
+		  )
+	`
+
+	args := make([]any, 0, 2)
+	if recommendOnly {
+		query += ` AND p.is_recommend = 1`
+	}
+	if len(excludeProductIDs) > 0 {
+		query += ` AND p.id NOT IN (?)`
+		args = append(args, excludeProductIDs)
+	}
+	query += ` ORDER BY p.created_at DESC, p.id DESC LIMIT ?`
+	args = append(args, limit)
+
+	if len(excludeProductIDs) > 0 {
+		var err error
+		query, args, err = sqlx.In(query, args...)
+		if err != nil {
+			return nil, err
+		}
+	}
+	query = r.db.Rebind(query)
+
+	rows := []productBaseRow{}
+	if err := r.db.SelectContext(ctx, &rows, query, args...); err != nil {
+		return nil, err
+	}
+	return rows, nil
 }

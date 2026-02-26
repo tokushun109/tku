@@ -44,3 +44,8 @@ type CategoryProducts struct {
 	Category Classification
 	Products []*Product
 }
+
+type CarouselItem struct {
+	Product *Product
+	APIPath string
+}

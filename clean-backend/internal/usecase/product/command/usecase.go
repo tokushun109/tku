@@ -1,13 +1,10 @@
-package product
+package command
 
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
-	"strings"
-	"time"
 
 	domainCategory "github.com/tokushun109/tku/clean-backend/internal/domain/category"
 	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
@@ -17,25 +14,15 @@ import (
 	domainTag "github.com/tokushun109/tku/clean-backend/internal/domain/tag"
 	domainTarget "github.com/tokushun109/tku/clean-backend/internal/domain/target"
 	"github.com/tokushun109/tku/clean-backend/internal/usecase"
-	usecaseProductQuery "github.com/tokushun109/tku/clean-backend/internal/usecase/product/query"
-)
-
-const (
-	ListModeAll    = "all"
-	ListModeActive = "active"
-
-	defaultProductImagePresignTTL = 30 * time.Minute
+	usecaseProduct "github.com/tokushun109/tku/clean-backend/internal/usecase/product"
 )
 
 type Usecase interface {
-	List(ctx context.Context, mode string, category string, target string) ([]*usecaseProductQuery.Product, error)
-	ListByCategory(ctx context.Context, mode string, category string, target string) ([]*usecaseProductQuery.CategoryProducts, error)
-	Get(ctx context.Context, productUUID string) (*usecaseProductQuery.Product, error)
-	Create(ctx context.Context, input CreateProductInput) (*usecaseProductQuery.Product, error)
-	Update(ctx context.Context, productUUID string, input UpdateProductInput) error
+	Create(ctx context.Context, input usecaseProduct.CreateProductInput) (primitive.UUID, error)
+	Update(ctx context.Context, productUUID string, input usecaseProduct.UpdateProductInput) error
 	Delete(ctx context.Context, productUUID string) error
-	GetProductImageBlob(ctx context.Context, productImageUUID string) (*ProductImageBlob, error)
-	CreateProductImages(ctx context.Context, productUUID string, files []ProductImageUploadFile, isChanged bool, orderMap map[int]int) error
+	GetProductImageBlob(ctx context.Context, productImageUUID string) (*usecaseProduct.ProductImageBlob, error)
+	CreateProductImages(ctx context.Context, productUUID string, files []usecaseProduct.ProductImageUploadFile, isChanged bool, orderMap map[int]int) error
 	DeleteProductImage(ctx context.Context, productUUID string, productImageUUID string) error
 }
 
@@ -47,7 +34,6 @@ type Service struct {
 	targetRepo       domainTarget.Repository
 	tagRepo          domainTag.Repository
 	salesSiteRepo    domainSalesSite.Repository
-	queryReader      usecaseProductQuery.Reader
 	storage          usecase.Storage
 	uuidGen          usecase.UUIDGenerator
 	txManager        usecase.TxManager
@@ -63,7 +49,6 @@ func New(
 	targetRepo domainTarget.Repository,
 	tagRepo domainTag.Repository,
 	salesSiteRepo domainSalesSite.Repository,
-	queryReader usecaseProductQuery.Reader,
 	storage usecase.Storage,
 	uuidGen usecase.UUIDGenerator,
 	txManager usecase.TxManager,
@@ -76,94 +61,20 @@ func New(
 		targetRepo:       targetRepo,
 		tagRepo:          tagRepo,
 		salesSiteRepo:    salesSiteRepo,
-		queryReader:      queryReader,
 		storage:          storage,
 		uuidGen:          uuidGen,
 		txManager:        txManager,
 	}
 }
 
-func (s *Service) List(ctx context.Context, mode string, category string, target string) ([]*usecaseProductQuery.Product, error) {
-	if !isValidListMode(mode) || strings.TrimSpace(category) == "" || strings.TrimSpace(target) == "" {
-		return nil, usecase.NewAppError(usecase.ErrInvalidInput)
-	}
-
-	products, err := s.queryReader.ListProducts(ctx, usecaseProductQuery.ListProductsQuery{
-		Mode:     mode,
-		Category: category,
-		Target:   target,
-	})
-	if err != nil {
-		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
-	}
-
-	if err := s.attachPresignedImageURLs(ctx, products); err != nil {
-		return nil, err
-	}
-
-	return products, nil
-}
-
-func (s *Service) ListByCategory(ctx context.Context, mode string, category string, target string) ([]*usecaseProductQuery.CategoryProducts, error) {
-	trimmedCategory := strings.TrimSpace(category)
-	trimmedTarget := strings.TrimSpace(target)
-
-	if !isValidListMode(mode) || trimmedCategory == "" || trimmedTarget == "" {
-		return nil, usecase.NewAppError(usecase.ErrInvalidInput)
-	}
-
-	categoryProducts, err := s.queryReader.ListCategoryProducts(ctx, usecaseProductQuery.ListCategoryProductsQuery{
-		Mode:     mode,
-		Category: trimmedCategory,
-		Target:   trimmedTarget,
-	})
-	if err != nil {
-		if errors.Is(err, usecaseProductQuery.ErrCategoryNotFound) {
-			return nil, usecase.NewAppError(usecase.ErrNotFound)
-		}
-		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
-	}
-
-	for _, group := range categoryProducts {
-		if group == nil {
-			continue
-		}
-		if err := s.attachPresignedImageURLs(ctx, group.Products); err != nil {
-			return nil, err
-		}
-	}
-
-	return categoryProducts, nil
-}
-
-func (s *Service) Get(ctx context.Context, productUUID string) (*usecaseProductQuery.Product, error) {
-	if _, err := primitive.NewUUID(productUUID); err != nil {
-		return nil, usecase.NewAppError(usecase.ErrInvalidInput)
-	}
-
-	product, err := s.queryReader.GetProductByUUID(ctx, productUUID)
-	if err != nil {
-		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
-	}
-	if product == nil {
-		return nil, usecase.NewAppError(usecase.ErrNotFound)
-	}
-
-	if err := s.attachPresignedImageURLs(ctx, []*usecaseProductQuery.Product{product}); err != nil {
-		return nil, err
-	}
-
-	return product, nil
-}
-
-func (s *Service) Create(ctx context.Context, input CreateProductInput) (*usecaseProductQuery.Product, error) {
+func (s *Service) Create(ctx context.Context, input usecaseProduct.CreateProductInput) (primitive.UUID, error) {
 	categoryID, err := s.resolveCategoryID(ctx, input.CategoryUUID)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	targetID, err := s.resolveTargetID(ctx, input.TargetUUID)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	newUUID := s.uuidGen.New()
@@ -179,14 +90,14 @@ func (s *Service) Create(ctx context.Context, input CreateProductInput) (*usecas
 	)
 	if err != nil {
 		if isInvalidProductInputError(err) {
-			return nil, usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error())
+			return "", usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error())
 		}
-		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
+		return "", usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 
 	tagIDs, err := s.resolveTagIDs(ctx, input.TagUUIDs)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	if err := s.txManager.WithinTransaction(ctx, func(txCtx context.Context) error {
@@ -209,27 +120,15 @@ func (s *Service) Create(ctx context.Context, input CreateProductInput) (*usecas
 		return nil
 	}); err != nil {
 		if errors.Is(err, usecase.ErrInvalidInput) || isInvalidProductInputError(err) {
-			return nil, usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error())
+			return "", usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error())
 		}
-		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
+		return "", usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 
-	product, err := s.queryReader.GetProductByUUID(ctx, newUUID)
-	if err != nil {
-		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
-	}
-	if product == nil {
-		return nil, usecase.NewAppError(usecase.ErrNotFound)
-	}
-
-	if err := s.attachPresignedImageURLs(ctx, []*usecaseProductQuery.Product{product}); err != nil {
-		return nil, err
-	}
-
-	return product, nil
+	return newProduct.UUID(), nil
 }
 
-func (s *Service) Update(ctx context.Context, productUUID string, input UpdateProductInput) error {
+func (s *Service) Update(ctx context.Context, productUUID string, input usecaseProduct.UpdateProductInput) error {
 	uuid, err := primitive.NewUUID(productUUID)
 	if err != nil {
 		return usecase.NewAppError(usecase.ErrInvalidInput)
@@ -425,7 +324,7 @@ func (s *Service) Delete(ctx context.Context, productUUID string) error {
 	return nil
 }
 
-func (s *Service) GetProductImageBlob(ctx context.Context, productImageUUID string) (*ProductImageBlob, error) {
+func (s *Service) GetProductImageBlob(ctx context.Context, productImageUUID string) (*usecaseProduct.ProductImageBlob, error) {
 	uuid, err := primitive.NewUUID(productImageUUID)
 	if err != nil {
 		return nil, usecase.NewAppError(usecase.ErrInvalidInput)
@@ -447,13 +346,13 @@ func (s *Service) GetProductImageBlob(ctx context.Context, productImageUUID stri
 		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 
-	return &ProductImageBlob{
+	return &usecaseProduct.ProductImageBlob{
 		ContentType: image.MimeType().Value(),
 		Body:        body,
 	}, nil
 }
 
-func (s *Service) CreateProductImages(ctx context.Context, productUUID string, files []ProductImageUploadFile, isChanged bool, orderMap map[int]int) error {
+func (s *Service) CreateProductImages(ctx context.Context, productUUID string, files []usecaseProduct.ProductImageUploadFile, isChanged bool, orderMap map[int]int) error {
 	uuid, err := primitive.NewUUID(productUUID)
 	if err != nil {
 		return usecase.NewAppError(usecase.ErrInvalidInput)
@@ -577,176 +476,4 @@ func (s *Service) DeleteProductImage(ctx context.Context, productUUID string, pr
 	}
 
 	return nil
-}
-
-func (s *Service) resolveCategoryID(ctx context.Context, rawUUID string) (*uint, error) {
-	trimmed := strings.TrimSpace(rawUUID)
-	if trimmed == "" {
-		return nil, nil
-	}
-
-	uuid, err := primitive.NewUUID(trimmed)
-	if err != nil {
-		return nil, usecase.NewAppError(usecase.ErrInvalidInput)
-	}
-
-	category, err := s.categoryRepo.FindByUUID(ctx, uuid)
-	if err != nil {
-		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
-	}
-	if category == nil {
-		return nil, usecase.NewAppError(usecase.ErrInvalidInput)
-	}
-
-	id := category.ID().Value()
-	return &id, nil
-}
-
-func (s *Service) resolveTargetID(ctx context.Context, rawUUID string) (*uint, error) {
-	trimmed := strings.TrimSpace(rawUUID)
-	if trimmed == "" {
-		return nil, nil
-	}
-
-	uuid, err := primitive.NewUUID(trimmed)
-	if err != nil {
-		return nil, usecase.NewAppError(usecase.ErrInvalidInput)
-	}
-
-	target, err := s.targetRepo.FindByUUID(ctx, uuid)
-	if err != nil {
-		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
-	}
-	if target == nil {
-		return nil, usecase.NewAppError(usecase.ErrInvalidInput)
-	}
-
-	id := target.ID().Value()
-	return &id, nil
-}
-
-func (s *Service) resolveTagIDs(ctx context.Context, rawUUIDs []string) ([]primitive.ID, error) {
-	if len(rawUUIDs) == 0 {
-		return []primitive.ID{}, nil
-	}
-
-	seen := map[primitive.ID]struct{}{}
-	tagIDs := make([]primitive.ID, 0, len(rawUUIDs))
-	for _, rawUUID := range rawUUIDs {
-		uuid, err := primitive.NewUUID(strings.TrimSpace(rawUUID))
-		if err != nil {
-			return nil, usecase.NewAppError(usecase.ErrInvalidInput)
-		}
-
-		tag, err := s.tagRepo.FindByUUID(ctx, uuid)
-		if err != nil {
-			return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
-		}
-		if tag == nil {
-			return nil, usecase.NewAppError(usecase.ErrInvalidInput)
-		}
-		tagID := tag.ID()
-		if _, exists := seen[tagID]; exists {
-			continue
-		}
-		seen[tagID] = struct{}{}
-		tagIDs = append(tagIDs, tagID)
-	}
-	return tagIDs, nil
-}
-
-func (s *Service) buildSiteDetails(ctx context.Context, productID primitive.ID, inputs []SiteDetailInput) ([]*domainSiteDetail.SiteDetail, error) {
-	details := make([]*domainSiteDetail.SiteDetail, 0, len(inputs))
-	for _, input := range inputs {
-		salesSiteUUID := strings.TrimSpace(input.SalesSiteUUID)
-		if salesSiteUUID == "" {
-			return nil, usecase.ErrInvalidInput
-		}
-		uuid, err := primitive.NewUUID(salesSiteUUID)
-		if err != nil {
-			return nil, usecase.ErrInvalidInput
-		}
-
-		salesSite, err := s.salesSiteRepo.FindByUUID(ctx, uuid)
-		if err != nil {
-			return nil, err
-		}
-		if salesSite == nil {
-			return nil, usecase.ErrInvalidInput
-		}
-
-		siteDetail, err := domainSiteDetail.New(
-			s.uuidGen.New(),
-			input.DetailURL,
-			productID.Value(),
-			salesSite.ID().Value(),
-		)
-		if err != nil {
-			return nil, err
-		}
-		details = append(details, siteDetail)
-	}
-	return details, nil
-}
-
-func (s *Service) attachPresignedImageURLs(ctx context.Context, products []*usecaseProductQuery.Product) error {
-	for _, product := range products {
-		for i := range product.ProductImages {
-			if strings.TrimSpace(product.ProductImages[i].Path) == "" {
-				continue
-			}
-			url, err := s.storage.PresignGet(ctx, product.ProductImages[i].Path, defaultProductImagePresignTTL)
-			if err != nil {
-				return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
-			}
-			product.ProductImages[i].APIPath = url
-		}
-	}
-	return nil
-}
-
-func isValidListMode(mode string) bool {
-	switch mode {
-	case ListModeAll, ListModeActive:
-		return true
-	default:
-		return false
-	}
-}
-
-func buildProductImagePath(uuidStr string, mimeType domainProduct.ProductImageMimeType) (domainProduct.ProductImagePath, error) {
-	if len(uuidStr) < 2 {
-		return "", fmt.Errorf("invalid uuid length: %d", len(uuidStr))
-	}
-
-	rawPath := fmt.Sprintf(
-		"img/product/%s/%s/%s%s",
-		uuidStr[0:1],
-		uuidStr[1:2],
-		uuidStr,
-		mimeType.Extension(),
-	)
-
-	return domainProduct.NewProductImagePath(rawPath)
-}
-
-func isInvalidProductInputError(err error) bool {
-	if err == nil {
-		return false
-	}
-
-	return errors.Is(err, primitive.ErrInvalidUUID) ||
-		errors.Is(err, primitive.ErrInvalidURL) ||
-		errors.Is(err, domainProduct.ErrInvalidName) ||
-		errors.Is(err, domainProduct.ErrInvalidPrice) ||
-		errors.Is(err, domainProduct.ErrInvalidCategoryID) ||
-		errors.Is(err, domainProduct.ErrInvalidTargetID) ||
-		errors.Is(err, domainProduct.ErrInvalidImageName) ||
-		errors.Is(err, domainProduct.ErrInvalidImageMimeType) ||
-		errors.Is(err, domainProduct.ErrInvalidImagePath) ||
-		errors.Is(err, domainProduct.ErrInvalidImageOrder) ||
-		errors.Is(err, domainProduct.ErrInvalidImageProductID) ||
-		errors.Is(err, domainSiteDetail.ErrInvalidDetailURL) ||
-		errors.Is(err, domainSiteDetail.ErrInvalidProductID) ||
-		errors.Is(err, domainSiteDetail.ErrInvalidSalesSiteID)
 }

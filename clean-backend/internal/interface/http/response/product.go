@@ -37,7 +37,16 @@ type ProductResponse struct {
 	SiteDetails   []ProductSiteDetailResponse     `json:"siteDetails"`
 }
 
+type CreateProductResponse struct {
+	UUID string `json:"uuid"`
+}
+
 type CategoryProductsResponse struct {
 	Category ProductClassificationResponse `json:"category"`
 	Products []*ProductResponse            `json:"products"`
+}
+
+type CarouselItemResponse struct {
+	Product *ProductResponse `json:"product"`
+	APIPath string           `json:"apiPath"`
 }
