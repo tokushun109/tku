@@ -46,6 +46,13 @@ func (s *stubRepo) FindAll(ctx context.Context) ([]*domain.SalesSite, error) {
 	return s.findAll, nil
 }
 
+func (s *stubRepo) FindByName(ctx context.Context, name domain.SalesSiteName) (*domain.SalesSite, error) {
+	if s.findByErr != nil {
+		return nil, s.findByErr
+	}
+	return s.findByUUID, nil
+}
+
 func (s *stubRepo) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domain.SalesSite, error) {
 	if s.findByErr != nil {
 		return nil, s.findByErr

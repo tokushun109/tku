@@ -142,6 +142,21 @@ func (h *ProductHandler) Create(w http.ResponseWriter, r *http.Request) {
 	response.WriteJSON(w, http.StatusOK, res)
 }
 
+func (h *ProductHandler) Duplicate(w http.ResponseWriter, r *http.Request) {
+	var req request.DuplicateProductRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		response.WriteAppError(w, usecase.NewAppError(usecase.ErrInvalidInput))
+		return
+	}
+
+	if err := h.productUC.Duplicate(r.Context(), req.URL); err != nil {
+		response.WriteAppError(w, err)
+		return
+	}
+
+	response.WriteSuccess(w)
+}
+
 func (h *ProductHandler) Update(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	productUUID := vars["product_uuid"]

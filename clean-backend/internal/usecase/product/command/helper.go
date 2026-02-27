@@ -4,12 +4,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/url"
 	"strings"
 
 	domainCategory "github.com/tokushun109/tku/clean-backend/internal/domain/category"
 	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
 	domainProduct "github.com/tokushun109/tku/clean-backend/internal/domain/product"
+	domainSalesSite "github.com/tokushun109/tku/clean-backend/internal/domain/sales_site"
 	domainSiteDetail "github.com/tokushun109/tku/clean-backend/internal/domain/site_detail"
+	domainTag "github.com/tokushun109/tku/clean-backend/internal/domain/tag"
 	domainTarget "github.com/tokushun109/tku/clean-backend/internal/domain/target"
 	"github.com/tokushun109/tku/clean-backend/internal/usecase"
 	usecaseProduct "github.com/tokushun109/tku/clean-backend/internal/usecase/product"
@@ -88,6 +91,53 @@ func (s *Service) resolveTagIDs(ctx context.Context, rawUUIDs []string) ([]primi
 		seen[tagID] = struct{}{}
 		tagIDs = append(tagIDs, tagID)
 	}
+	return tagIDs, nil
+}
+
+func (s *Service) resolveOrCreateTagIDsByNames(ctx context.Context, rawNames []string) ([]primitive.ID, error) {
+	if len(rawNames) == 0 {
+		return []primitive.ID{}, nil
+	}
+
+	seen := map[string]struct{}{}
+	tagIDs := make([]primitive.ID, 0, len(rawNames))
+	for _, rawName := range rawNames {
+		tagName, err := domainTag.NewTagName(rawName)
+		if err != nil {
+			return nil, err
+		}
+
+		key := strings.ToLower(tagName.Value())
+		if _, exists := seen[key]; exists {
+			continue
+		}
+		seen[key] = struct{}{}
+
+		tag, err := s.tagRepo.FindByName(ctx, tagName)
+		if err != nil {
+			return nil, err
+		}
+		if tag == nil {
+			newTag, err := domainTag.New(s.uuidGen.New(), tagName.Value())
+			if err != nil {
+				return nil, err
+			}
+			if err := s.tagRepo.Create(ctx, newTag); err != nil {
+				return nil, err
+			}
+
+			tag, err = s.tagRepo.FindByName(ctx, tagName)
+			if err != nil {
+				return nil, err
+			}
+			if tag == nil {
+				return nil, fmt.Errorf("created tag was not found: %s", tagName.Value())
+			}
+		}
+
+		tagIDs = append(tagIDs, tag.ID())
+	}
+
 	return tagIDs, nil
 }
 
@@ -218,6 +268,14 @@ func (s *Service) findOrCreateTargetByName(
 	return created, nil
 }
 
+func (s *Service) findSalesSiteByName(ctx context.Context, rawName string) (*domainSalesSite.SalesSite, error) {
+	name, err := domainSalesSite.NewSalesSiteName(rawName)
+	if err != nil {
+		return nil, err
+	}
+	return s.salesSiteRepo.FindByName(ctx, name)
+}
+
 func (s *Service) buildSiteDetails(ctx context.Context, productID primitive.ID, inputs []usecaseProduct.SiteDetailInput) ([]*domainSiteDetail.SiteDetail, error) {
 	details := make([]*domainSiteDetail.SiteDetail, 0, len(inputs))
 	for _, input := range inputs {
@@ -250,6 +308,24 @@ func (s *Service) buildSiteDetails(ctx context.Context, productID primitive.ID, 
 		details = append(details, siteDetail)
 	}
 	return details, nil
+}
+
+func normalizeDuplicateProductURL(rawURL string) (string, error) {
+	trimmed := strings.TrimSpace(rawURL)
+	parsedURL, err := primitive.NewURL(trimmed)
+	if err != nil {
+		return "", err
+	}
+
+	u, err := url.Parse(parsedURL.Value())
+	if err != nil {
+		return "", primitive.ErrInvalidURL
+	}
+	if !strings.Contains(strings.ToLower(u.Host), "creema") {
+		return "", usecase.ErrInvalidInput
+	}
+
+	return trimmed, nil
 }
 
 func buildProductImagePath(uuidStr string, mimeType domainProduct.ProductImageMimeType) (domainProduct.ProductImagePath, error) {

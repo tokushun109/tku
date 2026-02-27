@@ -30,9 +30,12 @@ type stubProductUC struct {
 	listCarouselRes    []*usecaseProductQuery.CarouselItem
 	listCarouselCalled bool
 
-	createErr    error
-	createRes    primitive.UUID
-	createCalled bool
+	createErr       error
+	createRes       primitive.UUID
+	createCalled    bool
+	duplicateErr    error
+	duplicateReq    string
+	duplicateCalled bool
 
 	exportCSVErr error
 	exportCSVRes []*usecaseProductQuery.ProductCSVRow
@@ -89,6 +92,12 @@ func (s *stubProductUC) Create(ctx context.Context, input usecaseProduct.CreateP
 		return "", s.createErr
 	}
 	return s.createRes, nil
+}
+
+func (s *stubProductUC) Duplicate(ctx context.Context, rawURL string) error {
+	s.duplicateCalled = true
+	s.duplicateReq = rawURL
+	return s.duplicateErr
 }
 
 func (s *stubProductUC) Update(ctx context.Context, productUUID string, input usecaseProduct.UpdateProductInput) error {

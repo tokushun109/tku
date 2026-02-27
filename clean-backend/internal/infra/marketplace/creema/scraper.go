@@ -1,0 +1,201 @@
+package creema
+
+import (
+	"bytes"
+	"context"
+	"fmt"
+	"io"
+	"net/http"
+	"net/url"
+	"path"
+	"strconv"
+	"strings"
+	"time"
+
+	"github.com/PuerkitoBio/goquery"
+	"github.com/saintfish/chardet"
+	"golang.org/x/net/html/charset"
+
+	usecaseProduct "github.com/tokushun109/tku/clean-backend/internal/usecase/product"
+)
+
+const defaultTimeout = 10 * time.Second
+
+type Scraper struct {
+	client *http.Client
+}
+
+var _ usecaseProduct.DuplicateSource = (*Scraper)(nil)
+
+func NewScraper() *Scraper {
+	return &Scraper{
+		client: &http.Client{Timeout: defaultTimeout},
+	}
+}
+
+func (s *Scraper) Duplicate(ctx context.Context, rawURL string) (*usecaseProduct.DuplicateProductData, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rawURL, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := s.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	document, err := newDocument(body)
+	if err != nil {
+		return nil, err
+	}
+
+	priceText := strings.TrimSpace(document.Find("#js-item-detail > aside > div.p-item-detail-info.p-item-detail-info--side > div > div:nth-child(1) > div.p-item-detail-info__item--price--row > span.p-item-detail-info__item--price--row--price").Text())
+	price, err := parsePrice(priceText)
+	if err != nil {
+		return nil, err
+	}
+
+	baseURL, err := url.Parse(rawURL)
+	if err != nil {
+		return nil, err
+	}
+
+	product := &usecaseProduct.DuplicateProductData{
+		Name:        strings.TrimSpace(document.Find("title").Text()),
+		Description: strings.TrimSpace(document.Find("#introduction > div > div").Text()),
+		Price:       price,
+		Tags:        extractTags(document),
+		Images:      make([]usecaseProduct.DuplicateProductImage, 0),
+	}
+
+	var imageErr error
+	document.Find("#js-item-detail-centerpiece > img").EachWithBreak(func(i int, selection *goquery.Selection) bool {
+		src, ok := selection.Attr("src")
+		if !ok {
+			return true
+		}
+
+		imageURL, err := resolveImageURL(baseURL, src)
+		if err != nil {
+			imageErr = err
+			return false
+		}
+
+		imageData, err := s.fetchImage(ctx, imageURL)
+		if err != nil {
+			imageErr = err
+			return false
+		}
+
+		product.Images = append(product.Images, usecaseProduct.DuplicateProductImage{
+			Name: buildImageName(imageURL, i),
+			Data: imageData,
+		})
+		return true
+	})
+	if imageErr != nil {
+		return nil, imageErr
+	}
+
+	return product, nil
+}
+
+func newDocument(body []byte) (*goquery.Document, error) {
+	reader, err := newDecodedReader(body)
+	if err != nil {
+		return nil, err
+	}
+	return goquery.NewDocumentFromReader(reader)
+}
+
+func newDecodedReader(body []byte) (io.Reader, error) {
+	detector := chardet.NewTextDetector()
+	detected, err := detector.DetectBest(body)
+	if err != nil {
+		return bytes.NewReader(body), nil
+	}
+
+	reader, err := charset.NewReaderLabel(detected.Charset, bytes.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+	return reader, nil
+}
+
+func parsePrice(price string) (int, error) {
+	replacer := strings.NewReplacer("￥", "", "¥", "", ",", "", " ", "", "\u00a0", "")
+	normalized := replacer.Replace(strings.TrimSpace(price))
+	if normalized == "" {
+		return 0, fmt.Errorf("price is empty")
+	}
+
+	value, err := strconv.Atoi(normalized)
+	if err != nil {
+		return 0, fmt.Errorf("parse price: %w", err)
+	}
+	return value, nil
+}
+
+func extractTags(document *goquery.Document) []string {
+	tags := make([]string, 0)
+	document.Find("#js-item-detail > aside > div:nth-child(5) > ul:nth-child(3) > li > a").Each(func(_ int, selection *goquery.Selection) {
+		tagName := strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(selection.Text()), "#"))
+		if tagName == "" {
+			return
+		}
+		tags = append(tags, tagName)
+	})
+	return tags
+}
+
+func resolveImageURL(baseURL *url.URL, rawURL string) (string, error) {
+	parsedURL, err := url.Parse(strings.TrimSpace(rawURL))
+	if err != nil {
+		return "", err
+	}
+	return baseURL.ResolveReference(parsedURL).String(), nil
+}
+
+func (s *Scraper) fetchImage(ctx context.Context, imageURL string) ([]byte, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, imageURL, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := s.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected image status code: %d", resp.StatusCode)
+	}
+
+	return io.ReadAll(resp.Body)
+}
+
+func buildImageName(imageURL string, index int) string {
+	parsedURL, err := url.Parse(imageURL)
+	if err == nil {
+		name := path.Base(parsedURL.Path)
+		if name != "" && name != "." && name != "/" {
+			return name
+		}
+	}
+	return fmt.Sprintf("image-%d", index)
+}

@@ -48,6 +48,13 @@ func (s *stubRepo) FindAll(ctx context.Context) ([]*domain.Tag, error) {
 	return s.findAll, nil
 }
 
+func (s *stubRepo) FindByName(ctx context.Context, name domain.TagName) (*domain.Tag, error) {
+	if s.findByErr != nil {
+		return nil, s.findByErr
+	}
+	return s.findByUUID, nil
+}
+
 func (s *stubRepo) ExistsByName(ctx context.Context, name domain.TagName) (bool, error) {
 	if s.existsErr != nil {
 		return false, s.existsErr

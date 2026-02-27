@@ -52,6 +52,24 @@ func (r *SalesSiteRepository) FindAll(ctx context.Context) ([]*domain.SalesSite,
 	return res, nil
 }
 
+func (r *SalesSiteRepository) FindByName(ctx context.Context, name domain.SalesSiteName) (*domain.SalesSite, error) {
+	type row struct {
+		ID   uint           `db:"id"`
+		UUID string         `db:"uuid"`
+		Name string         `db:"name"`
+		URL  string         `db:"url"`
+		Icon sql.NullString `db:"icon"`
+	}
+	var rrow row
+	if err := getExecutor(ctx, r.db).GetContext(ctx, &rrow, `SELECT id, uuid, name, url, icon FROM sales_site WHERE name = ? AND deleted_at IS NULL`, name.Value()); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return toDomainSalesSite(rrow.ID, rrow.UUID, rrow.Name, rrow.URL, rrow.Icon)
+}
+
 func (r *SalesSiteRepository) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domain.SalesSite, error) {
 	type row struct {
 		ID   uint           `db:"id"`

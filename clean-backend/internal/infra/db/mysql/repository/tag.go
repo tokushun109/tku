@@ -49,6 +49,22 @@ func (r *TagRepository) FindAll(ctx context.Context) ([]*domain.Tag, error) {
 	return res, nil
 }
 
+func (r *TagRepository) FindByName(ctx context.Context, name domain.TagName) (*domain.Tag, error) {
+	type row struct {
+		ID   uint   `db:"id"`
+		UUID string `db:"uuid"`
+		Name string `db:"name"`
+	}
+	var rrow row
+	if err := getExecutor(ctx, r.db).GetContext(ctx, &rrow, `SELECT id, uuid, name FROM tag WHERE name = ? AND deleted_at IS NULL`, name.Value()); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return toDomainTag(rrow.ID, rrow.UUID, rrow.Name)
+}
+
 func (r *TagRepository) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domain.Tag, error) {
 	type row struct {
 		ID   uint   `db:"id"`

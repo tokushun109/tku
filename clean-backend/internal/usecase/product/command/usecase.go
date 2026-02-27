@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	domainCategory "github.com/tokushun109/tku/clean-backend/internal/domain/category"
 	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
@@ -20,6 +21,7 @@ import (
 
 type Usecase interface {
 	Create(ctx context.Context, input usecaseProduct.CreateProductInput) (primitive.UUID, error)
+	Duplicate(ctx context.Context, rawURL string) error
 	Update(ctx context.Context, productUUID string, input usecaseProduct.UpdateProductInput) error
 	Delete(ctx context.Context, productUUID string) error
 	UploadCSV(ctx context.Context, rows []usecaseProduct.ProductCSVInputRow) error
@@ -36,6 +38,7 @@ type Service struct {
 	targetRepo       domainTarget.Repository
 	tagRepo          domainTag.Repository
 	salesSiteRepo    domainSalesSite.Repository
+	duplicateSource  usecaseProduct.DuplicateSource
 	storage          usecase.Storage
 	uuidGen          usecase.UUIDGenerator
 	txManager        usecase.TxManager
@@ -51,6 +54,7 @@ func New(
 	targetRepo domainTarget.Repository,
 	tagRepo domainTag.Repository,
 	salesSiteRepo domainSalesSite.Repository,
+	duplicateSource usecaseProduct.DuplicateSource,
 	storage usecase.Storage,
 	uuidGen usecase.UUIDGenerator,
 	txManager usecase.TxManager,
@@ -63,6 +67,7 @@ func New(
 		targetRepo:       targetRepo,
 		tagRepo:          tagRepo,
 		salesSiteRepo:    salesSiteRepo,
+		duplicateSource:  duplicateSource,
 		storage:          storage,
 		uuidGen:          uuidGen,
 		txManager:        txManager,
@@ -128,6 +133,135 @@ func (s *Service) Create(ctx context.Context, input usecaseProduct.CreateProduct
 	}
 
 	return newProduct.UUID(), nil
+}
+
+func (s *Service) Duplicate(ctx context.Context, rawURL string) error {
+	if s.duplicateSource == nil {
+		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, "duplicate source is nil")
+	}
+
+	duplicateURL, err := normalizeDuplicateProductURL(rawURL)
+	if err != nil {
+		if errors.Is(err, usecase.ErrInvalidInput) || errors.Is(err, primitive.ErrInvalidURL) {
+			return usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error())
+		}
+		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
+	}
+
+	duplicatedProduct, err := s.duplicateSource.Duplicate(ctx, duplicateURL)
+	if err != nil {
+		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
+	}
+	if duplicatedProduct == nil {
+		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, "duplicated product data is nil")
+	}
+
+	newProduct, err := domainProduct.New(
+		s.uuidGen.New(),
+		duplicatedProduct.Name,
+		duplicatedProduct.Description,
+		duplicatedProduct.Price,
+		false,
+		false,
+		nil,
+		nil,
+	)
+	if err != nil {
+		if isInvalidProductInputError(err) {
+			return usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error())
+		}
+		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
+	}
+
+	salesSite, err := s.findSalesSiteByName(ctx, "creema")
+	if err != nil {
+		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
+	}
+	if salesSite == nil {
+		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, "sales site is not found: creema")
+	}
+
+	uploadedPaths := make([]string, 0, len(duplicatedProduct.Images))
+	if err := s.txManager.WithinTransaction(ctx, func(txCtx context.Context) error {
+		tagIDs, err := s.resolveOrCreateTagIDsByNames(txCtx, duplicatedProduct.Tags)
+		if err != nil {
+			return err
+		}
+
+		createdProductID, err := s.productRepo.Create(txCtx, newProduct)
+		if err != nil {
+			return err
+		}
+
+		if err := s.productRepo.ReplaceTags(txCtx, createdProductID, tagIDs); err != nil {
+			return err
+		}
+
+		siteDetail, err := domainSiteDetail.New(
+			s.uuidGen.New(),
+			duplicateURL,
+			createdProductID.Value(),
+			salesSite.ID().Value(),
+		)
+		if err != nil {
+			return err
+		}
+		if err := s.siteDetailRepo.ReplaceByProductID(txCtx, createdProductID, []*domainSiteDetail.SiteDetail{siteDetail}); err != nil {
+			return err
+		}
+
+		for i, image := range duplicatedProduct.Images {
+			imageMimeType, err := domainProduct.NewProductImageMimeType(http.DetectContentType(image.Data))
+			if err != nil {
+				return err
+			}
+
+			imageUUID := s.uuidGen.New()
+			imagePath, err := buildProductImagePath(imageUUID, imageMimeType)
+			if err != nil {
+				return err
+			}
+			if err := s.storage.Put(txCtx, imagePath.Value(), imageMimeType.Value(), image.Data); err != nil {
+				return err
+			}
+			uploadedPaths = append(uploadedPaths, imagePath.Value())
+
+			imageName := strings.TrimSpace(image.Name)
+			if imageName == "" {
+				imageName = fmt.Sprintf("image-%d%s", i, imageMimeType.Extension())
+			}
+
+			productImage, err := domainProduct.NewProductImage(
+				imageUUID,
+				imageName,
+				imageMimeType.Value(),
+				imagePath.Value(),
+				len(duplicatedProduct.Images)-i,
+				createdProductID.Value(),
+			)
+			if err != nil {
+				return err
+			}
+			if err := s.productImageRepo.Create(txCtx, productImage); err != nil {
+				return err
+			}
+		}
+
+		return nil
+	}); err != nil {
+		for _, path := range uploadedPaths {
+			if delErr := s.storage.Delete(ctx, path); delErr != nil {
+				log.Printf("[WARN] product duplicate rollback delete failed: path=%s err=%v", path, delErr)
+			}
+		}
+
+		if errors.Is(err, usecase.ErrInvalidInput) || errors.Is(err, domainTag.ErrInvalidName) || isInvalidProductInputError(err) {
+			return usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error())
+		}
+		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
+	}
+
+	return nil
 }
 
 func (s *Service) Update(ctx context.Context, productUUID string, input usecaseProduct.UpdateProductInput) error {

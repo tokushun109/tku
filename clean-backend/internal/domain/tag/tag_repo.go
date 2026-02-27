@@ -9,6 +9,7 @@ import (
 type Repository interface {
 	Create(ctx context.Context, t *Tag) error
 	FindAll(ctx context.Context) ([]*Tag, error)
+	FindByName(ctx context.Context, name TagName) (*Tag, error)
 	FindByUUID(ctx context.Context, uuid primitive.UUID) (*Tag, error)
 	ExistsByName(ctx context.Context, name TagName) (bool, error)
 	Update(ctx context.Context, t *Tag) (bool, error)
