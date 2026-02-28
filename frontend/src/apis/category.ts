@@ -1,3 +1,4 @@
+import { getApiBaseUrl } from '@/apis/baseUrl'
 import { IClassification, IClassificationForm } from '@/features/classification/type'
 import { ApiError } from '@/utils/error'
 import { convertObjectToURLSearchParams } from '@/utils/request'
@@ -26,7 +27,7 @@ export interface ICategoryResponse {
 export const getCategories = async (params: IGetCategoriesParams): Promise<IClassification[]> => {
     try {
         const query = convertObjectToURLSearchParams(params)
-        const res = await fetch(`${process.env.API_BASE_URL}/category?${query}`, {
+        const res = await fetch(`${getApiBaseUrl()}/category?${query}`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -47,7 +48,7 @@ export const getCategories = async (params: IGetCategoriesParams): Promise<IClas
 /** カテゴリを追加 */
 export const postCategory = async (params: IPostCategoryParams): Promise<ICategoryResponse> => {
     try {
-        const res = await fetch(`${process.env.API_BASE_URL}/category`, {
+        const res = await fetch(`${getApiBaseUrl()}/category`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -70,7 +71,7 @@ export const postCategory = async (params: IPostCategoryParams): Promise<ICatego
 /** カテゴリを更新 */
 export const putCategory = async (params: IPutCategoryParams): Promise<ICategoryResponse> => {
     try {
-        const res = await fetch(`${process.env.API_BASE_URL}/category/${params.uuid}`, {
+        const res = await fetch(`${getApiBaseUrl()}/category/${params.uuid}`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -93,7 +94,7 @@ export const putCategory = async (params: IPutCategoryParams): Promise<ICategory
 /** カテゴリを削除 */
 export const deleteCategory = async (params: IDeleteCategoryParams): Promise<ICategoryResponse> => {
     try {
-        const res = await fetch(`${process.env.API_BASE_URL}/category/${params.uuid}`, {
+        const res = await fetch(`${getApiBaseUrl()}/category/${params.uuid}`, {
             headers: {
                 'Content-Type': 'application/json',
             },

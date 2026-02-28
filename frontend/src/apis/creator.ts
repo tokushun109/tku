@@ -1,9 +1,10 @@
+import { getApiBaseUrl } from '@/apis/baseUrl'
 import { ICreator } from '@/features/creator/type'
 import { ApiError } from '@/utils/error'
 
 export const getCreator = async (): Promise<ICreator> => {
     try {
-        const res = await fetch(`${process.env.API_BASE_URL}/creator`, {
+        const res = await fetch(`${getApiBaseUrl()}/creator`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -23,7 +24,7 @@ export const getCreator = async (): Promise<ICreator> => {
 
 export const updateCreator = async (creator: Omit<ICreator, 'apiPath' | 'logo'>) => {
     try {
-        const res = await fetch(`${process.env.API_BASE_URL}/creator`, {
+        const res = await fetch(`${getApiBaseUrl()}/creator`, {
             body: JSON.stringify(creator),
             headers: {
                 'Content-Type': 'application/json',
@@ -48,7 +49,7 @@ export const updateCreatorLogo = async (file: File) => {
         const formData = new FormData()
         formData.append('logo', file)
 
-        const res = await fetch(`${process.env.API_BASE_URL}/creator/logo`, {
+        const res = await fetch(`${getApiBaseUrl()}/creator/logo`, {
             body: formData,
             method: 'PUT',
             credentials: 'include',

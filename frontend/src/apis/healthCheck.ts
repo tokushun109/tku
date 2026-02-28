@@ -1,3 +1,4 @@
+import { getApiBaseUrl } from '@/apis/baseUrl'
 import { ApiError } from '@/utils/error'
 
 export interface IHealthCheckResponse {
@@ -6,7 +7,7 @@ export interface IHealthCheckResponse {
 
 export const healthCheck = async (): Promise<IHealthCheckResponse> => {
     try {
-        const res = await fetch(`${process.env.API_BASE_URL}/health_check`, {
+        const res = await fetch(`${getApiBaseUrl()}/health_check`, {
             headers: {
                 'Content-Type': 'application/json',
             },

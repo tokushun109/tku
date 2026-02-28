@@ -89,7 +89,7 @@ services:
     container_name: frontend
     environment:
       BROWSER_BASE_URL: http://localhost:8080/api
-      API_BASE_URL: http://host.docker.internal:8080/api
+      API_BASE_URL: http://api:8080/api
     depends_on:
       - api
     command: sh ./docker/script/local/command.sh

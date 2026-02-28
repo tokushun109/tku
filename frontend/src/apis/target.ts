@@ -1,3 +1,4 @@
+import { getApiBaseUrl } from '@/apis/baseUrl'
 import { IClassification, IClassificationForm } from '@/features/classification/type'
 import { ApiError } from '@/utils/error'
 import { convertObjectToURLSearchParams } from '@/utils/request'
@@ -26,7 +27,7 @@ export interface ITargetResponse {
 export const getTargets = async (params: IGetTargetsParams): Promise<IClassification[]> => {
     try {
         const query = convertObjectToURLSearchParams(params)
-        const res = await fetch(`${process.env.API_BASE_URL}/target?${query}`, {
+        const res = await fetch(`${getApiBaseUrl()}/target?${query}`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -47,7 +48,7 @@ export const getTargets = async (params: IGetTargetsParams): Promise<IClassifica
 /** ターゲットを追加 */
 export const postTarget = async (params: IPostTargetParams): Promise<ITargetResponse> => {
     try {
-        const res = await fetch(`${process.env.API_BASE_URL}/target`, {
+        const res = await fetch(`${getApiBaseUrl()}/target`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -70,7 +71,7 @@ export const postTarget = async (params: IPostTargetParams): Promise<ITargetResp
 /** ターゲットを更新 */
 export const putTarget = async (params: IPutTargetParams): Promise<ITargetResponse> => {
     try {
-        const res = await fetch(`${process.env.API_BASE_URL}/target/${params.uuid}`, {
+        const res = await fetch(`${getApiBaseUrl()}/target/${params.uuid}`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -93,7 +94,7 @@ export const putTarget = async (params: IPutTargetParams): Promise<ITargetRespon
 /** ターゲットを削除 */
 export const deleteTarget = async (params: IDeleteTargetParams): Promise<ITargetResponse> => {
     try {
-        const res = await fetch(`${process.env.API_BASE_URL}/target/${params.uuid}`, {
+        const res = await fetch(`${getApiBaseUrl()}/target/${params.uuid}`, {
             headers: {
                 'Content-Type': 'application/json',
             },

@@ -1,3 +1,5 @@
+import { getApiBaseUrl } from '@/apis/baseUrl'
+
 /**
  * CSV関連のAPI呼び出し
  */
@@ -7,7 +9,7 @@
  */
 export const downloadProductCsv = async (): Promise<void> => {
     try {
-        const response = await fetch(`${process.env.API_BASE_URL}/csv/product`, {
+        const response = await fetch(`${getApiBaseUrl()}/csv/product`, {
             method: 'GET',
             credentials: 'include',
         })
@@ -37,7 +39,7 @@ export const uploadProductCsv = async (file: File): Promise<void> => {
         const formData = new FormData()
         formData.append('csv', file)
 
-        const response = await fetch(`${process.env.API_BASE_URL}/csv/product`, {
+        const response = await fetch(`${getApiBaseUrl()}/csv/product`, {
             method: 'POST',
             credentials: 'include',
             body: formData,
