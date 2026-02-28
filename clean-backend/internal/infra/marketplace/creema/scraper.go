@@ -21,12 +21,20 @@ import (
 	usecaseProduct "github.com/tokushun109/tku/clean-backend/internal/usecase/product"
 )
 
-const defaultTimeout = 10 * time.Second
+const (
+	defaultTimeout = 10 * time.Second
 
-const creemaProductPageHost = "www.creema.jp"
+	creemaProductPageHost = "www.creema.jp"
 
-const maxProductPageBodySize = 2 << 20   // 2MB
-const maxProductImageBodySize = 20 << 20 // 20MB
+	maxProductPageBodySize  = 2 << 20  // 2MB
+	maxProductImageBodySize = 20 << 20 // 20MB
+
+	// Creemaの商品ページの現在のDOM構造に依存するため、サイト変更時に見直しが必要。
+	priceSelector       = "#js-item-detail > aside > div.p-item-detail-info.p-item-detail-info--side > div > div:nth-child(1) > div.p-item-detail-info__item--price--row > span.p-item-detail-info__item--price--row--price"
+	descriptionSelector = "#introduction > div > div"
+	imageSelector       = "#js-item-detail-centerpiece > img"
+	tagSelector         = "#js-item-detail > aside > div:nth-child(5) > ul:nth-child(3) > li > a"
+)
 
 var allowedImageHosts = map[string]struct{}{
 	"c.p02.c4a.im": {},
@@ -77,7 +85,7 @@ func (s *Scraper) Duplicate(ctx context.Context, rawURL string) (*usecaseProduct
 		return nil, err
 	}
 
-	priceText := strings.TrimSpace(document.Find("#js-item-detail > aside > div.p-item-detail-info.p-item-detail-info--side > div > div:nth-child(1) > div.p-item-detail-info__item--price--row > span.p-item-detail-info__item--price--row--price").Text())
+	priceText := strings.TrimSpace(document.Find(priceSelector).Text())
 	price, err := parsePrice(priceText)
 	if err != nil {
 		return nil, err
@@ -90,14 +98,14 @@ func (s *Scraper) Duplicate(ctx context.Context, rawURL string) (*usecaseProduct
 
 	product := &usecaseProduct.DuplicateProductData{
 		Name:        strings.TrimSpace(document.Find("title").Text()),
-		Description: strings.TrimSpace(document.Find("#introduction > div > div").Text()),
+		Description: strings.TrimSpace(document.Find(descriptionSelector).Text()),
 		Price:       price,
 		Tags:        extractTags(document),
 		Images:      make([]usecaseProduct.DuplicateProductImage, 0),
 	}
 
 	var imageErr error
-	document.Find("#js-item-detail-centerpiece > img").EachWithBreak(func(i int, selection *goquery.Selection) bool {
+	document.Find(imageSelector).EachWithBreak(func(i int, selection *goquery.Selection) bool {
 		src, ok := selection.Attr("src")
 		if !ok {
 			return true
@@ -195,7 +203,7 @@ func parsePrice(price string) (int, error) {
 
 func extractTags(document *goquery.Document) []string {
 	tags := make([]string, 0)
-	document.Find("#js-item-detail > aside > div:nth-child(5) > ul:nth-child(3) > li > a").Each(func(_ int, selection *goquery.Selection) {
+	document.Find(tagSelector).Each(func(_ int, selection *goquery.Selection) {
 		tagName := strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(selection.Text()), "#"))
 		if tagName == "" {
 			return
