@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { validateSession } from '@/apis/auth'
+import { getCurrentUser } from '@/apis/auth'
 import { healthCheck } from '@/apis/healthCheck'
 import { NavigationType } from '@/types/enum/navigation'
 
@@ -14,8 +14,9 @@ async function checkAuth(request: NextRequest) {
         return false
     }
 
-    // セッション検証API呼び出し
-    return await validateSession(sessionToken)
+    // ログイン中ユーザーを取得し、管理者のみ許可
+    const currentUser = await getCurrentUser(sessionToken)
+    return currentUser?.isAdmin ?? false
 }
 
 export async function middleware(request: NextRequest) {

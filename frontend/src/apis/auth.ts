@@ -7,6 +7,14 @@ export interface ILoginResponse {
     session: ISession
 }
 
+// ログイン中のユーザー型
+export interface ICurrentUser {
+    email: string
+    isAdmin: boolean
+    name: string
+    uuid: string
+}
+
 // ログイン
 export const login = async (loginData: ILoginForm): Promise<ILoginResponse> => {
     try {
@@ -56,8 +64,8 @@ export const logout = async (sessionToken: string): Promise<void> => {
     }
 }
 
-// セッション検証API関数
-export const validateSession = async (sessionToken: string): Promise<boolean> => {
+// ログイン中ユーザー取得API関数
+export const getCurrentUser = async (sessionToken: string): Promise<ICurrentUser | null> => {
     try {
         const res = await fetch(`${getApiBaseUrl()}/user/me`, {
             method: 'GET',
@@ -67,9 +75,15 @@ export const validateSession = async (sessionToken: string): Promise<boolean> =>
             },
             credentials: 'include',
         })
-        return res.ok
+
+        if (!res.ok) {
+            return null
+        }
+
+        const currentUser: ICurrentUser = await res.json()
+        return currentUser
     } catch (error) {
-        console.error('Session validation error:', error)
-        return false
+        console.error('Get current user error:', error)
+        return null
     }
 }
