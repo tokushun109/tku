@@ -43,6 +43,29 @@ func TestValidateProductPageURL(t *testing.T) {
 	})
 }
 
+func TestMapProductPageStatusError(t *testing.T) {
+	t.Run("404はnot foundを返す", func(t *testing.T) {
+		err := mapProductPageStatusError(404)
+		if !errors.Is(err, usecase.ErrNotFound) {
+			t.Fatalf("expected ErrNotFound, got %v", err)
+		}
+	})
+
+	t.Run("400はinvalid inputを返す", func(t *testing.T) {
+		err := mapProductPageStatusError(400)
+		if !errors.Is(err, usecase.ErrInvalidInput) {
+			t.Fatalf("expected ErrInvalidInput, got %v", err)
+		}
+	})
+
+	t.Run("500は内部エラー扱いのままにする", func(t *testing.T) {
+		err := mapProductPageStatusError(500)
+		if err == nil || errors.Is(err, usecase.ErrInvalidInput) || errors.Is(err, usecase.ErrNotFound) {
+			t.Fatalf("expected generic error, got %v", err)
+		}
+	})
+}
+
 func TestResolveImageURL(t *testing.T) {
 	baseURL, err := url.Parse("https://www.creema.jp/items/123")
 	if err != nil {

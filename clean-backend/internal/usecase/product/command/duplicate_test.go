@@ -274,6 +274,21 @@ func TestDuplicateProduct(t *testing.T) {
 		}
 	})
 
+	t.Run("duplicate sourceがnot foundを返したときnot foundで失敗する", func(t *testing.T) {
+		source := &stubDuplicateSource{err: usecase.ErrNotFound}
+		s := &Service{
+			duplicateSource: source,
+		}
+
+		err := s.Duplicate(context.Background(), "https://www.creema.jp/items/1")
+		if err == nil || !errors.Is(err, usecase.ErrNotFound) {
+			t.Fatalf("expected ErrNotFound, got %v", err)
+		}
+		if !source.called {
+			t.Fatalf("duplicate source should be called")
+		}
+	})
+
 	t.Run("有効な入力を渡したとき商品と関連データの複製に成功する", func(t *testing.T) {
 		source := &stubDuplicateSource{
 			result: &usecaseProduct.DuplicateProductData{

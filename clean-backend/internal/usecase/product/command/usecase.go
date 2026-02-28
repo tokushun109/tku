@@ -155,6 +155,9 @@ func (s *Service) Duplicate(ctx context.Context, rawURL string) error {
 		if errors.Is(err, usecase.ErrInvalidInput) || errors.Is(err, primitive.ErrInvalidURL) {
 			return usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error())
 		}
+		if errors.Is(err, usecase.ErrNotFound) {
+			return usecase.NewAppErrorWithMessage(usecase.ErrNotFound, err.Error())
+		}
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 	if duplicatedProduct == nil {

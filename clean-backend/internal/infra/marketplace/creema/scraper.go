@@ -72,7 +72,7 @@ func (s *Scraper) Duplicate(ctx context.Context, rawURL string) (*usecaseProduct
 	}()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		return nil, mapProductPageStatusError(resp.StatusCode)
 	}
 
 	body, err := readResponseBodyWithLimit(resp.Body, maxProductPageBodySize)
@@ -163,6 +163,17 @@ func validateProductPageRequestURL(u *url.URL) error {
 		return usecase.ErrInvalidInput
 	}
 	return nil
+}
+
+func mapProductPageStatusError(statusCode int) error {
+	switch statusCode {
+	case http.StatusBadRequest, http.StatusUnprocessableEntity:
+		return usecase.ErrInvalidInput
+	case http.StatusNotFound, http.StatusGone:
+		return usecase.ErrNotFound
+	default:
+		return fmt.Errorf("unexpected status code: %d", statusCode)
+	}
 }
 
 func newDocument(body []byte) (*goquery.Document, error) {
