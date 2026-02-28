@@ -40,6 +40,7 @@ export const logout = async (sessionToken: string): Promise<void> => {
             headers: {
                 'Content-Type': 'application/json',
                 Cookie: `__sess__=${sessionToken}`,
+                ...(process.env.DOMAIN_URL && { Origin: process.env.DOMAIN_URL }),
             },
             credentials: 'include',
         })

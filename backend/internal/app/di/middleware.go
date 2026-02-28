@@ -10,6 +10,7 @@ import (
 type middlewares struct {
 	auth    *middleware.AuthMiddleware
 	admin   *middleware.AdminMiddleware
+	origin  *middleware.OriginMiddleware
 	logging func(http.Handler) http.Handler
 	cors    func(http.Handler) http.Handler
 }
@@ -23,9 +24,15 @@ func newMiddlewares(cfg *config.Config, ucs *usecases) (*middlewares, error) {
 		return nil, err
 	}
 
+	originMW, err := middleware.NewOriginMiddleware(cfg.ClientURL)
+	if err != nil {
+		return nil, err
+	}
+
 	mws := &middlewares{
 		auth:    middleware.NewAuthMiddleware(ucs.user),
 		admin:   middleware.NewAdminMiddleware(),
+		origin:  originMW,
 		logging: middleware.LoggingMiddleware,
 		cors:    middleware.CORSMiddleware([]string{cfg.ClientURL}),
 	}
