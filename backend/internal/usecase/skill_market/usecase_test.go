@@ -73,7 +73,7 @@ func (s *stubRepo) Delete(ctx context.Context, uuid primitive.UUID) (bool, error
 func TestListSkillMarkets(t *testing.T) {
 	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
 
-		s := mustSkillMarket(testUUID, "minne", "https://minne.com", "")
+		s := mustSkillMarket(testUUID, "minne", "https://minne.com")
 		repo := &stubRepo{findAll: []*domain.SkillMarket{s}}
 		uc := New(repo, &stubUUIDGen{uuid: testUUID})
 
@@ -103,7 +103,7 @@ func TestCreateSkillMarket(t *testing.T) {
 		repo := &stubRepo{}
 		uc := New(repo, &stubUUIDGen{uuid: testUUID})
 
-		if err := uc.Create(context.Background(), "minne", "https://minne.com", ""); err != nil {
+		if err := uc.Create(context.Background(), "minne", "https://minne.com"); err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 		if repo.created == nil {
@@ -118,7 +118,7 @@ func TestCreateSkillMarket(t *testing.T) {
 		repo := &stubRepo{}
 		uc := New(repo, &stubUUIDGen{uuid: testUUID})
 
-		err := uc.Create(context.Background(), "", "https://minne.com", "")
+		err := uc.Create(context.Background(), "", "https://minne.com")
 		if err == nil {
 			t.Fatalf("expected error")
 		}
@@ -131,7 +131,7 @@ func TestCreateSkillMarket(t *testing.T) {
 		repo := &stubRepo{}
 		uc := New(repo, &stubUUIDGen{uuid: testUUID})
 
-		err := uc.Create(context.Background(), "minne", "not-url", "")
+		err := uc.Create(context.Background(), "minne", "not-url")
 		if err == nil {
 			t.Fatalf("expected error")
 		}
@@ -144,7 +144,7 @@ func TestCreateSkillMarket(t *testing.T) {
 		repo := &stubRepo{createErr: errors.New("db error")}
 		uc := New(repo, &stubUUIDGen{uuid: testUUID})
 
-		err := uc.Create(context.Background(), "minne", "https://minne.com", "")
+		err := uc.Create(context.Background(), "minne", "https://minne.com")
 		if err == nil {
 			t.Fatalf("expected error")
 		}
@@ -158,12 +158,12 @@ func TestUpdateSkillMarket(t *testing.T) {
 	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
 
 		repo := &stubRepo{
-			findByUUID: mustSkillMarket(testUUID, "old", "https://old.example.com", ""),
+			findByUUID: mustSkillMarket(testUUID, "old", "https://old.example.com"),
 			updateOK:   true,
 		}
 		uc := New(repo, &stubUUIDGen{uuid: testUUID})
 
-		if err := uc.Update(context.Background(), testUUID, "new", "https://new.example.com", "icon"); err != nil {
+		if err := uc.Update(context.Background(), testUUID, "new", "https://new.example.com"); err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
@@ -172,27 +172,27 @@ func TestUpdateSkillMarket(t *testing.T) {
 		repo := &stubRepo{}
 		uc := New(repo, &stubUUIDGen{uuid: testUUID})
 
-		err := uc.Update(context.Background(), "bad-uuid", "new", "https://new.example.com", "")
+		err := uc.Update(context.Background(), "bad-uuid", "new", "https://new.example.com")
 		if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
 			t.Fatalf("expected ErrInvalidInput, got %v", err)
 		}
 	})
 	t.Run("名前が不正なときバリデーションエラーで失敗する", func(t *testing.T) {
 
-		repo := &stubRepo{findByUUID: mustSkillMarket(testUUID, "old", "https://old.example.com", "")}
+		repo := &stubRepo{findByUUID: mustSkillMarket(testUUID, "old", "https://old.example.com")}
 		uc := New(repo, &stubUUIDGen{uuid: testUUID})
 
-		err := uc.Update(context.Background(), testUUID, "", "https://new.example.com", "")
+		err := uc.Update(context.Background(), testUUID, "", "https://new.example.com")
 		if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
 			t.Fatalf("expected ErrInvalidInput, got %v", err)
 		}
 	})
 	t.Run("URLが不正なときバリデーションエラーで失敗する", func(t *testing.T) {
 
-		repo := &stubRepo{findByUUID: mustSkillMarket(testUUID, "old", "https://old.example.com", "")}
+		repo := &stubRepo{findByUUID: mustSkillMarket(testUUID, "old", "https://old.example.com")}
 		uc := New(repo, &stubUUIDGen{uuid: testUUID})
 
-		err := uc.Update(context.Background(), testUUID, "new", "not-url", "")
+		err := uc.Update(context.Background(), testUUID, "new", "not-url")
 		if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
 			t.Fatalf("expected ErrInvalidInput, got %v", err)
 		}
@@ -202,7 +202,7 @@ func TestUpdateSkillMarket(t *testing.T) {
 		repo := &stubRepo{findByUUID: nil}
 		uc := New(repo, &stubUUIDGen{uuid: testUUID})
 
-		err := uc.Update(context.Background(), testUUID, "new", "https://new.example.com", "")
+		err := uc.Update(context.Background(), testUUID, "new", "https://new.example.com")
 		if err == nil || !errors.Is(err, usecase.ErrNotFound) {
 			t.Fatalf("expected ErrNotFound, got %v", err)
 		}
@@ -210,12 +210,12 @@ func TestUpdateSkillMarket(t *testing.T) {
 	t.Run("更新処理でエラーが発生したなら内部エラーを返す", func(t *testing.T) {
 
 		repo := &stubRepo{
-			findByUUID: mustSkillMarket(testUUID, "old", "https://old.example.com", ""),
+			findByUUID: mustSkillMarket(testUUID, "old", "https://old.example.com"),
 			updateErr:  errors.New("db error"),
 		}
 		uc := New(repo, &stubUUIDGen{uuid: testUUID})
 
-		err := uc.Update(context.Background(), testUUID, "new", "https://new.example.com", "")
+		err := uc.Update(context.Background(), testUUID, "new", "https://new.example.com")
 		if err == nil || !errors.Is(err, usecase.ErrInternal) {
 			t.Fatalf("expected ErrInternal, got %v", err)
 		}
@@ -264,8 +264,8 @@ func TestDeleteSkillMarket(t *testing.T) {
 	})
 }
 
-func mustSkillMarket(uuidStr, name, rawURL, icon string) *domain.SkillMarket {
-	skillMarket, err := domain.Rebuild(1, uuidStr, name, rawURL, icon)
+func mustSkillMarket(uuidStr, name, rawURL string) *domain.SkillMarket {
+	skillMarket, err := domain.Rebuild(1, uuidStr, name, rawURL)
 	if err != nil {
 		panic(err)
 	}

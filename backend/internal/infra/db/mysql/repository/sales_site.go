@@ -9,7 +9,6 @@ import (
 
 	"github.com/tokushun109/tku/backend/internal/domain/primitive"
 	domain "github.com/tokushun109/tku/backend/internal/domain/sales_site"
-	"github.com/tokushun109/tku/backend/internal/infra/db/mysql/mysqlutil"
 )
 
 type SalesSiteRepository struct {
@@ -23,8 +22,8 @@ func NewSalesSiteRepository(db *sqlx.DB) *SalesSiteRepository {
 func (r *SalesSiteRepository) Create(ctx context.Context, s *domain.SalesSite) (*domain.SalesSite, error) {
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
-		`INSERT INTO sales_site (uuid, name, url, icon, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())`,
-		s.UUID().Value(), s.Name().Value(), s.URL().Value(), s.Icon(),
+		`INSERT INTO sales_site (uuid, name, url, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())`,
+		s.UUID().Value(), s.Name().Value(), s.URL().Value(),
 	)
 	if err != nil {
 		return nil, err
@@ -35,7 +34,7 @@ func (r *SalesSiteRepository) Create(ctx context.Context, s *domain.SalesSite) (
 		return nil, err
 	}
 
-	created, err := domain.Rebuild(uint(lastID), s.UUID().Value(), s.Name().Value(), s.URL().Value(), s.Icon())
+	created, err := domain.Rebuild(uint(lastID), s.UUID().Value(), s.Name().Value(), s.URL().Value())
 	if err != nil {
 		return nil, fmt.Errorf("invalid sales site row: %w", err)
 	}
@@ -44,19 +43,18 @@ func (r *SalesSiteRepository) Create(ctx context.Context, s *domain.SalesSite) (
 
 func (r *SalesSiteRepository) FindAll(ctx context.Context) ([]*domain.SalesSite, error) {
 	type row struct {
-		ID   uint           `db:"id"`
-		UUID string         `db:"uuid"`
-		Name string         `db:"name"`
-		URL  string         `db:"url"`
-		Icon sql.NullString `db:"icon"`
+		ID   uint   `db:"id"`
+		UUID string `db:"uuid"`
+		Name string `db:"name"`
+		URL  string `db:"url"`
 	}
 	var rows []row
-	if err := getExecutor(ctx, r.db).SelectContext(ctx, &rows, `SELECT id, uuid, name, url, icon FROM sales_site WHERE deleted_at IS NULL`); err != nil {
+	if err := getExecutor(ctx, r.db).SelectContext(ctx, &rows, `SELECT id, uuid, name, url FROM sales_site WHERE deleted_at IS NULL`); err != nil {
 		return nil, err
 	}
 	res := make([]*domain.SalesSite, 0, len(rows))
 	for _, r := range rows {
-		s, err := toDomainSalesSite(r.ID, r.UUID, r.Name, r.URL, r.Icon)
+		s, err := toDomainSalesSite(r.ID, r.UUID, r.Name, r.URL)
 		if err != nil {
 			return nil, err
 		}
@@ -67,47 +65,44 @@ func (r *SalesSiteRepository) FindAll(ctx context.Context) ([]*domain.SalesSite,
 
 func (r *SalesSiteRepository) FindByName(ctx context.Context, name domain.SalesSiteName) (*domain.SalesSite, error) {
 	type row struct {
-		ID   uint           `db:"id"`
-		UUID string         `db:"uuid"`
-		Name string         `db:"name"`
-		URL  string         `db:"url"`
-		Icon sql.NullString `db:"icon"`
+		ID   uint   `db:"id"`
+		UUID string `db:"uuid"`
+		Name string `db:"name"`
+		URL  string `db:"url"`
 	}
 	var rrow row
-	if err := getExecutor(ctx, r.db).GetContext(ctx, &rrow, `SELECT id, uuid, name, url, icon FROM sales_site WHERE name = ? AND deleted_at IS NULL`, name.Value()); err != nil {
+	if err := getExecutor(ctx, r.db).GetContext(ctx, &rrow, `SELECT id, uuid, name, url FROM sales_site WHERE name = ? AND deleted_at IS NULL`, name.Value()); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
 		return nil, err
 	}
-	return toDomainSalesSite(rrow.ID, rrow.UUID, rrow.Name, rrow.URL, rrow.Icon)
+	return toDomainSalesSite(rrow.ID, rrow.UUID, rrow.Name, rrow.URL)
 }
 
 func (r *SalesSiteRepository) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domain.SalesSite, error) {
 	type row struct {
-		ID   uint           `db:"id"`
-		UUID string         `db:"uuid"`
-		Name string         `db:"name"`
-		URL  string         `db:"url"`
-		Icon sql.NullString `db:"icon"`
+		ID   uint   `db:"id"`
+		UUID string `db:"uuid"`
+		Name string `db:"name"`
+		URL  string `db:"url"`
 	}
 	var rrow row
-	if err := getExecutor(ctx, r.db).GetContext(ctx, &rrow, `SELECT id, uuid, name, url, icon FROM sales_site WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value()); err != nil {
+	if err := getExecutor(ctx, r.db).GetContext(ctx, &rrow, `SELECT id, uuid, name, url FROM sales_site WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value()); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
 		return nil, err
 	}
-	return toDomainSalesSite(rrow.ID, rrow.UUID, rrow.Name, rrow.URL, rrow.Icon)
+	return toDomainSalesSite(rrow.ID, rrow.UUID, rrow.Name, rrow.URL)
 }
 
 func (r *SalesSiteRepository) Update(ctx context.Context, s *domain.SalesSite) (bool, error) {
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
-		`UPDATE sales_site SET name = ?, url = ?, icon = ?, updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`,
+		`UPDATE sales_site SET name = ?, url = ?, updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`,
 		s.Name().Value(),
 		s.URL().Value(),
-		s.Icon(),
 		s.UUID().Value(),
 	)
 	if err != nil {
@@ -155,10 +150,8 @@ func (r *SalesSiteRepository) Delete(ctx context.Context, uuid primitive.UUID) (
 	return affected > 0, nil
 }
 
-func toDomainSalesSite(id uint, uuidStr, nameStr, urlStr string, icon sql.NullString) (*domain.SalesSite, error) {
-	iconValue := mysqlutil.NullStringOrEmpty(icon)
-
-	salesSite, err := domain.Rebuild(id, uuidStr, nameStr, urlStr, iconValue)
+func toDomainSalesSite(id uint, uuidStr, nameStr, urlStr string) (*domain.SalesSite, error) {
+	salesSite, err := domain.Rebuild(id, uuidStr, nameStr, urlStr)
 	if err != nil {
 		return nil, fmt.Errorf("invalid sales site row: %w", err)
 	}

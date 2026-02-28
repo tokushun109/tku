@@ -7,23 +7,22 @@ type Sns struct {
 	uuid primitive.UUID
 	name SnsName
 	url  primitive.URL
-	icon string
 }
 
-func New(rawUUID string, name string, rawURL string, icon string) (*Sns, error) {
-	sns, err := newWithValidatedValues(rawUUID, name, rawURL, icon)
+func New(rawUUID string, name string, rawURL string) (*Sns, error) {
+	sns, err := newWithValidatedValues(rawUUID, name, rawURL)
 	if err != nil {
 		return nil, err
 	}
 	return sns, nil
 }
 
-func Rebuild(id uint, rawUUID string, name string, rawURL string, icon string) (*Sns, error) {
+func Rebuild(id uint, rawUUID string, name string, rawURL string) (*Sns, error) {
 	parsedID, err := primitive.NewID(id)
 	if err != nil {
 		return nil, ErrInvalidID
 	}
-	sns, err := newWithValidatedValues(rawUUID, name, rawURL, icon)
+	sns, err := newWithValidatedValues(rawUUID, name, rawURL)
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +30,7 @@ func Rebuild(id uint, rawUUID string, name string, rawURL string, icon string) (
 	return sns, nil
 }
 
-func newWithValidatedValues(rawUUID string, name string, rawURL string, icon string) (*Sns, error) {
+func newWithValidatedValues(rawUUID string, name string, rawURL string) (*Sns, error) {
 	uuid, err := primitive.NewUUID(rawUUID)
 	if err != nil {
 		return nil, err
@@ -48,7 +47,6 @@ func newWithValidatedValues(rawUUID string, name string, rawURL string, icon str
 		uuid: uuid,
 		name: snsName,
 		url:  snsURL,
-		icon: icon,
 	}, nil
 }
 
@@ -68,11 +66,7 @@ func (s *Sns) URL() primitive.URL {
 	return s.url
 }
 
-func (s *Sns) Icon() string {
-	return s.icon
-}
-
-func (s *Sns) Change(name string, rawURL string, icon string) error {
+func (s *Sns) Change(name string, rawURL string) error {
 	snsName, err := NewSnsName(name)
 	if err != nil {
 		return err
@@ -83,6 +77,5 @@ func (s *Sns) Change(name string, rawURL string, icon string) error {
 	}
 	s.name = snsName
 	s.url = snsURL
-	s.icon = icon
 	return nil
 }

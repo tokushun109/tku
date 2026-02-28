@@ -10,7 +10,6 @@ func ToSnsResponse(s *domain.Sns) *response.SnsResponse {
 		UUID: s.UUID().Value(),
 		Name: s.Name().Value(),
 		URL:  s.URL().Value(),
-		Icon: s.Icon(),
 	}
 }
 

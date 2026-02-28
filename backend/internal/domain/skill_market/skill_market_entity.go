@@ -7,23 +7,22 @@ type SkillMarket struct {
 	uuid primitive.UUID
 	name SkillMarketName
 	url  primitive.URL
-	icon string
 }
 
-func New(rawUUID string, name string, rawURL string, icon string) (*SkillMarket, error) {
-	skillMarket, err := newWithValidatedValues(rawUUID, name, rawURL, icon)
+func New(rawUUID string, name string, rawURL string) (*SkillMarket, error) {
+	skillMarket, err := newWithValidatedValues(rawUUID, name, rawURL)
 	if err != nil {
 		return nil, err
 	}
 	return skillMarket, nil
 }
 
-func Rebuild(id uint, rawUUID string, name string, rawURL string, icon string) (*SkillMarket, error) {
+func Rebuild(id uint, rawUUID string, name string, rawURL string) (*SkillMarket, error) {
 	parsedID, err := primitive.NewID(id)
 	if err != nil {
 		return nil, ErrInvalidID
 	}
-	skillMarket, err := newWithValidatedValues(rawUUID, name, rawURL, icon)
+	skillMarket, err := newWithValidatedValues(rawUUID, name, rawURL)
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +30,7 @@ func Rebuild(id uint, rawUUID string, name string, rawURL string, icon string) (
 	return skillMarket, nil
 }
 
-func newWithValidatedValues(rawUUID string, name string, rawURL string, icon string) (*SkillMarket, error) {
+func newWithValidatedValues(rawUUID string, name string, rawURL string) (*SkillMarket, error) {
 	uuid, err := primitive.NewUUID(rawUUID)
 	if err != nil {
 		return nil, err
@@ -48,7 +47,6 @@ func newWithValidatedValues(rawUUID string, name string, rawURL string, icon str
 		uuid: uuid,
 		name: skillMarketName,
 		url:  skillMarketURL,
-		icon: icon,
 	}, nil
 }
 
@@ -68,11 +66,7 @@ func (s *SkillMarket) URL() primitive.URL {
 	return s.url
 }
 
-func (s *SkillMarket) Icon() string {
-	return s.icon
-}
-
-func (s *SkillMarket) Change(name string, rawURL string, icon string) error {
+func (s *SkillMarket) Change(name string, rawURL string) error {
 	skillMarketName, err := NewSkillMarketName(name)
 	if err != nil {
 		return err
@@ -83,6 +77,5 @@ func (s *SkillMarket) Change(name string, rawURL string, icon string) error {
 	}
 	s.name = skillMarketName
 	s.url = skillMarketURL
-	s.icon = icon
 	return nil
 }

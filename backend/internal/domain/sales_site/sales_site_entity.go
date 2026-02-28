@@ -7,23 +7,22 @@ type SalesSite struct {
 	uuid primitive.UUID
 	name SalesSiteName
 	url  primitive.URL
-	icon string
 }
 
-func New(rawUUID string, name string, rawURL string, icon string) (*SalesSite, error) {
-	salesSite, err := newWithValidatedValues(rawUUID, name, rawURL, icon)
+func New(rawUUID string, name string, rawURL string) (*SalesSite, error) {
+	salesSite, err := newWithValidatedValues(rawUUID, name, rawURL)
 	if err != nil {
 		return nil, err
 	}
 	return salesSite, nil
 }
 
-func Rebuild(id uint, rawUUID string, name string, rawURL string, icon string) (*SalesSite, error) {
+func Rebuild(id uint, rawUUID string, name string, rawURL string) (*SalesSite, error) {
 	parsedID, err := primitive.NewID(id)
 	if err != nil {
 		return nil, ErrInvalidID
 	}
-	salesSite, err := newWithValidatedValues(rawUUID, name, rawURL, icon)
+	salesSite, err := newWithValidatedValues(rawUUID, name, rawURL)
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +30,7 @@ func Rebuild(id uint, rawUUID string, name string, rawURL string, icon string) (
 	return salesSite, nil
 }
 
-func newWithValidatedValues(rawUUID string, name string, rawURL string, icon string) (*SalesSite, error) {
+func newWithValidatedValues(rawUUID string, name string, rawURL string) (*SalesSite, error) {
 	uuid, err := primitive.NewUUID(rawUUID)
 	if err != nil {
 		return nil, err
@@ -48,7 +47,6 @@ func newWithValidatedValues(rawUUID string, name string, rawURL string, icon str
 		uuid: uuid,
 		name: salesSiteName,
 		url:  salesSiteURL,
-		icon: icon,
 	}, nil
 }
 
@@ -68,11 +66,7 @@ func (s *SalesSite) URL() primitive.URL {
 	return s.url
 }
 
-func (s *SalesSite) Icon() string {
-	return s.icon
-}
-
-func (s *SalesSite) Change(name string, rawURL string, icon string) error {
+func (s *SalesSite) Change(name string, rawURL string) error {
 	salesSiteName, err := NewSalesSiteName(name)
 	if err != nil {
 		return err
@@ -83,6 +77,5 @@ func (s *SalesSite) Change(name string, rawURL string, icon string) error {
 	}
 	s.name = salesSiteName
 	s.url = salesSiteURL
-	s.icon = icon
 	return nil
 }

@@ -37,7 +37,7 @@ func (h *SnsHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.snsUC.Create(r.Context(), req.Name, req.URL, req.Icon); err != nil {
+	if err := h.snsUC.Create(r.Context(), req.Name, req.URL); err != nil {
 		response.WriteAppError(w, err)
 		return
 	}
@@ -55,7 +55,7 @@ func (h *SnsHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.snsUC.Update(r.Context(), uuid, req.Name, req.URL, req.Icon); err != nil {
+	if err := h.snsUC.Update(r.Context(), uuid, req.Name, req.URL); err != nil {
 		response.WriteAppError(w, err)
 		return
 	}
