@@ -1,4 +1,0 @@
-ALTER TABLE
-    product
-MODIFY
-    name VARCHAR(30) NOT NULL

@@ -4,14 +4,12 @@ on:
   push:
     branches: [main]
     paths:
-      - "clean-backend/**"
-      # TODO: apiがまだ移行途中のため追加。以降が完了したら見直しを行う。
       - "backend/**"
       - ".github/workflows/railway-deploy.yml"
   workflow_dispatch:
 
 concurrency:
-  group: railway-deploy-clean-backend
+  group: railway-deploy-backend
 
 jobs:
   deploy:
