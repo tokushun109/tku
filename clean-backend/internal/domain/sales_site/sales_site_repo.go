@@ -7,7 +7,7 @@ import (
 )
 
 type Repository interface {
-	Create(ctx context.Context, s *SalesSite) error
+	Create(ctx context.Context, s *SalesSite) (*SalesSite, error)
 	FindAll(ctx context.Context) ([]*SalesSite, error)
 	FindByName(ctx context.Context, name SalesSiteName) (*SalesSite, error)
 	FindByUUID(ctx context.Context, uuid primitive.UUID) (*SalesSite, error)

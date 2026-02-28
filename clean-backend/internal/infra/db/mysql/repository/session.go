@@ -20,19 +20,32 @@ func NewSessionRepository(db *sqlx.DB) *SessionRepository {
 	return &SessionRepository{db: db}
 }
 
-func (r *SessionRepository) Create(ctx context.Context, s *domain.Session) error {
+func (r *SessionRepository) Create(ctx context.Context, s *domain.Session) (*domain.Session, error) {
 	createdAt := s.CreatedAt()
 	if createdAt.IsZero() {
 		createdAt = time.Now()
 	}
-	_, err := getExecutor(ctx, r.db).ExecContext(
+	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`INSERT INTO session (uuid, user_id, created_at) VALUES (?, ?, ?)`,
 		s.UUID().Value(),
 		s.UserID(),
 		createdAt,
 	)
-	return err
+	if err != nil {
+		return nil, err
+	}
+
+	lastID, err := res.LastInsertId()
+	if err != nil {
+		return nil, err
+	}
+
+	created, err := domain.Rebuild(uint(lastID), s.UUID().Value(), s.UserID(), createdAt)
+	if err != nil {
+		return nil, fmt.Errorf("invalid session row: %w", err)
+	}
+	return created, nil
 }
 
 func (r *SessionRepository) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domain.Session, error) {

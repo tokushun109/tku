@@ -44,7 +44,7 @@ func (s *Service) Create(ctx context.Context, name string, rawURL string, icon s
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 
-	if err := s.repo.Create(ctx, skillMarket); err != nil {
+	if _, err := s.repo.Create(ctx, skillMarket); err != nil {
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 	return nil

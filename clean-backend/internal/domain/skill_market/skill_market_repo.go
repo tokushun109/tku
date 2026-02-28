@@ -7,7 +7,7 @@ import (
 )
 
 type Repository interface {
-	Create(ctx context.Context, s *SkillMarket) error
+	Create(ctx context.Context, s *SkillMarket) (*SkillMarket, error)
 	FindAll(ctx context.Context) ([]*SkillMarket, error)
 	FindByUUID(ctx context.Context, uuid primitive.UUID) (*SkillMarket, error)
 	Update(ctx context.Context, s *SkillMarket) (bool, error)

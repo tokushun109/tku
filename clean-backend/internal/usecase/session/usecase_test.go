@@ -23,12 +23,12 @@ type stubRepo struct {
 	created   *domain.Session
 }
 
-func (s *stubRepo) Create(ctx context.Context, sess *domain.Session) error {
+func (s *stubRepo) Create(ctx context.Context, sess *domain.Session) (*domain.Session, error) {
 	if s.createErr != nil {
-		return s.createErr
+		return nil, s.createErr
 	}
 	s.created = sess
-	return nil
+	return sess, nil
 }
 
 func (s *stubRepo) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domain.Session, error) {

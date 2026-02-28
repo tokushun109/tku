@@ -34,9 +34,12 @@ func (g *stubUUIDGen) New() string {
 	return g.uuid
 }
 
-func (s *stubRepo) Create(ctx context.Context, skillMarket *domain.SkillMarket) error {
+func (s *stubRepo) Create(ctx context.Context, skillMarket *domain.SkillMarket) (*domain.SkillMarket, error) {
 	s.created = skillMarket
-	return s.createErr
+	if s.createErr != nil {
+		return nil, s.createErr
+	}
+	return skillMarket, nil
 }
 
 func (s *stubRepo) FindAll(ctx context.Context) ([]*domain.SkillMarket, error) {

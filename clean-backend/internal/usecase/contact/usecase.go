@@ -49,10 +49,11 @@ func (s *Service) Create(ctx context.Context, name string, company string, phone
 		}
 	}
 
-	if err := s.repo.Create(ctx, contact); err != nil {
+	createdContact, err := s.repo.Create(ctx, contact)
+	if err != nil {
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 
-	s.notifier.NotifyContactCreated(ctx, contact)
+	s.notifier.NotifyContactCreated(ctx, createdContact)
 	return nil
 }

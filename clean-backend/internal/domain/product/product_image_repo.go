@@ -7,7 +7,7 @@ import (
 )
 
 type ProductImageRepository interface {
-	Create(ctx context.Context, image *ProductImage) error
+	Create(ctx context.Context, image *ProductImage) (*ProductImage, error)
 	FindByUUID(ctx context.Context, uuid primitive.UUID) (*ProductImage, error)
 	FindByProductID(ctx context.Context, productID primitive.ID) ([]*ProductImage, error)
 	UpdateOrder(ctx context.Context, uuid primitive.UUID, order int) (bool, error)

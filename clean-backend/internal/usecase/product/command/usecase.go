@@ -250,7 +250,7 @@ func (s *Service) Duplicate(ctx context.Context, rawURL string) error {
 			if err != nil {
 				return err
 			}
-			if err := s.productImageRepo.Create(txCtx, productImage); err != nil {
+			if _, err := s.productImageRepo.Create(txCtx, productImage); err != nil {
 				return err
 			}
 		}
@@ -634,7 +634,7 @@ func (s *Service) CreateProductImages(ctx context.Context, productUUID string, f
 				return err
 			}
 
-			if err := s.productImageRepo.Create(txCtx, image); err != nil {
+			if _, err := s.productImageRepo.Create(txCtx, image); err != nil {
 				return err
 			}
 		}

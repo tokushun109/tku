@@ -121,16 +121,12 @@ func (s *Service) resolveOrCreateTagIDsByNames(ctx context.Context, rawNames []s
 			if err != nil {
 				return nil, err
 			}
-			if err := s.tagRepo.Create(ctx, newTag); err != nil {
-				return nil, err
-			}
-
-			tag, err = s.tagRepo.FindByName(ctx, tagName)
+			tag, err = s.tagRepo.Create(ctx, newTag)
 			if err != nil {
 				return nil, err
 			}
 			if tag == nil {
-				return nil, fmt.Errorf("created tag was not found: %s", tagName.Value())
+				return nil, fmt.Errorf("created tag was not returned: %s", tagName.Value())
 			}
 		}
 

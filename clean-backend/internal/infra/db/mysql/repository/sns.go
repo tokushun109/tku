@@ -20,13 +20,26 @@ func NewSnsRepository(db *sqlx.DB) *SnsRepository {
 	return &SnsRepository{db: db}
 }
 
-func (r *SnsRepository) Create(ctx context.Context, s *domain.Sns) error {
-	_, err := getExecutor(ctx, r.db).ExecContext(
+func (r *SnsRepository) Create(ctx context.Context, s *domain.Sns) (*domain.Sns, error) {
+	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`INSERT INTO sns (uuid, name, url, icon, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())`,
 		s.UUID().Value(), s.Name().Value(), s.URL().Value(), s.Icon(),
 	)
-	return err
+	if err != nil {
+		return nil, err
+	}
+
+	lastID, err := res.LastInsertId()
+	if err != nil {
+		return nil, err
+	}
+
+	created, err := domain.Rebuild(uint(lastID), s.UUID().Value(), s.Name().Value(), s.URL().Value(), s.Icon())
+	if err != nil {
+		return nil, fmt.Errorf("invalid sns row: %w", err)
+	}
+	return created, nil
 }
 
 func (r *SnsRepository) FindAll(ctx context.Context) ([]*domain.Sns, error) {

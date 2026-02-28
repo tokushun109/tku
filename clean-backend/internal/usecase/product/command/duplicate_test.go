@@ -87,18 +87,18 @@ type stubTagRepoForDuplicate struct {
 	findErr error
 }
 
-func (s *stubTagRepoForDuplicate) Create(ctx context.Context, tag *domainTag.Tag) error {
+func (s *stubTagRepoForDuplicate) Create(ctx context.Context, tag *domainTag.Tag) (*domainTag.Tag, error) {
 	if s.byName == nil {
 		s.byName = map[string]*domainTag.Tag{}
 	}
 
 	rebuilt, err := domainTag.Rebuild(uint(len(s.byName)+1), tag.UUID().Value(), tag.Name().Value())
 	if err != nil {
-		return err
+		return nil, err
 	}
 	s.byName[strings.ToLower(rebuilt.Name().Value())] = rebuilt
 	s.created = append(s.created, rebuilt)
-	return nil
+	return rebuilt, nil
 }
 
 func (s *stubTagRepoForDuplicate) FindAll(ctx context.Context) ([]*domainTag.Tag, error) {
@@ -116,6 +116,14 @@ func (s *stubTagRepoForDuplicate) FindByName(ctx context.Context, name domainTag
 }
 
 func (s *stubTagRepoForDuplicate) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domainTag.Tag, error) {
+	if s.findErr != nil {
+		return nil, s.findErr
+	}
+	for _, tag := range s.byName {
+		if tag != nil && tag.UUID() == uuid {
+			return tag, nil
+		}
+	}
 	return nil, nil
 }
 
@@ -140,8 +148,8 @@ type stubSalesSiteRepoForDuplicate struct {
 	err    error
 }
 
-func (s *stubSalesSiteRepoForDuplicate) Create(ctx context.Context, salesSite *domainSalesSite.SalesSite) error {
-	return nil
+func (s *stubSalesSiteRepoForDuplicate) Create(ctx context.Context, salesSite *domainSalesSite.SalesSite) (*domainSalesSite.SalesSite, error) {
+	return salesSite, nil
 }
 
 func (s *stubSalesSiteRepoForDuplicate) FindAll(ctx context.Context) ([]*domainSalesSite.SalesSite, error) {
@@ -189,9 +197,9 @@ type stubProductImageRepoForDuplicate struct {
 	created []*domainProduct.ProductImage
 }
 
-func (s *stubProductImageRepoForDuplicate) Create(ctx context.Context, image *domainProduct.ProductImage) error {
+func (s *stubProductImageRepoForDuplicate) Create(ctx context.Context, image *domainProduct.ProductImage) (*domainProduct.ProductImage, error) {
 	s.created = append(s.created, image)
-	return nil
+	return image, nil
 }
 
 func (s *stubProductImageRepoForDuplicate) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domainProduct.ProductImage, error) {

@@ -29,8 +29,8 @@ func NewProductImageRepository(db *sqlx.DB) *ProductImageRepository {
 	return &ProductImageRepository{db: db}
 }
 
-func (r *ProductImageRepository) Create(ctx context.Context, image *domain.ProductImage) error {
-	_, err := getExecutor(ctx, r.db).ExecContext(
+func (r *ProductImageRepository) Create(ctx context.Context, image *domain.ProductImage) (*domain.ProductImage, error) {
+	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		"INSERT INTO product_image (uuid, name, mime_type, path, `order`, product_id, created_at, updated_at) "+
 			"VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())",
@@ -41,7 +41,28 @@ func (r *ProductImageRepository) Create(ctx context.Context, image *domain.Produ
 		image.Order().Value(),
 		image.ProductID(),
 	)
-	return err
+	if err != nil {
+		return nil, err
+	}
+
+	lastID, err := res.LastInsertId()
+	if err != nil {
+		return nil, err
+	}
+
+	created, err := domain.RebuildProductImage(
+		uint(lastID),
+		image.UUID().Value(),
+		image.Name().Value(),
+		image.MimeType().Value(),
+		image.Path().Value(),
+		image.Order().Value(),
+		image.ProductID(),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("invalid product image row: %w", err)
+	}
+	return created, nil
 }
 
 func (r *ProductImageRepository) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domain.ProductImage, error) {
