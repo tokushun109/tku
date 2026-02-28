@@ -3,11 +3,11 @@ package response
 import (
 	"bytes"
 	"encoding/json"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/tokushun109/tku/backend/internal/shared/logger"
 	"github.com/tokushun109/tku/backend/internal/usecase"
 )
 
@@ -65,15 +65,11 @@ func TestWriteSuccess(t *testing.T) {
 func TestWriteAppError(t *testing.T) {
 	t.Run("クライアントエラーならエラーログを出力しない", func(t *testing.T) {
 
-		var buf bytes.Buffer
-		prevOut := log.Writer()
-		prevFlags := log.Flags()
-		log.SetOutput(&buf)
-		log.SetFlags(0)
-		defer func() {
-			log.SetOutput(prevOut)
-			log.SetFlags(prevFlags)
-		}()
+		var stdoutBuf bytes.Buffer
+		var stderrBuf bytes.Buffer
+		logger.SetOutputs(&stdoutBuf, &stderrBuf)
+		logger.SetFlags(0)
+		defer logger.Reset()
 
 		rr := httptest.NewRecorder()
 		WriteAppError(rr, usecase.NewAppError(usecase.ErrInvalidInput))
@@ -81,8 +77,8 @@ func TestWriteAppError(t *testing.T) {
 		if rr.Code != http.StatusBadRequest {
 			t.Fatalf("expected status %d, got %d", http.StatusBadRequest, rr.Code)
 		}
-		if buf.Len() != 0 {
-			t.Fatalf("expected no log output, got %q", buf.String())
+		if stdoutBuf.Len() != 0 || stderrBuf.Len() != 0 {
+			t.Fatalf("expected no log output, got stdout=%q stderr=%q", stdoutBuf.String(), stderrBuf.String())
 		}
 		var body errorResp
 		if err := json.NewDecoder(rr.Body).Decode(&body); err != nil {
@@ -94,15 +90,11 @@ func TestWriteAppError(t *testing.T) {
 	})
 	t.Run("内部エラーならエラーログを出力する", func(t *testing.T) {
 
-		var buf bytes.Buffer
-		prevOut := log.Writer()
-		prevFlags := log.Flags()
-		log.SetOutput(&buf)
-		log.SetFlags(0)
-		defer func() {
-			log.SetOutput(prevOut)
-			log.SetFlags(prevFlags)
-		}()
+		var stdoutBuf bytes.Buffer
+		var stderrBuf bytes.Buffer
+		logger.SetOutputs(&stdoutBuf, &stderrBuf)
+		logger.SetFlags(0)
+		defer logger.Reset()
 
 		rr := httptest.NewRecorder()
 		WriteAppError(rr, usecase.NewAppErrorWithMessage(usecase.ErrInternal, "db error"))
@@ -110,7 +102,10 @@ func TestWriteAppError(t *testing.T) {
 		if rr.Code != http.StatusInternalServerError {
 			t.Fatalf("expected status %d, got %d", http.StatusInternalServerError, rr.Code)
 		}
-		logStr := buf.String()
+		if stdoutBuf.Len() != 0 {
+			t.Fatalf("expected no stdout log, got %q", stdoutBuf.String())
+		}
+		logStr := stderrBuf.String()
 		if logStr == "" || !bytes.Contains([]byte(logStr), []byte("internal error")) {
 			t.Fatalf("expected internal error log, got %q", logStr)
 		}

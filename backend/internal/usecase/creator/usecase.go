@@ -5,13 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"path"
 	"strings"
 	"time"
 
 	domain "github.com/tokushun109/tku/backend/internal/domain/creator"
+	"github.com/tokushun109/tku/backend/internal/shared/logger"
 	"github.com/tokushun109/tku/backend/internal/usecase"
 )
 
@@ -141,13 +141,13 @@ func (s *Service) UpdateLogo(ctx context.Context, logoBytes []byte) error {
 	updated, err := s.repo.UpdateLogo(ctx, current.ID(), logoMimeType, newLogoPath)
 	if err != nil {
 		if delErr := s.storage.Delete(ctx, newLogoPath.Value()); delErr != nil {
-			log.Printf("[WARN] creator update logo rollback delete failed: path=%s err=%v", newLogoPath.Value(), delErr)
+			logger.Warnf("creator update logo rollback delete failed: path=%s err=%v", newLogoPath.Value(), delErr)
 		}
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 	if !updated {
 		if delErr := s.storage.Delete(ctx, newLogoPath.Value()); delErr != nil {
-			log.Printf("[WARN] creator update logo rollback delete failed: path=%s err=%v", newLogoPath.Value(), delErr)
+			logger.Warnf("creator update logo rollback delete failed: path=%s err=%v", newLogoPath.Value(), delErr)
 		}
 		return usecase.NewAppErrorWithMessage(usecase.ErrNotFound, domain.ErrCreatorRecordMissing.Error())
 	}
@@ -155,7 +155,7 @@ func (s *Service) UpdateLogo(ctx context.Context, logoBytes []byte) error {
 	// DB の更新後に旧ファイルを削除する。削除失敗は orphan を許容して成功扱いにする。
 	if current.LogoPath() != nil && *current.LogoPath() != newLogoPath {
 		if delErr := s.storage.Delete(ctx, current.LogoPath().Value()); delErr != nil {
-			log.Printf("[WARN] creator update logo old file delete failed: path=%s err=%v", current.LogoPath().Value(), delErr)
+			logger.Warnf("creator update logo old file delete failed: path=%s err=%v", current.LogoPath().Value(), delErr)
 		}
 	}
 

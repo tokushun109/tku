@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 
@@ -15,6 +14,7 @@ import (
 	domainSiteDetail "github.com/tokushun109/tku/backend/internal/domain/site_detail"
 	domainTag "github.com/tokushun109/tku/backend/internal/domain/tag"
 	domainTarget "github.com/tokushun109/tku/backend/internal/domain/target"
+	"github.com/tokushun109/tku/backend/internal/shared/logger"
 	"github.com/tokushun109/tku/backend/internal/usecase"
 	usecaseProduct "github.com/tokushun109/tku/backend/internal/usecase/product"
 )
@@ -259,7 +259,7 @@ func (s *Service) Duplicate(ctx context.Context, rawURL string) error {
 	}); err != nil {
 		for _, path := range uploadedPaths {
 			if delErr := s.storage.Delete(ctx, path); delErr != nil {
-				log.Printf("[WARN] product duplicate rollback delete failed: path=%s err=%v", path, delErr)
+				logger.Warnf("product duplicate rollback delete failed: path=%s err=%v", path, delErr)
 			}
 		}
 
@@ -400,7 +400,7 @@ func (s *Service) Update(ctx context.Context, productUUID string, input usecaseP
 
 	for _, path := range deletedImagePaths {
 		if delErr := s.storage.Delete(ctx, path); delErr != nil {
-			log.Printf("[WARN] product update delete image object failed: path=%s err=%v", path, delErr)
+			logger.Warnf("product update delete image object failed: path=%s err=%v", path, delErr)
 		}
 	}
 
@@ -461,7 +461,7 @@ func (s *Service) Delete(ctx context.Context, productUUID string) error {
 
 	for _, path := range deletedImagePaths {
 		if delErr := s.storage.Delete(ctx, path); delErr != nil {
-			log.Printf("[WARN] product delete delete image object failed: path=%s err=%v", path, delErr)
+			logger.Warnf("product delete delete image object failed: path=%s err=%v", path, delErr)
 		}
 	}
 
@@ -642,7 +642,7 @@ func (s *Service) CreateProductImages(ctx context.Context, productUUID string, f
 	}); err != nil {
 		for _, path := range uploadedPaths {
 			if delErr := s.storage.Delete(ctx, path); delErr != nil {
-				log.Printf("[WARN] product image create rollback delete failed: path=%s err=%v", path, delErr)
+				logger.Warnf("product image create rollback delete failed: path=%s err=%v", path, delErr)
 			}
 		}
 
@@ -701,7 +701,7 @@ func (s *Service) DeleteProductImage(ctx context.Context, productUUID string, pr
 	}
 
 	if delErr := s.storage.Delete(ctx, image.Path().Value()); delErr != nil {
-		log.Printf("[WARN] product image delete object failed: path=%s err=%v", image.Path().Value(), delErr)
+		logger.Warnf("product image delete object failed: path=%s err=%v", image.Path().Value(), delErr)
 	}
 
 	return nil

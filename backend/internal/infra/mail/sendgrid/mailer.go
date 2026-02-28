@@ -6,11 +6,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 	"time"
 
+	"github.com/tokushun109/tku/backend/internal/shared/logger"
 	usecase "github.com/tokushun109/tku/backend/internal/usecase"
 )
 
@@ -52,7 +52,7 @@ func NewMailer(env, apiKey string) *Mailer {
 	normalizedEnv := strings.ToLower(strings.TrimSpace(env))
 	trimmedAPIKey := strings.TrimSpace(apiKey)
 	if trimmedAPIKey == "" {
-		log.Printf("[WARN] sendgrid mailer is disabled: sendgrid api key is empty (env=%s)", normalizedEnv)
+		logger.Warnf("sendgrid mailer is disabled: sendgrid api key is empty (env=%s)", normalizedEnv)
 	}
 
 	return &Mailer{

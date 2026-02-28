@@ -27,6 +27,7 @@ const AdminHeader = ({ isLoggedIn = true }: Props) => {
         setDialogVisible(false)
         try {
             await logoutAction()
+            router.push('/admin/login')
         } catch (error) {
             console.error('Logout error:', error)
             // エラーが発生してもログインページにリダイレクト

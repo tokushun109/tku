@@ -1,21 +1,21 @@
 package main
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/tokushun109/tku/backend/internal/app/di"
+	"github.com/tokushun109/tku/backend/internal/shared/logger"
 )
 
 func main() {
 	cfg, handler, err := di.BuildServer()
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatalf("%v", err)
 	}
 
 	addr := ":" + cfg.Port
-	log.Printf("server starting on %s", addr)
+	logger.Infof("server starting on %s", addr)
 	if err := http.ListenAndServe(addr, handler); err != nil {
-		log.Fatal(err)
+		logger.Fatalf("%v", err)
 	}
 }
