@@ -72,9 +72,9 @@ export const getCarouselImages = async (): Promise<IThumbnail[]> => {
     }
 }
 
-export interface IProductImageParams {
+export interface IProductImageDisplayOrderParams {
+    displayOrder: { [key: number]: number }
     isChanged: boolean
-    order: { [key: number]: number }
 }
 
 /** 商品リストを取得（管理画面用） */
@@ -166,10 +166,10 @@ export const deleteProduct = async (uuid: string): Promise<void> => {
 }
 
 /** 商品画像をアップロード */
-export const uploadProductImages = async (productUuid: string, files: File[], orderParams: IProductImageParams): Promise<void> => {
+export const uploadProductImages = async (productUuid: string, files: File[], displayOrderParams: IProductImageDisplayOrderParams): Promise<void> => {
     try {
         const formData = new FormData()
-        formData.append('order', JSON.stringify(orderParams))
+        formData.append('displayOrder', JSON.stringify(displayOrderParams))
 
         files.forEach((file, index) => {
             formData.append(`file${index}`, file)

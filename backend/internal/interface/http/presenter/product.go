@@ -18,10 +18,10 @@ func ToProductResponse(product *usecaseProductQuery.Product) *response.ProductRe
 	images := make([]response.ProductImageResponse, 0, len(product.ProductImages))
 	for _, image := range product.ProductImages {
 		images = append(images, response.ProductImageResponse{
-			UUID:    image.UUID,
-			Name:    image.Name,
-			Order:   image.Order,
-			APIPath: image.APIPath,
+			UUID:         image.UUID,
+			Name:         image.Name,
+			DisplayOrder: image.DisplayOrder,
+			APIPath:      image.APIPath,
 		})
 	}
 

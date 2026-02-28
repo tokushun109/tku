@@ -33,8 +33,8 @@ type SiteDetailInput struct {
 }
 
 type ProductImageUpdateInput struct {
-	UUID  string
-	Order int
+	UUID         string
+	DisplayOrder int
 }
 
 type ProductImageUploadFile struct {

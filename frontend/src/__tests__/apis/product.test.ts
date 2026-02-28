@@ -134,7 +134,7 @@ describe('product API', () => {
                     {
                         apiPath: '/image/earrings-women-1.jpg',
                         name: 'earrings-women-1.jpg',
-                        order: 1,
+                        displayOrder: 1,
                         uuid: 'earrings-women-1-image-uuid',
                     },
                 ],

@@ -210,7 +210,7 @@ func (s *stubProductImageRepoForDuplicate) FindByProductID(ctx context.Context, 
 	return nil, nil
 }
 
-func (s *stubProductImageRepoForDuplicate) UpdateOrder(ctx context.Context, uuid primitive.UUID, order int) (bool, error) {
+func (s *stubProductImageRepoForDuplicate) UpdateDisplayOrder(ctx context.Context, uuid primitive.UUID, displayOrder int) (bool, error) {
 	return false, nil
 }
 
@@ -368,8 +368,8 @@ func TestDuplicateProduct(t *testing.T) {
 		if len(productImageRepo.created) != 2 {
 			t.Fatalf("expected 2 product images, got %d", len(productImageRepo.created))
 		}
-		if productImageRepo.created[0].Order().Value() != 2 || productImageRepo.created[1].Order().Value() != 1 {
-			t.Fatalf("unexpected image order: %d, %d", productImageRepo.created[0].Order().Value(), productImageRepo.created[1].Order().Value())
+		if productImageRepo.created[0].DisplayOrder().Value() != 2 || productImageRepo.created[1].DisplayOrder().Value() != 1 {
+			t.Fatalf("unexpected image display order: %d, %d", productImageRepo.created[0].DisplayOrder().Value(), productImageRepo.created[1].DisplayOrder().Value())
 		}
 		if len(storage.puts) != 2 {
 			t.Fatalf("expected 2 storage puts, got %d", len(storage.puts))

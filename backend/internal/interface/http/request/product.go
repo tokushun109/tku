@@ -27,8 +27,8 @@ type ProductSiteDetailRequest struct {
 }
 
 type ProductImageRequest struct {
-	UUID  string `json:"uuid"`
-	Order int    `json:"order"`
+	UUID         string `json:"uuid"`
+	DisplayOrder int    `json:"displayOrder"`
 }
 
 type CreateProductRequest struct {

@@ -47,7 +47,7 @@ const mockProductData = [
                 uuid: 'image-1',
                 apiPath: '/image/product-1.jpg',
                 name: 'product-1.jpg',
-                order: 1,
+                displayOrder: 1,
             },
         ],
         siteDetails: [],

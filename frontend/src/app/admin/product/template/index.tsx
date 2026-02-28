@@ -154,16 +154,16 @@ export const AdminProductTemplate = ({
                     const existingItems = data.imageItems.filter((item) => !item.isNewUpload)
                     const updatedProductImages = updateItem.productImages.map((image) => {
                         const reorderedItem = existingItems.find((item) => item.src === image.apiPath)
-                        if (reorderedItem && reorderedItem.order) {
+                        if (reorderedItem && reorderedItem.displayOrder) {
                             // 並び替え後の位置に基づいて100から降順で計算
                             return {
                                 ...image,
-                                order: 100 - (reorderedItem.order - 1),
+                                displayOrder: 100 - (reorderedItem.displayOrder - 1),
                             }
                         }
                         return {
                             ...image,
-                            order: image.order, // 並び替えされていない場合は既存の値を維持
+                            displayOrder: image.displayOrder, // 並び替えされていない場合は既存の値を維持
                         }
                     })
 
@@ -185,7 +185,7 @@ export const AdminProductTemplate = ({
                 const hasOrderChanged = data.isImageOrderChanged || false
 
                 // 新規画像の優先順位を計算
-                let uploadFileOrder: { [key: number]: number } = {}
+                let uploadFileDisplayOrder: { [key: number]: number } = {}
 
                 if (hasOrderChanged && data.imageItems) {
                     // 並び替えが行われた場合、全体の順序から新規画像の順序を計算
@@ -200,27 +200,27 @@ export const AdminProductTemplate = ({
                             return expectedIndex === uploadIndex
                         })
 
-                        if (matchingItem && matchingItem.order) {
+                        if (matchingItem && matchingItem.displayOrder) {
                             // 並び替え後の位置（1から始まる）を100から降順に変換
-                            uploadFileOrder[uploadIndex] = 100 - (matchingItem.order - 1)
+                            uploadFileDisplayOrder[uploadIndex] = 100 - (matchingItem.displayOrder - 1)
                         } else {
                             // フォールバック: 既存画像数を考慮した順序
-                            uploadFileOrder[uploadIndex] = 100 - existingImagesCount - uploadIndex
+                            uploadFileDisplayOrder[uploadIndex] = 100 - existingImagesCount - uploadIndex
                         }
                     })
                 } else {
                     // 通常の場合、既存画像より低い優先順位を設定
                     data.uploadImages.forEach((_, index) => {
-                        uploadFileOrder[index] = 100 - existingImagesCount - index
+                        uploadFileDisplayOrder[index] = 100 - existingImagesCount - index
                     })
                 }
 
-                const orderParams = {
+                const displayOrderParams = {
                     isChanged: hasOrderChanged,
-                    order: uploadFileOrder,
+                    displayOrder: uploadFileDisplayOrder,
                 }
 
-                await uploadProductImages(productUuid, data.uploadImages, orderParams)
+                await uploadProductImages(productUuid, data.uploadImages, displayOrderParams)
             }
 
             setIsDialogOpen(false)

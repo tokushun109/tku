@@ -170,7 +170,7 @@ export const ProductFormDialog = ({
                     id: `existing-${image.uuid}`,
                     src: image.apiPath,
                     isNewUpload: false,
-                    order: image.order,
+                    displayOrder: image.displayOrder,
                 })) || []
             setImageItems(existingImages)
         }
@@ -296,7 +296,7 @@ export const ProductFormDialog = ({
         // 順序を更新
         const updatedItems = newItems.map((item, index) => ({
             ...item,
-            order: index + 1,
+            displayOrder: index + 1,
         }))
 
         setImageItems(updatedItems)

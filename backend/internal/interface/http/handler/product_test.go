@@ -47,10 +47,10 @@ type stubProductUC struct {
 	createProductImagesErr    error
 	createProductImagesCalled bool
 	createProductImagesReq    struct {
-		productUUID string
-		files       []usecaseProduct.ProductImageUploadFile
-		isChanged   bool
-		orderMap    map[int]int
+		productUUID     string
+		files           []usecaseProduct.ProductImageUploadFile
+		isChanged       bool
+		displayOrderMap map[int]int
 	}
 }
 
@@ -130,13 +130,13 @@ func (s *stubProductUC) CreateProductImages(
 	productUUID string,
 	files []usecaseProduct.ProductImageUploadFile,
 	isChanged bool,
-	orderMap map[int]int,
+	displayOrderMap map[int]int,
 ) error {
 	s.createProductImagesCalled = true
 	s.createProductImagesReq.productUUID = productUUID
 	s.createProductImagesReq.files = files
 	s.createProductImagesReq.isChanged = isChanged
-	s.createProductImagesReq.orderMap = orderMap
+	s.createProductImagesReq.displayOrderMap = displayOrderMap
 	return s.createProductImagesErr
 }
 

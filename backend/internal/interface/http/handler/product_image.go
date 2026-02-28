@@ -19,9 +19,9 @@ type ProductImageHandler struct {
 	productUC usecaseProduct.Usecase
 }
 
-type productImageOrderParams struct {
-	IsChanged bool        `json:"isChanged"`
-	Order     map[int]int `json:"order"`
+type productImageDisplayOrderParams struct {
+	IsChanged    bool        `json:"isChanged"`
+	DisplayOrder map[int]int `json:"displayOrder"`
 }
 
 func NewProductImageHandler(productUC usecaseProduct.Usecase) *ProductImageHandler {
@@ -50,10 +50,10 @@ func (h *ProductImageHandler) Create(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	productUUID := vars["product_uuid"]
 
-	orderParams := productImageOrderParams{Order: map[int]int{}}
-	orderJSON := r.FormValue("order")
-	if orderJSON != "" {
-		if err := json.Unmarshal([]byte(orderJSON), &orderParams); err != nil {
+	displayOrderParams := productImageDisplayOrderParams{DisplayOrder: map[int]int{}}
+	displayOrderJSON := r.FormValue("displayOrder")
+	if displayOrderJSON != "" {
+		if err := json.Unmarshal([]byte(displayOrderJSON), &displayOrderParams); err != nil {
 			response.WriteAppError(w, usecase.NewAppError(usecase.ErrInvalidInput))
 			return
 		}
@@ -88,7 +88,7 @@ func (h *ProductImageHandler) Create(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	if err := h.productUC.CreateProductImages(r.Context(), productUUID, files, orderParams.IsChanged, orderParams.Order); err != nil {
+	if err := h.productUC.CreateProductImages(r.Context(), productUUID, files, displayOrderParams.IsChanged, displayOrderParams.DisplayOrder); err != nil {
 		response.WriteAppError(w, err)
 		return
 	}

@@ -17,12 +17,12 @@ type SiteDetail struct {
 }
 
 type ProductImage struct {
-	UUID     string
-	Name     string
-	MimeType string
-	Path     string
-	Order    int
-	APIPath  string
+	UUID         string
+	Name         string
+	MimeType     string
+	Path         string
+	DisplayOrder int
+	APIPath      string
 }
 
 type Product struct {

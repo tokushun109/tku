@@ -27,7 +27,7 @@ type CommandUsecase interface {
 	Delete(ctx context.Context, productUUID string) error
 	UploadCSV(ctx context.Context, rows []ProductCSVInputRow) error
 	GetProductImageBlob(ctx context.Context, productImageUUID string) (*ProductImageBlob, error)
-	CreateProductImages(ctx context.Context, productUUID string, files []ProductImageUploadFile, isChanged bool, orderMap map[int]int) error
+	CreateProductImages(ctx context.Context, productUUID string, files []ProductImageUploadFile, isChanged bool, displayOrderMap map[int]int) error
 	DeleteProductImage(ctx context.Context, productUUID string, productImageUUID string) error
 }
 
@@ -94,8 +94,8 @@ func (s *Service) GetProductImageBlob(ctx context.Context, productImageUUID stri
 	return s.commandUC.GetProductImageBlob(ctx, productImageUUID)
 }
 
-func (s *Service) CreateProductImages(ctx context.Context, productUUID string, files []ProductImageUploadFile, isChanged bool, orderMap map[int]int) error {
-	return s.commandUC.CreateProductImages(ctx, productUUID, files, isChanged, orderMap)
+func (s *Service) CreateProductImages(ctx context.Context, productUUID string, files []ProductImageUploadFile, isChanged bool, displayOrderMap map[int]int) error {
+	return s.commandUC.CreateProductImages(ctx, productUUID, files, isChanged, displayOrderMap)
 }
 
 func (s *Service) DeleteProductImage(ctx context.Context, productUUID string, productImageUUID string) error {

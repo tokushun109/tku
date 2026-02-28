@@ -13,9 +13,9 @@ const mockProduct: IProduct = {
     isActive: true,
     isRecommend: false,
     productImages: [
-        { uuid: '1', apiPath: '/image/about/story.jpg', name: 'image1', order: 1 },
-        { uuid: '2', apiPath: '/image/about/concept1.jpg', name: 'image2', order: 2 },
-        { uuid: '3', apiPath: '/image/about/concept2.jpg', name: 'image3', order: 3 },
+        { uuid: '1', apiPath: '/image/about/story.jpg', name: 'image1', displayOrder: 1 },
+        { uuid: '2', apiPath: '/image/about/concept1.jpg', name: 'image2', displayOrder: 2 },
+        { uuid: '3', apiPath: '/image/about/concept2.jpg', name: 'image3', displayOrder: 3 },
     ],
     target: { uuid: '1', name: 'レディース' },
     category: { uuid: '1', name: 'ピアス' },
@@ -115,7 +115,7 @@ export const SingleImage: Story = {
     args: {
         product: {
             ...mockProduct,
-            productImages: [{ uuid: '1', apiPath: '/image/about/story.jpg', name: 'image1', order: 1 }],
+            productImages: [{ uuid: '1', apiPath: '/image/about/story.jpg', name: 'image1', displayOrder: 1 }],
         },
     },
 }
