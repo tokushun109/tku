@@ -386,7 +386,7 @@ func (r *ProductQueryReader) loadTags(ctx context.Context, productIDs []uint) (m
 func (r *ProductQueryReader) loadImages(ctx context.Context, productIDs []uint) (map[uint][]usecaseProductQuery.ProductImage, error) {
 	query, args, err := sqlx.In(
 		`
-		SELECT pi.product_id, pi.uuid, pi.name, pi.mime_type, pi.path, pi.display_order AS display_order
+		SELECT pi.product_id, pi.uuid, pi.name, pi.mime_type, pi.path, pi.display_order
 		FROM product_image pi
 		WHERE pi.deleted_at IS NULL AND pi.product_id IN (?)
 		ORDER BY pi.display_order DESC, pi.id ASC
