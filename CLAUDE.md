@@ -14,7 +14,7 @@
 ハンドメイドアクセサリー作家「tku」の商品販売サイト（tocoriri.com）です。プロジェクト構成：
 
 - **フロントエンド**: Next.js + TypeScript による SSR/SPA ハイブリッド
-- **バックエンド**: Go REST API with GORM、Railway にデプロイ
+- **バックエンド**: Go REST API with sqlx、Railway にデプロイ
 - **データベース**: MySQL with golang-migrate によるスキーマ管理
 - **インフラ**: CDK for Terraform による AWS リソース管理
 

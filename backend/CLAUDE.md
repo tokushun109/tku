@@ -6,7 +6,7 @@
 
 - Go 製の REST API
 - Gorilla Mux を使った HTTP ルーティング
-- MySQL + GORM / sqlx ベースの永続化
+- MySQL + sqlx ベースの永続化
 - DDD + Clean Architecture を前提に `internal/` 配下へ責務分離
 
 ## 開発コマンド
