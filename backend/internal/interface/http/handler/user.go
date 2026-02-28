@@ -44,7 +44,7 @@ func (h *UserHandler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res := &response.LoginUserResponse{
+	res := &response.CurrentUserResponse{
 		UUID:    authUser.UUID,
 		Name:    authUser.Name,
 		Email:   authUser.Email,

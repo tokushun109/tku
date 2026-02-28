@@ -41,7 +41,7 @@ type loginSessionResp struct {
 	UUID string `json:"uuid"`
 }
 
-type loginUserResp struct {
+type currentUserResp struct {
 	UUID    string `json:"uuid"`
 	Name    string `json:"name"`
 	Email   string `json:"email"`
@@ -121,7 +121,7 @@ func TestGetCurrentUser(t *testing.T) {
 			t.Fatalf("expected 200, got %d", rr.Code)
 		}
 
-		var resp loginUserResp
+		var resp currentUserResp
 		if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
 			t.Fatalf("decode error: %v", err)
 		}

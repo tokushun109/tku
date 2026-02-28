@@ -1,6 +1,6 @@
 package response
 
-type LoginUserResponse struct {
+type CurrentUserResponse struct {
 	UUID    string `json:"uuid"`
 	Name    string `json:"name"`
 	Email   string `json:"email"`
