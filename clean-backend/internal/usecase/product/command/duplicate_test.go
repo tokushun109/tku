@@ -250,12 +250,27 @@ func TestDuplicateProduct(t *testing.T) {
 			duplicateSource: source,
 		}
 
-		err := s.Duplicate(context.Background(), "https://example.com/items/1")
+		err := s.Duplicate(context.Background(), "example.com/items/1")
 		if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
 			t.Fatalf("expected ErrInvalidInput, got %v", err)
 		}
 		if source.called {
 			t.Fatalf("duplicate source should not be called")
+		}
+	})
+
+	t.Run("duplicate sourceが入力エラーを返したときバリデーションエラーで失敗する", func(t *testing.T) {
+		source := &stubDuplicateSource{err: usecase.ErrInvalidInput}
+		s := &Service{
+			duplicateSource: source,
+		}
+
+		err := s.Duplicate(context.Background(), "https://www.creema.jp/items/1")
+		if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
+			t.Fatalf("expected ErrInvalidInput, got %v", err)
+		}
+		if !source.called {
+			t.Fatalf("duplicate source should be called")
 		}
 	})
 

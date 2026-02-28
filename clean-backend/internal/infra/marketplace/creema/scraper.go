@@ -16,6 +16,8 @@ import (
 	"github.com/saintfish/chardet"
 	"golang.org/x/net/html/charset"
 
+	"github.com/tokushun109/tku/clean-backend/internal/domain/primitive"
+	"github.com/tokushun109/tku/clean-backend/internal/usecase"
 	usecaseProduct "github.com/tokushun109/tku/clean-backend/internal/usecase/product"
 )
 
@@ -34,7 +36,12 @@ func NewScraper() *Scraper {
 }
 
 func (s *Scraper) Duplicate(ctx context.Context, rawURL string) (*usecaseProduct.DuplicateProductData, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rawURL, nil)
+	productURL, err := validateProductPageURL(rawURL)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, productURL.String(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +74,7 @@ func (s *Scraper) Duplicate(ctx context.Context, rawURL string) (*usecaseProduct
 		return nil, err
 	}
 
-	baseURL, err := url.Parse(rawURL)
+	baseURL, err := url.Parse(productURL.String())
 	if err != nil {
 		return nil, err
 	}
@@ -110,6 +117,25 @@ func (s *Scraper) Duplicate(ctx context.Context, rawURL string) (*usecaseProduct
 	}
 
 	return product, nil
+}
+
+func validateProductPageURL(rawURL string) (*url.URL, error) {
+	trimmed := strings.TrimSpace(rawURL)
+	parsedURL, err := primitive.NewURL(trimmed)
+	if err != nil {
+		return nil, err
+	}
+
+	u, err := url.Parse(parsedURL.Value())
+	if err != nil {
+		return nil, primitive.ErrInvalidURL
+	}
+
+	if u.Scheme != "https" || strings.ToLower(u.Hostname()) != "www.creema.jp" {
+		return nil, usecase.ErrInvalidInput
+	}
+
+	return u, nil
 }
 
 func newDocument(body []byte) (*goquery.Document, error) {

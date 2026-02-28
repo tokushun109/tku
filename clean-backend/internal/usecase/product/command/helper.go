@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/url"
 	"strings"
 
 	domainCategory "github.com/tokushun109/tku/clean-backend/internal/domain/category"
@@ -312,17 +311,8 @@ func (s *Service) buildSiteDetails(ctx context.Context, productID primitive.ID, 
 
 func normalizeDuplicateProductURL(rawURL string) (string, error) {
 	trimmed := strings.TrimSpace(rawURL)
-	parsedURL, err := primitive.NewURL(trimmed)
-	if err != nil {
+	if _, err := primitive.NewURL(trimmed); err != nil {
 		return "", err
-	}
-
-	u, err := url.Parse(parsedURL.Value())
-	if err != nil {
-		return "", primitive.ErrInvalidURL
-	}
-	if !strings.Contains(strings.ToLower(u.Host), "creema") {
-		return "", usecase.ErrInvalidInput
 	}
 
 	return trimmed, nil
