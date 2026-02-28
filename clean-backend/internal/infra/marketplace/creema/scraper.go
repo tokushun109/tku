@@ -25,6 +25,9 @@ const defaultTimeout = 10 * time.Second
 
 const creemaProductPageHost = "www.creema.jp"
 
+const maxProductPageBodySize = 2 << 20   // 2MB
+const maxProductImageBodySize = 20 << 20 // 20MB
+
 var allowedImageHosts = map[string]struct{}{
 	"c.p02.c4a.im": {},
 }
@@ -64,7 +67,7 @@ func (s *Scraper) Duplicate(ctx context.Context, rawURL string) (*usecaseProduct
 		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
-	body, err := io.ReadAll(resp.Body)
+	body, err := readResponseBodyWithLimit(resp.Body, maxProductPageBodySize)
 	if err != nil {
 		return nil, err
 	}
@@ -232,7 +235,7 @@ func (s *Scraper) fetchImage(ctx context.Context, imageURL string) ([]byte, erro
 		return nil, fmt.Errorf("unexpected image status code: %d", resp.StatusCode)
 	}
 
-	return io.ReadAll(resp.Body)
+	return readResponseBodyWithLimit(resp.Body, maxProductImageBodySize)
 }
 
 func validateImageRequestURL(u *url.URL) error {
@@ -267,6 +270,17 @@ func (s *Scraper) doRequest(req *http.Request, validateURL func(*url.URL) error)
 	}
 
 	return resp, nil
+}
+
+func readResponseBodyWithLimit(body io.Reader, maxSize int64) ([]byte, error) {
+	data, err := io.ReadAll(io.LimitReader(body, maxSize+1))
+	if err != nil {
+		return nil, err
+	}
+	if len(data) == 0 || int64(len(data)) > maxSize {
+		return nil, usecase.ErrInvalidInput
+	}
+	return data, nil
 }
 
 func buildImageName(imageURL string, index int) string {

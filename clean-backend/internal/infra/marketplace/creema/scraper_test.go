@@ -1,6 +1,7 @@
 package creema
 
 import (
+	"bytes"
 	"errors"
 	"net/url"
 	"testing"
@@ -77,6 +78,32 @@ func TestResolveImageURL(t *testing.T) {
 
 	t.Run("https以外の画像URLを拒否する", func(t *testing.T) {
 		_, err := resolveImageURL(baseURL, "http://c.p02.c4a.im/images/item/example.png")
+		if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
+			t.Fatalf("expected ErrInvalidInput, got %v", err)
+		}
+	})
+}
+
+func TestReadResponseBodyWithLimit(t *testing.T) {
+	t.Run("上限内の本文を読み込める", func(t *testing.T) {
+		body, err := readResponseBodyWithLimit(bytes.NewReader([]byte("ok")), 2)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if string(body) != "ok" {
+			t.Fatalf("unexpected body: %s", string(body))
+		}
+	})
+
+	t.Run("空の本文は入力エラーを返す", func(t *testing.T) {
+		_, err := readResponseBodyWithLimit(bytes.NewReader(nil), 2)
+		if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
+			t.Fatalf("expected ErrInvalidInput, got %v", err)
+		}
+	})
+
+	t.Run("上限を超える本文は入力エラーを返す", func(t *testing.T) {
+		_, err := readResponseBodyWithLimit(bytes.NewReader(bytes.Repeat([]byte("a"), 4)), 3)
 		if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
 			t.Fatalf("expected ErrInvalidInput, got %v", err)
 		}
