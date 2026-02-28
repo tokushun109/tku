@@ -1,3 +1,4 @@
+import { getApiBaseUrl } from '@/apis/baseUrl'
 import { IProduct, IProductsByCategory, IThumbnail } from '@/features/product/type'
 import { ApiError } from '@/utils/error'
 import { convertObjectToURLSearchParams } from '@/utils/request'
@@ -12,7 +13,7 @@ export interface IGetProductsParams {
 export const getProductsByCategory = async (params: IGetProductsParams): Promise<IProductsByCategory[]> => {
     try {
         const query = convertObjectToURLSearchParams(params)
-        const res = await fetch(`${process.env.API_BASE_URL}/category/product?${query}`, {
+        const res = await fetch(`${getApiBaseUrl()}/category/product?${query}`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -33,7 +34,7 @@ export const getProductsByCategory = async (params: IGetProductsParams): Promise
 /** 商品詳細を取得 */
 export const getProduct = async (uuid: string): Promise<IProduct> => {
     try {
-        const res = await fetch(`${process.env.API_BASE_URL}/product/${uuid}`, {
+        const res = await fetch(`${getApiBaseUrl()}/product/${uuid}`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -53,7 +54,7 @@ export const getProduct = async (uuid: string): Promise<IProduct> => {
 
 export const getCarouselImages = async (): Promise<IThumbnail[]> => {
     try {
-        const res = await fetch(`${process.env.API_BASE_URL}/carousel_image/`, {
+        const res = await fetch(`${getApiBaseUrl()}/carousel_image/`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -80,7 +81,7 @@ export interface IProductImageParams {
 export const getProducts = async (params: IGetProductsParams): Promise<IProduct[]> => {
     try {
         const query = convertObjectToURLSearchParams(params)
-        const res = await fetch(`${process.env.API_BASE_URL}/product?${query}`, {
+        const res = await fetch(`${getApiBaseUrl()}/product?${query}`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -101,7 +102,7 @@ export const getProducts = async (params: IGetProductsParams): Promise<IProduct[
 /** 商品を作成 */
 export const createProduct = async (product: Omit<IProduct, 'uuid'>): Promise<{ uuid: string }> => {
     try {
-        const res = await fetch(`${process.env.API_BASE_URL}/product`, {
+        const res = await fetch(`${getApiBaseUrl()}/product`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -124,7 +125,7 @@ export const createProduct = async (product: Omit<IProduct, 'uuid'>): Promise<{ 
 /** 商品を更新 */
 export const updateProduct = async (uuid: string, product: IProduct): Promise<void> => {
     try {
-        const res = await fetch(`${process.env.API_BASE_URL}/product/${uuid}`, {
+        const res = await fetch(`${getApiBaseUrl()}/product/${uuid}`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -147,7 +148,7 @@ export const updateProduct = async (uuid: string, product: IProduct): Promise<vo
 /** 商品を削除 */
 export const deleteProduct = async (uuid: string): Promise<void> => {
     try {
-        const res = await fetch(`${process.env.API_BASE_URL}/product/${uuid}`, {
+        const res = await fetch(`${getApiBaseUrl()}/product/${uuid}`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -174,7 +175,7 @@ export const uploadProductImages = async (productUuid: string, files: File[], or
             formData.append(`file${index}`, file)
         })
 
-        const res = await fetch(`${process.env.API_BASE_URL}/product/${productUuid}/product_image`, {
+        const res = await fetch(`${getApiBaseUrl()}/product/${productUuid}/product_image`, {
             method: 'POST',
             body: formData,
             credentials: 'include',
@@ -196,7 +197,7 @@ export interface ICreemaDuplicateParams {
 /** Creemaから商品を複製 */
 export const duplicateProductFromCreema = async (params: ICreemaDuplicateParams): Promise<void> => {
     try {
-        const res = await fetch(`${process.env.API_BASE_URL}/product/duplicate`, {
+        const res = await fetch(`${getApiBaseUrl()}/product/duplicate`, {
             headers: {
                 'Content-Type': 'application/json',
             },

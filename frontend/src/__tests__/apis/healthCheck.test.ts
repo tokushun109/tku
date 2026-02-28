@@ -1,10 +1,13 @@
 import { http, HttpResponse } from 'msw'
 import { describe, it, expect, beforeEach } from 'vitest'
 
+import { getApiBaseUrl } from '@/apis/baseUrl'
 import { healthCheck } from '@/apis/healthCheck'
 import { ApiError } from '@/utils/error'
 
 import { server } from '../mocks/server'
+
+const apiBaseUrl = getApiBaseUrl()
 
 describe('healthCheck API', () => {
     beforeEach(() => {
@@ -14,7 +17,7 @@ describe('healthCheck API', () => {
     describe('healthCheck', () => {
         it('正常にヘルスチェックを実行する', async () => {
             server.use(
-                http.get('http://localhost:8080/health_check', () => {
+                http.get(`${apiBaseUrl}/health_check`, () => {
                     return HttpResponse.json({
                         message: 'API server is healthy',
                     })
@@ -30,7 +33,7 @@ describe('healthCheck API', () => {
 
         it('メッセージなしでもレスポンスを処理する', async () => {
             server.use(
-                http.get('http://localhost:8080/health_check', () => {
+                http.get(`${apiBaseUrl}/health_check`, () => {
                     return HttpResponse.json({})
                 }),
             )
@@ -42,7 +45,7 @@ describe('healthCheck API', () => {
 
         it('APIエラーの場合、ApiErrorが投げられる', async () => {
             server.use(
-                http.get('http://localhost:8080/health_check', () => {
+                http.get(`${apiBaseUrl}/health_check`, () => {
                     return new HttpResponse(null, { status: 500 })
                 }),
             )
@@ -52,7 +55,7 @@ describe('healthCheck API', () => {
 
         it('ネットワークエラーの場合、一般的なエラーが投げられる', async () => {
             server.use(
-                http.get('http://localhost:8080/health_check', () => {
+                http.get(`${apiBaseUrl}/health_check`, () => {
                     return HttpResponse.error()
                 }),
             )
@@ -64,7 +67,7 @@ describe('healthCheck API', () => {
             let capturedMethod: string | undefined
 
             server.use(
-                http.get('http://localhost:8080/health_check', ({ request }) => {
+                http.get(`${apiBaseUrl}/health_check`, ({ request }) => {
                     capturedMethod = request.method
                     return HttpResponse.json({ message: 'success' })
                 }),
@@ -79,7 +82,7 @@ describe('healthCheck API', () => {
             let capturedPath: string | undefined
 
             server.use(
-                http.get('http://localhost:8080/health_check', ({ request }) => {
+                http.get(`${apiBaseUrl}/health_check`, ({ request }) => {
                     capturedPath = new URL(request.url).pathname
                     return HttpResponse.json({ message: 'success' })
                 }),
@@ -87,14 +90,14 @@ describe('healthCheck API', () => {
 
             await healthCheck()
 
-            expect(capturedPath).toBe('/health_check')
+            expect(capturedPath).toBe(new URL(`${apiBaseUrl}/health_check`).pathname)
         })
 
         it('正しいContent-Typeヘッダーでリクエストされる', async () => {
             let capturedHeaders: Headers | undefined
 
             server.use(
-                http.get('http://localhost:8080/health_check', ({ request }) => {
+                http.get(`${apiBaseUrl}/health_check`, ({ request }) => {
                     capturedHeaders = request.headers
                     return HttpResponse.json({ message: 'success' })
                 }),
@@ -107,7 +110,7 @@ describe('healthCheck API', () => {
 
         it('503エラーの場合、適切にApiErrorが投げられる', async () => {
             server.use(
-                http.get('http://localhost:8080/health_check', () => {
+                http.get(`${apiBaseUrl}/health_check`, () => {
                     return new HttpResponse(null, { status: 503 })
                 }),
             )
@@ -122,7 +125,7 @@ describe('healthCheck API', () => {
 
         it('404エラーの場合、適切にApiErrorが投げられる', async () => {
             server.use(
-                http.get('http://localhost:8080/health_check', () => {
+                http.get(`${apiBaseUrl}/health_check`, () => {
                     return new HttpResponse(null, { status: 404 })
                 }),
             )

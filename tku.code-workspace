@@ -9,8 +9,8 @@
       "path": "./frontend"
     },
     {
-      "name": "backend/api",
-      "path": "./backend/api"
+      "name": "backend",
+      "path": "./backend"
     },
     {
       "name": "infra",

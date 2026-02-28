@@ -4,6 +4,8 @@ import { ICreator } from '@/features/creator/type'
 import { IProduct, IProductsByCategory, IThumbnail } from '@/features/product/type'
 import { ISite } from '@/features/site/type'
 
+const apiBaseUrl = 'http://localhost:8080/api'
+
 // モックデータの定義
 const mockCategories = {
     earrings: {
@@ -175,12 +177,12 @@ const mockSalesTarget: ISite = {
 // APIハンドラーの定義
 export const handlers = [
     // 商品関連のAPI
-    http.get('http://localhost:8080/category/product', () => {
+    http.get(`${apiBaseUrl}/category/product`, () => {
         return HttpResponse.json(mockProductsByCategory)
     }),
 
     // 全商品一覧取得API（管理画面用）
-    http.get('http://localhost:8080/product', ({ request }) => {
+    http.get(`${apiBaseUrl}/product`, ({ request }) => {
         const url = new URL(request.url)
         const mode = url.searchParams.get('mode')
         const category = url.searchParams.get('category')
@@ -208,7 +210,7 @@ export const handlers = [
         return HttpResponse.json(activeProducts)
     }),
 
-    http.get('http://localhost:8080/product/:uuid', ({ params }) => {
+    http.get(`${apiBaseUrl}/product/:uuid`, ({ params }) => {
         const { uuid } = params
         const product = mockProducts.find((p) => p.uuid === uuid)
 
@@ -219,45 +221,45 @@ export const handlers = [
         return HttpResponse.json(product)
     }),
 
-    http.get('http://localhost:8080/carousel_image/', () => {
+    http.get(`${apiBaseUrl}/carousel_image/`, () => {
         return HttpResponse.json(mockThumbnails)
     }),
 
     // カテゴリ関連のAPI
-    http.get('http://localhost:8080/category', () => {
+    http.get(`${apiBaseUrl}/category`, () => {
         return HttpResponse.json(Object.values(mockCategories))
     }),
 
     // ターゲット関連のAPI
-    http.get('http://localhost:8080/target', () => {
+    http.get(`${apiBaseUrl}/target`, () => {
         return HttpResponse.json(Object.values(mockTargets))
     }),
 
     // タグ関連のAPI
-    http.get('http://localhost:8080/tag', () => {
+    http.get(`${apiBaseUrl}/tag`, () => {
         return HttpResponse.json(mockTags)
     }),
 
     // 販売サイト関連のAPI
-    http.get('http://localhost:8080/sales_site/', () => {
+    http.get(`${apiBaseUrl}/sales_site/`, () => {
         return HttpResponse.json(mockSalesSites)
     }),
 
     // その他のAPI
-    http.get('http://localhost:8080/creator', () => {
+    http.get(`${apiBaseUrl}/creator`, () => {
         return HttpResponse.json(mockCreator)
     }),
 
-    http.get('http://localhost:8080/sales_target', () => {
+    http.get(`${apiBaseUrl}/sales_target`, () => {
         return HttpResponse.json([mockSalesTarget])
     }),
 
-    http.get('http://localhost:8080/health', () => {
-        return HttpResponse.json({ status: 'ok' })
+    http.get(`${apiBaseUrl}/health_check`, () => {
+        return HttpResponse.json({ message: 'API server is healthy' })
     }),
 
     // お問い合わせAPI
-    http.post('http://localhost:8080/contact', async ({ request }) => {
+    http.post(`${apiBaseUrl}/contact`, async ({ request }) => {
         const body = (await request.json()) as any
 
         // バリデーション（簡単なチェック）
@@ -269,21 +271,21 @@ export const handlers = [
     }),
 
     // エラーケースのテスト用
-    http.get('http://localhost:8080/error/500', () => {
+    http.get(`${apiBaseUrl}/error/500`, () => {
         return new HttpResponse(null, { status: 500 })
     }),
 
-    http.get('http://localhost:8080/error/404', () => {
+    http.get(`${apiBaseUrl}/error/404`, () => {
         return new HttpResponse(null, { status: 404 })
     }),
 
     // ネットワークエラーのテスト用
-    http.get('http://localhost:8080/error/network', () => {
+    http.get(`${apiBaseUrl}/error/network`, () => {
         return HttpResponse.error()
     }),
 
     // CSV関連のAPI
-    http.get('http://localhost:8080/csv/product', () => {
+    http.get(`${apiBaseUrl}/csv/product`, () => {
         const csvContent = `name,price,description,isActive,isRecommend
 女性向けイヤリング1,1500,女性向けイヤリング1の詳細,true,true
 女性向けイヤリング2,2000,女性向けイヤリング2の詳細,false,false
@@ -298,7 +300,7 @@ export const handlers = [
         })
     }),
 
-    http.post('http://localhost:8080/csv/product', async ({ request }) => {
+    http.post(`${apiBaseUrl}/csv/product`, async ({ request }) => {
         const formData = await request.formData()
         const csvFile = formData.get('csv') as File
 

@@ -1,5 +1,7 @@
 #!/usr/bin/env sh
-cd frontend
+repo_root="$(git rev-parse --show-toplevel)"
+
+cd "$repo_root/frontend"
 
 # 全てのテストを実行
 echo "🧪 全てのテストを実行しています..."
@@ -16,12 +18,12 @@ fi
 # フロントエンドのテストが成功したら次へ
 echo "✅ フロントエンドのテストが成功しました。"
 
-# clean-backend のテストを実行
-echo "🧪 clean-backend のテストを実行しています..."
-cd ../clean-backend
+# backend のテストを実行
+echo "🧪 backend のテストを実行しています..."
+cd "$repo_root/backend"
 if ! go test ./...; then
-  echo "❌ clean-backend のテストが失敗しました。以下を確認してください:"
-  echo "  - (cd clean-backend && go test ./...)"
+  echo "❌ backend のテストが失敗しました。以下を確認してください:"
+  echo "  - (cd backend && go test ./...)"
   echo "🔧 テストを修正してから再度プッシュしてください。"
   exit 1
 fi

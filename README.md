@@ -34,7 +34,7 @@ tku/
 | 内容                                     | 補足                                                               |
 | ---------------------------------------- | ------------------------------------------------------------------ |
 | 使用言語は Go                            | フレームワークは使用せずに作成を行っている                         |
-| ORM は GORM を使用                       | Gorilla Mux を使って、RESTful API を作成                           |
+| DB アクセスは sqlx を使用                | Gorilla Mux を使って、RESTful API を作成                           |
 | お問い合わせに対するメール送信機能も実装 | SendGrid を使用して作成                                            |
 | デプロイ先                               | Railway でホスティング、コンテナベースの自動デプロイとスケーリング |
 | テーブルの ver は golang-migrate で管理  | Railway 上で migrate を実行して DB の migration を管理             |
@@ -67,7 +67,7 @@ graph TD
 
     %% Railway Platform
     subgraph Railway[Railway Platform]
-        API[Go REST API<br/>GORM + Gorilla Mux]
+        API[Go REST API<br/>sqlx + Gorilla Mux]
         MySQL[(MySQL Database<br/>golang-migrate)]
     end
 

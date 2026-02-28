@@ -1,13 +1,13 @@
 services:
-  # MySQL(clean-backend)
+  # MySQL
   db:
     build:
-      context: ./clean-backend
+      context: ./backend
       dockerfile: ./docker/db/Dockerfile
     container_name: mysql
     volumes:
-      - ./clean-backend/docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
-      - ./clean-backend/docker/db/initdb.d:/docker-entrypoint-initdb.d
+      - ./backend/docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./backend/docker/db/initdb.d:/docker-entrypoint-initdb.d
     environment:
       - MYSQL_ROOT_PASSWORD=root
       - DB_USER=root
@@ -21,26 +21,26 @@ services:
       - 3306:3306
     command: mysqld --innodb_use_native_aio=0
 
-  # DB migrations(clean-backend)
+  # DB migrations
   migrate:
     build:
-      context: ./clean-backend
+      context: ./backend
       dockerfile: ./docker/migrations/Dockerfile
     container_name: migrate
-    env_file: ./clean-backend/.env
+    env_file: ./backend/.env
     environment:
       MYSQL_HOST: mysql
     depends_on:
       db:
         condition: service_healthy
     volumes:
-      - ./clean-backend/db/migrations:/migrations
+      - ./backend/db/migrations:/migrations
 
-  # S3 compatible storage (MinIO) for clean-backend local development
+  # S3 compatible storage (MinIO) for backend local development
   minio:
     image: minio/minio:latest
     container_name: minio
-    env_file: ./clean-backend/.env
+    env_file: ./backend/.env
     command: server /data --console-address ":9001"
     ports:
       - 9000:9000
@@ -52,7 +52,7 @@ services:
   minio-init:
     image: minio/mc:latest
     container_name: minio-init
-    env_file: ./clean-backend/.env
+    env_file: ./backend/.env
     depends_on:
       - minio
     entrypoint: >
@@ -62,13 +62,13 @@ services:
       exit 0;
       "
 
-  # API(backend ※今後移行予定)
+  # Backend API
   api:
     build:
-      context: ./backend/api
+      context: ./backend
       dockerfile: ./docker/api/Dockerfile
     container_name: api
-    env_file: ./backend/api/.env
+    env_file: ./backend/.env
     environment:
       MYSQL_HOST: mysql
     depends_on:
@@ -79,9 +79,9 @@ services:
     ports:
       - 8080:8080
     volumes:
-      - ./backend/api:/api
+      - ./backend:/api
 
-  # FRONTEND
+  # Frontend React App
   frontend:
     build:
       context: ./frontend
@@ -89,7 +89,7 @@ services:
     container_name: frontend
     environment:
       BROWSER_BASE_URL: http://localhost:8080/api
-      API_BASE_URL: http://host.docker.internal:8080/api
+      API_BASE_URL: http://api:8080/api
     depends_on:
       - api
     command: sh ./docker/script/local/command.sh

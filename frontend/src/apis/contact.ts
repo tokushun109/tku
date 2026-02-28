@@ -1,3 +1,4 @@
+import { getApiBaseUrl } from '@/apis/baseUrl'
 import { IContact, IContactListItem } from '@/features/contact/type'
 import { createAPIHeaders } from '@/utils/cookie'
 import { ApiError } from '@/utils/error'
@@ -15,7 +16,7 @@ export const getContacts = async (): Promise<IContactListItem[]> => {
     try {
         const headers = await createAPIHeaders()
 
-        const res = await fetch(`${process.env.API_BASE_URL}/contact`, {
+        const res = await fetch(`${getApiBaseUrl()}/contact`, {
             headers,
             method: 'GET',
         })
@@ -34,7 +35,7 @@ export const getContacts = async (): Promise<IContactListItem[]> => {
 /** お問い合わせを送信 */
 export const postContact = async (params: IPostContactParams): Promise<IContactResponse> => {
     try {
-        const res = await fetch(`${process.env.API_BASE_URL}/contact`, {
+        const res = await fetch(`${getApiBaseUrl()}/contact`, {
             headers: {
                 'Content-Type': 'application/json',
             },

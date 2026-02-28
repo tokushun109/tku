@@ -1,3 +1,4 @@
+import { getApiBaseUrl } from '@/apis/baseUrl'
 import { ILoginForm, ISession } from '@/features/auth/type'
 import { ApiError } from '@/utils/error'
 
@@ -9,7 +10,7 @@ export interface ILoginResponse {
 // ログイン
 export const login = async (loginData: ILoginForm): Promise<ILoginResponse> => {
     try {
-        const res = await fetch(`${process.env.API_BASE_URL}/user/login`, {
+        const res = await fetch(`${getApiBaseUrl()}/user/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -34,7 +35,7 @@ export const login = async (loginData: ILoginForm): Promise<ILoginResponse> => {
 // ログアウトAPI関数
 export const logout = async (sessionToken: string): Promise<void> => {
     try {
-        const res = await fetch(`${process.env.API_BASE_URL}/user/logout`, {
+        const res = await fetch(`${getApiBaseUrl()}/user/logout`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -57,7 +58,7 @@ export const logout = async (sessionToken: string): Promise<void> => {
 // セッション検証API関数
 export const validateSession = async (sessionToken: string): Promise<boolean> => {
     try {
-        const res = await fetch(`${process.env.API_BASE_URL}/user/login`, {
+        const res = await fetch(`${getApiBaseUrl()}/user/login`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

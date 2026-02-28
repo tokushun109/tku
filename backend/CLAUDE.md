@@ -1,102 +1,47 @@
-# CLAUDE.md - API (バックエンド)
+# CLAUDE.md - backend
 
-このファイルは、apiディレクトリでのコード開発における Claude Code (claude.ai/code)向けのガイドラインです。
+このファイルは、`backend/` 配下で作業する開発者とエージェント向けの補助ガイドです。
 
 ## プロジェクト概要
 
-Go REST API with GORM によるバックエンドアプリケーション。フレームワークなしの Go + Gorilla Mux で構築。
+- Go 製の REST API
+- Gorilla Mux を使った HTTP ルーティング
+- MySQL + sqlx ベースの永続化
+- DDD + Clean Architecture を前提に `internal/` 配下へ責務分離
 
 ## 開発コマンド
 
 ```bash
-# ホットリロード開発（air使用）
-go install github.com/cosmtrek/air@v1.40.0
-air
+# ホットリロード開発
+sh ./docker/api/script/local/command.sh
 
 # 直接実行
-go run main.go
+go run ./cmd/api
 
 # ビルド
-go build -o bin/main main.go
+go build -o ./bin/main ./cmd/api
+
+# テスト
+go test ./...
 ```
 
-## プロジェクト構造
+## ディレクトリ構成
 
-```
+```text
 backend/
-├── api/                   # Goアプリケーションのメインディレクトリ
-│   ├── app/              # アプリケーションコア
-│   │   ├── controllers/ # HTTP リクエストハンドラーとルーティング
-│   │   ├── models/      # GORM データベースモデル
-│   │   └── db/          # マイグレーションファイルと DB 設定
-│   ├── config/           # アプリケーション設定管理
-│   ├── utils/            # ユーティリティ関数
-│   ├── docker/           # Docker関連ファイル
-│   ├── main.go           # アプリケーションエントリーポイント
-│   ├── go.mod            # Go modules設定
-│   └── go.sum            # Go modules依存関係
-└── CLAUDE.md              # 本ドキュメント
+├── cmd/api/                 # アプリケーションのエントリーポイント
+├── db/migrations/           # golang-migrate 用マイグレーション
+├── docker/                  # ローカル開発 / DB / migrate 用設定
+├── docs/                    # 設計メモと移行ドキュメント
+├── internal/app/di/         # 依存注入
+├── internal/domain/         # ドメインモデル
+├── internal/usecase/        # ユースケース
+├── internal/interface/http/ # handler / presenter / request / response / router
+└── internal/infra/          # DB / mail / storage / marketplace などの実装
 ```
 
-### 詳細構成
+## 運用メモ
 
-- **Controllers**: `/api/app/controllers/` - HTTP リクエストハンドラーとルーティング
-- **Models**: `/api/app/models/` - GORM データベースモデル
-- **Database**: `/api/app/db/` - マイグレーションファイルと DB 設定
-- **Config**: `/api/config/` - アプリケーション設定管理
-- **Utils**: `/api/utils/` - UUID生成、ログ、ディレクトリ操作等のユーティリティ
-
-## 主要機能
-
-- **商品管理**: ハンドメイドアクセサリーの CRUD 操作
-- **画像アップロード**: S3 連携による商品画像管理
-- **管理ダッシュボード**: CSV 一括編集機能付きコンテンツ管理
-- **Web スクレイピング**: Creema マーケットプレイス連携による商品データ取得
-- **お問い合わせフォーム**: SendGrid 連携によるメール通知
-- **SEO**: SNS シェア用動的 OGP 生成
-
-## データベース
-
-### マイグレーション
-
-- **場所**: `/api/app/db/migrations/`
-- **管理**: golang-migrate による管理
-- **本番環境**: Railway でマイグレーション実行
-- **手動実行**: マイグレーション用 Docker コンテナ使用
-
-### 設定
-
-- **ローカル**: `.env`ファイルと`config.ini`使用
-- **本番**: Railway の環境変数
-- **データベース設定**: `/api/config/config.go`で設定
-
-## 技術スタック
-
-- **言語**: Go
-- **ルーター**: Gorilla Mux
-- **ORM**: GORM
-- **データベース**: MySQL
-- **画像保存**: S3 (UUID ベース)
-
-## デプロイ
-
-- **プラットフォーム**: Railway にデプロイ
-- **CI/CD**: GitHub Actions（`.github/workflows/ci.yml`）
-- **方法**: Git Push によるデプロイ（Railway 自動ビルド）
-- **データベース**: Railway MySQL インスタンス使用
-
-## 開発方針
-
-### アーキテクチャ
-
-- **設計**: RESTful API
-- **認証**: 必要に応じて実装
-- **エラーハンドリング**: 適切なHTTPステータスコードとエラーレスポンス
-- **ログ**: 構造化ログの実装
-
-### コーディング規約
-
-- **パッケージ構成**: 機能別にパッケージを分割
-- **命名**: Go の慣例に従う（CamelCase、省略形の適切な使用）
-- **エラーハンドリング**: Go らしいエラーハンドリングの実装
-- **テスト**: 重要な機能にはユニットテストを実装
+- Railway では `backend` を Root Directory として扱う
+- ローカルの Docker 起動も `backend/.env` を前提にする
+- 詳細な移行背景は `backend/docs/` 配下のドキュメントを参照する
