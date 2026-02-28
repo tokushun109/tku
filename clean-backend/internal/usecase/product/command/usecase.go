@@ -44,6 +44,8 @@ type Service struct {
 	txManager        usecase.TxManager
 }
 
+const creemaSalesSiteName = "creema"
+
 var _ Usecase = (*Service)(nil)
 
 func New(
@@ -176,12 +178,12 @@ func (s *Service) Duplicate(ctx context.Context, rawURL string) error {
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 
-	salesSite, err := s.findSalesSiteByName(ctx, "creema")
+	salesSite, err := s.findSalesSiteByName(ctx, creemaSalesSiteName)
 	if err != nil {
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 	if salesSite == nil {
-		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, "sales site is not found: creema")
+		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, "sales site is not found: "+creemaSalesSiteName)
 	}
 
 	uploadedPaths := make([]string, 0, len(duplicatedProduct.Images))
