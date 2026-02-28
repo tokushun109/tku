@@ -28,7 +28,7 @@ const ProductThumbnail = ({ item }: Props) => {
     return (
         <div className={styles['container']} onClick={handleClick} style={{ cursor: 'pointer' }}>
             <div className={styles['image-container']}>
-                <Image alt={item.product.name} src={item.apiPath} />
+                <Image alt={item.product.name} src={item.apiPath.trim() || '/image/gray-image.png'} />
                 <div className={styles['chip']}>
                     <Chip color={ColorType.Secondary} fontSize={isSmallScreen ? FontSizeType.Small : FontSizeType.SmMd}>
                         {item.product.target.name}
