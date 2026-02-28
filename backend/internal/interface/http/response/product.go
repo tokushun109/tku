@@ -17,10 +17,10 @@ type ProductSiteDetailResponse struct {
 }
 
 type ProductImageResponse struct {
-	UUID    string `json:"uuid"`
-	Name    string `json:"name"`
-	Order   int    `json:"order"`
-	APIPath string `json:"apiPath"`
+	UUID         string `json:"uuid"`
+	Name         string `json:"name"`
+	DisplayOrder int    `json:"displayOrder"`
+	APIPath      string `json:"apiPath"`
 }
 
 type ProductResponse struct {

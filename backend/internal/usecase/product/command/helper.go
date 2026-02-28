@@ -344,7 +344,7 @@ func isInvalidProductInputError(err error) bool {
 		errors.Is(err, domainProduct.ErrInvalidImageName) ||
 		errors.Is(err, domainProduct.ErrInvalidImageMimeType) ||
 		errors.Is(err, domainProduct.ErrInvalidImagePath) ||
-		errors.Is(err, domainProduct.ErrInvalidImageOrder) ||
+		errors.Is(err, domainProduct.ErrInvalidImageDisplayOrder) ||
 		errors.Is(err, domainProduct.ErrInvalidImageProductID) ||
 		errors.Is(err, domainSiteDetail.ErrInvalidDetailURL) ||
 		errors.Is(err, domainSiteDetail.ErrInvalidProductID) ||

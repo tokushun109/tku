@@ -5,13 +5,13 @@ import { ISiteDetail } from '../site/type'
 
 export interface IProductImage {
     apiPath: string
+    displayOrder: number
     name: string
-    order: number
     uuid: string
 }
 
-export interface IImagePathOrder {
-    order: number | null
+export interface IImagePathDisplayOrder {
+    displayOrder: number | null
     path: string
     type: ImageType
 }

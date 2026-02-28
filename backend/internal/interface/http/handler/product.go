@@ -276,8 +276,8 @@ func toUpdateProductInput(req request.UpdateProductRequest) usecaseProduct.Updat
 	productImages := make([]usecaseProduct.ProductImageUpdateInput, 0, len(req.ProductImages))
 	for _, image := range req.ProductImages {
 		productImages = append(productImages, usecaseProduct.ProductImageUpdateInput{
-			UUID:  image.UUID,
-			Order: image.Order,
+			UUID:         image.UUID,
+			DisplayOrder: image.DisplayOrder,
 		})
 	}
 

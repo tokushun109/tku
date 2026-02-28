@@ -7,26 +7,26 @@ import (
 )
 
 const (
-	productImageOrderMin = 0
-	productImageOrderMax = 100000
+	productImageDisplayOrderMin = 0
+	productImageDisplayOrderMax = 100000
 )
 
 // NOTE: 値が大きいほど、表示優先度が高い
-type ProductImageOrder int
+type ProductImageDisplayOrder int
 
-var _ domainVO.ValueObject[int] = ProductImageOrder(0)
+var _ domainVO.ValueObject[int] = ProductImageDisplayOrder(0)
 
-func NewProductImageOrder(v int) (ProductImageOrder, error) {
-	if v < productImageOrderMin || v > productImageOrderMax {
-		return 0, ErrInvalidImageOrder
+func NewProductImageDisplayOrder(v int) (ProductImageDisplayOrder, error) {
+	if v < productImageDisplayOrderMin || v > productImageDisplayOrderMax {
+		return 0, ErrInvalidImageDisplayOrder
 	}
-	return ProductImageOrder(v), nil
+	return ProductImageDisplayOrder(v), nil
 }
 
-func (o ProductImageOrder) Value() int {
+func (o ProductImageDisplayOrder) Value() int {
 	return int(o)
 }
 
-func (o ProductImageOrder) String() string {
+func (o ProductImageDisplayOrder) String() string {
 	return strconv.Itoa(o.Value())
 }

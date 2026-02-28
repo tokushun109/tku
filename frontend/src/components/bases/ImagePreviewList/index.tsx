@@ -5,9 +5,9 @@ import { Image } from '../Image'
 import styles from './styles.module.scss'
 
 export interface ImageItem {
+    displayOrder?: number
     id: string
     isNewUpload: boolean
-    order?: number
     src: string
 }
 

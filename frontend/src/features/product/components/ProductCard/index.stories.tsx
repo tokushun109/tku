@@ -17,7 +17,7 @@ const meta: Meta<typeof ProductCard> = {
                     uuid: '1',
                     apiPath: '/image/gray-image.png',
                     name: 'sample-image',
-                    order: 1,
+                    displayOrder: 1,
                 },
             ],
             category: {
@@ -75,7 +75,7 @@ export const RecommendProduct: Story = {
                     uuid: '2',
                     apiPath: '/image/gray-image.png',
                     name: 'recommend-image',
-                    order: 1,
+                    displayOrder: 1,
                 },
             ],
             category: {

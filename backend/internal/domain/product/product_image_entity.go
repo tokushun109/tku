@@ -3,13 +3,13 @@ package product
 import "github.com/tokushun109/tku/backend/internal/domain/primitive"
 
 type ProductImage struct {
-	id        primitive.ID
-	uuid      primitive.UUID
-	name      ProductImageName
-	mimeType  ProductImageMimeType
-	path      ProductImagePath
-	order     ProductImageOrder
-	productID primitive.ID
+	id           primitive.ID
+	uuid         primitive.UUID
+	name         ProductImageName
+	mimeType     ProductImageMimeType
+	path         ProductImagePath
+	displayOrder ProductImageDisplayOrder
+	productID    primitive.ID
 }
 
 func NewProductImage(
@@ -17,10 +17,10 @@ func NewProductImage(
 	name string,
 	rawMimeType string,
 	rawPath string,
-	order int,
+	displayOrder int,
 	productID uint,
 ) (*ProductImage, error) {
-	image, err := newProductImageWithValidatedValues(rawUUID, name, rawMimeType, rawPath, order, productID)
+	image, err := newProductImageWithValidatedValues(rawUUID, name, rawMimeType, rawPath, displayOrder, productID)
 	if err != nil {
 		return nil, err
 	}
@@ -33,14 +33,14 @@ func RebuildProductImage(
 	name string,
 	rawMimeType string,
 	rawPath string,
-	order int,
+	displayOrder int,
 	productID uint,
 ) (*ProductImage, error) {
 	parsedID, err := primitive.NewID(id)
 	if err != nil {
 		return nil, ErrInvalidImageID
 	}
-	image, err := newProductImageWithValidatedValues(rawUUID, name, rawMimeType, rawPath, order, productID)
+	image, err := newProductImageWithValidatedValues(rawUUID, name, rawMimeType, rawPath, displayOrder, productID)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func newProductImageWithValidatedValues(
 	name string,
 	rawMimeType string,
 	rawPath string,
-	order int,
+	displayOrder int,
 	productID uint,
 ) (*ProductImage, error) {
 	uuid, err := primitive.NewUUID(rawUUID)
@@ -72,7 +72,7 @@ func newProductImageWithValidatedValues(
 	if err != nil {
 		return nil, err
 	}
-	imageOrder, err := NewProductImageOrder(order)
+	productImageDisplayOrder, err := NewProductImageDisplayOrder(displayOrder)
 	if err != nil {
 		return nil, err
 	}
@@ -82,12 +82,12 @@ func newProductImageWithValidatedValues(
 	}
 
 	return &ProductImage{
-		uuid:      uuid,
-		name:      productImageName,
-		mimeType:  mimeType,
-		path:      path,
-		order:     imageOrder,
-		productID: parsedProductID,
+		uuid:         uuid,
+		name:         productImageName,
+		mimeType:     mimeType,
+		path:         path,
+		displayOrder: productImageDisplayOrder,
+		productID:    parsedProductID,
 	}, nil
 }
 
@@ -111,19 +111,19 @@ func (p *ProductImage) Path() ProductImagePath {
 	return p.path
 }
 
-func (p *ProductImage) Order() ProductImageOrder {
-	return p.order
+func (p *ProductImage) DisplayOrder() ProductImageDisplayOrder {
+	return p.displayOrder
 }
 
 func (p *ProductImage) ProductID() uint {
 	return p.productID.Value()
 }
 
-func (p *ProductImage) ChangeOrder(order int) error {
-	imageOrder, err := NewProductImageOrder(order)
+func (p *ProductImage) ChangeDisplayOrder(displayOrder int) error {
+	productImageDisplayOrder, err := NewProductImageDisplayOrder(displayOrder)
 	if err != nil {
 		return err
 	}
-	p.order = imageOrder
+	p.displayOrder = productImageDisplayOrder
 	return nil
 }

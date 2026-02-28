@@ -315,18 +315,18 @@ func (s *Service) Update(ctx context.Context, productUUID string, input usecaseP
 		return err
 	}
 
-	requestedImageOrders := make(map[string]int, len(input.ProductImages))
+	requestedImageDisplayOrders := make(map[string]int, len(input.ProductImages))
 	for _, image := range input.ProductImages {
 		if _, err := primitive.NewUUID(image.UUID); err != nil {
 			return usecase.NewAppError(usecase.ErrInvalidInput)
 		}
-		if _, err := domainProduct.NewProductImageOrder(image.Order); err != nil {
+		if _, err := domainProduct.NewProductImageDisplayOrder(image.DisplayOrder); err != nil {
 			return usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error())
 		}
-		if _, exists := requestedImageOrders[image.UUID]; exists {
+		if _, exists := requestedImageDisplayOrders[image.UUID]; exists {
 			return usecase.NewAppError(usecase.ErrInvalidInput)
 		}
-		requestedImageOrders[image.UUID] = image.Order
+		requestedImageDisplayOrders[image.UUID] = image.DisplayOrder
 	}
 
 	deletedImagePaths := make([]string, 0)
@@ -360,12 +360,12 @@ func (s *Service) Update(ctx context.Context, productUUID string, input usecaseP
 			imageMap[image.UUID().Value()] = image
 		}
 
-		for imageUUID, order := range requestedImageOrders {
+		for imageUUID, displayOrder := range requestedImageDisplayOrders {
 			image, ok := imageMap[imageUUID]
 			if !ok {
 				return usecase.ErrInvalidInput
 			}
-			updated, err := s.productImageRepo.UpdateOrder(txCtx, image.UUID(), order)
+			updated, err := s.productImageRepo.UpdateDisplayOrder(txCtx, image.UUID(), displayOrder)
 			if err != nil {
 				return err
 			}
@@ -375,7 +375,7 @@ func (s *Service) Update(ctx context.Context, productUUID string, input usecaseP
 		}
 
 		for _, image := range currentImages {
-			if _, keep := requestedImageOrders[image.UUID().Value()]; keep {
+			if _, keep := requestedImageDisplayOrders[image.UUID().Value()]; keep {
 				continue
 			}
 			deleted, err := s.productImageRepo.DeleteByUUID(txCtx, image.UUID())
@@ -581,7 +581,7 @@ func (s *Service) GetProductImageBlob(ctx context.Context, productImageUUID stri
 	}, nil
 }
 
-func (s *Service) CreateProductImages(ctx context.Context, productUUID string, files []usecaseProduct.ProductImageUploadFile, isChanged bool, orderMap map[int]int) error {
+func (s *Service) CreateProductImages(ctx context.Context, productUUID string, files []usecaseProduct.ProductImageUploadFile, isChanged bool, displayOrderMap map[int]int) error {
 	uuid, err := primitive.NewUUID(productUUID)
 	if err != nil {
 		return usecase.NewAppError(usecase.ErrInvalidInput)
@@ -617,9 +617,9 @@ func (s *Service) CreateProductImages(ctx context.Context, productUUID string, f
 			}
 			uploadedPaths = append(uploadedPaths, imagePath.Value())
 
-			order := 0
+			displayOrder := 0
 			if isChanged {
-				order = orderMap[i]
+				displayOrder = displayOrderMap[i]
 			}
 
 			image, err := domainProduct.NewProductImage(
@@ -627,7 +627,7 @@ func (s *Service) CreateProductImages(ctx context.Context, productUUID string, f
 				file.Name,
 				imageMimeType.Value(),
 				imagePath.Value(),
-				order,
+				displayOrder,
 				product.ID().Value(),
 			)
 			if err != nil {

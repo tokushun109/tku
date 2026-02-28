@@ -53,13 +53,13 @@ describe('Product Detail Page Integration Test', () => {
                 {
                     apiPath: '/image/earrings-women-1.jpg',
                     name: 'earrings-women-1.jpg',
-                    order: 1,
+                    displayOrder: 1,
                     uuid: 'earrings-women-1-image-uuid',
                 },
                 {
                     apiPath: '/image/earrings-women-1-2.jpg',
                     name: 'earrings-women-1-2.jpg',
-                    order: 2,
+                    displayOrder: 2,
                     uuid: 'earrings-women-1-2-image-uuid',
                 },
             ],

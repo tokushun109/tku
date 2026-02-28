@@ -35,12 +35,12 @@ type productTagRow struct {
 }
 
 type productImageRow struct {
-	ProductID uint   `db:"product_id"`
-	UUID      string `db:"uuid"`
-	Name      string `db:"name"`
-	MimeType  string `db:"mime_type"`
-	Path      string `db:"path"`
-	Order     int    `db:"order"`
+	ProductID    uint   `db:"product_id"`
+	UUID         string `db:"uuid"`
+	Name         string `db:"name"`
+	MimeType     string `db:"mime_type"`
+	Path         string `db:"path"`
+	DisplayOrder int    `db:"display_order"`
 }
 
 type productSiteDetailRow struct {
@@ -385,10 +385,12 @@ func (r *ProductQueryReader) loadTags(ctx context.Context, productIDs []uint) (m
 
 func (r *ProductQueryReader) loadImages(ctx context.Context, productIDs []uint) (map[uint][]usecaseProductQuery.ProductImage, error) {
 	query, args, err := sqlx.In(
-		"SELECT pi.product_id, pi.uuid, pi.name, pi.mime_type, pi.path, pi.`order` AS `order`\n"+
-			"FROM product_image pi\n"+
-			"WHERE pi.deleted_at IS NULL AND pi.product_id IN (?)\n"+
-			"ORDER BY pi.`order` DESC, pi.id ASC",
+		`
+		SELECT pi.product_id, pi.uuid, pi.name, pi.mime_type, pi.path, pi.display_order AS display_order
+		FROM product_image pi
+		WHERE pi.deleted_at IS NULL AND pi.product_id IN (?)
+		ORDER BY pi.display_order DESC, pi.id ASC
+		`,
 		productIDs,
 	)
 	if err != nil {
@@ -404,12 +406,12 @@ func (r *ProductQueryReader) loadImages(ctx context.Context, productIDs []uint) 
 	result := make(map[uint][]usecaseProductQuery.ProductImage, len(productIDs))
 	for _, row := range rows {
 		result[row.ProductID] = append(result[row.ProductID], usecaseProductQuery.ProductImage{
-			UUID:     row.UUID,
-			Name:     row.Name,
-			MimeType: row.MimeType,
-			Path:     row.Path,
-			Order:    row.Order,
-			APIPath:  "",
+			UUID:         row.UUID,
+			Name:         row.Name,
+			MimeType:     row.MimeType,
+			Path:         row.Path,
+			DisplayOrder: row.DisplayOrder,
+			APIPath:      "",
 		})
 	}
 	return result, nil

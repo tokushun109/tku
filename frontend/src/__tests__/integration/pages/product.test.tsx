@@ -51,7 +51,7 @@ describe('Product Page Integration Test', () => {
                             {
                                 apiPath: '/image/earrings-women-1.jpg',
                                 name: 'earrings-women-1.jpg',
-                                order: 1,
+                                displayOrder: 1,
                                 uuid: 'earrings-women-1-image-uuid',
                             },
                         ],
@@ -76,7 +76,7 @@ describe('Product Page Integration Test', () => {
                             {
                                 apiPath: '/image/rings-men-1.jpg',
                                 name: 'rings-men-1.jpg',
-                                order: 1,
+                                displayOrder: 1,
                                 uuid: 'rings-men-1-image-uuid',
                             },
                         ],

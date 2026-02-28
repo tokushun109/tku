@@ -52,7 +52,7 @@ const mockProducts: IProduct[] = [
             {
                 apiPath: '/image/earrings-women-1.jpg',
                 name: 'earrings-women-1.jpg',
-                order: 1,
+                displayOrder: 1,
                 uuid: 'earrings-women-1-image-uuid',
             },
         ],
@@ -72,7 +72,7 @@ const mockProducts: IProduct[] = [
             {
                 apiPath: '/image/earrings-women-2.jpg',
                 name: 'earrings-women-2.jpg',
-                order: 1,
+                displayOrder: 1,
                 uuid: 'earrings-women-2-image-uuid',
             },
         ],
@@ -92,7 +92,7 @@ const mockProducts: IProduct[] = [
             {
                 apiPath: '/image/rings-men-1.jpg',
                 name: 'rings-men-1.jpg',
-                order: 1,
+                displayOrder: 1,
                 uuid: 'rings-men-1-image-uuid',
             },
         ],
@@ -112,7 +112,7 @@ const mockProducts: IProduct[] = [
             {
                 apiPath: '/image/necklaces-unisex-1.jpg',
                 name: 'necklaces-unisex-1.jpg',
-                order: 1,
+                displayOrder: 1,
                 uuid: 'necklaces-unisex-1-image-uuid',
             },
         ],
