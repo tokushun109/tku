@@ -2,11 +2,12 @@ package middleware
 
 import (
 	"bytes"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/tokushun109/tku/backend/internal/shared/logger"
 )
 
 func TestLoggingMiddleware(t *testing.T) {
@@ -24,15 +25,11 @@ func TestLoggingMiddleware(t *testing.T) {
 
 		for _, tc := range cases {
 			t.Run(tc.name, func(t *testing.T) {
-				var buf bytes.Buffer
-				prevOut := log.Writer()
-				prevFlags := log.Flags()
-				log.SetOutput(&buf)
-				log.SetFlags(0)
-				defer func() {
-					log.SetOutput(prevOut)
-					log.SetFlags(prevFlags)
-				}()
+				var stdoutBuf bytes.Buffer
+				var stderrBuf bytes.Buffer
+				logger.SetOutputs(&stdoutBuf, &stderrBuf)
+				logger.SetFlags(0)
+				defer logger.Reset()
 
 				h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					w.WriteHeader(tc.status)
@@ -48,7 +45,15 @@ func TestLoggingMiddleware(t *testing.T) {
 				if got := rr.Header().Get("X-Request-ID"); got != "fixed-id" {
 					t.Fatalf("expected X-Request-ID fixed-id, got %q", got)
 				}
-				logStr := buf.String()
+				logStr := stdoutBuf.String()
+				if tc.status >= http.StatusInternalServerError {
+					logStr = stderrBuf.String()
+					if stdoutBuf.Len() != 0 {
+						t.Fatalf("expected no stdout log, got %q", stdoutBuf.String())
+					}
+				} else if stderrBuf.Len() != 0 {
+					t.Fatalf("expected no stderr log, got %q", stderrBuf.String())
+				}
 				if !strings.Contains(logStr, "["+tc.level+"]") {
 					t.Fatalf("expected level %s in log, got %q", tc.level, logStr)
 				}
@@ -60,15 +65,11 @@ func TestLoggingMiddleware(t *testing.T) {
 	})
 	t.Run("リクエストIDがないなら新しいIDを返す", func(t *testing.T) {
 
-		var buf bytes.Buffer
-		prevOut := log.Writer()
-		prevFlags := log.Flags()
-		log.SetOutput(&buf)
-		log.SetFlags(0)
-		defer func() {
-			log.SetOutput(prevOut)
-			log.SetFlags(prevFlags)
-		}()
+		var stdoutBuf bytes.Buffer
+		var stderrBuf bytes.Buffer
+		logger.SetOutputs(&stdoutBuf, &stderrBuf)
+		logger.SetFlags(0)
+		defer logger.Reset()
 
 		h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
@@ -83,7 +84,10 @@ func TestLoggingMiddleware(t *testing.T) {
 		if got := rr.Header().Get("X-Request-ID"); got == "" {
 			t.Fatalf("expected X-Request-ID to be set")
 		}
-		logStr := buf.String()
+		if stderrBuf.Len() != 0 {
+			t.Fatalf("expected no stderr log, got %q", stderrBuf.String())
+		}
+		logStr := stdoutBuf.String()
 		if !strings.Contains(logStr, "request_id=") {
 			t.Fatalf("expected request_id in log, got %q", logStr)
 		}

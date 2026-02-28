@@ -2,8 +2,9 @@ package response
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
+
+	"github.com/tokushun109/tku/backend/internal/shared/logger"
 )
 
 type ErrorResponse struct {
@@ -27,7 +28,7 @@ func WriteError(w http.ResponseWriter, status int, msg string) {
 func WriteAppError(w http.ResponseWriter, err error) {
 	status, msg := MapError(err)
 	if status >= 500 {
-		log.Printf("internal error: %v", err)
+		logger.Errorf("internal error: %v", err)
 	}
 	WriteError(w, status, msg)
 }

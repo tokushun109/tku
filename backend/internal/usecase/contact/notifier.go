@@ -6,13 +6,13 @@ import (
 	"embed"
 	htmltmpl "html/template"
 	"io"
-	"log"
 	"strings"
 	texttmpl "text/template"
 
 	domainContact "github.com/tokushun109/tku/backend/internal/domain/contact"
 	domainUser "github.com/tokushun109/tku/backend/internal/domain/user"
 	domainVO "github.com/tokushun109/tku/backend/internal/domain/vo"
+	"github.com/tokushun109/tku/backend/internal/shared/logger"
 	usecase "github.com/tokushun109/tku/backend/internal/usecase"
 )
 
@@ -75,17 +75,17 @@ func (n *notifier) NotifyContactCreated(ctx context.Context, contact *domainCont
 	}
 
 	if err := n.sendAutoReply(ctx, contact); err != nil {
-		log.Printf("[WARN] contact notifier auto-reply failed: %v", err)
+		logger.Warnf("contact notifier auto-reply failed: %v", err)
 	}
 
 	if n.userRepo == nil {
-		log.Printf("[WARN] contact notifier skipped admin mail: user repository is nil")
+		logger.Warnf("contact notifier skipped admin mail: user repository is nil")
 		return
 	}
 
 	notificationUsers, err := n.userRepo.FindContactNotificationUsers(ctx)
 	if err != nil {
-		log.Printf("[WARN] contact notifier failed to load admin contacts: %v", err)
+		logger.Warnf("contact notifier failed to load admin contacts: %v", err)
 		return
 	}
 
@@ -100,12 +100,12 @@ func (n *notifier) NotifyContactCreated(ctx context.Context, contact *domainCont
 		})
 	}
 	if len(recipients) == 0 {
-		log.Printf("[WARN] contact notifier skipped admin mail: no admin recipient")
+		logger.Warnf("contact notifier skipped admin mail: no admin recipient")
 		return
 	}
 
 	if err := n.sendAdminNotification(ctx, contact, recipients); err != nil {
-		log.Printf("[WARN] contact notifier admin mail failed: %v", err)
+		logger.Warnf("contact notifier admin mail failed: %v", err)
 	}
 }
 

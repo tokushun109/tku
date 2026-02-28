@@ -1,12 +1,12 @@
 package middleware
 
 import (
-	"log"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/tokushun109/tku/backend/internal/shared/id"
+	"github.com/tokushun109/tku/backend/internal/shared/logger"
 )
 
 func LoggingMiddleware(next http.Handler) http.Handler {
@@ -22,17 +22,17 @@ func LoggingMiddleware(next http.Handler) http.Handler {
 
 		latency := time.Since(start).Milliseconds()
 		status := rw.Status()
+		path := sanitizeLogValue(r.URL.Path, 256)
+		msgFormat := "request_id=%s method=%s path=%s status=%d latency_ms=%d"
 
-		level := "INFO"
-		if status >= 500 {
-			level = "ERROR"
-		} else if status >= 400 {
-			level = "WARN"
+		switch {
+		case status >= 500:
+			logger.Errorf(msgFormat, reqID, r.Method, path, status, latency)
+		case status >= 400:
+			logger.Warnf(msgFormat, reqID, r.Method, path, status, latency)
+		default:
+			logger.Infof(msgFormat, reqID, r.Method, path, status, latency)
 		}
-
-		log.Printf("[%s] request_id=%s method=%s path=%s status=%d latency_ms=%d",
-			level, reqID, r.Method, sanitizeLogValue(r.URL.Path, 256), status, latency,
-		)
 	})
 }
 
