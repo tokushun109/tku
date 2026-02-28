@@ -34,9 +34,12 @@ func (g *stubUUIDGen) New() string {
 	return g.uuid
 }
 
-func (s *stubRepo) Create(ctx context.Context, salesSite *domain.SalesSite) error {
+func (s *stubRepo) Create(ctx context.Context, salesSite *domain.SalesSite) (*domain.SalesSite, error) {
 	s.created = salesSite
-	return s.createErr
+	if s.createErr != nil {
+		return nil, s.createErr
+	}
+	return salesSite, nil
 }
 
 func (s *stubRepo) FindAll(ctx context.Context) ([]*domain.SalesSite, error) {
@@ -44,6 +47,13 @@ func (s *stubRepo) FindAll(ctx context.Context) ([]*domain.SalesSite, error) {
 		return nil, s.findAllErr
 	}
 	return s.findAll, nil
+}
+
+func (s *stubRepo) FindByName(ctx context.Context, name domain.SalesSiteName) (*domain.SalesSite, error) {
+	if s.findByErr != nil {
+		return nil, s.findByErr
+	}
+	return s.findByUUID, nil
 }
 
 func (s *stubRepo) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domain.SalesSite, error) {

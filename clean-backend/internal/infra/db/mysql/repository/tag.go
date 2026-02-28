@@ -19,13 +19,26 @@ func NewTagRepository(db *sqlx.DB) *TagRepository {
 	return &TagRepository{db: db}
 }
 
-func (r *TagRepository) Create(ctx context.Context, t *domain.Tag) error {
-	_, err := getExecutor(ctx, r.db).ExecContext(
+func (r *TagRepository) Create(ctx context.Context, t *domain.Tag) (*domain.Tag, error) {
+	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`INSERT INTO tag (uuid, name, created_at, updated_at) VALUES (?, ?, NOW(), NOW())`,
 		t.UUID().Value(), t.Name().Value(),
 	)
-	return err
+	if err != nil {
+		return nil, err
+	}
+
+	lastID, err := res.LastInsertId()
+	if err != nil {
+		return nil, err
+	}
+
+	created, err := domain.Rebuild(uint(lastID), t.UUID().Value(), t.Name().Value())
+	if err != nil {
+		return nil, fmt.Errorf("invalid tag row: %w", err)
+	}
+	return created, nil
 }
 
 func (r *TagRepository) FindAll(ctx context.Context) ([]*domain.Tag, error) {
@@ -47,6 +60,22 @@ func (r *TagRepository) FindAll(ctx context.Context) ([]*domain.Tag, error) {
 		res = append(res, t)
 	}
 	return res, nil
+}
+
+func (r *TagRepository) FindByName(ctx context.Context, name domain.TagName) (*domain.Tag, error) {
+	type row struct {
+		ID   uint   `db:"id"`
+		UUID string `db:"uuid"`
+		Name string `db:"name"`
+	}
+	var rrow row
+	if err := getExecutor(ctx, r.db).GetContext(ctx, &rrow, `SELECT id, uuid, name FROM tag WHERE name = ? AND deleted_at IS NULL`, name.Value()); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return toDomainTag(rrow.ID, rrow.UUID, rrow.Name)
 }
 
 func (r *TagRepository) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domain.Tag, error) {

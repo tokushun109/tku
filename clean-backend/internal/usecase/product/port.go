@@ -22,6 +22,7 @@ type QueryUsecase interface {
 
 type CommandUsecase interface {
 	Create(ctx context.Context, input CreateProductInput) (primitive.UUID, error)
+	Duplicate(ctx context.Context, rawURL string) error
 	Update(ctx context.Context, productUUID string, input UpdateProductInput) error
 	Delete(ctx context.Context, productUUID string) error
 	UploadCSV(ctx context.Context, rows []ProductCSVInputRow) error
@@ -71,6 +72,10 @@ func (s *Service) ExportCSV(ctx context.Context) ([]*usecaseProductQuery.Product
 
 func (s *Service) Create(ctx context.Context, input CreateProductInput) (primitive.UUID, error) {
 	return s.commandUC.Create(ctx, input)
+}
+
+func (s *Service) Duplicate(ctx context.Context, rawURL string) error {
+	return s.commandUC.Duplicate(ctx, rawURL)
 }
 
 func (s *Service) Update(ctx context.Context, productUUID string, input UpdateProductInput) error {

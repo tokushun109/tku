@@ -20,13 +20,26 @@ func NewSkillMarketRepository(db *sqlx.DB) *SkillMarketRepository {
 	return &SkillMarketRepository{db: db}
 }
 
-func (r *SkillMarketRepository) Create(ctx context.Context, s *domain.SkillMarket) error {
-	_, err := getExecutor(ctx, r.db).ExecContext(
+func (r *SkillMarketRepository) Create(ctx context.Context, s *domain.SkillMarket) (*domain.SkillMarket, error) {
+	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`INSERT INTO skill_market (uuid, name, url, icon, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())`,
 		s.UUID().Value(), s.Name().Value(), s.URL().Value(), s.Icon(),
 	)
-	return err
+	if err != nil {
+		return nil, err
+	}
+
+	lastID, err := res.LastInsertId()
+	if err != nil {
+		return nil, err
+	}
+
+	created, err := domain.Rebuild(uint(lastID), s.UUID().Value(), s.Name().Value(), s.URL().Value(), s.Icon())
+	if err != nil {
+		return nil, fmt.Errorf("invalid skill market row: %w", err)
+	}
+	return created, nil
 }
 
 func (r *SkillMarketRepository) FindAll(ctx context.Context) ([]*domain.SkillMarket, error) {

@@ -24,12 +24,12 @@ func (s *stubRepo) FindAll(ctx context.Context) ([]*domain.Contact, error) {
 	return s.findAll, nil
 }
 
-func (s *stubRepo) Create(ctx context.Context, contact *domain.Contact) error {
+func (s *stubRepo) Create(ctx context.Context, contact *domain.Contact) (*domain.Contact, error) {
 	if s.createErr != nil {
-		return s.createErr
+		return nil, s.createErr
 	}
 	s.created = contact
-	return nil
+	return contact, nil
 }
 
 type stubNotifier struct {

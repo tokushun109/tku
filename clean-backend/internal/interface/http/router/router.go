@@ -84,6 +84,7 @@ func NewRouter(
 	r.HandleFunc("/api/product", productHandler.List).Methods(http.MethodGet)
 	r.HandleFunc("/api/product/{product_uuid}", productHandler.Get).Methods(http.MethodGet)
 	r.Handle("/api/product", requireAdmin(productHandler.Create)).Methods(http.MethodPost)
+	r.Handle("/api/product/duplicate", requireAdmin(productHandler.Duplicate)).Methods(http.MethodPost)
 	r.Handle("/api/product/{product_uuid}", requireAdmin(productHandler.Update)).Methods(http.MethodPut)
 	r.Handle("/api/product/{product_uuid}", requireAdmin(productHandler.Delete)).Methods(http.MethodDelete)
 	r.Handle("/api/csv/product", requireAdmin(productHandler.ExportCSV)).Methods(http.MethodGet)

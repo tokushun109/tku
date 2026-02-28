@@ -7,6 +7,7 @@ import (
 	"github.com/tokushun109/tku/clean-backend/internal/infra/config"
 	cryptoInfra "github.com/tokushun109/tku/clean-backend/internal/infra/crypto"
 	mailInfra "github.com/tokushun109/tku/clean-backend/internal/infra/mail/sendgrid"
+	creemaMarketplace "github.com/tokushun109/tku/clean-backend/internal/infra/marketplace/creema"
 	s3Storage "github.com/tokushun109/tku/clean-backend/internal/infra/storage/s3"
 	uuidInfra "github.com/tokushun109/tku/clean-backend/internal/infra/uuid"
 	usecase "github.com/tokushun109/tku/clean-backend/internal/usecase"
@@ -80,6 +81,10 @@ func newUsecases(repos *repositories, qrs *queries, cfg *config.Config, txManage
 	if err := requireNonNil("creatorStorage", storage); err != nil {
 		return nil, err
 	}
+	productDuplicateSource := creemaMarketplace.NewScraper()
+	if err := requireNonNil("productDuplicateSource", productDuplicateSource); err != nil {
+		return nil, err
+	}
 
 	// ドメイン固有のユースケースの依存関係の構築
 	contactNotifier := usecaseContact.NewContactNotifier(mailer, repos.user, cfg.ContactSupportEmail)
@@ -102,6 +107,7 @@ func newUsecases(repos *repositories, qrs *queries, cfg *config.Config, txManage
 		repos.target,
 		repos.tag,
 		repos.salesSite,
+		productDuplicateSource,
 		storage,
 		uuidGen,
 		txManager,

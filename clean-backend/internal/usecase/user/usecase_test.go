@@ -50,12 +50,12 @@ type stubSessionRepo struct {
 	deletedUserID   primitive.ID
 }
 
-func (s *stubSessionRepo) Create(ctx context.Context, sess *domainSession.Session) error {
+func (s *stubSessionRepo) Create(ctx context.Context, sess *domainSession.Session) (*domainSession.Session, error) {
 	if s.createErr != nil {
-		return s.createErr
+		return nil, s.createErr
 	}
 	s.created = sess
-	return nil
+	return sess, nil
 }
 
 func (s *stubSessionRepo) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domainSession.Session, error) {

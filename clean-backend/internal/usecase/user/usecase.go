@@ -83,9 +83,11 @@ func (s *Service) Login(ctx context.Context, email string, password string) (*do
 		if err := s.sessionRepo.DeleteByUserID(txCtx, u.ID()); err != nil {
 			return err
 		}
-		if err := s.sessionRepo.Create(txCtx, sess); err != nil {
+		createdSession, err := s.sessionRepo.Create(txCtx, sess)
+		if err != nil {
 			return err
 		}
+		sess = createdSession
 		return nil
 	}); err != nil {
 		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())

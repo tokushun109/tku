@@ -53,20 +53,43 @@ func (r *ContactRepository) FindAll(ctx context.Context) ([]*domain.Contact, err
 	return res, nil
 }
 
-func (r *ContactRepository) Create(ctx context.Context, contact *domain.Contact) error {
+func (r *ContactRepository) Create(ctx context.Context, contact *domain.Contact) (*domain.Contact, error) {
 	company := domainVO.ToValuePtr(contact.Company())
 	phoneNumber := domainVO.ToValuePtr(contact.PhoneNumber())
+	createdAt := time.Now()
 
-	_, err := getExecutor(ctx, r.db).ExecContext(
+	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
-		`INSERT INTO contact (name, company, phone_number, email, content, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())`,
+		`INSERT INTO contact (name, company, phone_number, email, content, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, NOW())`,
 		contact.Name().Value(),
 		company,
 		phoneNumber,
 		contact.Email().Value(),
 		contact.Content().Value(),
+		createdAt,
 	)
-	return err
+	if err != nil {
+		return nil, err
+	}
+
+	lastID, err := res.LastInsertId()
+	if err != nil {
+		return nil, err
+	}
+
+	created, err := domain.Rebuild(
+		uint(lastID),
+		contact.Name().Value(),
+		domainVO.ToValueOrEmpty(contact.Company()),
+		domainVO.ToValueOrEmpty(contact.PhoneNumber()),
+		contact.Email().Value(),
+		contact.Content().Value(),
+		createdAt,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("invalid contact row: %w", err)
+	}
+	return created, nil
 }
 
 func toDomainContact(r contactRow) (*domain.Contact, error) {

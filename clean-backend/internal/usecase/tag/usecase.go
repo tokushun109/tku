@@ -52,7 +52,7 @@ func (s *Service) Create(ctx context.Context, name string) error {
 		return usecase.NewAppErrorWithMessage(usecase.ErrConflict, domain.ErrNameDuplicated.Error())
 	}
 
-	if err := s.repo.Create(ctx, t); err != nil {
+	if _, err := s.repo.Create(ctx, t); err != nil {
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 	return nil
