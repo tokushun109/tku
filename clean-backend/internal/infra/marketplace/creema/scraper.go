@@ -32,8 +32,8 @@ const (
 	// Creemaの商品ページの現在のDOM構造に依存するため、サイト変更時に見直しが必要。
 	priceSelector       = "#js-item-detail > aside > div.p-item-detail-info.p-item-detail-info--side > div > div:nth-child(1) > div.p-item-detail-info__item--price--row > span.p-item-detail-info__item--price--row--price"
 	descriptionSelector = "#introduction > div > div"
-	imageSelector       = "#js-item-detail-centerpiece > img"
-	tagSelector         = "#js-item-detail > aside > div:nth-child(5) > ul:nth-child(3) > li > a"
+	imageSelector       = "#js-item-detail-centerpiece > img.js-attach-centerpiece"
+	tagSelector         = "a.js-item-attributes-tag"
 )
 
 var allowedImageHosts = map[string]struct{}{
