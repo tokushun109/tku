@@ -28,11 +28,11 @@ func (s *stubSalesSiteUC) List(ctx context.Context) ([]*domain.SalesSite, error)
 	return s.listRes, s.listErr
 }
 
-func (s *stubSalesSiteUC) Create(ctx context.Context, name string, rawURL string, icon string) error {
+func (s *stubSalesSiteUC) Create(ctx context.Context, name string, rawURL string) error {
 	return s.createErr
 }
 
-func (s *stubSalesSiteUC) Update(ctx context.Context, uuid string, name string, rawURL string, icon string) error {
+func (s *stubSalesSiteUC) Update(ctx context.Context, uuid string, name string, rawURL string) error {
 	return s.updateErr
 }
 
@@ -44,13 +44,12 @@ type salesSiteResp struct {
 	UUID string `json:"uuid"`
 	Name string `json:"name"`
 	URL  string `json:"url"`
-	Icon string `json:"icon"`
 }
 
 func TestSalesSiteGet(t *testing.T) {
 	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
 
-		s := mustSalesSite(salesSiteTestUUID, "Creema", "https://www.creema.jp", "icon")
+		s := mustSalesSite(salesSiteTestUUID, "Creema", "https://www.creema.jp")
 		salesSiteUC := &stubSalesSiteUC{listRes: []*domain.SalesSite{s}}
 		h := NewSalesSiteHandler(salesSiteUC)
 
@@ -182,8 +181,8 @@ func TestSalesSiteDelete(t *testing.T) {
 
 }
 
-func mustSalesSite(uuidStr, name, rawURL, icon string) *domain.SalesSite {
-	salesSite, err := domain.Rebuild(1, uuidStr, name, rawURL, icon)
+func mustSalesSite(uuidStr, name, rawURL string) *domain.SalesSite {
+	salesSite, err := domain.Rebuild(1, uuidStr, name, rawURL)
 	if err != nil {
 		panic(err)
 	}

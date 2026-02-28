@@ -28,11 +28,11 @@ func (s *stubSnsUC) List(ctx context.Context) ([]*domain.Sns, error) {
 	return s.listRes, s.listErr
 }
 
-func (s *stubSnsUC) Create(ctx context.Context, name string, rawURL string, icon string) error {
+func (s *stubSnsUC) Create(ctx context.Context, name string, rawURL string) error {
 	return s.createErr
 }
 
-func (s *stubSnsUC) Update(ctx context.Context, uuid string, name string, rawURL string, icon string) error {
+func (s *stubSnsUC) Update(ctx context.Context, uuid string, name string, rawURL string) error {
 	return s.updateErr
 }
 
@@ -44,13 +44,12 @@ type snsResp struct {
 	UUID string `json:"uuid"`
 	Name string `json:"name"`
 	URL  string `json:"url"`
-	Icon string `json:"icon"`
 }
 
 func TestSnsGet(t *testing.T) {
 	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
 
-		s := mustSns(snsTestUUID, "Instagram", "https://www.instagram.com", "icon")
+		s := mustSns(snsTestUUID, "Instagram", "https://www.instagram.com")
 		snsUC := &stubSnsUC{listRes: []*domain.Sns{s}}
 		h := NewSnsHandler(snsUC)
 
@@ -182,8 +181,8 @@ func TestSnsDelete(t *testing.T) {
 
 }
 
-func mustSns(uuidStr, name, rawURL, icon string) *domain.Sns {
-	sns, err := domain.Rebuild(1, uuidStr, name, rawURL, icon)
+func mustSns(uuidStr, name, rawURL string) *domain.Sns {
+	sns, err := domain.Rebuild(1, uuidStr, name, rawURL)
 	if err != nil {
 		panic(err)
 	}

@@ -10,7 +10,6 @@ func ToSkillMarketResponse(s *domain.SkillMarket) *response.SkillMarketResponse 
 		UUID: s.UUID().Value(),
 		Name: s.Name().Value(),
 		URL:  s.URL().Value(),
-		Icon: s.Icon(),
 	}
 }
 

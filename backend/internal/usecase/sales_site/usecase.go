@@ -11,8 +11,8 @@ import (
 
 type Usecase interface {
 	List(ctx context.Context) ([]*domain.SalesSite, error)
-	Create(ctx context.Context, name string, rawURL string, icon string) error
-	Update(ctx context.Context, uuid string, name string, rawURL string, icon string) error
+	Create(ctx context.Context, name string, rawURL string) error
+	Update(ctx context.Context, uuid string, name string, rawURL string) error
 	Delete(ctx context.Context, uuid string) error
 }
 
@@ -33,10 +33,10 @@ func (s *Service) List(ctx context.Context) ([]*domain.SalesSite, error) {
 	return salesSites, nil
 }
 
-func (s *Service) Create(ctx context.Context, name string, rawURL string, icon string) error {
+func (s *Service) Create(ctx context.Context, name string, rawURL string) error {
 	newUUID := s.uuidGen.New()
 
-	salesSite, err := domain.New(newUUID, name, rawURL, icon)
+	salesSite, err := domain.New(newUUID, name, rawURL)
 	if err != nil {
 		if errors.Is(err, domain.ErrInvalidName) || errors.Is(err, primitive.ErrInvalidURL) {
 			return usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error())
@@ -50,7 +50,7 @@ func (s *Service) Create(ctx context.Context, name string, rawURL string, icon s
 	return nil
 }
 
-func (s *Service) Update(ctx context.Context, uuidStr string, name string, rawURL string, icon string) error {
+func (s *Service) Update(ctx context.Context, uuidStr string, name string, rawURL string) error {
 	uuid, err := primitive.NewUUID(uuidStr)
 	if err != nil {
 		return usecase.NewAppError(usecase.ErrInvalidInput)
@@ -63,7 +63,7 @@ func (s *Service) Update(ctx context.Context, uuidStr string, name string, rawUR
 		return usecase.NewAppError(usecase.ErrNotFound)
 	}
 
-	if err := current.Change(name, rawURL, icon); err != nil {
+	if err := current.Change(name, rawURL); err != nil {
 		if errors.Is(err, domain.ErrInvalidName) || errors.Is(err, primitive.ErrInvalidURL) {
 			return usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error())
 		}

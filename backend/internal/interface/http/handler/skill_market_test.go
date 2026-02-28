@@ -28,11 +28,11 @@ func (s *stubSkillMarketUC) List(ctx context.Context) ([]*domain.SkillMarket, er
 	return s.listRes, s.listErr
 }
 
-func (s *stubSkillMarketUC) Create(ctx context.Context, name string, rawURL string, icon string) error {
+func (s *stubSkillMarketUC) Create(ctx context.Context, name string, rawURL string) error {
 	return s.createErr
 }
 
-func (s *stubSkillMarketUC) Update(ctx context.Context, uuid string, name string, rawURL string, icon string) error {
+func (s *stubSkillMarketUC) Update(ctx context.Context, uuid string, name string, rawURL string) error {
 	return s.updateErr
 }
 
@@ -44,13 +44,12 @@ type skillMarketResp struct {
 	UUID string `json:"uuid"`
 	Name string `json:"name"`
 	URL  string `json:"url"`
-	Icon string `json:"icon"`
 }
 
 func TestSkillMarketGet(t *testing.T) {
 	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
 
-		s := mustSkillMarket(skillMarketTestUUID, "minne", "https://minne.com", "icon")
+		s := mustSkillMarket(skillMarketTestUUID, "minne", "https://minne.com")
 		skillMarketUC := &stubSkillMarketUC{listRes: []*domain.SkillMarket{s}}
 		h := NewSkillMarketHandler(skillMarketUC)
 
@@ -182,8 +181,8 @@ func TestSkillMarketDelete(t *testing.T) {
 
 }
 
-func mustSkillMarket(uuidStr, name, rawURL, icon string) *domain.SkillMarket {
-	skillMarket, err := domain.Rebuild(1, uuidStr, name, rawURL, icon)
+func mustSkillMarket(uuidStr, name, rawURL string) *domain.SkillMarket {
+	skillMarket, err := domain.Rebuild(1, uuidStr, name, rawURL)
 	if err != nil {
 		panic(err)
 	}

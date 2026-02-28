@@ -37,7 +37,7 @@ func (h *SkillMarketHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.skillMarketUC.Create(r.Context(), req.Name, req.URL, req.Icon); err != nil {
+	if err := h.skillMarketUC.Create(r.Context(), req.Name, req.URL); err != nil {
 		response.WriteAppError(w, err)
 		return
 	}
@@ -55,7 +55,7 @@ func (h *SkillMarketHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.skillMarketUC.Update(r.Context(), uuid, req.Name, req.URL, req.Icon); err != nil {
+	if err := h.skillMarketUC.Update(r.Context(), uuid, req.Name, req.URL); err != nil {
 		response.WriteAppError(w, err)
 		return
 	}

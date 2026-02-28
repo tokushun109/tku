@@ -423,7 +423,7 @@ func TestDuplicateProduct(t *testing.T) {
 func mustDuplicateSalesSite(t *testing.T, uuid string) *domainSalesSite.SalesSite {
 	t.Helper()
 
-	salesSite, err := domainSalesSite.Rebuild(1, uuid, "Creema", "https://www.creema.jp", "")
+	salesSite, err := domainSalesSite.Rebuild(1, uuid, "Creema", "https://www.creema.jp")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

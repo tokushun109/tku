@@ -3,7 +3,6 @@ import z from 'zod'
 import { SiteSchema } from './schema'
 
 export interface ISite {
-    icon?: string
     name: string
     url?: string
     uuid?: string

@@ -10,7 +10,6 @@ func ToSalesSiteResponse(s *domain.SalesSite) *response.SalesSiteResponse {
 		UUID: s.UUID().Value(),
 		Name: s.Name().Value(),
 		URL:  s.URL().Value(),
-		Icon: s.Icon(),
 	}
 }
 
