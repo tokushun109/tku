@@ -1,5 +1,5 @@
 services:
-  # MySQL (backend)
+  # MySQL
   db:
     build:
       context: ./backend
@@ -21,7 +21,7 @@ services:
       - 3306:3306
     command: mysqld --innodb_use_native_aio=0
 
-  # DB migrations (backend)
+  # DB migrations
   migrate:
     build:
       context: ./backend
@@ -62,7 +62,7 @@ services:
       exit 0;
       "
 
-  # API (backend)
+  # Backend API
   api:
     build:
       context: ./backend
@@ -81,7 +81,7 @@ services:
     volumes:
       - ./backend:/api
 
-  # FRONTEND
+  # Frontend React App
   frontend:
     build:
       context: ./frontend
