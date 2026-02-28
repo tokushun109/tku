@@ -58,7 +58,7 @@ export const logout = async (sessionToken: string): Promise<void> => {
 // セッション検証API関数
 export const validateSession = async (sessionToken: string): Promise<boolean> => {
     try {
-        const res = await fetch(`${getApiBaseUrl()}/user/login`, {
+        const res = await fetch(`${getApiBaseUrl()}/user/me`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

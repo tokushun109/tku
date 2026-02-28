@@ -37,7 +37,7 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	response.WriteJSON(w, http.StatusOK, res)
 }
 
-func (h *UserHandler) GetLoginUser(w http.ResponseWriter, r *http.Request) {
+func (h *UserHandler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 	authUser, ok := middleware.AuthenticatedUserFromContext(r.Context())
 	if !ok {
 		response.WriteAppError(w, usecase.NewAppError(usecase.ErrUnauthorized))

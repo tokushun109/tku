@@ -100,7 +100,7 @@ func NewRouter(
 	r.Handle("/api/contact", http.HandlerFunc(contactHandler.Create)).Methods(http.MethodPost)
 
 	// user
-	r.Handle("/api/user/login", auth.RequireSession(http.HandlerFunc(userHandler.GetLoginUser))).Methods(http.MethodGet)
+	r.Handle("/api/user/me", auth.RequireSession(http.HandlerFunc(userHandler.GetCurrentUser))).Methods(http.MethodGet)
 	r.HandleFunc("/api/user/login", userHandler.Login).Methods(http.MethodPost)
 	r.Handle("/api/user/logout", auth.RequireSession(http.HandlerFunc(userHandler.Logout))).Methods(http.MethodPost)
 

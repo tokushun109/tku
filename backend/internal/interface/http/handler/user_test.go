@@ -86,15 +86,15 @@ func TestUserLogin(t *testing.T) {
 	})
 }
 
-func TestGetLoginUser(t *testing.T) {
+func TestGetCurrentUser(t *testing.T) {
 	t.Run("コンテキストに認証情報がないなら未認証エラーを返す", func(t *testing.T) {
 
 		h := NewUserHandler(&stubUserUC{})
 
-		req := httptest.NewRequest(http.MethodGet, "/api/user/login", nil)
+		req := httptest.NewRequest(http.MethodGet, "/api/user/me", nil)
 		rr := httptest.NewRecorder()
 
-		h.GetLoginUser(rr, req)
+		h.GetCurrentUser(rr, req)
 
 		if rr.Code != http.StatusUnauthorized {
 			t.Fatalf("expected 401, got %d", rr.Code)
@@ -104,7 +104,7 @@ func TestGetLoginUser(t *testing.T) {
 
 		h := NewUserHandler(&stubUserUC{})
 
-		req := httptest.NewRequest(http.MethodGet, "/api/user/login", nil)
+		req := httptest.NewRequest(http.MethodGet, "/api/user/me", nil)
 		req = req.WithContext(middleware.ContextWithAuthenticatedUser(req.Context(), middleware.AuthenticatedUser{
 			UserID:       1,
 			UUID:         "11111111-1111-4111-8111-111111111111",
@@ -115,7 +115,7 @@ func TestGetLoginUser(t *testing.T) {
 		}))
 		rr := httptest.NewRecorder()
 
-		h.GetLoginUser(rr, req)
+		h.GetCurrentUser(rr, req)
 
 		if rr.Code != http.StatusOK {
 			t.Fatalf("expected 200, got %d", rr.Code)
