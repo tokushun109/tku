@@ -109,3 +109,19 @@ func TestReadResponseBodyWithLimit(t *testing.T) {
 		}
 	})
 }
+
+func TestBuildImageName(t *testing.T) {
+	t.Run("URLパスにファイル名があればその名前を返す", func(t *testing.T) {
+		name := buildImageName("https://c.p02.c4a.im/images/item/example.png")
+		if name != "example.png" {
+			t.Fatalf("unexpected name: %s", name)
+		}
+	})
+
+	t.Run("ファイル名を抽出できないときは空文字を返す", func(t *testing.T) {
+		name := buildImageName("https://c.p02.c4a.im/")
+		if name != "" {
+			t.Fatalf("expected empty name, got %s", name)
+		}
+	})
+}

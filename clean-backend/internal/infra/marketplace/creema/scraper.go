@@ -124,7 +124,7 @@ func (s *Scraper) Duplicate(ctx context.Context, rawURL string) (*usecaseProduct
 		}
 
 		product.Images = append(product.Images, usecaseProduct.DuplicateProductImage{
-			Name: buildImageName(imageURL, i),
+			Name: buildImageName(imageURL),
 			Data: imageData,
 		})
 		return true
@@ -291,7 +291,7 @@ func readResponseBodyWithLimit(body io.Reader, maxSize int64) ([]byte, error) {
 	return data, nil
 }
 
-func buildImageName(imageURL string, index int) string {
+func buildImageName(imageURL string) string {
 	parsedURL, err := url.Parse(imageURL)
 	if err == nil {
 		name := path.Base(parsedURL.Path)
@@ -299,5 +299,5 @@ func buildImageName(imageURL string, index int) string {
 			return name
 		}
 	}
-	return fmt.Sprintf("image-%d", index)
+	return ""
 }
