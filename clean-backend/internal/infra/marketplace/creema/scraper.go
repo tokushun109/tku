@@ -23,6 +23,12 @@ import (
 
 const defaultTimeout = 10 * time.Second
 
+const creemaProductPageHost = "www.creema.jp"
+
+var allowedImageHosts = map[string]struct{}{
+	"c.p02.c4a.im": {},
+}
+
 type Scraper struct {
 	client *http.Client
 }
@@ -46,7 +52,7 @@ func (s *Scraper) Duplicate(ctx context.Context, rawURL string) (*usecaseProduct
 		return nil, err
 	}
 
-	resp, err := s.client.Do(req)
+	resp, err := s.doRequest(req, validateProductPageRequestURL)
 	if err != nil {
 		return nil, err
 	}
@@ -131,11 +137,21 @@ func validateProductPageURL(rawURL string) (*url.URL, error) {
 		return nil, primitive.ErrInvalidURL
 	}
 
-	if u.Scheme != "https" || strings.ToLower(u.Hostname()) != "www.creema.jp" {
+	if err := validateProductPageRequestURL(u); err != nil {
 		return nil, usecase.ErrInvalidInput
 	}
 
 	return u, nil
+}
+
+func validateProductPageRequestURL(u *url.URL) error {
+	if u == nil {
+		return primitive.ErrInvalidURL
+	}
+	if u.Scheme != "https" || strings.ToLower(u.Hostname()) != creemaProductPageHost {
+		return usecase.ErrInvalidInput
+	}
+	return nil
 }
 
 func newDocument(body []byte) (*goquery.Document, error) {
@@ -191,7 +207,11 @@ func resolveImageURL(baseURL *url.URL, rawURL string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return baseURL.ResolveReference(parsedURL).String(), nil
+	resolvedURL := baseURL.ResolveReference(parsedURL)
+	if err := validateImageRequestURL(resolvedURL); err != nil {
+		return "", err
+	}
+	return resolvedURL.String(), nil
 }
 
 func (s *Scraper) fetchImage(ctx context.Context, imageURL string) ([]byte, error) {
@@ -200,7 +220,7 @@ func (s *Scraper) fetchImage(ctx context.Context, imageURL string) ([]byte, erro
 		return nil, err
 	}
 
-	resp, err := s.client.Do(req)
+	resp, err := s.doRequest(req, validateImageRequestURL)
 	if err != nil {
 		return nil, err
 	}
@@ -213,6 +233,40 @@ func (s *Scraper) fetchImage(ctx context.Context, imageURL string) ([]byte, erro
 	}
 
 	return io.ReadAll(resp.Body)
+}
+
+func validateImageRequestURL(u *url.URL) error {
+	if u == nil {
+		return primitive.ErrInvalidURL
+	}
+	if u.Scheme != "https" {
+		return usecase.ErrInvalidInput
+	}
+	if _, ok := allowedImageHosts[strings.ToLower(u.Hostname())]; !ok {
+		return usecase.ErrInvalidInput
+	}
+	return nil
+}
+
+func (s *Scraper) doRequest(req *http.Request, validateURL func(*url.URL) error) (*http.Response, error) {
+	if err := validateURL(req.URL); err != nil {
+		return nil, err
+	}
+
+	client := *s.client
+	client.CheckRedirect = func(req *http.Request, _ []*http.Request) error {
+		return validateURL(req.URL)
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		if resp != nil && resp.Body != nil {
+			_ = resp.Body.Close()
+		}
+		return nil, err
+	}
+
+	return resp, nil
 }
 
 func buildImageName(imageURL string, index int) string {
