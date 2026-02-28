@@ -23,13 +23,14 @@ func NewRouter(
 	userHandler *handler.UserHandler,
 	auth *middleware.AuthMiddleware,
 	admin *middleware.AdminMiddleware,
+	origin *middleware.OriginMiddleware,
 	logging func(http.Handler) http.Handler,
 	cors func(http.Handler) http.Handler,
 ) http.Handler {
 	r := mux.NewRouter().StrictSlash(true)
 	r.Use(logging)
 	requireAdmin := func(hf http.HandlerFunc) http.Handler {
-		return auth.RequireSession(admin.RequireAdmin(http.HandlerFunc(hf)))
+		return auth.RequireSession(origin.RequireTrustedOrigin(admin.RequireAdmin(http.HandlerFunc(hf))))
 	}
 
 	// health check
@@ -100,9 +101,9 @@ func NewRouter(
 	r.Handle("/api/contact", http.HandlerFunc(contactHandler.Create)).Methods(http.MethodPost)
 
 	// user
-	r.Handle("/api/user/login", auth.RequireSession(http.HandlerFunc(userHandler.GetLoginUser))).Methods(http.MethodGet)
+	r.Handle("/api/user/me", auth.RequireSession(http.HandlerFunc(userHandler.GetCurrentUser))).Methods(http.MethodGet)
 	r.HandleFunc("/api/user/login", userHandler.Login).Methods(http.MethodPost)
-	r.Handle("/api/user/logout", auth.RequireSession(http.HandlerFunc(userHandler.Logout))).Methods(http.MethodPost)
+	r.Handle("/api/user/logout", auth.RequireSession(origin.RequireTrustedOrigin(http.HandlerFunc(userHandler.Logout)))).Methods(http.MethodPost)
 
 	return cors(r)
 }

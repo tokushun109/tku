@@ -63,6 +63,7 @@ func BuildServer() (*config.Config, http.Handler, error) {
 		handlers.user,
 		middlewares.auth,
 		middlewares.admin,
+		middlewares.origin,
 		middlewares.logging,
 		middlewares.cors,
 	)

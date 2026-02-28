@@ -3,7 +3,7 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
-import { login, logout, validateSession } from '@/apis/auth'
+import { getCurrentUser, login, logout } from '@/apis/auth'
 
 import { LoginSchema } from './schema'
 
@@ -78,7 +78,7 @@ export async function logoutAction(): Promise<void> {
     redirect('/admin/login')
 }
 
-// セッションチェック用のServer Action
+// 管理者セッションチェック用のServer Action
 export async function checkSession(): Promise<boolean> {
     try {
         const cookieStore = await cookies()
@@ -88,8 +88,9 @@ export async function checkSession(): Promise<boolean> {
             return false
         }
 
-        // セッション検証API呼び出し
-        return await validateSession(sessionToken)
+        // ログイン中ユーザーを取得し、管理者のみ有効とする
+        const currentUser = await getCurrentUser(sessionToken)
+        return currentUser?.isAdmin ?? false
     } catch (error) {
         console.error('Session check error:', error)
         return false
