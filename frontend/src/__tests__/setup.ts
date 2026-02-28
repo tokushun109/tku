@@ -5,7 +5,7 @@ import '@testing-library/jest-dom'
 import { server } from './mocks/server'
 
 // MSW サーバーを起動
-beforeAll(() => server.listen())
+beforeAll(() => server.listen({ onUnhandledRequest: 'error' }))
 
 // 各テスト後にハンドラーをリセット
 afterEach(() => server.resetHandlers())
@@ -14,7 +14,8 @@ afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 // process.env の設定
-process.env.API_BASE_URL = 'http://localhost:8080'
+process.env.API_BASE_URL = 'http://localhost:8080/api'
+process.env.BROWSER_BASE_URL = 'http://localhost:8080/api'
 
 // React の global 設定
 global.React = React

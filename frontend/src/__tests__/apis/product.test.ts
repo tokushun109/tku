@@ -1,10 +1,13 @@
 import { http, HttpResponse } from 'msw'
 import { describe, it, expect, beforeEach } from 'vitest'
 
+import { getApiBaseUrl } from '@/apis/baseUrl'
 import { getProductsByCategory, getProduct, getCarouselImages } from '@/apis/product'
 import { ApiError } from '@/utils/error'
 
 import { server } from '../mocks/server'
+
+const apiBaseUrl = getApiBaseUrl()
 
 describe('product API', () => {
     beforeEach(() => {
@@ -48,7 +51,7 @@ describe('product API', () => {
 
         it('APIエラーの場合、ApiErrorが投げられる', async () => {
             server.use(
-                http.get('http://localhost:8080/category/product', () => {
+                http.get(`${apiBaseUrl}/category/product`, () => {
                     return new HttpResponse(null, { status: 500 })
                 }),
             )
@@ -64,7 +67,7 @@ describe('product API', () => {
 
         it('ネットワークエラーの場合、一般的なエラーが投げられる', async () => {
             server.use(
-                http.get('http://localhost:8080/category/product', () => {
+                http.get(`${apiBaseUrl}/category/product`, () => {
                     return HttpResponse.error()
                 }),
             )
@@ -82,7 +85,7 @@ describe('product API', () => {
             let capturedRequest: Request | undefined
 
             server.use(
-                http.get('http://localhost:8080/category/product', ({ request }) => {
+                http.get(`${apiBaseUrl}/category/product`, ({ request }) => {
                     capturedRequest = request
                     return HttpResponse.json([])
                 }),
@@ -168,7 +171,7 @@ describe('product API', () => {
 
         it('存在しないUUIDの場合、ApiErrorが投げられる', async () => {
             server.use(
-                http.get('http://localhost:8080/product/:uuid', () => {
+                http.get(`${apiBaseUrl}/product/:uuid`, () => {
                     return new HttpResponse(null, { status: 404 })
                 }),
             )
@@ -178,7 +181,7 @@ describe('product API', () => {
 
         it('APIエラーの場合、ApiErrorが投げられる', async () => {
             server.use(
-                http.get('http://localhost:8080/product/:uuid', () => {
+                http.get(`${apiBaseUrl}/product/:uuid`, () => {
                     return new HttpResponse(null, { status: 500 })
                 }),
             )
@@ -188,7 +191,7 @@ describe('product API', () => {
 
         it('ネットワークエラーの場合、一般的なエラーが投げられる', async () => {
             server.use(
-                http.get('http://localhost:8080/product/:uuid', () => {
+                http.get(`${apiBaseUrl}/product/:uuid`, () => {
                     return HttpResponse.error()
                 }),
             )
@@ -200,7 +203,7 @@ describe('product API', () => {
             let capturedUuid: string | undefined
 
             server.use(
-                http.get('http://localhost:8080/product/:uuid', ({ params }) => {
+                http.get(`${apiBaseUrl}/product/:uuid`, ({ params }) => {
                     capturedUuid = params.uuid as string
                     return HttpResponse.json({
                         uuid: params.uuid,
@@ -275,7 +278,7 @@ describe('product API', () => {
 
         it('APIエラーの場合、ApiErrorが投げられる', async () => {
             server.use(
-                http.get('http://localhost:8080/carousel_image/', () => {
+                http.get(`${apiBaseUrl}/carousel_image/`, () => {
                     return new HttpResponse(null, { status: 500 })
                 }),
             )
@@ -285,7 +288,7 @@ describe('product API', () => {
 
         it('ネットワークエラーの場合、一般的なエラーが投げられる', async () => {
             server.use(
-                http.get('http://localhost:8080/carousel_image/', () => {
+                http.get(`${apiBaseUrl}/carousel_image/`, () => {
                     return HttpResponse.error()
                 }),
             )
@@ -297,7 +300,7 @@ describe('product API', () => {
             let capturedPath: string | undefined
 
             server.use(
-                http.get('http://localhost:8080/carousel_image/', ({ request }) => {
+                http.get(`${apiBaseUrl}/carousel_image/`, ({ request }) => {
                     capturedPath = new URL(request.url).pathname
                     return HttpResponse.json([])
                 }),
@@ -305,7 +308,7 @@ describe('product API', () => {
 
             await getCarouselImages()
 
-            expect(capturedPath).toBe('/carousel_image/')
+            expect(capturedPath).toBe(new URL(`${apiBaseUrl}/carousel_image/`).pathname)
         })
     })
 })
