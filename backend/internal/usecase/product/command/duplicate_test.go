@@ -63,10 +63,6 @@ func (s *stubProductRepoForDuplicate) FindByUUID(ctx context.Context, uuid primi
 	return nil, nil
 }
 
-func (s *stubProductRepoForDuplicate) FindByID(ctx context.Context, id primitive.ID) (*domainProduct.Product, error) {
-	return nil, nil
-}
-
 func (s *stubProductRepoForDuplicate) Update(ctx context.Context, p *domainProduct.Product) (bool, error) {
 	return false, nil
 }

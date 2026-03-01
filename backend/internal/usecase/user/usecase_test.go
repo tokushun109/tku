@@ -18,8 +18,6 @@ var testUUID = id.GenerateUUID()
 type stubUserRepo struct {
 	userByEmail    *domainUser.User
 	userByEmailErr error
-	userByID       *domainUser.User
-	userByIDErr    error
 	userByUUID     *domainUser.User
 	userByUUIDErr  error
 }
@@ -29,13 +27,6 @@ func (s *stubUserRepo) FindByEmail(ctx context.Context, email primitive.Email) (
 		return nil, s.userByEmailErr
 	}
 	return s.userByEmail, nil
-}
-
-func (s *stubUserRepo) FindByID(ctx context.Context, id primitive.ID) (*domainUser.User, error) {
-	if s.userByIDErr != nil {
-		return nil, s.userByIDErr
-	}
-	return s.userByID, nil
 }
 
 func (s *stubUserRepo) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domainUser.User, error) {

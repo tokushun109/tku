@@ -155,7 +155,8 @@ ORDER BY ptt.created_at ASC, ptt.tag_uuid ASC
 - `user` / `session` は、アプリケーション上は `session.user_uuid` を主に使う実装へ切り替え済み。
 - 商品 CSV は `id` ではなく `uuid` を更新キーに使う実装へ切り替え済み。
 - 商品一覧・CSV 出力などの query 側も、UUID 参照を優先する JOIN / 読み取りへ切り替え済み。
-- 移行期間を考慮し、一部 repository / query では旧 `*_id` 列をフォールバック参照する互換処理を残している。
+- repository / query の読み取りは、旧 `*_id` へのフォールバックを外し、UUID のみを参照する実装へ切り替え済み。
+- `product` / `user` repository に残っていた未使用の `FindByID` は削除済み。
 - 2026-03-01 時点で、`backend` 配下の `go test ./...` は通過済み。
 
 ### 9.2 実装時の補足
@@ -184,7 +185,6 @@ ORDER BY ptt.created_at ASC, ptt.tag_uuid ASC
 
 ### 10.3 後続の整理
 
-- UUID 切り替えが安定した段階で、旧 `*_id` を前提にしたフォールバック参照コードを削除する。
 - 必要に応じて、旧 `*_id` 列・旧 FK・不要なインデックスの削除を別 migration で行う。
 - `product_to_tag` など中間テーブルの物理削除方針に合わせて、`deleted_at` の削除要否を再確認する。
 - `creator` の「常に 1 レコード」前提をどう担保するかを別途確定する。

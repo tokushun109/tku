@@ -33,10 +33,6 @@ func (s *stubNotificationUserRepo) FindByEmail(ctx context.Context, email primit
 	return nil, nil
 }
 
-func (s *stubNotificationUserRepo) FindByID(ctx context.Context, id primitive.ID) (*domainUser.User, error) {
-	return nil, nil
-}
-
 func (s *stubNotificationUserRepo) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domainUser.User, error) {
 	return nil, nil
 }

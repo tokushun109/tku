@@ -46,24 +46,6 @@ func (r *UserRepository) FindByEmail(ctx context.Context, email primitive.Email)
 	return toDomainUser(rrow)
 }
 
-func (r *UserRepository) FindByID(ctx context.Context, id primitive.ID) (*domain.User, error) {
-	var rrow userRow
-	err := getExecutor(ctx, r.db).GetContext(
-		ctx,
-		&rrow,
-		`SELECT id, uuid, name, email, password, is_admin FROM user WHERE id = ? AND deleted_at IS NULL LIMIT 1`,
-		id.Value(),
-	)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, nil
-		}
-		return nil, err
-	}
-
-	return toDomainUser(rrow)
-}
-
 func (r *UserRepository) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domain.User, error) {
 	var rrow userRow
 	err := getExecutor(ctx, r.db).GetContext(

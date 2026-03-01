@@ -33,10 +33,6 @@ func (s *stubProductRepoForCreateImages) FindByUUID(ctx context.Context, uuid pr
 	return s.findByUUIDRes, nil
 }
 
-func (s *stubProductRepoForCreateImages) FindByID(ctx context.Context, id primitive.ID) (*domainProduct.Product, error) {
-	return nil, nil
-}
-
 func (s *stubProductRepoForCreateImages) Update(ctx context.Context, p *domainProduct.Product) (bool, error) {
 	return false, nil
 }
@@ -72,10 +68,6 @@ func (s *stubProductRepoForCSV) FindByUUID(ctx context.Context, uuid primitive.U
 		return nil, nil
 	}
 	return s.productsByUUID[uuid.Value()], nil
-}
-
-func (s *stubProductRepoForCSV) FindByID(ctx context.Context, id primitive.ID) (*domainProduct.Product, error) {
-	return nil, nil
 }
 
 func (s *stubProductRepoForCSV) Update(ctx context.Context, p *domainProduct.Product) (bool, error) {
