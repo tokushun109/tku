@@ -1,0 +1,2 @@
+DROP INDEX idx_site_detail_product_uuid_sales_site_uuid
+ON site_detail;
