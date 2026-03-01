@@ -29,6 +29,7 @@ func (s *stubContactUC) Create(ctx context.Context, name string, company string,
 }
 
 type contactResp struct {
+	ID          uint      `json:"id"`
 	UUID        string    `json:"uuid"`
 	Name        string    `json:"name"`
 	Company     *string   `json:"company"`
@@ -73,6 +74,9 @@ func TestContactGet(t *testing.T) {
 		}
 		if len(res) != 1 {
 			t.Fatalf("expected 1, got %d", len(res))
+		}
+		if res[0].ID != 1 {
+			t.Fatalf("unexpected id: %d", res[0].ID)
 		}
 		if res[0].Name != "山田太郎" {
 			t.Fatalf("unexpected response: %+v", res[0])

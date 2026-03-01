@@ -118,7 +118,7 @@ const ContactTemplate = () => {
                                     error={errors.content?.message}
                                     id="content"
                                     label="お問い合わせ内容"
-                                    maxLength={1000}
+                                    maxLength={2000}
                                     placeholder="商品についてのご質問、ご要望などをお聞かせください"
                                     required
                                     rows={5}
