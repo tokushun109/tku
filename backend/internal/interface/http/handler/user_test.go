@@ -106,7 +106,6 @@ func TestGetCurrentUser(t *testing.T) {
 
 		req := httptest.NewRequest(http.MethodGet, "/api/user/me", nil)
 		req = req.WithContext(middleware.ContextWithAuthenticatedUser(req.Context(), middleware.AuthenticatedUser{
-			UserID:       1,
 			UUID:         "11111111-1111-4111-8111-111111111111",
 			Name:         "admin",
 			Email:        "admin@example.com",
@@ -152,7 +151,6 @@ func TestLogout(t *testing.T) {
 
 		req := httptest.NewRequest(http.MethodPost, "/api/user/logout", nil)
 		req = req.WithContext(middleware.ContextWithAuthenticatedUser(req.Context(), middleware.AuthenticatedUser{
-			UserID:       1,
 			UUID:         "11111111-1111-4111-8111-111111111111",
 			Name:         "admin",
 			Email:        "admin@example.com",

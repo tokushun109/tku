@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
-
 	"github.com/tokushun109/tku/backend/internal/domain/primitive"
 	domain "github.com/tokushun109/tku/backend/internal/domain/target"
 )
@@ -164,8 +163,8 @@ func (r *TargetRepository) Delete(ctx context.Context, uuid primitive.UUID) (boo
 	if _, err := tx.ExecContext(
 		ctx,
 		`UPDATE product
-		 SET target_uuid = NULL, target_id = NULL
-		 WHERE target_uuid = ?`,
+			 SET target_uuid = NULL
+			 WHERE target_uuid = ?`,
 		uuid.Value(),
 	); err != nil {
 		return false, err

@@ -78,7 +78,7 @@ func TestAuthMiddleware(t *testing.T) {
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
-			if authUser.UserID != 1 || !authUser.IsAdmin {
+			if authUser.UUID != "11111111-1111-4111-8111-111111111111" || !authUser.IsAdmin {
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}

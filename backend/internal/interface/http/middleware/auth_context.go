@@ -3,7 +3,6 @@ package middleware
 import "context"
 
 type AuthenticatedUser struct {
-	UserID       uint
 	UUID         string
 	Name         string
 	Email        string

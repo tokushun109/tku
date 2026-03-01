@@ -11,7 +11,7 @@ export interface IContactListItem {
     content: string
     createdAt: string
     email: string
-    id: number
     name: string
     phoneNumber?: string
+    uuid: string
 }

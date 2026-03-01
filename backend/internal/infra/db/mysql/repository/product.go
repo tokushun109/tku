@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
-
 	"github.com/tokushun109/tku/backend/internal/domain/primitive"
 	domain "github.com/tokushun109/tku/backend/internal/domain/product"
 	domainVO "github.com/tokushun109/tku/backend/internal/domain/vo"
@@ -98,8 +97,8 @@ func (r *ProductRepository) Update(ctx context.Context, p *domain.Product) (bool
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`UPDATE product
-		 SET name = ?, description = ?, price = ?, is_active = ?, is_recommend = ?, category_uuid = ?, target_uuid = ?, category_id = NULL, target_id = NULL, updated_at = NOW()
-		 WHERE uuid = ? AND deleted_at IS NULL`,
+			 SET name = ?, description = ?, price = ?, is_active = ?, is_recommend = ?, category_uuid = ?, target_uuid = ?, updated_at = NOW()
+			 WHERE uuid = ? AND deleted_at IS NULL`,
 		p.Name().Value(),
 		domainVO.ToValuePtr(p.Description()),
 		p.Price().Value(),
