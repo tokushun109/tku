@@ -23,7 +23,7 @@ func NewSessionRepository(db *sqlx.DB) *SessionRepository {
 func (r *SessionRepository) Create(ctx context.Context, s *domain.Session) (*domain.Session, error) {
 	createdAt := s.CreatedAt()
 	if createdAt.IsZero() {
-		createdAt = time.Now()
+		createdAt = time.Now().UTC()
 	}
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,

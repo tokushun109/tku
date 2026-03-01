@@ -22,7 +22,7 @@ func NewSnsRepository(db *sqlx.DB) *SnsRepository {
 func (r *SnsRepository) Create(ctx context.Context, s *domain.Sns) (*domain.Sns, error) {
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
-		`INSERT INTO sns (uuid, name, url, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())`,
+		`INSERT INTO sns (uuid, name, url, created_at, updated_at) VALUES (?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
 		s.UUID().Value(), s.Name().Value(), s.URL().Value(),
 	)
 	if err != nil {
@@ -83,7 +83,7 @@ func (r *SnsRepository) FindByUUID(ctx context.Context, uuid primitive.UUID) (*d
 func (r *SnsRepository) Update(ctx context.Context, s *domain.Sns) (bool, error) {
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
-		`UPDATE sns SET name = ?, url = ?, updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`,
+		`UPDATE sns SET name = ?, url = ?, updated_at = UTC_TIMESTAMP() WHERE uuid = ? AND deleted_at IS NULL`,
 		s.Name().Value(),
 		s.URL().Value(),
 		s.UUID().Value(),
@@ -101,7 +101,7 @@ func (r *SnsRepository) Update(ctx context.Context, s *domain.Sns) (bool, error)
 func (r *SnsRepository) Delete(ctx context.Context, uuid primitive.UUID) (bool, error) {
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
-		`UPDATE sns SET deleted_at = NOW(), updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`,
+		`UPDATE sns SET deleted_at = UTC_TIMESTAMP(), updated_at = UTC_TIMESTAMP() WHERE uuid = ? AND deleted_at IS NULL`,
 		uuid.Value(),
 	)
 	if err != nil {

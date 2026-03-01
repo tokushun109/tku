@@ -19,7 +19,7 @@ func NewDB(cfg *config.Config) (*sqlx.DB, error) {
 	}
 
 	dsn := fmt.Sprintf(
-		"%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Asia%%2FTokyo&time_zone='Asia%%2FTokyo'",
+		"%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=UTC&time_zone='%%2B00%%3A00'",
 		cfg.DBUser,
 		cfg.DBPass,
 		cfg.DBHost,

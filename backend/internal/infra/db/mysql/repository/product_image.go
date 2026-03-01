@@ -34,7 +34,7 @@ func (r *ProductImageRepository) Create(ctx context.Context, image *domain.Produ
 		ctx,
 		`
 			INSERT INTO product_image (uuid, name, mime_type, path, display_order, product_uuid, created_at, updated_at)
-			VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())
+			VALUES (?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())
 			`,
 		image.UUID().Value(),
 		image.Name().Value(),
@@ -141,7 +141,7 @@ func (r *ProductImageRepository) UpdateDisplayOrder(ctx context.Context, uuid pr
 		ctx,
 		`
 		UPDATE product_image
-		SET display_order = ?, updated_at = NOW()
+		SET display_order = ?, updated_at = UTC_TIMESTAMP()
 		WHERE uuid = ? AND deleted_at IS NULL
 		`,
 		validatedDisplayOrder.Value(),
@@ -161,7 +161,7 @@ func (r *ProductImageRepository) UpdateDisplayOrder(ctx context.Context, uuid pr
 func (r *ProductImageRepository) DeleteByUUID(ctx context.Context, uuid primitive.UUID) (bool, error) {
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
-		`UPDATE product_image SET deleted_at = NOW(), updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`,
+		`UPDATE product_image SET deleted_at = UTC_TIMESTAMP(), updated_at = UTC_TIMESTAMP() WHERE uuid = ? AND deleted_at IS NULL`,
 		uuid.Value(),
 	)
 	if err != nil {
@@ -179,7 +179,7 @@ func (r *ProductImageRepository) DeleteByProductUUID(ctx context.Context, produc
 	_, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`UPDATE product_image
-		 SET deleted_at = NOW(), updated_at = NOW()
+		 SET deleted_at = UTC_TIMESTAMP(), updated_at = UTC_TIMESTAMP()
 		 WHERE product_uuid = ? AND deleted_at IS NULL`,
 		productUUID.Value(),
 	)

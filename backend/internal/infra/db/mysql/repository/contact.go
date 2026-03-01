@@ -57,11 +57,11 @@ func (r *ContactRepository) FindAll(ctx context.Context) ([]*domain.Contact, err
 func (r *ContactRepository) Create(ctx context.Context, contact *domain.Contact) (*domain.Contact, error) {
 	company := domainVO.ToValuePtr(contact.Company())
 	phoneNumber := domainVO.ToValuePtr(contact.PhoneNumber())
-	createdAt := time.Now()
+	createdAt := time.Now().UTC()
 
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
-		`INSERT INTO contact (uuid, name, company, phone_number, email, content, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())`,
+		`INSERT INTO contact (uuid, name, company, phone_number, email, content, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP())`,
 		contact.UUID().Value(),
 		contact.Name().Value(),
 		company,

@@ -21,7 +21,7 @@ func NewCategoryRepository(db *sqlx.DB) *CategoryRepository {
 func (r *CategoryRepository) Create(ctx context.Context, c *domain.Category) (*domain.Category, error) {
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
-		`INSERT INTO category (uuid, name, created_at, updated_at) VALUES (?, ?, NOW(), NOW())`,
+		`INSERT INTO category (uuid, name, created_at, updated_at) VALUES (?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
 		c.UUID().Value(), c.Name().Value(),
 	)
 	if err != nil {
@@ -137,7 +137,7 @@ func (r *CategoryRepository) ExistsByName(ctx context.Context, name domain.Categ
 func (r *CategoryRepository) Update(ctx context.Context, c *domain.Category) (bool, error) {
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
-		`UPDATE category SET name = ?, updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`,
+		`UPDATE category SET name = ?, updated_at = UTC_TIMESTAMP() WHERE uuid = ? AND deleted_at IS NULL`,
 		c.Name().Value(),
 		c.UUID().Value(),
 	)
@@ -170,7 +170,7 @@ func (r *CategoryRepository) Delete(ctx context.Context, uuid primitive.UUID) (b
 		return false, err
 	}
 
-	res, err := tx.ExecContext(ctx, `UPDATE category SET deleted_at = NOW(), updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value())
+	res, err := tx.ExecContext(ctx, `UPDATE category SET deleted_at = UTC_TIMESTAMP(), updated_at = UTC_TIMESTAMP() WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value())
 	if err != nil {
 		return false, err
 	}

@@ -33,7 +33,7 @@ func (r *SiteDetailRepository) ReplaceByProductUUID(ctx context.Context, product
 		if _, err := getExecutor(ctx, r.db).ExecContext(
 			ctx,
 			`INSERT INTO site_detail (uuid, detail_url, product_uuid, sales_site_uuid, created_at, updated_at)
-			 VALUES (?, ?, ?, ?, NOW(), NOW())`,
+			 VALUES (?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
 			detail.UUID().Value(),
 			detail.DetailURL().Value(),
 			detail.ProductUUID().Value(),

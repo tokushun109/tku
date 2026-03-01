@@ -36,7 +36,7 @@ func (r *ProductRepository) Create(ctx context.Context, p *domain.Product) (*dom
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`INSERT INTO product (uuid, name, description, price, is_active, is_recommend, category_uuid, target_uuid, created_at, updated_at)
-		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
 		p.UUID().Value(),
 		p.Name().Value(),
 		domainVO.ToValuePtr(p.Description()),
@@ -107,7 +107,7 @@ func (r *ProductRepository) Update(ctx context.Context, p *domain.Product) (bool
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`UPDATE product
-			 SET name = ?, description = ?, price = ?, is_active = ?, is_recommend = ?, category_uuid = ?, target_uuid = ?, updated_at = NOW()
+			 SET name = ?, description = ?, price = ?, is_active = ?, is_recommend = ?, category_uuid = ?, target_uuid = ?, updated_at = UTC_TIMESTAMP()
 			 WHERE uuid = ? AND deleted_at IS NULL`,
 		p.Name().Value(),
 		domainVO.ToValuePtr(p.Description()),
@@ -132,7 +132,7 @@ func (r *ProductRepository) Update(ctx context.Context, p *domain.Product) (bool
 func (r *ProductRepository) Delete(ctx context.Context, uuid primitive.UUID) (bool, error) {
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
-		`UPDATE product SET deleted_at = NOW(), updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`,
+		`UPDATE product SET deleted_at = UTC_TIMESTAMP(), updated_at = UTC_TIMESTAMP() WHERE uuid = ? AND deleted_at IS NULL`,
 		uuid.Value(),
 	)
 	if err != nil {
@@ -161,7 +161,7 @@ func (r *ProductRepository) ReplaceTags(ctx context.Context, productUUID primiti
 	for _, tagUUID := range tagUUIDs {
 		if _, err := getExecutor(ctx, r.db).ExecContext(
 			ctx,
-			`INSERT INTO product_to_tag (product_uuid, tag_uuid, created_at, updated_at) VALUES (?, ?, NOW(), NOW())`,
+			`INSERT INTO product_to_tag (product_uuid, tag_uuid, created_at, updated_at) VALUES (?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
 			productUUID.Value(),
 			tagUUID.Value(),
 		); err != nil {

@@ -21,7 +21,7 @@ func NewTargetRepository(db *sqlx.DB) *TargetRepository {
 func (r *TargetRepository) Create(ctx context.Context, t *domain.Target) (*domain.Target, error) {
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
-		`INSERT INTO target (uuid, name, created_at, updated_at) VALUES (?, ?, NOW(), NOW())`,
+		`INSERT INTO target (uuid, name, created_at, updated_at) VALUES (?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
 		t.UUID().Value(), t.Name().Value(),
 	)
 	if err != nil {
@@ -137,7 +137,7 @@ func (r *TargetRepository) ExistsByName(ctx context.Context, name domain.TargetN
 func (r *TargetRepository) Update(ctx context.Context, t *domain.Target) (bool, error) {
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
-		`UPDATE target SET name = ?, updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`,
+		`UPDATE target SET name = ?, updated_at = UTC_TIMESTAMP() WHERE uuid = ? AND deleted_at IS NULL`,
 		t.Name().Value(),
 		t.UUID().Value(),
 	)
@@ -170,7 +170,7 @@ func (r *TargetRepository) Delete(ctx context.Context, uuid primitive.UUID) (boo
 		return false, err
 	}
 
-	res, err := tx.ExecContext(ctx, `UPDATE target SET deleted_at = NOW(), updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value())
+	res, err := tx.ExecContext(ctx, `UPDATE target SET deleted_at = UTC_TIMESTAMP(), updated_at = UTC_TIMESTAMP() WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value())
 	if err != nil {
 		return false, err
 	}

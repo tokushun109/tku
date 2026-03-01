@@ -22,7 +22,7 @@ func NewSkillMarketRepository(db *sqlx.DB) *SkillMarketRepository {
 func (r *SkillMarketRepository) Create(ctx context.Context, s *domain.SkillMarket) (*domain.SkillMarket, error) {
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
-		`INSERT INTO skill_market (uuid, name, url, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())`,
+		`INSERT INTO skill_market (uuid, name, url, created_at, updated_at) VALUES (?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
 		s.UUID().Value(), s.Name().Value(), s.URL().Value(),
 	)
 	if err != nil {
@@ -83,7 +83,7 @@ func (r *SkillMarketRepository) FindByUUID(ctx context.Context, uuid primitive.U
 func (r *SkillMarketRepository) Update(ctx context.Context, s *domain.SkillMarket) (bool, error) {
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
-		`UPDATE skill_market SET name = ?, url = ?, updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`,
+		`UPDATE skill_market SET name = ?, url = ?, updated_at = UTC_TIMESTAMP() WHERE uuid = ? AND deleted_at IS NULL`,
 		s.Name().Value(),
 		s.URL().Value(),
 		s.UUID().Value(),
@@ -101,7 +101,7 @@ func (r *SkillMarketRepository) Update(ctx context.Context, s *domain.SkillMarke
 func (r *SkillMarketRepository) Delete(ctx context.Context, uuid primitive.UUID) (bool, error) {
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
-		`UPDATE skill_market SET deleted_at = NOW(), updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`,
+		`UPDATE skill_market SET deleted_at = UTC_TIMESTAMP(), updated_at = UTC_TIMESTAMP() WHERE uuid = ? AND deleted_at IS NULL`,
 		uuid.Value(),
 	)
 	if err != nil {
