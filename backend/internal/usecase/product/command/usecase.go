@@ -77,11 +77,11 @@ func New(
 }
 
 func (s *Service) Create(ctx context.Context, input usecaseProduct.CreateProductInput) (primitive.UUID, error) {
-	categoryID, err := s.resolveCategoryID(ctx, input.CategoryUUID)
+	categoryUUID, err := s.resolveCategoryUUID(input.CategoryUUID)
 	if err != nil {
 		return "", err
 	}
-	targetID, err := s.resolveTargetID(ctx, input.TargetUUID)
+	targetUUID, err := s.resolveTargetUUID(input.TargetUUID)
 	if err != nil {
 		return "", err
 	}
@@ -94,8 +94,8 @@ func (s *Service) Create(ctx context.Context, input usecaseProduct.CreateProduct
 		input.Price,
 		input.IsActive,
 		input.IsRecommend,
-		categoryID,
-		targetID,
+		categoryUUID,
+		targetUUID,
 	)
 	if err != nil {
 		if isInvalidProductInputError(err) {
@@ -104,26 +104,26 @@ func (s *Service) Create(ctx context.Context, input usecaseProduct.CreateProduct
 		return "", usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 
-	tagIDs, err := s.resolveTagIDs(ctx, input.TagUUIDs)
+	tagUUIDs, err := s.resolveTagUUIDs(input.TagUUIDs)
 	if err != nil {
 		return "", err
 	}
 
 	if err := s.txManager.WithinTransaction(ctx, func(txCtx context.Context) error {
-		createdProductID, createErr := s.productRepo.Create(txCtx, newProduct)
+		_, createErr := s.productRepo.Create(txCtx, newProduct)
 		if createErr != nil {
 			return createErr
 		}
 
-		if err := s.productRepo.ReplaceTags(txCtx, createdProductID, tagIDs); err != nil {
+		if err := s.productRepo.ReplaceTags(txCtx, newProduct.UUID(), tagUUIDs); err != nil {
 			return err
 		}
 
-		siteDetails, buildErr := s.buildSiteDetails(txCtx, createdProductID, input.SiteDetails)
+		siteDetails, buildErr := s.buildSiteDetails(txCtx, newProduct.UUID(), input.SiteDetails)
 		if buildErr != nil {
 			return buildErr
 		}
-		if err := s.siteDetailRepo.ReplaceByProductID(txCtx, createdProductID, siteDetails); err != nil {
+		if err := s.siteDetailRepo.ReplaceByProductUUID(txCtx, newProduct.UUID(), siteDetails); err != nil {
 			return err
 		}
 		return nil
@@ -191,30 +191,30 @@ func (s *Service) Duplicate(ctx context.Context, rawURL string) error {
 
 	uploadedPaths := make([]string, 0, len(duplicatedProduct.Images))
 	if err := s.txManager.WithinTransaction(ctx, func(txCtx context.Context) error {
-		tagIDs, err := s.resolveOrCreateTagIDsByNames(txCtx, duplicatedProduct.Tags)
+		tagUUIDs, err := s.resolveOrCreateTagUUIDsByNames(txCtx, duplicatedProduct.Tags)
 		if err != nil {
 			return err
 		}
 
-		createdProductID, err := s.productRepo.Create(txCtx, newProduct)
+		_, err = s.productRepo.Create(txCtx, newProduct)
 		if err != nil {
 			return err
 		}
 
-		if err := s.productRepo.ReplaceTags(txCtx, createdProductID, tagIDs); err != nil {
+		if err := s.productRepo.ReplaceTags(txCtx, newProduct.UUID(), tagUUIDs); err != nil {
 			return err
 		}
 
 		siteDetail, err := domainSiteDetail.New(
 			s.uuidGen.New(),
 			duplicateURL,
-			createdProductID.Value(),
-			salesSite.ID().Value(),
+			newProduct.UUID().Value(),
+			salesSite.UUID().Value(),
 		)
 		if err != nil {
 			return err
 		}
-		if err := s.siteDetailRepo.ReplaceByProductID(txCtx, createdProductID, []*domainSiteDetail.SiteDetail{siteDetail}); err != nil {
+		if err := s.siteDetailRepo.ReplaceByProductUUID(txCtx, newProduct.UUID(), []*domainSiteDetail.SiteDetail{siteDetail}); err != nil {
 			return err
 		}
 
@@ -245,7 +245,7 @@ func (s *Service) Duplicate(ctx context.Context, rawURL string) error {
 				imageMimeType.Value(),
 				imagePath.Value(),
 				len(duplicatedProduct.Images)-i,
-				createdProductID.Value(),
+				newProduct.UUID().Value(),
 			)
 			if err != nil {
 				return err
@@ -286,11 +286,11 @@ func (s *Service) Update(ctx context.Context, productUUID string, input usecaseP
 		return usecase.NewAppError(usecase.ErrNotFound)
 	}
 
-	categoryID, err := s.resolveCategoryID(ctx, input.CategoryUUID)
+	categoryUUID, err := s.resolveCategoryUUID(input.CategoryUUID)
 	if err != nil {
 		return err
 	}
-	targetID, err := s.resolveTargetID(ctx, input.TargetUUID)
+	targetUUID, err := s.resolveTargetUUID(input.TargetUUID)
 	if err != nil {
 		return err
 	}
@@ -301,8 +301,8 @@ func (s *Service) Update(ctx context.Context, productUUID string, input usecaseP
 		input.Price,
 		input.IsActive,
 		input.IsRecommend,
-		categoryID,
-		targetID,
+		categoryUUID,
+		targetUUID,
 	); err != nil {
 		if isInvalidProductInputError(err) {
 			return usecase.NewAppErrorWithMessage(usecase.ErrInvalidInput, err.Error())
@@ -310,7 +310,7 @@ func (s *Service) Update(ctx context.Context, productUUID string, input usecaseP
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 
-	tagIDs, err := s.resolveTagIDs(ctx, input.TagUUIDs)
+	tagUUIDs, err := s.resolveTagUUIDs(input.TagUUIDs)
 	if err != nil {
 		return err
 	}
@@ -339,19 +339,19 @@ func (s *Service) Update(ctx context.Context, productUUID string, input usecaseP
 			return usecase.ErrNotFound
 		}
 
-		if err := s.productRepo.ReplaceTags(txCtx, current.ID(), tagIDs); err != nil {
+		if err := s.productRepo.ReplaceTags(txCtx, current.UUID(), tagUUIDs); err != nil {
 			return err
 		}
 
-		siteDetails, buildErr := s.buildSiteDetails(txCtx, current.ID(), input.SiteDetails)
+		siteDetails, buildErr := s.buildSiteDetails(txCtx, current.UUID(), input.SiteDetails)
 		if buildErr != nil {
 			return buildErr
 		}
-		if err := s.siteDetailRepo.ReplaceByProductID(txCtx, current.ID(), siteDetails); err != nil {
+		if err := s.siteDetailRepo.ReplaceByProductUUID(txCtx, current.UUID(), siteDetails); err != nil {
 			return err
 		}
 
-		currentImages, err := s.productImageRepo.FindByProductID(txCtx, current.ID())
+		currentImages, err := s.productImageRepo.FindByProductUUID(txCtx, current.UUID())
 		if err != nil {
 			return err
 		}
@@ -423,7 +423,7 @@ func (s *Service) Delete(ctx context.Context, productUUID string) error {
 
 	deletedImagePaths := make([]string, 0)
 	if err := s.txManager.WithinTransaction(ctx, func(txCtx context.Context) error {
-		images, err := s.productImageRepo.FindByProductID(txCtx, current.ID())
+		images, err := s.productImageRepo.FindByProductUUID(txCtx, current.UUID())
 		if err != nil {
 			return err
 		}
@@ -437,10 +437,10 @@ func (s *Service) Delete(ctx context.Context, productUUID string) error {
 			}
 		}
 
-		if err := s.siteDetailRepo.DeleteByProductID(txCtx, current.ID()); err != nil {
+		if err := s.siteDetailRepo.DeleteByProductUUID(txCtx, current.UUID()); err != nil {
 			return err
 		}
-		if err := s.productRepo.ReplaceTags(txCtx, current.ID(), nil); err != nil {
+		if err := s.productRepo.ReplaceTags(txCtx, current.UUID(), nil); err != nil {
 			return err
 		}
 
@@ -479,37 +479,37 @@ func (s *Service) UploadCSV(ctx context.Context, rows []usecaseProduct.ProductCS
 		targetCache := make(map[string]*domainTarget.Target)
 
 		for _, row := range normalizedRows {
-			productID, err := primitive.NewID(row.id)
+			productUUID, err := primitive.NewUUID(row.uuid)
 			if err != nil {
-				return fmt.Errorf("product id is invalid: id=%d: %w", row.id, usecase.ErrInvalidInput)
+				return fmt.Errorf("product uuid is invalid: uuid=%s: %w", row.uuid, usecase.ErrInvalidInput)
 			}
 
-			current, err := s.productRepo.FindByID(txCtx, productID)
+			current, err := s.productRepo.FindByUUID(txCtx, productUUID)
 			if err != nil {
 				return err
 			}
 			if current == nil {
-				return fmt.Errorf("product not found: id=%d: %w", row.id, usecase.ErrInvalidInput)
+				return fmt.Errorf("product not found: uuid=%s: %w", row.uuid, usecase.ErrInvalidInput)
 			}
 
-			var categoryID *uint
+			var categoryUUID *string
 			if row.categoryName != nil {
 				categoryEntity, err := s.findOrCreateCategoryByName(txCtx, *row.categoryName, categoryCache)
 				if err != nil {
 					return err
 				}
-				categoryIDValue := categoryEntity.ID().Value()
-				categoryID = &categoryIDValue
+				categoryUUIDValue := categoryEntity.UUID().Value()
+				categoryUUID = &categoryUUIDValue
 			}
 
-			var targetID *uint
+			var targetUUID *string
 			if row.targetName != nil {
 				targetEntity, err := s.findOrCreateTargetByName(txCtx, *row.targetName, targetCache)
 				if err != nil {
 					return err
 				}
-				targetIDValue := targetEntity.ID().Value()
-				targetID = &targetIDValue
+				targetUUIDValue := targetEntity.UUID().Value()
+				targetUUID = &targetUUIDValue
 			}
 
 			description := ""
@@ -523,10 +523,10 @@ func (s *Service) UploadCSV(ctx context.Context, rows []usecaseProduct.ProductCS
 				row.price,
 				current.IsActive(),
 				current.IsRecommend(),
-				categoryID,
-				targetID,
+				categoryUUID,
+				targetUUID,
 			); err != nil {
-				return fmt.Errorf("row update failed: id=%d: %w", row.id, err)
+				return fmt.Errorf("row update failed: uuid=%s: %w", row.uuid, err)
 			}
 
 			updated, err := s.productRepo.Update(txCtx, current)
@@ -534,7 +534,7 @@ func (s *Service) UploadCSV(ctx context.Context, rows []usecaseProduct.ProductCS
 				return err
 			}
 			if !updated {
-				return fmt.Errorf("product update failed: id=%d: %w", row.id, usecase.ErrInvalidInput)
+				return fmt.Errorf("product update failed: uuid=%s: %w", row.uuid, usecase.ErrInvalidInput)
 			}
 		}
 
@@ -628,7 +628,7 @@ func (s *Service) CreateProductImages(ctx context.Context, productUUID string, f
 				imageMimeType.Value(),
 				imagePath.Value(),
 				displayOrder,
-				product.ID().Value(),
+				product.UUID().Value(),
 			)
 			if err != nil {
 				return err
@@ -680,7 +680,7 @@ func (s *Service) DeleteProductImage(ctx context.Context, productUUID string, pr
 	if image == nil {
 		return usecase.NewAppError(usecase.ErrNotFound)
 	}
-	if image.ProductID() != product.ID().Value() {
+	if image.ProductUUID() != product.UUID() {
 		return usecase.NewAppError(usecase.ErrNotFound)
 	}
 

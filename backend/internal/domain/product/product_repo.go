@@ -12,5 +12,5 @@ type Repository interface {
 	FindByID(ctx context.Context, id primitive.ID) (*Product, error)
 	Update(ctx context.Context, p *Product) (bool, error)
 	Delete(ctx context.Context, uuid primitive.UUID) (bool, error)
-	ReplaceTags(ctx context.Context, productID primitive.ID, tagIDs []primitive.ID) error
+	ReplaceTags(ctx context.Context, productUUID primitive.UUID, tagUUIDs []primitive.UUID) error
 }

@@ -17,8 +17,15 @@ func NewSiteDetailRepository(db *sqlx.DB) *SiteDetailRepository {
 	return &SiteDetailRepository{db: db}
 }
 
-func (r *SiteDetailRepository) ReplaceByProductID(ctx context.Context, productID primitive.ID, details []*domain.SiteDetail) error {
-	if _, err := getExecutor(ctx, r.db).ExecContext(ctx, `DELETE FROM site_detail WHERE product_id = ?`, productID.Value()); err != nil {
+func (r *SiteDetailRepository) ReplaceByProductUUID(ctx context.Context, productUUID primitive.UUID, details []*domain.SiteDetail) error {
+	if _, err := getExecutor(ctx, r.db).ExecContext(
+		ctx,
+		`DELETE sd
+		 FROM site_detail sd
+		 LEFT JOIN product p ON sd.product_uuid IS NULL AND p.id = sd.product_id
+		 WHERE COALESCE(sd.product_uuid, p.uuid) = ?`,
+		productUUID.Value(),
+	); err != nil {
 		return err
 	}
 	if len(details) == 0 {
@@ -28,12 +35,12 @@ func (r *SiteDetailRepository) ReplaceByProductID(ctx context.Context, productID
 	for _, detail := range details {
 		if _, err := getExecutor(ctx, r.db).ExecContext(
 			ctx,
-			`INSERT INTO site_detail (uuid, detail_url, product_id, sales_site_id, created_at, updated_at)
+			`INSERT INTO site_detail (uuid, detail_url, product_uuid, sales_site_uuid, created_at, updated_at)
 			 VALUES (?, ?, ?, ?, NOW(), NOW())`,
 			detail.UUID().Value(),
 			detail.DetailURL().Value(),
-			detail.ProductID(),
-			detail.SalesSiteID(),
+			detail.ProductUUID().Value(),
+			detail.SalesSiteUUID().Value(),
 		); err != nil {
 			return err
 		}
@@ -41,7 +48,14 @@ func (r *SiteDetailRepository) ReplaceByProductID(ctx context.Context, productID
 	return nil
 }
 
-func (r *SiteDetailRepository) DeleteByProductID(ctx context.Context, productID primitive.ID) error {
-	_, err := getExecutor(ctx, r.db).ExecContext(ctx, `DELETE FROM site_detail WHERE product_id = ?`, productID.Value())
+func (r *SiteDetailRepository) DeleteByProductUUID(ctx context.Context, productUUID primitive.UUID) error {
+	_, err := getExecutor(ctx, r.db).ExecContext(
+		ctx,
+		`DELETE sd
+		 FROM site_detail sd
+		 LEFT JOIN product p ON sd.product_uuid IS NULL AND p.id = sd.product_id
+		 WHERE COALESCE(sd.product_uuid, p.uuid) = ?`,
+		productUUID.Value(),
+	)
 	return err
 }

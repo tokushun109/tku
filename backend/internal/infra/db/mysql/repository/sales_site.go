@@ -124,19 +124,17 @@ func (r *SalesSiteRepository) Delete(ctx context.Context, uuid primitive.UUID) (
 		_ = tx.Rollback()
 	}()
 
-	var salesSiteID int64
-	if err := tx.GetContext(ctx, &salesSiteID, `SELECT id FROM sales_site WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value()); err != nil {
-		if err == sql.ErrNoRows {
-			return false, nil
-		}
+	if _, err := tx.ExecContext(
+		ctx,
+		`DELETE FROM site_detail
+		 WHERE sales_site_uuid = ? OR (sales_site_uuid IS NULL AND sales_site_id = (SELECT id FROM sales_site WHERE uuid = ? LIMIT 1))`,
+		uuid.Value(),
+		uuid.Value(),
+	); err != nil {
 		return false, err
 	}
 
-	if _, err := tx.ExecContext(ctx, `DELETE FROM site_detail WHERE sales_site_id = ?`, salesSiteID); err != nil {
-		return false, err
-	}
-
-	res, err := tx.ExecContext(ctx, `UPDATE sales_site SET deleted_at = NOW(), updated_at = NOW() WHERE id = ? AND deleted_at IS NULL`, salesSiteID)
+	res, err := tx.ExecContext(ctx, `UPDATE sales_site SET deleted_at = NOW(), updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value())
 	if err != nil {
 		return false, err
 	}

@@ -128,19 +128,17 @@ func (r *TagRepository) Delete(ctx context.Context, uuid primitive.UUID) (bool, 
 		_ = tx.Rollback()
 	}()
 
-	var tagID int64
-	if err := tx.GetContext(ctx, &tagID, `SELECT id FROM tag WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value()); err != nil {
-		if err == sql.ErrNoRows {
-			return false, nil
-		}
+	if _, err := tx.ExecContext(
+		ctx,
+		`DELETE FROM product_to_tag
+		 WHERE tag_uuid = ? OR (tag_uuid IS NULL AND tag_id = (SELECT id FROM tag WHERE uuid = ? LIMIT 1))`,
+		uuid.Value(),
+		uuid.Value(),
+	); err != nil {
 		return false, err
 	}
 
-	if _, err := tx.ExecContext(ctx, `DELETE FROM product_to_tag WHERE tag_id = ?`, tagID); err != nil {
-		return false, err
-	}
-
-	res, err := tx.ExecContext(ctx, `UPDATE tag SET deleted_at = NOW(), updated_at = NOW() WHERE id = ? AND deleted_at IS NULL`, tagID)
+	res, err := tx.ExecContext(ctx, `UPDATE tag SET deleted_at = NOW(), updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value())
 	if err != nil {
 		return false, err
 	}

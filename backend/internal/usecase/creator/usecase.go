@@ -138,7 +138,7 @@ func (s *Service) UpdateLogo(ctx context.Context, logoBytes []byte) error {
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 
-	updated, err := s.repo.UpdateLogo(ctx, current.ID(), logoMimeType, newLogoPath)
+	updated, err := s.repo.UpdateLogo(ctx, current.UUID(), logoMimeType, newLogoPath)
 	if err != nil {
 		if delErr := s.storage.Delete(ctx, newLogoPath.Value()); delErr != nil {
 			logger.Warnf("creator update logo rollback delete failed: path=%s err=%v", newLogoPath.Value(), delErr)

@@ -9,6 +9,7 @@ import (
 
 type Contact struct {
 	id          primitive.ID
+	uuid        primitive.UUID
 	name        ContactName
 	company     *ContactCompany
 	phoneNumber *primitive.PhoneNumber
@@ -17,8 +18,8 @@ type Contact struct {
 	createdAt   time.Time
 }
 
-func New(name, company, phoneNumber, email, content string) (*Contact, error) {
-	contact, err := newWithValidatedValues(name, company, phoneNumber, email, content)
+func New(rawUUID, name, company, phoneNumber, email, content string) (*Contact, error) {
+	contact, err := newWithValidatedValues(rawUUID, name, company, phoneNumber, email, content)
 	if err != nil {
 		return nil, err
 	}
@@ -27,6 +28,7 @@ func New(name, company, phoneNumber, email, content string) (*Contact, error) {
 
 func Rebuild(
 	id uint,
+	rawUUID string,
 	name string,
 	company string,
 	phoneNumber string,
@@ -38,7 +40,7 @@ func Rebuild(
 	if err != nil {
 		return nil, ErrInvalidID
 	}
-	contact, err := newWithValidatedValues(name, company, phoneNumber, email, content)
+	contact, err := newWithValidatedValues(rawUUID, name, company, phoneNumber, email, content)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +49,11 @@ func Rebuild(
 	return contact, nil
 }
 
-func newWithValidatedValues(name, company, phoneNumber, email, content string) (*Contact, error) {
+func newWithValidatedValues(rawUUID, name, company, phoneNumber, email, content string) (*Contact, error) {
+	validUUID, err := primitive.NewUUID(rawUUID)
+	if err != nil {
+		return nil, ErrInvalidUUID
+	}
 	validName, err := NewContactName(name)
 	if err != nil {
 		return nil, err
@@ -70,6 +76,7 @@ func newWithValidatedValues(name, company, phoneNumber, email, content string) (
 	}
 
 	return &Contact{
+		uuid:        validUUID,
 		name:        validName,
 		company:     validCompany,
 		phoneNumber: validPhoneNumber,
@@ -80,6 +87,10 @@ func newWithValidatedValues(name, company, phoneNumber, email, content string) (
 
 func (c *Contact) ID() primitive.ID {
 	return c.id
+}
+
+func (c *Contact) UUID() primitive.UUID {
+	return c.uuid
 }
 
 func (c *Contact) Name() ContactName {

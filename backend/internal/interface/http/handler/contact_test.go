@@ -29,7 +29,7 @@ func (s *stubContactUC) Create(ctx context.Context, name string, company string,
 }
 
 type contactResp struct {
-	ID          uint      `json:"id"`
+	UUID        string    `json:"uuid"`
 	Name        string    `json:"name"`
 	Company     *string   `json:"company"`
 	PhoneNumber *string   `json:"phoneNumber"`
@@ -42,6 +42,7 @@ func TestContactGet(t *testing.T) {
 	t.Run("有効な入力を渡したときお問い合わせ一覧の取得に成功する", func(t *testing.T) {
 		contact, err := domain.Rebuild(
 			1,
+			"11111111-1111-4111-8111-111111111111",
 			"山田太郎",
 			"株式会社サンプル",
 			"09012345678",

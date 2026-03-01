@@ -7,6 +7,6 @@ import (
 )
 
 type Repository interface {
-	ReplaceByProductID(ctx context.Context, productID primitive.ID, details []*SiteDetail) error
-	DeleteByProductID(ctx context.Context, productID primitive.ID) error
+	ReplaceByProductUUID(ctx context.Context, productUUID primitive.UUID, details []*SiteDetail) error
+	DeleteByProductUUID(ctx context.Context, productUUID primitive.UUID) error
 }

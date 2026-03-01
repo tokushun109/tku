@@ -42,15 +42,23 @@ func (s *stubNotifier) NotifyContactCreated(ctx context.Context, contact *domain
 	s.contact = contact
 }
 
+type stubUUIDGen struct {
+	uuid string
+}
+
+func (s *stubUUIDGen) New() string {
+	return s.uuid
+}
+
 func TestListContact(t *testing.T) {
 	t.Run("有効な入力を渡したときお問い合わせ一覧の取得に成功する", func(t *testing.T) {
-		contact, err := domain.Rebuild(1, "山田太郎", "", "", "test@example.com", "お問い合わせ内容", time.Now())
+		contact, err := domain.Rebuild(1, "11111111-1111-4111-8111-111111111111", "山田太郎", "", "", "test@example.com", "お問い合わせ内容", time.Now())
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
 		repo := &stubRepo{findAll: []*domain.Contact{contact}}
-		uc := New(repo, &stubNotifier{})
+		uc := New(repo, &stubNotifier{}, &stubUUIDGen{uuid: "11111111-1111-4111-8111-111111111111"})
 
 		res, err := uc.List(context.Background())
 		if err != nil {
@@ -63,7 +71,7 @@ func TestListContact(t *testing.T) {
 
 	t.Run("一覧取得でエラーが発生したなら内部エラーを返す", func(t *testing.T) {
 		repo := &stubRepo{findAllErr: errors.New("db error")}
-		uc := New(repo, &stubNotifier{})
+		uc := New(repo, &stubNotifier{}, &stubUUIDGen{uuid: "11111111-1111-4111-8111-111111111111"})
 
 		_, err := uc.List(context.Background())
 		if err == nil || !errors.Is(err, usecase.ErrInternal) {
@@ -76,7 +84,7 @@ func TestCreateContact(t *testing.T) {
 	t.Run("有効な入力を渡したとき作成と通知に成功する", func(t *testing.T) {
 		repo := &stubRepo{}
 		notifier := &stubNotifier{}
-		uc := New(repo, notifier)
+		uc := New(repo, notifier, &stubUUIDGen{uuid: "11111111-1111-4111-8111-111111111111"})
 
 		err := uc.Create(
 			context.Background(),
@@ -100,7 +108,7 @@ func TestCreateContact(t *testing.T) {
 	t.Run("入力値が不正なときバリデーションエラーで失敗する", func(t *testing.T) {
 		repo := &stubRepo{}
 		notifier := &stubNotifier{}
-		uc := New(repo, notifier)
+		uc := New(repo, notifier, &stubUUIDGen{uuid: "11111111-1111-4111-8111-111111111111"})
 
 		err := uc.Create(context.Background(), "", "", "", "invalid", "")
 		if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
@@ -114,7 +122,7 @@ func TestCreateContact(t *testing.T) {
 	t.Run("作成処理でエラーが発生したなら内部エラーを返す", func(t *testing.T) {
 		repo := &stubRepo{createErr: errors.New("db error")}
 		notifier := &stubNotifier{}
-		uc := New(repo, notifier)
+		uc := New(repo, notifier, &stubUUIDGen{uuid: "11111111-1111-4111-8111-111111111111"})
 
 		err := uc.Create(context.Background(), "山田太郎", "", "", "test@example.com", "お問い合わせです")
 		if err == nil || !errors.Is(err, usecase.ErrInternal) {

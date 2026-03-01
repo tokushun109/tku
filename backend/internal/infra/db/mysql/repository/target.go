@@ -72,7 +72,7 @@ func (r *TargetRepository) FindUsed(ctx context.Context) ([]*domain.Target, erro
 	query := `
 		SELECT DISTINCT t.id, t.uuid, t.name
 		FROM target t
-		INNER JOIN product p ON p.target_id = t.id
+		INNER JOIN product p ON (p.target_uuid = t.uuid OR (p.target_uuid IS NULL AND p.target_id = t.id))
 		WHERE t.deleted_at IS NULL AND p.deleted_at IS NULL
 	`
 	if err := getExecutor(ctx, r.db).SelectContext(ctx, &rows, query); err != nil {
@@ -161,19 +161,18 @@ func (r *TargetRepository) Delete(ctx context.Context, uuid primitive.UUID) (boo
 		_ = tx.Rollback()
 	}()
 
-	var targetID int64
-	if err := tx.GetContext(ctx, &targetID, `SELECT id FROM target WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value()); err != nil {
-		if err == sql.ErrNoRows {
-			return false, nil
-		}
+	if _, err := tx.ExecContext(
+		ctx,
+		`UPDATE product
+		 SET target_uuid = NULL, target_id = NULL
+		 WHERE target_uuid = ? OR (target_uuid IS NULL AND target_id = (SELECT id FROM target WHERE uuid = ? LIMIT 1))`,
+		uuid.Value(),
+		uuid.Value(),
+	); err != nil {
 		return false, err
 	}
 
-	if _, err := tx.ExecContext(ctx, `UPDATE product SET target_id = NULL WHERE target_id = ?`, targetID); err != nil {
-		return false, err
-	}
-
-	res, err := tx.ExecContext(ctx, `UPDATE target SET deleted_at = NOW(), updated_at = NOW() WHERE id = ? AND deleted_at IS NULL`, targetID)
+	res, err := tx.ExecContext(ctx, `UPDATE target SET deleted_at = NOW(), updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value())
 	if err != nil {
 		return false, err
 	}

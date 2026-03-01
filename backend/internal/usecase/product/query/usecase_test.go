@@ -411,7 +411,7 @@ func TestExportCSV(t *testing.T) {
 			queryReader: &stubQueryReader{
 				exportCSVRes: []*ProductCSVRow{
 					{
-						ID:           1,
+						UUID:         "11111111-1111-4111-8111-111111111111",
 						Name:         "product",
 						Price:        1000,
 						CategoryName: "cat",

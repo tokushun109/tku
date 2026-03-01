@@ -48,7 +48,7 @@ type ProductImageBlob struct {
 }
 
 type ProductCSVInputRow struct {
-	ID           uint
+	UUID         string
 	Name         string
 	Price        int
 	CategoryName string

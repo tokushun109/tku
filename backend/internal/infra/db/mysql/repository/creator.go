@@ -19,6 +19,7 @@ type CreatorRepository struct {
 
 type creatorRow struct {
 	ID           uint           `db:"id"`
+	UUID         string         `db:"uuid"`
 	Name         string         `db:"name"`
 	Introduction sql.NullString `db:"introduction"`
 	MimeType     sql.NullString `db:"mime_type"`
@@ -34,7 +35,7 @@ func (r *CreatorRepository) Find(ctx context.Context) (*domain.Creator, error) {
 	err := getExecutor(ctx, r.db).GetContext(
 		ctx,
 		&row,
-		`SELECT id, name, introduction, mime_type, logo FROM creator WHERE deleted_at IS NULL ORDER BY id ASC LIMIT 1`,
+		`SELECT id, uuid, name, introduction, mime_type, logo FROM creator WHERE deleted_at IS NULL ORDER BY id ASC LIMIT 1`,
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -51,10 +52,10 @@ func (r *CreatorRepository) UpdateProfile(ctx context.Context, c *domain.Creator
 
 	result, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
-		`UPDATE creator SET name = ?, introduction = ?, updated_at = NOW() WHERE id = ? AND deleted_at IS NULL`,
+		`UPDATE creator SET name = ?, introduction = ?, updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`,
 		c.Name().Value(),
 		introduction,
-		c.ID().Value(),
+		c.UUID().Value(),
 	)
 	if err != nil {
 		return false, err
@@ -69,16 +70,16 @@ func (r *CreatorRepository) UpdateProfile(ctx context.Context, c *domain.Creator
 
 func (r *CreatorRepository) UpdateLogo(
 	ctx context.Context,
-	creatorID primitive.ID,
+	creatorUUID primitive.UUID,
 	mimeType domain.CreatorLogoMimeType,
 	logoPath domain.CreatorLogoPath,
 ) (bool, error) {
 	result, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
-		`UPDATE creator SET mime_type = ?, logo = ?, updated_at = NOW() WHERE id = ? AND deleted_at IS NULL`,
+		`UPDATE creator SET mime_type = ?, logo = ?, updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`,
 		mimeType.Value(),
 		logoPath.Value(),
-		creatorID.Value(),
+		creatorUUID.Value(),
 	)
 	if err != nil {
 		return false, err
@@ -98,6 +99,7 @@ func toDomainCreator(row creatorRow) (*domain.Creator, error) {
 
 	creator, err := domain.Rebuild(
 		row.ID,
+		row.UUID,
 		row.Name,
 		introductionRaw,
 		mimeTypeRaw,
