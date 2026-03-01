@@ -21,16 +21,13 @@ func NewSessionRepository(db *sqlx.DB) *SessionRepository {
 }
 
 func (r *SessionRepository) Create(ctx context.Context, s *domain.Session) (*domain.Session, error) {
-	createdAt := s.CreatedAt()
-	if createdAt.IsZero() {
-		createdAt = time.Now().UTC()
-	}
-	res, err := getExecutor(ctx, r.db).ExecContext(
+	executor := getExecutor(ctx, r.db)
+
+	res, err := executor.ExecContext(
 		ctx,
-		`INSERT INTO session (uuid, user_uuid, created_at) VALUES (?, ?, ?)`,
+		`INSERT INTO session (uuid, user_uuid, created_at) VALUES (?, ?, UTC_TIMESTAMP())`,
 		s.UUID().Value(),
 		s.UserUUID().Value(),
-		createdAt,
 	)
 	if err != nil {
 		return nil, err
@@ -41,7 +38,19 @@ func (r *SessionRepository) Create(ctx context.Context, s *domain.Session) (*dom
 		return nil, err
 	}
 
-	created, err := domain.Rebuild(uint(lastID), s.UUID().Value(), s.UserUUID().Value(), createdAt)
+	var row struct {
+		CreatedAt time.Time `db:"created_at"`
+	}
+	if err := executor.GetContext(
+		ctx,
+		&row,
+		`SELECT created_at FROM session WHERE id = ?`,
+		lastID,
+	); err != nil {
+		return nil, err
+	}
+
+	created, err := domain.Rebuild(uint(lastID), s.UUID().Value(), s.UserUUID().Value(), row.CreatedAt)
 	if err != nil {
 		return nil, fmt.Errorf("invalid session row: %w", err)
 	}
