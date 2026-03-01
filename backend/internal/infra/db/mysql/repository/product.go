@@ -32,7 +32,7 @@ func NewProductRepository(db *sqlx.DB) *ProductRepository {
 	return &ProductRepository{db: db}
 }
 
-func (r *ProductRepository) Create(ctx context.Context, p *domain.Product) (primitive.ID, error) {
+func (r *ProductRepository) Create(ctx context.Context, p *domain.Product) (*domain.Product, error) {
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
 		`INSERT INTO product (uuid, name, description, price, is_active, is_recommend, category_uuid, target_uuid, created_at, updated_at)
@@ -47,21 +47,31 @@ func (r *ProductRepository) Create(ctx context.Context, p *domain.Product) (prim
 		domainVO.ToValuePtr(p.TargetUUID()),
 	)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
 	lastID, err := res.LastInsertId()
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 	if lastID <= 0 {
-		return 0, fmt.Errorf("invalid inserted product id: %d", lastID)
+		return nil, fmt.Errorf("invalid inserted product id: %d", lastID)
 	}
-	id, err := primitive.NewID(uint(lastID))
+	created, err := domain.Rebuild(
+		uint(lastID),
+		p.UUID().Value(),
+		p.Name().Value(),
+		domainVO.ToValueOrEmpty(p.Description()),
+		p.Price().Value(),
+		p.IsActive(),
+		p.IsRecommend(),
+		domainVO.ToValuePtr(p.CategoryUUID()),
+		domainVO.ToValuePtr(p.TargetUUID()),
+	)
 	if err != nil {
-		return 0, fmt.Errorf("invalid inserted product id: %d", lastID)
+		return nil, fmt.Errorf("invalid inserted product row: %w", err)
 	}
-	return id, nil
+	return created, nil
 }
 
 func (r *ProductRepository) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domain.Product, error) {

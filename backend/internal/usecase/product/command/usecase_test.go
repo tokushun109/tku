@@ -21,8 +21,8 @@ type stubProductRepoForCreateImages struct {
 	findByUUIDCalled int
 }
 
-func (s *stubProductRepoForCreateImages) Create(ctx context.Context, p *domainProduct.Product) (primitive.ID, error) {
-	return 0, nil
+func (s *stubProductRepoForCreateImages) Create(ctx context.Context, p *domainProduct.Product) (*domainProduct.Product, error) {
+	return p, nil
 }
 
 func (s *stubProductRepoForCreateImages) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domainProduct.Product, error) {
@@ -59,8 +59,8 @@ type stubProductRepoForCSV struct {
 	updated        []*domainProduct.Product
 }
 
-func (s *stubProductRepoForCSV) Create(ctx context.Context, p *domainProduct.Product) (primitive.ID, error) {
-	return 0, nil
+func (s *stubProductRepoForCSV) Create(ctx context.Context, p *domainProduct.Product) (*domainProduct.Product, error) {
+	return p, nil
 }
 
 func (s *stubProductRepoForCSV) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domainProduct.Product, error) {

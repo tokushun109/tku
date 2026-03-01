@@ -7,7 +7,7 @@ import (
 )
 
 type Repository interface {
-	Create(ctx context.Context, p *Product) (primitive.ID, error)
+	Create(ctx context.Context, p *Product) (*Product, error)
 	FindByUUID(ctx context.Context, uuid primitive.UUID) (*Product, error)
 	Update(ctx context.Context, p *Product) (bool, error)
 	Delete(ctx context.Context, uuid primitive.UUID) (bool, error)

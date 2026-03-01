@@ -1,6 +1,5 @@
 $gap: 24px;
 $image-size: 512px;
-$image-length: 10; // 画像の数
 
 // ループカルーセルのアニメーション
 @keyframes loop-slide {
@@ -9,8 +8,7 @@ $image-length: 10; // 画像の数
     }
 
     to {
-        // (イメージの数 + 1) ✖️ 画像幅 + paddingと画像のgap
-        transform: translate(calc((-1 * $image-size * ($image-length + 1) + $gap * (2 + $image-length - 1))));
+        transform: translateX(calc(-1 * (#{$image-size} + #{$gap}) * var(--item-length)));
     }
 }
 
@@ -22,11 +20,13 @@ $image-length: 10; // 画像の数
     overflow-x: hidden;
 
     .wrapper {
+        --animation-duration: 60s;
+        --item-length: 0;
         position: absolute;
         background: $accent-light-color;
         display: flex;
         gap: $gap;
-        animation: loop-slide 60s infinite linear 1s both;
+        animation: loop-slide var(--animation-duration) infinite linear 1s both;
 
         .product-image {
             cursor: pointer;
