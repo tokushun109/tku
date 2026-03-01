@@ -430,7 +430,7 @@ func (r *ProductQueryReader) loadSiteDetails(ctx context.Context, productUUIDs [
 			ss.name AS sales_site_name
 		 FROM site_detail sd
 		 INNER JOIN sales_site ss ON sd.sales_site_uuid = ss.uuid AND ss.deleted_at IS NULL
-		 WHERE sd.deleted_at IS NULL AND sd.product_uuid IN (?)
+		 WHERE sd.product_uuid IN (?)
 		 ORDER BY sd.detail_url ASC, sd.id ASC`,
 		productUUIDs,
 	)
