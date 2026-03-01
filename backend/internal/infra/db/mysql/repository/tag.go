@@ -131,8 +131,7 @@ func (r *TagRepository) Delete(ctx context.Context, uuid primitive.UUID) (bool, 
 	if _, err := tx.ExecContext(
 		ctx,
 		`DELETE FROM product_to_tag
-		 WHERE tag_uuid = ? OR (tag_uuid IS NULL AND tag_id = (SELECT id FROM tag WHERE uuid = ? LIMIT 1))`,
-		uuid.Value(),
+		 WHERE tag_uuid = ?`,
 		uuid.Value(),
 	); err != nil {
 		return false, err

@@ -72,7 +72,7 @@ func (r *TargetRepository) FindUsed(ctx context.Context) ([]*domain.Target, erro
 	query := `
 		SELECT DISTINCT t.id, t.uuid, t.name
 		FROM target t
-		INNER JOIN product p ON (p.target_uuid = t.uuid OR (p.target_uuid IS NULL AND p.target_id = t.id))
+		INNER JOIN product p ON p.target_uuid = t.uuid
 		WHERE t.deleted_at IS NULL AND p.deleted_at IS NULL
 	`
 	if err := getExecutor(ctx, r.db).SelectContext(ctx, &rows, query); err != nil {
@@ -165,8 +165,7 @@ func (r *TargetRepository) Delete(ctx context.Context, uuid primitive.UUID) (boo
 		ctx,
 		`UPDATE product
 		 SET target_uuid = NULL, target_id = NULL
-		 WHERE target_uuid = ? OR (target_uuid IS NULL AND target_id = (SELECT id FROM target WHERE uuid = ? LIMIT 1))`,
-		uuid.Value(),
+		 WHERE target_uuid = ?`,
 		uuid.Value(),
 	); err != nil {
 		return false, err

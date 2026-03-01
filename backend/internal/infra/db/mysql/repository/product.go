@@ -78,11 +78,9 @@ func (r *ProductRepository) FindByUUID(ctx context.Context, uuid primitive.UUID)
 			p.price,
 			p.is_active,
 			p.is_recommend,
-			COALESCE(p.category_uuid, c.uuid) AS category_uuid,
-			COALESCE(p.target_uuid, t.uuid) AS target_uuid
+			p.category_uuid,
+			p.target_uuid
 		 FROM product p
-		 LEFT JOIN category c ON p.category_uuid IS NULL AND c.id = p.category_id AND c.deleted_at IS NULL
-		 LEFT JOIN target t ON p.target_uuid IS NULL AND t.id = p.target_id AND t.deleted_at IS NULL
 		 WHERE p.uuid = ? AND p.deleted_at IS NULL`,
 		uuid.Value(),
 	)
@@ -109,11 +107,9 @@ func (r *ProductRepository) FindByID(ctx context.Context, id primitive.ID) (*dom
 			p.price,
 			p.is_active,
 			p.is_recommend,
-			COALESCE(p.category_uuid, c.uuid) AS category_uuid,
-			COALESCE(p.target_uuid, t.uuid) AS target_uuid
+			p.category_uuid,
+			p.target_uuid
 		 FROM product p
-		 LEFT JOIN category c ON p.category_uuid IS NULL AND c.id = p.category_id AND c.deleted_at IS NULL
-		 LEFT JOIN target t ON p.target_uuid IS NULL AND t.id = p.target_id AND t.deleted_at IS NULL
 		 WHERE p.id = ? AND p.deleted_at IS NULL`,
 		id.Value(),
 	)
@@ -173,10 +169,7 @@ func (r *ProductRepository) Delete(ctx context.Context, uuid primitive.UUID) (bo
 func (r *ProductRepository) ReplaceTags(ctx context.Context, productUUID primitive.UUID, tagUUIDs []primitive.UUID) error {
 	if _, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
-		`DELETE ptt
-		 FROM product_to_tag ptt
-		 LEFT JOIN product p ON ptt.product_uuid IS NULL AND p.id = ptt.product_id
-		 WHERE COALESCE(ptt.product_uuid, p.uuid) = ?`,
+		`DELETE FROM product_to_tag WHERE product_uuid = ?`,
 		productUUID.Value(),
 	); err != nil {
 		return err

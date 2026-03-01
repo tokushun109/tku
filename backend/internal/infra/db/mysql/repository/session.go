@@ -59,9 +59,8 @@ func (r *SessionRepository) FindByUUID(ctx context.Context, uuid primitive.UUID)
 	err := getExecutor(ctx, r.db).GetContext(
 		ctx,
 		&rrow,
-		`SELECT s.id, s.uuid, COALESCE(s.user_uuid, u.uuid) AS user_uuid, s.created_at
+		`SELECT s.id, s.uuid, s.user_uuid, s.created_at
 		 FROM session s
-		 LEFT JOIN user u ON s.user_uuid IS NULL AND u.id = s.user_id
 		 WHERE s.uuid = ?`,
 		uuid.Value(),
 	)
@@ -86,10 +85,7 @@ func (r *SessionRepository) DeleteByUUID(ctx context.Context, uuid primitive.UUI
 func (r *SessionRepository) DeleteByUserUUID(ctx context.Context, userUUID primitive.UUID) error {
 	_, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
-		`DELETE s
-		 FROM session s
-		 LEFT JOIN user u ON s.user_uuid IS NULL AND u.id = s.user_id
-		 WHERE COALESCE(s.user_uuid, u.uuid) = ?`,
+		`DELETE FROM session WHERE user_uuid = ?`,
 		userUUID.Value(),
 	)
 	return err

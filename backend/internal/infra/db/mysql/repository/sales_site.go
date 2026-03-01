@@ -127,8 +127,7 @@ func (r *SalesSiteRepository) Delete(ctx context.Context, uuid primitive.UUID) (
 	if _, err := tx.ExecContext(
 		ctx,
 		`DELETE FROM site_detail
-		 WHERE sales_site_uuid = ? OR (sales_site_uuid IS NULL AND sales_site_id = (SELECT id FROM sales_site WHERE uuid = ? LIMIT 1))`,
-		uuid.Value(),
+		 WHERE sales_site_uuid = ?`,
 		uuid.Value(),
 	); err != nil {
 		return false, err

@@ -72,7 +72,7 @@ func (r *CategoryRepository) FindUsed(ctx context.Context) ([]*domain.Category, 
 	query := `
 		SELECT DISTINCT c.id, c.uuid, c.name
 		FROM category c
-		INNER JOIN product p ON (p.category_uuid = c.uuid OR (p.category_uuid IS NULL AND p.category_id = c.id))
+		INNER JOIN product p ON p.category_uuid = c.uuid
 		WHERE c.deleted_at IS NULL AND p.deleted_at IS NULL
 	`
 	if err := getExecutor(ctx, r.db).SelectContext(ctx, &rows, query); err != nil {
@@ -165,8 +165,7 @@ func (r *CategoryRepository) Delete(ctx context.Context, uuid primitive.UUID) (b
 		ctx,
 		`UPDATE product
 		 SET category_uuid = NULL, category_id = NULL
-		 WHERE category_uuid = ? OR (category_uuid IS NULL AND category_id = (SELECT id FROM category WHERE uuid = ? LIMIT 1))`,
-		uuid.Value(),
+		 WHERE category_uuid = ?`,
 		uuid.Value(),
 	); err != nil {
 		return false, err

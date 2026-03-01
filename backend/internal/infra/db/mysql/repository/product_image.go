@@ -80,9 +80,8 @@ func (r *ProductImageRepository) FindByUUID(ctx context.Context, uuid primitive.
 				pi.mime_type,
 				pi.path,
 				pi.display_order,
-				COALESCE(pi.product_uuid, p.uuid) AS product_uuid
+				pi.product_uuid
 			FROM product_image pi
-			LEFT JOIN product p ON pi.product_uuid IS NULL AND p.id = pi.product_id
 			WHERE pi.uuid = ? AND pi.deleted_at IS NULL
 			`,
 		uuid.Value(),
@@ -110,10 +109,9 @@ func (r *ProductImageRepository) FindByProductUUID(ctx context.Context, productU
 				pi.mime_type,
 				pi.path,
 				pi.display_order,
-				COALESCE(pi.product_uuid, p.uuid) AS product_uuid
+				pi.product_uuid
 			FROM product_image pi
-			LEFT JOIN product p ON pi.product_uuid IS NULL AND p.id = pi.product_id
-			WHERE COALESCE(pi.product_uuid, p.uuid) = ? AND pi.deleted_at IS NULL
+			WHERE pi.product_uuid = ? AND pi.deleted_at IS NULL
 			ORDER BY pi.display_order DESC, pi.id ASC
 			`,
 		productUUID.Value(),
@@ -180,10 +178,9 @@ func (r *ProductImageRepository) DeleteByUUID(ctx context.Context, uuid primitiv
 func (r *ProductImageRepository) DeleteByProductUUID(ctx context.Context, productUUID primitive.UUID) error {
 	_, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
-		`UPDATE product_image pi
-		 LEFT JOIN product p ON pi.product_uuid IS NULL AND p.id = pi.product_id
-		 SET pi.deleted_at = NOW(), pi.updated_at = NOW()
-		 WHERE COALESCE(pi.product_uuid, p.uuid) = ? AND pi.deleted_at IS NULL`,
+		`UPDATE product_image
+		 SET deleted_at = NOW(), updated_at = NOW()
+		 WHERE product_uuid = ? AND deleted_at IS NULL`,
 		productUUID.Value(),
 	)
 	return err

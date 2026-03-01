@@ -20,10 +20,7 @@ func NewSiteDetailRepository(db *sqlx.DB) *SiteDetailRepository {
 func (r *SiteDetailRepository) ReplaceByProductUUID(ctx context.Context, productUUID primitive.UUID, details []*domain.SiteDetail) error {
 	if _, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
-		`DELETE sd
-		 FROM site_detail sd
-		 LEFT JOIN product p ON sd.product_uuid IS NULL AND p.id = sd.product_id
-		 WHERE COALESCE(sd.product_uuid, p.uuid) = ?`,
+		`DELETE FROM site_detail WHERE product_uuid = ?`,
 		productUUID.Value(),
 	); err != nil {
 		return err
@@ -51,10 +48,7 @@ func (r *SiteDetailRepository) ReplaceByProductUUID(ctx context.Context, product
 func (r *SiteDetailRepository) DeleteByProductUUID(ctx context.Context, productUUID primitive.UUID) error {
 	_, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
-		`DELETE sd
-		 FROM site_detail sd
-		 LEFT JOIN product p ON sd.product_uuid IS NULL AND p.id = sd.product_id
-		 WHERE COALESCE(sd.product_uuid, p.uuid) = ?`,
+		`DELETE FROM site_detail WHERE product_uuid = ?`,
 		productUUID.Value(),
 	)
 	return err
