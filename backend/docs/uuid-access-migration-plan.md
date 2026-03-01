@@ -143,3 +143,49 @@ ORDER BY ptt.created_at ASC, ptt.tag_uuid ASC
 - `creator` の「常に 1 レコード」前提を DB / アプリのどこで担保するかは別途検討とする。
 - 内部補助キーとして残した `id` を、将来的にどこまで物理削除するかは UUID 移行完了後に再判断する。
 
+## 9. 現状の実装状況
+
+### 9.1 実装済み
+
+- UUID ベース移行の初期 migration として `db/migrations/000021_add_uuid_access_columns` を追加済み。
+- `creator` / `contact` に `uuid` 列を追加する前提で、ドメイン・repository・response を UUID 対応済み。
+- `product` の `category` / `target` 参照は、アプリケーション上は `category_uuid` / `target_uuid` を主に使う実装へ切り替え済み。
+- `product_to_tag` は、アプリケーション上は `product_uuid` / `tag_uuid` を使って関連更新する実装へ切り替え済み。
+- `product_image` / `site_detail` は、アプリケーション上は `product_uuid` / `sales_site_uuid` を使って関連更新する実装へ切り替え済み。
+- `user` / `session` は、アプリケーション上は `session.user_uuid` を主に使う実装へ切り替え済み。
+- 商品 CSV は `id` ではなく `uuid` を更新キーに使う実装へ切り替え済み。
+- 商品一覧・CSV 出力などの query 側も、UUID 参照を優先する JOIN / 読み取りへ切り替え済み。
+- 移行期間を考慮し、一部 repository / query では旧 `*_id` 列をフォールバック参照する互換処理を残している。
+- 2026-03-01 時点で、`backend` 配下の `go test ./...` は通過済み。
+
+### 9.2 実装時の補足
+
+- 既存データの UUID バックフィルは migration 内で実施する。
+- `creator.uuid` / `contact.uuid` の既存データ採番は、アプリ側の Go 実装ではなく MySQL の `LOWER(UUID())` を使用する。
+- 形式としてはアプリ側と同じ lowercase UUID を採用するが、生成アルゴリズム自体は MySQL の `UUID()` に依存する。
+- 現段階では、旧 `id` 列および旧 `*_id` 列は物理削除していない。
+
+## 10. 残作業
+
+### 10.1 運用 / 適用
+
+- 各環境で `000021_add_uuid_access_columns` を適用する。
+- migration 適用前に、対象テーブルのバックアップ取得手順を確認する。
+- migration 適用後に、既存データの `*_uuid` バックフィル結果を確認する。
+- migration 適用後に、`creator.uuid` / `contact.uuid` / `session.user_uuid` などの NULL 残存有無を確認する。
+
+### 10.2 動作確認
+
+- 商品の作成 / 更新 / 削除で、UUID ベースの関連更新が正しく動くかを確認する。
+- 商品 CSV の export / 編集 / upload の一連フローを確認する。
+- 画像アップロード、タグ更新、販売サイト詳細更新など、商品の関連データ更新を確認する。
+- ログイン / ログアウト / セッション解決を含む `user` / `session` の認証導線を確認する。
+- `contact` 一覧 / 作成、`creator` 取得 / 更新 / ロゴ更新の API 動作を確認する。
+
+### 10.3 後続の整理
+
+- UUID 切り替えが安定した段階で、旧 `*_id` を前提にしたフォールバック参照コードを削除する。
+- 必要に応じて、旧 `*_id` 列・旧 FK・不要なインデックスの削除を別 migration で行う。
+- `product_to_tag` など中間テーブルの物理削除方針に合わせて、`deleted_at` の削除要否を再確認する。
+- `creator` の「常に 1 レコード」前提をどう担保するかを別途確定する。
+- 将来的に `id` を内部補助キーとして残し続けるか、さらに削減するかを再判断する。
