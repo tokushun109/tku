@@ -8,29 +8,29 @@
 
 -- MySQL の文字列 FK は、長さだけでなく character set / collation も一致している必要がある。
 -- 既存テーブルは作成時期によってデフォルト collation が異なる可能性があるため、
--- UUID 参照元として使う既存 uuid 列は、先に同じ定義へ明示的に揃えておく。
+-- UUID 参照元として使う既存 uuid 列は、先に同じ utf8mb4 定義へ明示的に揃えておく。
 ALTER TABLE category
-MODIFY COLUMN uuid VARCHAR(36) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL;
+MODIFY COLUMN uuid VARCHAR(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL;
 
 ALTER TABLE target
-MODIFY COLUMN uuid VARCHAR(36) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL;
+MODIFY COLUMN uuid VARCHAR(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL;
 
 ALTER TABLE product
-MODIFY COLUMN uuid VARCHAR(36) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL;
+MODIFY COLUMN uuid VARCHAR(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL;
 
 ALTER TABLE tag
-MODIFY COLUMN uuid VARCHAR(36) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL;
+MODIFY COLUMN uuid VARCHAR(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL;
 
 ALTER TABLE sales_site
-MODIFY COLUMN uuid VARCHAR(36) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL;
+MODIFY COLUMN uuid VARCHAR(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL;
 
 ALTER TABLE user
-MODIFY COLUMN uuid VARCHAR(36) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL;
+MODIFY COLUMN uuid VARCHAR(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL;
 
 -- creator はこれまで id のみだったため、外部識別用の uuid を新規付与する。
 -- 既存レコードにも一意な値が必要なので、一度 NULL 許容で追加してから採番する。
 ALTER TABLE creator
-ADD COLUMN uuid VARCHAR(36) CHARACTER SET ascii COLLATE ascii_general_ci NULL AFTER id;
+ADD COLUMN uuid VARCHAR(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL AFTER id;
 
 -- 既存 creator レコードに lowercase の UUID を採番する。
 -- アプリケーション側では lowercase 前提で比較するため、ここでも小文字に揃える。
@@ -40,14 +40,14 @@ WHERE uuid IS NULL;
 
 -- 全件バックフィル後、NOT NULL に変更して必須カラム化する。
 ALTER TABLE creator
-MODIFY COLUMN uuid VARCHAR(36) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL;
+MODIFY COLUMN uuid VARCHAR(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL;
 
 -- creator.uuid を外部識別子として利用できるよう、UNIQUE 制約相当の一意インデックスを追加する。
 CREATE UNIQUE INDEX idx_creator_uuid ON creator (uuid);
 
 -- contact も creator と同様に、これまで id のみだったため uuid を新規付与する。
 ALTER TABLE contact
-ADD COLUMN uuid VARCHAR(36) CHARACTER SET ascii COLLATE ascii_general_ci NULL AFTER id;
+ADD COLUMN uuid VARCHAR(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL AFTER id;
 
 -- 既存 contact レコードに lowercase の UUID を採番する。
 UPDATE contact
@@ -56,7 +56,7 @@ WHERE uuid IS NULL;
 
 -- バックフィル完了後に NOT NULL 化する。
 ALTER TABLE contact
-MODIFY COLUMN uuid VARCHAR(36) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL;
+MODIFY COLUMN uuid VARCHAR(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL;
 
 -- contact.uuid を API レスポンスや外部参照の主識別子として使えるよう一意インデックスを付与する。
 CREATE UNIQUE INDEX idx_contact_uuid ON contact (uuid);
@@ -64,8 +64,8 @@ CREATE UNIQUE INDEX idx_contact_uuid ON contact (uuid);
 -- product は category / target の関連先を id ではなく uuid で保持できるようにする。
 -- 移行期間中に旧データを扱えるよう、追加時点では NULL 許容にしている。
 ALTER TABLE product
-ADD COLUMN category_uuid VARCHAR(36) CHARACTER SET ascii COLLATE ascii_general_ci NULL AFTER category_id,
-ADD COLUMN target_uuid VARCHAR(36) CHARACTER SET ascii COLLATE ascii_general_ci NULL AFTER target_id;
+ADD COLUMN category_uuid VARCHAR(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL AFTER category_id,
+ADD COLUMN target_uuid VARCHAR(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL AFTER target_id;
 
 -- 既存の category_id / target_id から、それぞれ対応する uuid をバックフィルする。
 -- LEFT JOIN にしているのは、片方だけ NULL のレコードもそのまま扱えるようにするため。
@@ -96,8 +96,8 @@ FOREIGN KEY (target_uuid) REFERENCES target (uuid);
 ALTER TABLE product_to_tag
 MODIFY COLUMN product_id INT NULL,
 MODIFY COLUMN tag_id INT NULL,
-ADD COLUMN product_uuid VARCHAR(36) CHARACTER SET ascii COLLATE ascii_general_ci NULL AFTER product_id,
-ADD COLUMN tag_uuid VARCHAR(36) CHARACTER SET ascii COLLATE ascii_general_ci NULL AFTER tag_id;
+ADD COLUMN product_uuid VARCHAR(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL AFTER product_id,
+ADD COLUMN tag_uuid VARCHAR(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL AFTER tag_id;
 
 -- 既存の product_id / tag_id から中間テーブルの UUID 参照をバックフィルする。
 UPDATE product_to_tag ptt
@@ -125,7 +125,7 @@ FOREIGN KEY (tag_uuid) REFERENCES tag (uuid);
 
 -- product_image も product_id 参照から product_uuid 参照へ移行できるようにする。
 ALTER TABLE product_image
-ADD COLUMN product_uuid VARCHAR(36) CHARACTER SET ascii COLLATE ascii_general_ci NULL AFTER product_id;
+ADD COLUMN product_uuid VARCHAR(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL AFTER product_id;
 
 -- 既存 product_id から product_uuid をバックフィルする。
 UPDATE product_image pi
@@ -146,8 +146,8 @@ FOREIGN KEY (product_uuid) REFERENCES product (uuid);
 ALTER TABLE site_detail
 MODIFY COLUMN product_id INT NULL,
 MODIFY COLUMN sales_site_id INT NULL,
-ADD COLUMN product_uuid VARCHAR(36) CHARACTER SET ascii COLLATE ascii_general_ci NULL AFTER product_id,
-ADD COLUMN sales_site_uuid VARCHAR(36) CHARACTER SET ascii COLLATE ascii_general_ci NULL AFTER sales_site_id;
+ADD COLUMN product_uuid VARCHAR(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL AFTER product_id,
+ADD COLUMN sales_site_uuid VARCHAR(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL AFTER sales_site_id;
 
 -- 既存の id 参照から product_uuid / sales_site_uuid をバックフィルする。
 UPDATE site_detail sd
@@ -175,7 +175,7 @@ FOREIGN KEY (sales_site_uuid) REFERENCES sales_site (uuid);
 -- 認証系は段階切替を想定しているため、旧 user_id は残したまま NULL 許容へ変更する。
 ALTER TABLE session
 MODIFY COLUMN user_id INT NULL,
-ADD COLUMN user_uuid VARCHAR(36) CHARACTER SET ascii COLLATE ascii_general_ci NULL AFTER user_id;
+ADD COLUMN user_uuid VARCHAR(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL AFTER user_id;
 
 -- 既存 session の user_id から user_uuid をバックフィルする。
 UPDATE session s
