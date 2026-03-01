@@ -43,20 +43,16 @@ func (g *stubUUIDGenerator) New() string {
 type stubProductRepoForDuplicate struct {
 	created          *domainProduct.Product
 	createErr        error
-	createdID        primitive.ID
 	replacedTagUUIDs []primitive.UUID
 	replacedProduct  primitive.UUID
 }
 
-func (s *stubProductRepoForDuplicate) Create(ctx context.Context, p *domainProduct.Product) (primitive.ID, error) {
+func (s *stubProductRepoForDuplicate) Create(ctx context.Context, p *domainProduct.Product) (*domainProduct.Product, error) {
 	s.created = p
 	if s.createErr != nil {
-		return 0, s.createErr
+		return nil, s.createErr
 	}
-	if s.createdID == 0 {
-		s.createdID = primitive.ID(10)
-	}
-	return s.createdID, nil
+	return p, nil
 }
 
 func (s *stubProductRepoForDuplicate) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domainProduct.Product, error) {
