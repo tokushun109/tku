@@ -56,8 +56,8 @@ describe('Home Page Integration Test', () => {
 
         // 商品情報の表示を確認
         await waitFor(() => {
-            expect(screen.getAllByText('女性向けイヤリング1')).toHaveLength(4)
-            expect(screen.getAllByText('イヤリング')).toHaveLength(4)
+            expect(screen.getAllByText('女性向けイヤリング1')).toHaveLength(5)
+            expect(screen.getAllByText('イヤリング')).toHaveLength(5)
         })
     })
 
