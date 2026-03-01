@@ -56,7 +56,7 @@ func (s *stubCreatorUC) GetLogoBlob(ctx context.Context, requestLogoFile string)
 
 func TestCreatorGet(t *testing.T) {
 	t.Run("有効な入力を渡したとき製作者情報の取得に成功する", func(t *testing.T) {
-		creator, err := domain.Rebuild(1, "とこりり", "ハンドメイド作品を制作", "", "")
+		creator, err := domain.Rebuild(1, "11111111-1111-4111-8111-111111111111", "とこりり", "ハンドメイド作品を制作", "", "")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}

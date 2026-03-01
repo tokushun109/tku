@@ -65,7 +65,7 @@ func TestUserLogin(t *testing.T) {
 	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
 
 		uuid := id.GenerateUUID()
-		h := NewUserHandler(&stubUserUC{loginRes: mustSession(uuid, 1)})
+		h := NewUserHandler(&stubUserUC{loginRes: mustSession(uuid, "11111111-1111-4111-8111-111111111111")})
 
 		reqBody := bytes.NewBufferString(`{"Email":"admin@example.com","Password":"pass"}`)
 		req := httptest.NewRequest(http.MethodPost, "/api/user/login", reqBody)
@@ -187,9 +187,9 @@ func mustUUID(s string) primitive.UUID {
 	return u
 }
 
-func mustSession(uuidStr string, userID uint) *domainSession.Session {
+func mustSession(uuidStr string, userUUID string) *domainSession.Session {
 	uuid := mustUUID(uuidStr)
-	sess, err := domainSession.New(uuid.Value(), userID, time.Now())
+	sess, err := domainSession.New(uuid.Value(), userUUID, time.Now())
 	if err != nil {
 		panic(err)
 	}

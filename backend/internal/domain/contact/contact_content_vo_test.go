@@ -24,7 +24,7 @@ func TestNewContactContent(t *testing.T) {
 	})
 
 	t.Run("値が長すぎるときバリデーションエラーで失敗する", func(t *testing.T) {
-		_, err := NewContactContent(strings.Repeat("あ", 1001))
+		_, err := NewContactContent(strings.Repeat("あ", 2001))
 		if err != ErrInvalidContent {
 			t.Fatalf("expected ErrInvalidContent, got %v", err)
 		}

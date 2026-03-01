@@ -7,6 +7,8 @@ import (
 	"io"
 	"strconv"
 	"strings"
+
+	"github.com/tokushun109/tku/backend/internal/domain/primitive"
 )
 
 var (
@@ -15,7 +17,7 @@ var (
 )
 
 type ProductCSVRow struct {
-	ID           uint
+	UUID         string
 	Name         string
 	Price        int
 	CategoryName string
@@ -74,7 +76,7 @@ func buildProductCSVColumnMap(header []string) (map[string]int, error) {
 		columnMap[normalized] = idx
 	}
 
-	required := []string{"id", "name", "price", "categoryname", "targetname"}
+	required := []string{"uuid", "name", "price", "categoryname", "targetname"}
 	for _, key := range required {
 		if _, ok := columnMap[key]; !ok {
 			return nil, fmt.Errorf("%w: missing column=%s", errInvalidCSVHeader, key)
@@ -85,7 +87,7 @@ func buildProductCSVColumnMap(header []string) (map[string]int, error) {
 }
 
 func parseProductCSVRecord(record []string, columnMap map[string]int, lineNo int) (ProductCSVRow, error) {
-	idText := getCSVColumn(record, columnMap["id"])
+	uuidText := getCSVColumn(record, columnMap["uuid"])
 	name := getCSVColumn(record, columnMap["name"])
 	priceText := getCSVColumn(record, columnMap["price"])
 	categoryName := getCSVColumn(record, columnMap["categoryname"])
@@ -95,8 +97,8 @@ func parseProductCSVRecord(record []string, columnMap map[string]int, lineNo int
 		return ProductCSVRow{}, fmt.Errorf("%w: line=%d", errInvalidCSVRecord, lineNo)
 	}
 
-	id, err := strconv.ParseUint(idText, 10, 64)
-	if err != nil || id == 0 {
+	uuid, err := primitive.NewUUID(uuidText)
+	if err != nil {
 		return ProductCSVRow{}, fmt.Errorf("%w: line=%d", errInvalidCSVRecord, lineNo)
 	}
 
@@ -106,7 +108,7 @@ func parseProductCSVRecord(record []string, columnMap map[string]int, lineNo int
 	}
 
 	return ProductCSVRow{
-		ID:           uint(id),
+		UUID:         uuid.Value(),
 		Name:         name,
 		Price:        price,
 		CategoryName: categoryName,

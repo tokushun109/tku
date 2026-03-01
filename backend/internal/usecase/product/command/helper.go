@@ -11,133 +11,13 @@ import (
 	domainProduct "github.com/tokushun109/tku/backend/internal/domain/product"
 	domainSalesSite "github.com/tokushun109/tku/backend/internal/domain/sales_site"
 	domainSiteDetail "github.com/tokushun109/tku/backend/internal/domain/site_detail"
-	domainTag "github.com/tokushun109/tku/backend/internal/domain/tag"
 	domainTarget "github.com/tokushun109/tku/backend/internal/domain/target"
 	"github.com/tokushun109/tku/backend/internal/usecase"
 	usecaseProduct "github.com/tokushun109/tku/backend/internal/usecase/product"
 )
 
-func (s *Service) resolveCategoryID(ctx context.Context, rawUUID string) (*uint, error) {
-	trimmed := strings.TrimSpace(rawUUID)
-	if trimmed == "" {
-		return nil, nil
-	}
-
-	uuid, err := primitive.NewUUID(trimmed)
-	if err != nil {
-		return nil, usecase.NewAppError(usecase.ErrInvalidInput)
-	}
-
-	category, err := s.categoryRepo.FindByUUID(ctx, uuid)
-	if err != nil {
-		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
-	}
-	if category == nil {
-		return nil, usecase.NewAppError(usecase.ErrInvalidInput)
-	}
-
-	id := category.ID().Value()
-	return &id, nil
-}
-
-func (s *Service) resolveTargetID(ctx context.Context, rawUUID string) (*uint, error) {
-	trimmed := strings.TrimSpace(rawUUID)
-	if trimmed == "" {
-		return nil, nil
-	}
-
-	uuid, err := primitive.NewUUID(trimmed)
-	if err != nil {
-		return nil, usecase.NewAppError(usecase.ErrInvalidInput)
-	}
-
-	target, err := s.targetRepo.FindByUUID(ctx, uuid)
-	if err != nil {
-		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
-	}
-	if target == nil {
-		return nil, usecase.NewAppError(usecase.ErrInvalidInput)
-	}
-
-	id := target.ID().Value()
-	return &id, nil
-}
-
-func (s *Service) resolveTagIDs(ctx context.Context, rawUUIDs []string) ([]primitive.ID, error) {
-	if len(rawUUIDs) == 0 {
-		return []primitive.ID{}, nil
-	}
-
-	seen := map[primitive.ID]struct{}{}
-	tagIDs := make([]primitive.ID, 0, len(rawUUIDs))
-	for _, rawUUID := range rawUUIDs {
-		uuid, err := primitive.NewUUID(strings.TrimSpace(rawUUID))
-		if err != nil {
-			return nil, usecase.NewAppError(usecase.ErrInvalidInput)
-		}
-
-		tag, err := s.tagRepo.FindByUUID(ctx, uuid)
-		if err != nil {
-			return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
-		}
-		if tag == nil {
-			return nil, usecase.NewAppError(usecase.ErrInvalidInput)
-		}
-		tagID := tag.ID()
-		if _, exists := seen[tagID]; exists {
-			continue
-		}
-		seen[tagID] = struct{}{}
-		tagIDs = append(tagIDs, tagID)
-	}
-	return tagIDs, nil
-}
-
-func (s *Service) resolveOrCreateTagIDsByNames(ctx context.Context, rawNames []string) ([]primitive.ID, error) {
-	if len(rawNames) == 0 {
-		return []primitive.ID{}, nil
-	}
-
-	seen := map[string]struct{}{}
-	tagIDs := make([]primitive.ID, 0, len(rawNames))
-	for _, rawName := range rawNames {
-		tagName, err := domainTag.NewTagName(rawName)
-		if err != nil {
-			return nil, err
-		}
-
-		key := strings.ToLower(tagName.Value())
-		if _, exists := seen[key]; exists {
-			continue
-		}
-		seen[key] = struct{}{}
-
-		tag, err := s.tagRepo.FindByName(ctx, tagName)
-		if err != nil {
-			return nil, err
-		}
-		if tag == nil {
-			newTag, err := domainTag.New(s.uuidGen.New(), tagName.Value())
-			if err != nil {
-				return nil, err
-			}
-			tag, err = s.tagRepo.Create(ctx, newTag)
-			if err != nil {
-				return nil, err
-			}
-			if tag == nil {
-				return nil, fmt.Errorf("created tag was not returned: %s", tagName.Value())
-			}
-		}
-
-		tagIDs = append(tagIDs, tag.ID())
-	}
-
-	return tagIDs, nil
-}
-
 type normalizedProductCSVRow struct {
-	id           uint
+	uuid         string
 	name         string
 	price        int
 	categoryName *domainCategory.CategoryName
@@ -147,8 +27,9 @@ type normalizedProductCSVRow struct {
 func normalizeProductCSVRows(rows []usecaseProduct.ProductCSVInputRow) ([]normalizedProductCSVRow, error) {
 	result := make([]normalizedProductCSVRow, 0, len(rows))
 	for i, row := range rows {
-		if _, err := primitive.NewID(row.ID); err != nil {
-			return nil, fmt.Errorf("row %d: product id is invalid", i+1)
+		productUUID, err := primitive.NewUUID(row.UUID)
+		if err != nil {
+			return nil, fmt.Errorf("row %d: product uuid is invalid", i+1)
 		}
 
 		productName, err := domainProduct.NewProductName(row.Name)
@@ -180,7 +61,7 @@ func normalizeProductCSVRows(rows []usecaseProduct.ProductCSVInputRow) ([]normal
 		}
 
 		result = append(result, normalizedProductCSVRow{
-			id:           row.ID,
+			uuid:         productUUID.Value(),
 			name:         productName.Value(),
 			price:        productPrice.Value(),
 			categoryName: categoryName,
@@ -271,7 +152,7 @@ func (s *Service) findSalesSiteByName(ctx context.Context, rawName string) (*dom
 	return s.salesSiteRepo.FindByName(ctx, name)
 }
 
-func (s *Service) buildSiteDetails(ctx context.Context, productID primitive.ID, inputs []usecaseProduct.SiteDetailInput) ([]*domainSiteDetail.SiteDetail, error) {
+func (s *Service) buildSiteDetails(ctx context.Context, productUUID primitive.UUID, inputs []usecaseProduct.SiteDetailInput) ([]*domainSiteDetail.SiteDetail, error) {
 	details := make([]*domainSiteDetail.SiteDetail, 0, len(inputs))
 	for _, input := range inputs {
 		salesSiteUUID := strings.TrimSpace(input.SalesSiteUUID)
@@ -294,8 +175,8 @@ func (s *Service) buildSiteDetails(ctx context.Context, productID primitive.ID, 
 		siteDetail, err := domainSiteDetail.New(
 			s.uuidGen.New(),
 			input.DetailURL,
-			productID.Value(),
-			salesSite.ID().Value(),
+			productUUID.Value(),
+			salesSiteUUID,
 		)
 		if err != nil {
 			return nil, err
@@ -339,14 +220,14 @@ func isInvalidProductInputError(err error) bool {
 		errors.Is(err, primitive.ErrInvalidURL) ||
 		errors.Is(err, domainProduct.ErrInvalidName) ||
 		errors.Is(err, domainProduct.ErrInvalidPrice) ||
-		errors.Is(err, domainProduct.ErrInvalidCategoryID) ||
-		errors.Is(err, domainProduct.ErrInvalidTargetID) ||
+		errors.Is(err, domainProduct.ErrInvalidCategoryUUID) ||
+		errors.Is(err, domainProduct.ErrInvalidTargetUUID) ||
 		errors.Is(err, domainProduct.ErrInvalidImageName) ||
 		errors.Is(err, domainProduct.ErrInvalidImageMimeType) ||
 		errors.Is(err, domainProduct.ErrInvalidImagePath) ||
 		errors.Is(err, domainProduct.ErrInvalidImageDisplayOrder) ||
-		errors.Is(err, domainProduct.ErrInvalidImageProductID) ||
+		errors.Is(err, domainProduct.ErrInvalidImageProductUUID) ||
 		errors.Is(err, domainSiteDetail.ErrInvalidDetailURL) ||
-		errors.Is(err, domainSiteDetail.ErrInvalidProductID) ||
-		errors.Is(err, domainSiteDetail.ErrInvalidSalesSiteID)
+		errors.Is(err, domainSiteDetail.ErrInvalidProductUUID) ||
+		errors.Is(err, domainSiteDetail.ErrInvalidSalesSiteUUID)
 }

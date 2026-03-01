@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
                 pathname: '**',
             },
             {
+                protocol: 'http',
+                hostname: 'minio',
+                pathname: '**',
+            },
+            {
                 protocol: 'https',
                 hostname: 'tocoriri.com',
                 pathname: '**',

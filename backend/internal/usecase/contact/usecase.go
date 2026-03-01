@@ -17,12 +17,14 @@ type Usecase interface {
 type Service struct {
 	repo     domain.Repository
 	notifier Notifier
+	uuidGen  usecase.UUIDGenerator
 }
 
-func New(repo domain.Repository, notifier Notifier) *Service {
+func New(repo domain.Repository, notifier Notifier, uuidGen usecase.UUIDGenerator) *Service {
 	return &Service{
 		repo:     repo,
 		notifier: notifier,
+		uuidGen:  uuidGen,
 	}
 }
 
@@ -35,7 +37,7 @@ func (s *Service) List(ctx context.Context) ([]*domain.Contact, error) {
 }
 
 func (s *Service) Create(ctx context.Context, name string, company string, phoneNumber string, email string, content string) error {
-	contact, err := domain.New(name, company, phoneNumber, email, content)
+	contact, err := domain.New(s.uuidGen.New(), name, company, phoneNumber, email, content)
 	if err != nil {
 		switch {
 		case errors.Is(err, domain.ErrInvalidName),

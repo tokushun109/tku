@@ -75,12 +75,12 @@ func (s *Service) Login(ctx context.Context, email string, password string) (*do
 
 	sessionUUID := s.uuidGen.New()
 
-	sess, err := domainSession.New(sessionUUID, u.ID().Value(), s.clock.Now())
+	sess, err := domainSession.New(sessionUUID, u.UUID().Value(), s.clock.Now())
 	if err != nil {
 		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 	if err := s.txManager.WithinTransaction(ctx, func(txCtx context.Context) error {
-		if err := s.sessionRepo.DeleteByUserID(txCtx, u.ID()); err != nil {
+		if err := s.sessionRepo.DeleteByUserUUID(txCtx, u.UUID()); err != nil {
 			return err
 		}
 		createdSession, err := s.sessionRepo.Create(txCtx, sess)
@@ -102,12 +102,8 @@ func (s *Service) GetBySessionToken(ctx context.Context, token string) (*domainU
 		return nil, err
 	}
 
-	sessionUserID, err := primitive.NewID(sess.UserID())
-	if err != nil {
-		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
-	}
-
-	u, err := s.userRepo.FindByID(ctx, sessionUserID)
+	sessionUserUUID := sess.UserUUID()
+	u, err := s.userRepo.FindByUUID(ctx, sessionUserUUID)
 	if err != nil {
 		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}

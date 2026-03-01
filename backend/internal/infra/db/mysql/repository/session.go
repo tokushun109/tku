@@ -27,9 +27,9 @@ func (r *SessionRepository) Create(ctx context.Context, s *domain.Session) (*dom
 	}
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
-		`INSERT INTO session (uuid, user_id, created_at) VALUES (?, ?, ?)`,
+		`INSERT INTO session (uuid, user_uuid, created_at) VALUES (?, ?, ?)`,
 		s.UUID().Value(),
-		s.UserID(),
+		s.UserUUID().Value(),
 		createdAt,
 	)
 	if err != nil {
@@ -41,7 +41,7 @@ func (r *SessionRepository) Create(ctx context.Context, s *domain.Session) (*dom
 		return nil, err
 	}
 
-	created, err := domain.Rebuild(uint(lastID), s.UUID().Value(), s.UserID(), createdAt)
+	created, err := domain.Rebuild(uint(lastID), s.UUID().Value(), s.UserUUID().Value(), createdAt)
 	if err != nil {
 		return nil, fmt.Errorf("invalid session row: %w", err)
 	}
@@ -52,18 +52,25 @@ func (r *SessionRepository) FindByUUID(ctx context.Context, uuid primitive.UUID)
 	type row struct {
 		ID        uint      `db:"id"`
 		UUID      string    `db:"uuid"`
-		UserID    uint      `db:"user_id"`
+		UserUUID  string    `db:"user_uuid"`
 		CreatedAt time.Time `db:"created_at"`
 	}
 	var rrow row
-	err := getExecutor(ctx, r.db).GetContext(ctx, &rrow, `SELECT id, uuid, user_id, created_at FROM session WHERE uuid = ?`, uuid.Value())
+	err := getExecutor(ctx, r.db).GetContext(
+		ctx,
+		&rrow,
+		`SELECT s.id, s.uuid, s.user_uuid, s.created_at
+		 FROM session s
+		 WHERE s.uuid = ?`,
+		uuid.Value(),
+	)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
 		return nil, err
 	}
-	sess, err := domain.Rebuild(rrow.ID, rrow.UUID, rrow.UserID, rrow.CreatedAt)
+	sess, err := domain.Rebuild(rrow.ID, rrow.UUID, rrow.UserUUID, rrow.CreatedAt)
 	if err != nil {
 		return nil, fmt.Errorf("invalid session row: %w", err)
 	}
@@ -75,7 +82,11 @@ func (r *SessionRepository) DeleteByUUID(ctx context.Context, uuid primitive.UUI
 	return err
 }
 
-func (r *SessionRepository) DeleteByUserID(ctx context.Context, userID primitive.ID) error {
-	_, err := getExecutor(ctx, r.db).ExecContext(ctx, `DELETE FROM session WHERE user_id = ?`, userID.Value())
+func (r *SessionRepository) DeleteByUserUUID(ctx context.Context, userUUID primitive.UUID) error {
+	_, err := getExecutor(ctx, r.db).ExecContext(
+		ctx,
+		`DELETE FROM session WHERE user_uuid = ?`,
+		userUUID.Value(),
+	)
 	return err
 }

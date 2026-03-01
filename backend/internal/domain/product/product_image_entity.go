@@ -9,7 +9,7 @@ type ProductImage struct {
 	mimeType     ProductImageMimeType
 	path         ProductImagePath
 	displayOrder ProductImageDisplayOrder
-	productID    primitive.ID
+	productUUID  primitive.UUID
 }
 
 func NewProductImage(
@@ -18,9 +18,9 @@ func NewProductImage(
 	rawMimeType string,
 	rawPath string,
 	displayOrder int,
-	productID uint,
+	productUUID string,
 ) (*ProductImage, error) {
-	image, err := newProductImageWithValidatedValues(rawUUID, name, rawMimeType, rawPath, displayOrder, productID)
+	image, err := newProductImageWithValidatedValues(rawUUID, name, rawMimeType, rawPath, displayOrder, productUUID)
 	if err != nil {
 		return nil, err
 	}
@@ -34,13 +34,13 @@ func RebuildProductImage(
 	rawMimeType string,
 	rawPath string,
 	displayOrder int,
-	productID uint,
+	productUUID string,
 ) (*ProductImage, error) {
 	parsedID, err := primitive.NewID(id)
 	if err != nil {
 		return nil, ErrInvalidImageID
 	}
-	image, err := newProductImageWithValidatedValues(rawUUID, name, rawMimeType, rawPath, displayOrder, productID)
+	image, err := newProductImageWithValidatedValues(rawUUID, name, rawMimeType, rawPath, displayOrder, productUUID)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func newProductImageWithValidatedValues(
 	rawMimeType string,
 	rawPath string,
 	displayOrder int,
-	productID uint,
+	productUUID string,
 ) (*ProductImage, error) {
 	uuid, err := primitive.NewUUID(rawUUID)
 	if err != nil {
@@ -76,9 +76,9 @@ func newProductImageWithValidatedValues(
 	if err != nil {
 		return nil, err
 	}
-	parsedProductID, err := primitive.NewID(productID)
+	parsedProductUUID, err := primitive.NewUUID(productUUID)
 	if err != nil {
-		return nil, ErrInvalidImageProductID
+		return nil, ErrInvalidImageProductUUID
 	}
 
 	return &ProductImage{
@@ -87,7 +87,7 @@ func newProductImageWithValidatedValues(
 		mimeType:     mimeType,
 		path:         path,
 		displayOrder: productImageDisplayOrder,
-		productID:    parsedProductID,
+		productUUID:  parsedProductUUID,
 	}, nil
 }
 
@@ -115,8 +115,8 @@ func (p *ProductImage) DisplayOrder() ProductImageDisplayOrder {
 	return p.displayOrder
 }
 
-func (p *ProductImage) ProductID() uint {
-	return p.productID.Value()
+func (p *ProductImage) ProductUUID() primitive.UUID {
+	return p.productUUID
 }
 
 func (p *ProductImage) ChangeDisplayOrder(displayOrder int) error {

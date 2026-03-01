@@ -33,10 +33,6 @@ func (s *stubProductRepoForCreateImages) FindByUUID(ctx context.Context, uuid pr
 	return s.findByUUIDRes, nil
 }
 
-func (s *stubProductRepoForCreateImages) FindByID(ctx context.Context, id primitive.ID) (*domainProduct.Product, error) {
-	return nil, nil
-}
-
 func (s *stubProductRepoForCreateImages) Update(ctx context.Context, p *domainProduct.Product) (bool, error) {
 	return false, nil
 }
@@ -45,7 +41,7 @@ func (s *stubProductRepoForCreateImages) Delete(ctx context.Context, uuid primit
 	return false, nil
 }
 
-func (s *stubProductRepoForCreateImages) ReplaceTags(ctx context.Context, productID primitive.ID, tagIDs []primitive.ID) error {
+func (s *stubProductRepoForCreateImages) ReplaceTags(ctx context.Context, productUUID primitive.UUID, tagUUIDs []primitive.UUID) error {
 	return nil
 }
 
@@ -59,8 +55,8 @@ func (s *stubTxManager) WithinTransaction(ctx context.Context, fn func(ctx conte
 }
 
 type stubProductRepoForCSV struct {
-	productsByID map[uint]*domainProduct.Product
-	updated      []*domainProduct.Product
+	productsByUUID map[string]*domainProduct.Product
+	updated        []*domainProduct.Product
 }
 
 func (s *stubProductRepoForCSV) Create(ctx context.Context, p *domainProduct.Product) (primitive.ID, error) {
@@ -68,14 +64,10 @@ func (s *stubProductRepoForCSV) Create(ctx context.Context, p *domainProduct.Pro
 }
 
 func (s *stubProductRepoForCSV) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domainProduct.Product, error) {
-	return nil, nil
-}
-
-func (s *stubProductRepoForCSV) FindByID(ctx context.Context, id primitive.ID) (*domainProduct.Product, error) {
-	if s.productsByID == nil {
+	if s.productsByUUID == nil {
 		return nil, nil
 	}
-	return s.productsByID[id.Value()], nil
+	return s.productsByUUID[uuid.Value()], nil
 }
 
 func (s *stubProductRepoForCSV) Update(ctx context.Context, p *domainProduct.Product) (bool, error) {
@@ -87,7 +79,7 @@ func (s *stubProductRepoForCSV) Delete(ctx context.Context, uuid primitive.UUID)
 	return false, nil
 }
 
-func (s *stubProductRepoForCSV) ReplaceTags(ctx context.Context, productID primitive.ID, tagIDs []primitive.ID) error {
+func (s *stubProductRepoForCSV) ReplaceTags(ctx context.Context, productUUID primitive.UUID, tagUUIDs []primitive.UUID) error {
 	return nil
 }
 
@@ -317,8 +309,8 @@ func TestUploadCSV(t *testing.T) {
 		}
 
 		productRepo := &stubProductRepoForCSV{
-			productsByID: map[uint]*domainProduct.Product{
-				1: product,
+			productsByUUID: map[string]*domainProduct.Product{
+				product.UUID().Value(): product,
 			},
 		}
 		categoryRepo := &stubCategoryRepoForCSV{}
@@ -335,7 +327,7 @@ func TestUploadCSV(t *testing.T) {
 
 		err = s.UploadCSV(context.Background(), []usecaseProduct.ProductCSVInputRow{
 			{
-				ID:           1,
+				UUID:         product.UUID().Value(),
 				Name:         "new product",
 				Price:        2500,
 				CategoryName: "new category",
@@ -354,11 +346,11 @@ func TestUploadCSV(t *testing.T) {
 		if product.Price().Value() != 2500 {
 			t.Fatalf("unexpected product price: %d", product.Price().Value())
 		}
-		if product.CategoryID() == nil {
-			t.Fatalf("expected category id assigned")
+		if product.CategoryUUID() == nil {
+			t.Fatalf("expected category uuid assigned")
 		}
-		if product.TargetID() == nil {
-			t.Fatalf("expected target id assigned")
+		if product.TargetUUID() == nil {
+			t.Fatalf("expected target uuid assigned")
 		}
 		if len(productRepo.updated) != 1 {
 			t.Fatalf("expected one update call, got %d", len(productRepo.updated))
@@ -379,7 +371,7 @@ func TestUploadCSV(t *testing.T) {
 
 		err := s.UploadCSV(context.Background(), []usecaseProduct.ProductCSVInputRow{
 			{
-				ID:           0,
+				UUID:         "",
 				Name:         "product",
 				Price:        1000,
 				CategoryName: "category",
@@ -395,8 +387,8 @@ func TestUploadCSV(t *testing.T) {
 	})
 
 	t.Run("分類名が空欄のとき分類IDをNULLに更新する", func(t *testing.T) {
-		currentCategoryID := uint(10)
-		currentTargetID := uint(20)
+		currentCategoryUUID := "22222222-2222-4222-8222-222222222222"
+		currentTargetUUID := "33333333-3333-4333-8333-333333333333"
 		product, err := domainProduct.Rebuild(
 			1,
 			id.GenerateUUID(),
@@ -405,16 +397,16 @@ func TestUploadCSV(t *testing.T) {
 			1000,
 			true,
 			false,
-			&currentCategoryID,
-			&currentTargetID,
+			&currentCategoryUUID,
+			&currentTargetUUID,
 		)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
 		productRepo := &stubProductRepoForCSV{
-			productsByID: map[uint]*domainProduct.Product{
-				1: product,
+			productsByUUID: map[string]*domainProduct.Product{
+				product.UUID().Value(): product,
 			},
 		}
 		categoryRepo := &stubCategoryRepoForCSV{}
@@ -431,7 +423,7 @@ func TestUploadCSV(t *testing.T) {
 
 		err = s.UploadCSV(context.Background(), []usecaseProduct.ProductCSVInputRow{
 			{
-				ID:           1,
+				UUID:         product.UUID().Value(),
 				Name:         "new product",
 				Price:        2500,
 				CategoryName: "",
@@ -444,11 +436,11 @@ func TestUploadCSV(t *testing.T) {
 		if !tx.called {
 			t.Fatalf("expected transaction called")
 		}
-		if product.CategoryID() != nil {
-			t.Fatalf("expected category id cleared")
+		if product.CategoryUUID() != nil {
+			t.Fatalf("expected category uuid cleared")
 		}
-		if product.TargetID() != nil {
-			t.Fatalf("expected target id cleared")
+		if product.TargetUUID() != nil {
+			t.Fatalf("expected target uuid cleared")
 		}
 		if len(productRepo.updated) != 1 {
 			t.Fatalf("expected one update call, got %d", len(productRepo.updated))
@@ -473,7 +465,7 @@ func TestUploadCSV(t *testing.T) {
 
 		err := s.UploadCSV(context.Background(), []usecaseProduct.ProductCSVInputRow{
 			{
-				ID:           99,
+				UUID:         id.GenerateUUID(),
 				Name:         "product",
 				Price:        1000,
 				CategoryName: "category",

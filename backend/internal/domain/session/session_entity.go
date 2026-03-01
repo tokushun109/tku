@@ -9,24 +9,24 @@ import (
 type Session struct {
 	id        primitive.ID
 	uuid      primitive.UUID
-	userID    primitive.ID
+	userUUID  primitive.UUID
 	createdAt time.Time
 }
 
-func New(rawUUID string, userID uint, createdAt time.Time) (*Session, error) {
-	session, err := newWithValidatedValues(rawUUID, userID, createdAt)
+func New(rawUUID string, userUUID string, createdAt time.Time) (*Session, error) {
+	session, err := newWithValidatedValues(rawUUID, userUUID, createdAt)
 	if err != nil {
 		return nil, err
 	}
 	return session, nil
 }
 
-func Rebuild(id uint, rawUUID string, userID uint, createdAt time.Time) (*Session, error) {
+func Rebuild(id uint, rawUUID string, userUUID string, createdAt time.Time) (*Session, error) {
 	parsedID, err := primitive.NewID(id)
 	if err != nil {
 		return nil, ErrInvalidID
 	}
-	session, err := newWithValidatedValues(rawUUID, userID, createdAt)
+	session, err := newWithValidatedValues(rawUUID, userUUID, createdAt)
 	if err != nil {
 		return nil, err
 	}
@@ -34,21 +34,21 @@ func Rebuild(id uint, rawUUID string, userID uint, createdAt time.Time) (*Sessio
 	return session, nil
 }
 
-func newWithValidatedValues(rawUUID string, userID uint, createdAt time.Time) (*Session, error) {
+func newWithValidatedValues(rawUUID string, userUUID string, createdAt time.Time) (*Session, error) {
 	uuid, err := primitive.NewUUID(rawUUID)
 	if err != nil {
 		return nil, err
 	}
-	parsedUserID, err := primitive.NewID(userID)
+	parsedUserUUID, err := primitive.NewUUID(userUUID)
 	if err != nil {
-		return nil, ErrInvalidUserID
+		return nil, ErrInvalidUserUUID
 	}
 	if createdAt.IsZero() {
 		return nil, ErrInvalidCreatedAt
 	}
 	return &Session{
 		uuid:      uuid,
-		userID:    parsedUserID,
+		userUUID:  parsedUserUUID,
 		createdAt: createdAt,
 	}, nil
 }
@@ -61,8 +61,8 @@ func (s *Session) UUID() primitive.UUID {
 	return s.uuid
 }
 
-func (s *Session) UserID() uint {
-	return s.userID.Value()
+func (s *Session) UserUUID() primitive.UUID {
+	return s.userUUID
 }
 
 func (s *Session) CreatedAt() time.Time {

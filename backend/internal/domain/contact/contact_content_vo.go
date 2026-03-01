@@ -8,7 +8,7 @@ import (
 )
 
 const contentMinLen = 1
-const contentMaxLen = 1000
+const contentMaxLen = 2000
 
 type ContactContent string
 

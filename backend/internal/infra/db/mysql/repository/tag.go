@@ -94,6 +94,42 @@ func (r *TagRepository) FindByUUID(ctx context.Context, uuid primitive.UUID) (*d
 	return toDomainTag(rrow.ID, rrow.UUID, rrow.Name)
 }
 
+func (r *TagRepository) FindByUUIDs(ctx context.Context, uuids []primitive.UUID) ([]*domain.Tag, error) {
+	if len(uuids) == 0 {
+		return []*domain.Tag{}, nil
+	}
+
+	values := make([]string, 0, len(uuids))
+	for _, uuid := range uuids {
+		values = append(values, uuid.Value())
+	}
+
+	query, args, err := sqlx.In(`SELECT id, uuid, name FROM tag WHERE uuid IN (?) AND deleted_at IS NULL`, values)
+	if err != nil {
+		return nil, err
+	}
+
+	type row struct {
+		ID   uint   `db:"id"`
+		UUID string `db:"uuid"`
+		Name string `db:"name"`
+	}
+	var rows []row
+	if err := getExecutor(ctx, r.db).SelectContext(ctx, &rows, query, args...); err != nil {
+		return nil, err
+	}
+
+	res := make([]*domain.Tag, 0, len(rows))
+	for _, rrow := range rows {
+		tag, err := toDomainTag(rrow.ID, rrow.UUID, rrow.Name)
+		if err != nil {
+			return nil, err
+		}
+		res = append(res, tag)
+	}
+	return res, nil
+}
+
 func (r *TagRepository) ExistsByName(ctx context.Context, name domain.TagName) (bool, error) {
 	var count int64
 	if err := getExecutor(ctx, r.db).GetContext(ctx, &count, `SELECT COUNT(1) FROM tag WHERE name = ? AND deleted_at IS NULL`, name.Value()); err != nil {
@@ -128,19 +164,16 @@ func (r *TagRepository) Delete(ctx context.Context, uuid primitive.UUID) (bool, 
 		_ = tx.Rollback()
 	}()
 
-	var tagID int64
-	if err := tx.GetContext(ctx, &tagID, `SELECT id FROM tag WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value()); err != nil {
-		if err == sql.ErrNoRows {
-			return false, nil
-		}
+	if _, err := tx.ExecContext(
+		ctx,
+		`DELETE FROM product_to_tag
+		 WHERE tag_uuid = ?`,
+		uuid.Value(),
+	); err != nil {
 		return false, err
 	}
 
-	if _, err := tx.ExecContext(ctx, `DELETE FROM product_to_tag WHERE tag_id = ?`, tagID); err != nil {
-		return false, err
-	}
-
-	res, err := tx.ExecContext(ctx, `UPDATE tag SET deleted_at = NOW(), updated_at = NOW() WHERE id = ? AND deleted_at IS NULL`, tagID)
+	res, err := tx.ExecContext(ctx, `UPDATE tag SET deleted_at = NOW(), updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value())
 	if err != nil {
 		return false, err
 	}

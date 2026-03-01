@@ -33,7 +33,7 @@ func (s *stubNotificationUserRepo) FindByEmail(ctx context.Context, email primit
 	return nil, nil
 }
 
-func (s *stubNotificationUserRepo) FindByID(ctx context.Context, id primitive.ID) (*domainUser.User, error) {
+func (s *stubNotificationUserRepo) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domainUser.User, error) {
 	return nil, nil
 }
 
@@ -59,7 +59,7 @@ func TestContactNotifierNotifyContactCreated(t *testing.T) {
 		}
 		notifier := NewContactNotifier(mailer, repo, "")
 
-		contact, err := domainContact.New("山田太郎", "株式会社サンプル", "09012345678", "user@example.com", "お問い合わせです")
+		contact, err := domainContact.New("11111111-1111-4111-8111-111111111111", "山田太郎", "株式会社サンプル", "09012345678", "user@example.com", "お問い合わせです")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -88,7 +88,7 @@ func TestContactNotifierNotifyContactCreated(t *testing.T) {
 		repo := &stubNotificationUserRepo{err: errors.New("db error")}
 		notifier := NewContactNotifier(mailer, repo, "")
 
-		contact, err := domainContact.New("山田太郎", "", "", "user@example.com", "お問い合わせです")
+		contact, err := domainContact.New("11111111-1111-4111-8111-111111111111", "山田太郎", "", "", "user@example.com", "お問い合わせです")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}

@@ -19,6 +19,7 @@ type ContactRepository struct {
 
 type contactRow struct {
 	ID          uint           `db:"id"`
+	UUID        string         `db:"uuid"`
 	Name        string         `db:"name"`
 	Company     sql.NullString `db:"company"`
 	PhoneNumber sql.NullString `db:"phone_number"`
@@ -36,7 +37,7 @@ func (r *ContactRepository) FindAll(ctx context.Context) ([]*domain.Contact, err
 	if err := getExecutor(ctx, r.db).SelectContext(
 		ctx,
 		&rows,
-		`SELECT id, name, company, phone_number, email, content, created_at FROM contact WHERE deleted_at IS NULL ORDER BY created_at DESC`,
+		`SELECT id, uuid, name, company, phone_number, email, content, created_at FROM contact WHERE deleted_at IS NULL ORDER BY created_at DESC`,
 	); err != nil {
 		return nil, err
 	}
@@ -60,7 +61,8 @@ func (r *ContactRepository) Create(ctx context.Context, contact *domain.Contact)
 
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
-		`INSERT INTO contact (name, company, phone_number, email, content, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, NOW())`,
+		`INSERT INTO contact (uuid, name, company, phone_number, email, content, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())`,
+		contact.UUID().Value(),
 		contact.Name().Value(),
 		company,
 		phoneNumber,
@@ -79,6 +81,7 @@ func (r *ContactRepository) Create(ctx context.Context, contact *domain.Contact)
 
 	created, err := domain.Rebuild(
 		uint(lastID),
+		contact.UUID().Value(),
 		contact.Name().Value(),
 		domainVO.ToValueOrEmpty(contact.Company()),
 		domainVO.ToValueOrEmpty(contact.PhoneNumber()),
@@ -103,6 +106,7 @@ func toDomainContact(r contactRow) (*domain.Contact, error) {
 
 	contact, err := domain.Rebuild(
 		r.ID,
+		r.UUID,
 		r.Name,
 		company,
 		phoneNumber,

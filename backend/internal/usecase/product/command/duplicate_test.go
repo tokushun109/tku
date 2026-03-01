@@ -41,11 +41,11 @@ func (g *stubUUIDGenerator) New() string {
 }
 
 type stubProductRepoForDuplicate struct {
-	created         *domainProduct.Product
-	createErr       error
-	createdID       primitive.ID
-	replacedTagIDs  []primitive.ID
-	replacedProduct primitive.ID
+	created          *domainProduct.Product
+	createErr        error
+	createdID        primitive.ID
+	replacedTagUUIDs []primitive.UUID
+	replacedProduct  primitive.UUID
 }
 
 func (s *stubProductRepoForDuplicate) Create(ctx context.Context, p *domainProduct.Product) (primitive.ID, error) {
@@ -63,10 +63,6 @@ func (s *stubProductRepoForDuplicate) FindByUUID(ctx context.Context, uuid primi
 	return nil, nil
 }
 
-func (s *stubProductRepoForDuplicate) FindByID(ctx context.Context, id primitive.ID) (*domainProduct.Product, error) {
-	return nil, nil
-}
-
 func (s *stubProductRepoForDuplicate) Update(ctx context.Context, p *domainProduct.Product) (bool, error) {
 	return false, nil
 }
@@ -75,9 +71,9 @@ func (s *stubProductRepoForDuplicate) Delete(ctx context.Context, uuid primitive
 	return false, nil
 }
 
-func (s *stubProductRepoForDuplicate) ReplaceTags(ctx context.Context, productID primitive.ID, tagIDs []primitive.ID) error {
-	s.replacedProduct = productID
-	s.replacedTagIDs = tagIDs
+func (s *stubProductRepoForDuplicate) ReplaceTags(ctx context.Context, productUUID primitive.UUID, tagUUIDs []primitive.UUID) error {
+	s.replacedProduct = productUUID
+	s.replacedTagUUIDs = tagUUIDs
 	return nil
 }
 
@@ -125,6 +121,24 @@ func (s *stubTagRepoForDuplicate) FindByUUID(ctx context.Context, uuid primitive
 		}
 	}
 	return nil, nil
+}
+
+func (s *stubTagRepoForDuplicate) FindByUUIDs(ctx context.Context, uuids []primitive.UUID) ([]*domainTag.Tag, error) {
+	if s.findErr != nil {
+		return nil, s.findErr
+	}
+
+	tags := make([]*domainTag.Tag, 0, len(uuids))
+	for _, uuid := range uuids {
+		tag, err := s.FindByUUID(ctx, uuid)
+		if err != nil {
+			return nil, err
+		}
+		if tag != nil {
+			tags = append(tags, tag)
+		}
+	}
+	return tags, nil
 }
 
 func (s *stubTagRepoForDuplicate) ExistsByName(ctx context.Context, name domainTag.TagName) (bool, error) {
@@ -179,17 +193,17 @@ func (s *stubSalesSiteRepoForDuplicate) Delete(ctx context.Context, uuid primiti
 }
 
 type stubSiteDetailRepoForDuplicate struct {
-	replacedProductID primitive.ID
-	replacedDetails   []*domainSiteDetail.SiteDetail
+	replacedProductUUID primitive.UUID
+	replacedDetails     []*domainSiteDetail.SiteDetail
 }
 
-func (s *stubSiteDetailRepoForDuplicate) ReplaceByProductID(ctx context.Context, productID primitive.ID, details []*domainSiteDetail.SiteDetail) error {
-	s.replacedProductID = productID
+func (s *stubSiteDetailRepoForDuplicate) ReplaceByProductUUID(ctx context.Context, productUUID primitive.UUID, details []*domainSiteDetail.SiteDetail) error {
+	s.replacedProductUUID = productUUID
 	s.replacedDetails = details
 	return nil
 }
 
-func (s *stubSiteDetailRepoForDuplicate) DeleteByProductID(ctx context.Context, productID primitive.ID) error {
+func (s *stubSiteDetailRepoForDuplicate) DeleteByProductUUID(ctx context.Context, productUUID primitive.UUID) error {
 	return nil
 }
 
@@ -206,7 +220,7 @@ func (s *stubProductImageRepoForDuplicate) FindByUUID(ctx context.Context, uuid 
 	return nil, nil
 }
 
-func (s *stubProductImageRepoForDuplicate) FindByProductID(ctx context.Context, productID primitive.ID) ([]*domainProduct.ProductImage, error) {
+func (s *stubProductImageRepoForDuplicate) FindByProductUUID(ctx context.Context, productUUID primitive.UUID) ([]*domainProduct.ProductImage, error) {
 	return nil, nil
 }
 
@@ -218,7 +232,7 @@ func (s *stubProductImageRepoForDuplicate) DeleteByUUID(ctx context.Context, uui
 	return false, nil
 }
 
-func (s *stubProductImageRepoForDuplicate) DeleteByProductID(ctx context.Context, productID primitive.ID) error {
+func (s *stubProductImageRepoForDuplicate) DeleteByProductUUID(ctx context.Context, productUUID primitive.UUID) error {
 	return nil
 }
 
@@ -356,8 +370,8 @@ func TestDuplicateProduct(t *testing.T) {
 		if len(tagRepo.created) != 2 {
 			t.Fatalf("expected 2 created tags, got %d", len(tagRepo.created))
 		}
-		if len(productRepo.replacedTagIDs) != 2 {
-			t.Fatalf("expected 2 tag ids, got %d", len(productRepo.replacedTagIDs))
+		if len(productRepo.replacedTagUUIDs) != 2 {
+			t.Fatalf("expected 2 tag uuids, got %d", len(productRepo.replacedTagUUIDs))
 		}
 		if len(siteDetailRepo.replacedDetails) != 1 {
 			t.Fatalf("expected 1 site detail, got %d", len(siteDetailRepo.replacedDetails))

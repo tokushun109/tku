@@ -51,7 +51,7 @@ type CarouselItem struct {
 }
 
 type ProductCSVRow struct {
-	ID           uint
+	UUID         string
 	Name         string
 	Price        int
 	CategoryName string

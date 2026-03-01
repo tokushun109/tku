@@ -3,27 +3,27 @@ package site_detail
 import "github.com/tokushun109/tku/backend/internal/domain/primitive"
 
 type SiteDetail struct {
-	id          primitive.ID
-	uuid        primitive.UUID
-	detailURL   SiteDetailDetailURL
-	productID   primitive.ID
-	salesSiteID primitive.ID
+	id            primitive.ID
+	uuid          primitive.UUID
+	detailURL     SiteDetailDetailURL
+	productUUID   primitive.UUID
+	salesSiteUUID primitive.UUID
 }
 
-func New(rawUUID string, detailURL string, productID uint, salesSiteID uint) (*SiteDetail, error) {
-	siteDetail, err := newWithValidatedValues(rawUUID, detailURL, productID, salesSiteID)
+func New(rawUUID string, detailURL string, productUUID string, salesSiteUUID string) (*SiteDetail, error) {
+	siteDetail, err := newWithValidatedValues(rawUUID, detailURL, productUUID, salesSiteUUID)
 	if err != nil {
 		return nil, err
 	}
 	return siteDetail, nil
 }
 
-func Rebuild(id uint, rawUUID string, detailURL string, productID uint, salesSiteID uint) (*SiteDetail, error) {
+func Rebuild(id uint, rawUUID string, detailURL string, productUUID string, salesSiteUUID string) (*SiteDetail, error) {
 	parsedID, err := primitive.NewID(id)
 	if err != nil {
 		return nil, ErrInvalidID
 	}
-	siteDetail, err := newWithValidatedValues(rawUUID, detailURL, productID, salesSiteID)
+	siteDetail, err := newWithValidatedValues(rawUUID, detailURL, productUUID, salesSiteUUID)
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +31,7 @@ func Rebuild(id uint, rawUUID string, detailURL string, productID uint, salesSit
 	return siteDetail, nil
 }
 
-func newWithValidatedValues(rawUUID string, detailURL string, productID uint, salesSiteID uint) (*SiteDetail, error) {
+func newWithValidatedValues(rawUUID string, detailURL string, productUUID string, salesSiteUUID string) (*SiteDetail, error) {
 	uuid, err := primitive.NewUUID(rawUUID)
 	if err != nil {
 		return nil, err
@@ -40,20 +40,20 @@ func newWithValidatedValues(rawUUID string, detailURL string, productID uint, sa
 	if err != nil {
 		return nil, err
 	}
-	parsedProductID, err := primitive.NewID(productID)
+	parsedProductUUID, err := primitive.NewUUID(productUUID)
 	if err != nil {
-		return nil, ErrInvalidProductID
+		return nil, ErrInvalidProductUUID
 	}
-	parsedSalesSiteID, err := primitive.NewID(salesSiteID)
+	parsedSalesSiteUUID, err := primitive.NewUUID(salesSiteUUID)
 	if err != nil {
-		return nil, ErrInvalidSalesSiteID
+		return nil, ErrInvalidSalesSiteUUID
 	}
 
 	return &SiteDetail{
-		uuid:        uuid,
-		detailURL:   parsedURL,
-		productID:   parsedProductID,
-		salesSiteID: parsedSalesSiteID,
+		uuid:          uuid,
+		detailURL:     parsedURL,
+		productUUID:   parsedProductUUID,
+		salesSiteUUID: parsedSalesSiteUUID,
 	}, nil
 }
 
@@ -69,10 +69,10 @@ func (s *SiteDetail) DetailURL() SiteDetailDetailURL {
 	return s.detailURL
 }
 
-func (s *SiteDetail) ProductID() uint {
-	return s.productID.Value()
+func (s *SiteDetail) ProductUUID() primitive.UUID {
+	return s.productUUID
 }
 
-func (s *SiteDetail) SalesSiteID() uint {
-	return s.salesSiteID.Value()
+func (s *SiteDetail) SalesSiteUUID() primitive.UUID {
+	return s.salesSiteUUID
 }

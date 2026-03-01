@@ -6,6 +6,7 @@ import (
 )
 
 type Creator struct {
+	uuid         primitive.UUID
 	id           primitive.ID
 	name         CreatorName
 	introduction *CreatorIntroduction
@@ -13,8 +14,8 @@ type Creator struct {
 	logoPath     *CreatorLogoPath
 }
 
-func New(name string, introduction string) (*Creator, error) {
-	creator, err := newWithValidatedValues(name, introduction, "", "")
+func New(rawUUID string, name string, introduction string) (*Creator, error) {
+	creator, err := newWithValidatedValues(rawUUID, name, introduction, "", "")
 	if err != nil {
 		return nil, err
 	}
@@ -23,6 +24,7 @@ func New(name string, introduction string) (*Creator, error) {
 
 func Rebuild(
 	id uint,
+	rawUUID string,
 	name string,
 	introduction string,
 	logoMimeType string,
@@ -32,7 +34,7 @@ func Rebuild(
 	if err != nil {
 		return nil, ErrInvalidID
 	}
-	creator, err := newWithValidatedValues(name, introduction, logoMimeType, logoPath)
+	creator, err := newWithValidatedValues(rawUUID, name, introduction, logoMimeType, logoPath)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +42,11 @@ func Rebuild(
 	return creator, nil
 }
 
-func newWithValidatedValues(name string, introduction string, logoMimeType string, logoPath string) (*Creator, error) {
+func newWithValidatedValues(rawUUID string, name string, introduction string, logoMimeType string, logoPath string) (*Creator, error) {
+	creatorUUID, err := primitive.NewUUID(rawUUID)
+	if err != nil {
+		return nil, ErrInvalidUUID
+	}
 	creatorName, err := NewCreatorName(name)
 	if err != nil {
 		return nil, err
@@ -59,11 +65,16 @@ func newWithValidatedValues(name string, introduction string, logoMimeType strin
 	}
 
 	return &Creator{
+		uuid:         creatorUUID,
 		name:         creatorName,
 		introduction: creatorIntroduction,
 		logoMimeType: parsedLogoMimeType,
 		logoPath:     parsedLogoPath,
 	}, nil
+}
+
+func (c *Creator) UUID() primitive.UUID {
+	return c.uuid
 }
 
 func (c *Creator) ID() primitive.ID {

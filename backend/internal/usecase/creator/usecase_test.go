@@ -21,11 +21,11 @@ type stubCreatorRepository struct {
 	updateProfileErr error
 	updatedProfile   *domain.Creator
 
-	updateLogoRes       bool
-	updateLogoErr       error
-	updateLogoCreatorID primitive.ID
-	updateLogoMimeType  domain.CreatorLogoMimeType
-	updateLogoPath      domain.CreatorLogoPath
+	updateLogoRes         bool
+	updateLogoErr         error
+	updateLogoCreatorUUID primitive.UUID
+	updateLogoMimeType    domain.CreatorLogoMimeType
+	updateLogoPath        domain.CreatorLogoPath
 }
 
 func (s *stubCreatorRepository) Find(ctx context.Context) (*domain.Creator, error) {
@@ -37,8 +37,8 @@ func (s *stubCreatorRepository) UpdateProfile(ctx context.Context, c *domain.Cre
 	return s.updateProfileRes, s.updateProfileErr
 }
 
-func (s *stubCreatorRepository) UpdateLogo(ctx context.Context, creatorID primitive.ID, mimeType domain.CreatorLogoMimeType, logoPath domain.CreatorLogoPath) (bool, error) {
-	s.updateLogoCreatorID = creatorID
+func (s *stubCreatorRepository) UpdateLogo(ctx context.Context, creatorUUID primitive.UUID, mimeType domain.CreatorLogoMimeType, logoPath domain.CreatorLogoPath) (bool, error) {
+	s.updateLogoCreatorUUID = creatorUUID
 	s.updateLogoMimeType = mimeType
 	s.updateLogoPath = logoPath
 	return s.updateLogoRes, s.updateLogoErr
@@ -132,13 +132,12 @@ func TestServiceUpdate(t *testing.T) {
 	t.Run("紹介文が空白のみなら紹介文をクリアして更新に成功する", func(t *testing.T) {
 		creator := mustCreator(1, "作家", "既存の紹介文", "", "")
 		repo := &stubCreatorRepository{
-			findRes:             creator,
-			updateProfileRes:    true,
-			updateProfileErr:    nil,
-			updatedProfile:      nil,
-			updateLogoRes:       false,
-			updateLogoErr:       nil,
-			updateLogoCreatorID: primitive.ID(0),
+			findRes:          creator,
+			updateProfileRes: true,
+			updateProfileErr: nil,
+			updatedProfile:   nil,
+			updateLogoRes:    false,
+			updateLogoErr:    nil,
 		}
 		svc := New(repo, &stubLogoStorage{}, &stubUUIDGenerator{})
 
@@ -184,8 +183,8 @@ func TestServiceUpdateLogo(t *testing.T) {
 		if repo.updateLogoPath.Value() != expectedPath {
 			t.Fatalf("unexpected updated logo path: %s", repo.updateLogoPath.Value())
 		}
-		if repo.updateLogoCreatorID.Value() != 10 {
-			t.Fatalf("unexpected creator id: %d", repo.updateLogoCreatorID.Value())
+		if repo.updateLogoCreatorUUID.Value() != creator.UUID().Value() {
+			t.Fatalf("unexpected creator uuid: %s", repo.updateLogoCreatorUUID.Value())
 		}
 		if len(storage.deletedKeys) != 1 || storage.deletedKeys[0] != "img/logo/o/l/old.jpg" {
 			t.Fatalf("unexpected deleted keys: %#v", storage.deletedKeys)
@@ -261,7 +260,7 @@ func TestServiceGetLogoBlob(t *testing.T) {
 }
 
 func mustCreator(id uint, name, introduction, mimeType, logoPath string) *domain.Creator {
-	creator, err := domain.Rebuild(id, name, introduction, mimeType, logoPath)
+	creator, err := domain.Rebuild(id, "11111111-1111-4111-8111-111111111111", name, introduction, mimeType, logoPath)
 	if err != nil {
 		panic(err)
 	}

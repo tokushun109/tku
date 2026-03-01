@@ -352,7 +352,7 @@ func TestProductExportCSV(t *testing.T) {
 		uc := &stubProductUC{
 			exportCSVRes: []*usecaseProductQuery.ProductCSVRow{
 				{
-					ID:           1,
+					UUID:         "11111111-1111-4111-8111-111111111111",
 					Name:         "product",
 					Price:        1200,
 					CategoryName: "category",
@@ -374,10 +374,10 @@ func TestProductExportCSV(t *testing.T) {
 			t.Fatalf("unexpected content type: %s", contentType)
 		}
 		got := rr.Body.String()
-		if !strings.Contains(got, "ID,Name,Price,CategoryName,TargetName") {
+		if !strings.Contains(got, "UUID,Name,Price,CategoryName,TargetName") {
 			t.Fatalf("unexpected csv header: %s", got)
 		}
-		if !strings.Contains(got, "1,product,1200,category,target") {
+		if !strings.Contains(got, "11111111-1111-4111-8111-111111111111,product,1200,category,target") {
 			t.Fatalf("unexpected csv body: %s", got)
 		}
 	})
@@ -408,7 +408,7 @@ func TestProductUploadCSV(t *testing.T) {
 		req := newProductCSVUploadRequest(
 			t,
 			"products.csv",
-			[]byte("id,name,price,categoryName,targetName\n1,new product,1200,new category,new target\n"),
+			[]byte("uuid,name,price,categoryName,targetName\n11111111-1111-4111-8111-111111111111,new product,1200,new category,new target\n"),
 		)
 		rr := httptest.NewRecorder()
 
@@ -423,8 +423,8 @@ func TestProductUploadCSV(t *testing.T) {
 		if len(uc.uploadCSVRows) != 1 {
 			t.Fatalf("expected 1 row, got %d", len(uc.uploadCSVRows))
 		}
-		if uc.uploadCSVRows[0].ID != 1 {
-			t.Fatalf("unexpected id: %d", uc.uploadCSVRows[0].ID)
+		if uc.uploadCSVRows[0].UUID != "11111111-1111-4111-8111-111111111111" {
+			t.Fatalf("unexpected uuid: %s", uc.uploadCSVRows[0].UUID)
 		}
 		if uc.uploadCSVRows[0].CategoryName != "new category" {
 			t.Fatalf("unexpected category name: %s", uc.uploadCSVRows[0].CategoryName)

@@ -70,14 +70,14 @@ func (h *ProductHandler) ExportCSV(w http.ResponseWriter, r *http.Request) {
 	var csvBuffer bytes.Buffer
 	csvWriter := csv.NewWriter(&csvBuffer)
 
-	if err := csvWriter.Write([]string{"ID", "Name", "Price", "CategoryName", "TargetName"}); err != nil {
+	if err := csvWriter.Write([]string{"UUID", "Name", "Price", "CategoryName", "TargetName"}); err != nil {
 		response.WriteAppError(w, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error()))
 		return
 	}
 
 	for _, row := range rows {
 		if err := csvWriter.Write([]string{
-			strconv.FormatUint(uint64(row.ID), 10),
+			row.UUID,
 			row.Name,
 			strconv.Itoa(row.Price),
 			row.CategoryName,
@@ -216,7 +216,7 @@ func (h *ProductHandler) UploadCSV(w http.ResponseWriter, r *http.Request) {
 	inputRows := make([]usecaseProduct.ProductCSVInputRow, 0, len(rows))
 	for _, row := range rows {
 		inputRows = append(inputRows, usecaseProduct.ProductCSVInputRow{
-			ID:           row.ID,
+			UUID:         row.UUID,
 			Name:         row.Name,
 			Price:        row.Price,
 			CategoryName: row.CategoryName,

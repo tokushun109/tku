@@ -9,6 +9,7 @@ import (
 func ToContactResponse(contact *domain.Contact) *response.ContactResponse {
 	return &response.ContactResponse{
 		ID:          contact.ID().Value(),
+		UUID:        contact.UUID().Value(),
 		Name:        contact.Name().Value(),
 		Company:     domainVO.ToValuePtr(contact.Company()),
 		PhoneNumber: domainVO.ToValuePtr(contact.PhoneNumber()),

@@ -72,7 +72,7 @@ func (r *CategoryRepository) FindUsed(ctx context.Context) ([]*domain.Category, 
 	query := `
 		SELECT DISTINCT c.id, c.uuid, c.name
 		FROM category c
-		INNER JOIN product p ON p.category_id = c.id
+		INNER JOIN product p ON p.category_uuid = c.uuid
 		WHERE c.deleted_at IS NULL AND p.deleted_at IS NULL
 	`
 	if err := getExecutor(ctx, r.db).SelectContext(ctx, &rows, query); err != nil {
@@ -161,19 +161,17 @@ func (r *CategoryRepository) Delete(ctx context.Context, uuid primitive.UUID) (b
 		_ = tx.Rollback()
 	}()
 
-	var categoryID int64
-	if err := tx.GetContext(ctx, &categoryID, `SELECT id FROM category WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value()); err != nil {
-		if err == sql.ErrNoRows {
-			return false, nil
-		}
+	if _, err := tx.ExecContext(
+		ctx,
+		`UPDATE product
+		 SET category_uuid = NULL, category_id = NULL
+		 WHERE category_uuid = ?`,
+		uuid.Value(),
+	); err != nil {
 		return false, err
 	}
 
-	if _, err := tx.ExecContext(ctx, `UPDATE product SET category_id = NULL WHERE category_id = ?`, categoryID); err != nil {
-		return false, err
-	}
-
-	res, err := tx.ExecContext(ctx, `UPDATE category SET deleted_at = NOW(), updated_at = NOW() WHERE id = ? AND deleted_at IS NULL`, categoryID)
+	res, err := tx.ExecContext(ctx, `UPDATE category SET deleted_at = NOW(), updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value())
 	if err != nil {
 		return false, err
 	}

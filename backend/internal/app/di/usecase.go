@@ -125,7 +125,7 @@ func newUsecases(repos *repositories, qrs *queries, cfg *config.Config, txManage
 		salesSite:   usecaseSalesSite.New(repos.salesSite, uuidGen),
 		skillMarket: usecaseSkillMarket.New(repos.skillMarket, uuidGen),
 		creator:     usecaseCreator.New(repos.creator, storage, uuidGen),
-		contact:     usecaseContact.New(repos.contact, contactNotifier),
+		contact:     usecaseContact.New(repos.contact, contactNotifier, uuidGen),
 		session:     sessionUC,
 		user:        usecaseUser.New(repos.user, repos.session, sessionUC, passwordHasher, uuidGen, clock, txManager),
 		product:     usecaseProduct.New(productQueryUC, productCommandUC),

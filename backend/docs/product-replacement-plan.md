@@ -41,6 +41,9 @@
 
 ### 2.4 Entity の `id` 利用方針（商品系）
 
+※ 現在の UUID ベース移行方針は `backend/docs/uuid-access-migration-plan.md` を優先する。  
+本節は商品置き換え初期の実装前提として扱う。
+
 - 商品系Entityは原則として `id`（DB内部識別子）を持つ
 - API入力/出力の識別子は `uuid` を使い、内部関連では `id` を使う
   - 例: `product_to_tag`, `site_detail`, `product_image` などの関連テーブル連携

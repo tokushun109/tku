@@ -6,15 +6,15 @@ import (
 )
 
 type Product struct {
-	id          primitive.ID
-	uuid        primitive.UUID
-	name        ProductName
-	description *ProductDescription
-	price       ProductPrice
-	isActive    bool
-	isRecommend bool
-	categoryID  *primitive.ID
-	targetID    *primitive.ID
+	id           primitive.ID
+	uuid         primitive.UUID
+	name         ProductName
+	description  *ProductDescription
+	price        ProductPrice
+	isActive     bool
+	isRecommend  bool
+	categoryUUID *primitive.UUID
+	targetUUID   *primitive.UUID
 }
 
 func New(
@@ -24,10 +24,10 @@ func New(
 	price int,
 	isActive bool,
 	isRecommend bool,
-	categoryID *uint,
-	targetID *uint,
+	categoryUUID *string,
+	targetUUID *string,
 ) (*Product, error) {
-	product, err := newWithValidatedValues(rawUUID, name, description, price, isActive, isRecommend, categoryID, targetID)
+	product, err := newWithValidatedValues(rawUUID, name, description, price, isActive, isRecommend, categoryUUID, targetUUID)
 	if err != nil {
 		return nil, err
 	}
@@ -42,14 +42,14 @@ func Rebuild(
 	price int,
 	isActive bool,
 	isRecommend bool,
-	categoryID *uint,
-	targetID *uint,
+	categoryUUID *string,
+	targetUUID *string,
 ) (*Product, error) {
 	parsedID, err := primitive.NewID(id)
 	if err != nil {
 		return nil, ErrInvalidID
 	}
-	product, err := newWithValidatedValues(rawUUID, name, description, price, isActive, isRecommend, categoryID, targetID)
+	product, err := newWithValidatedValues(rawUUID, name, description, price, isActive, isRecommend, categoryUUID, targetUUID)
 	if err != nil {
 		return nil, err
 	}
@@ -64,8 +64,8 @@ func newWithValidatedValues(
 	price int,
 	isActive bool,
 	isRecommend bool,
-	categoryID *uint,
-	targetID *uint,
+	categoryUUID *string,
+	targetUUID *string,
 ) (*Product, error) {
 	uuid, err := primitive.NewUUID(rawUUID)
 	if err != nil {
@@ -83,24 +83,24 @@ func newWithValidatedValues(
 	if err != nil {
 		return nil, err
 	}
-	parsedCategoryID, err := domainVO.ParseOptionalValue(categoryID, primitive.NewID)
+	parsedCategoryUUID, err := domainVO.ParseOptionalValue(categoryUUID, primitive.NewUUID)
 	if err != nil {
-		return nil, ErrInvalidCategoryID
+		return nil, ErrInvalidCategoryUUID
 	}
-	parsedTargetID, err := domainVO.ParseOptionalValue(targetID, primitive.NewID)
+	parsedTargetUUID, err := domainVO.ParseOptionalValue(targetUUID, primitive.NewUUID)
 	if err != nil {
-		return nil, ErrInvalidTargetID
+		return nil, ErrInvalidTargetUUID
 	}
 
 	return &Product{
-		uuid:        uuid,
-		name:        productName,
-		description: productDescription,
-		price:       productPrice,
-		isActive:    isActive,
-		isRecommend: isRecommend,
-		categoryID:  parsedCategoryID,
-		targetID:    parsedTargetID,
+		uuid:         uuid,
+		name:         productName,
+		description:  productDescription,
+		price:        productPrice,
+		isActive:     isActive,
+		isRecommend:  isRecommend,
+		categoryUUID: parsedCategoryUUID,
+		targetUUID:   parsedTargetUUID,
 	}, nil
 }
 
@@ -132,12 +132,12 @@ func (p *Product) IsRecommend() bool {
 	return p.isRecommend
 }
 
-func (p *Product) CategoryID() *primitive.ID {
-	return p.categoryID
+func (p *Product) CategoryUUID() *primitive.UUID {
+	return p.categoryUUID
 }
 
-func (p *Product) TargetID() *primitive.ID {
-	return p.targetID
+func (p *Product) TargetUUID() *primitive.UUID {
+	return p.targetUUID
 }
 
 func (p *Product) ChangeProduct(
@@ -146,8 +146,8 @@ func (p *Product) ChangeProduct(
 	price int,
 	isActive bool,
 	isRecommend bool,
-	categoryID *uint,
-	targetID *uint,
+	categoryUUID *string,
+	targetUUID *string,
 ) error {
 	productName, err := NewProductName(name)
 	if err != nil {
@@ -161,13 +161,13 @@ func (p *Product) ChangeProduct(
 	if err != nil {
 		return err
 	}
-	parsedCategoryID, err := domainVO.ParseOptionalValue(categoryID, primitive.NewID)
+	parsedCategoryUUID, err := domainVO.ParseOptionalValue(categoryUUID, primitive.NewUUID)
 	if err != nil {
-		return ErrInvalidCategoryID
+		return ErrInvalidCategoryUUID
 	}
-	parsedTargetID, err := domainVO.ParseOptionalValue(targetID, primitive.NewID)
+	parsedTargetUUID, err := domainVO.ParseOptionalValue(targetUUID, primitive.NewUUID)
 	if err != nil {
-		return ErrInvalidTargetID
+		return ErrInvalidTargetUUID
 	}
 
 	p.name = productName
@@ -175,7 +175,7 @@ func (p *Product) ChangeProduct(
 	p.price = productPrice
 	p.isActive = isActive
 	p.isRecommend = isRecommend
-	p.categoryID = parsedCategoryID
-	p.targetID = parsedTargetID
+	p.categoryUUID = parsedCategoryUUID
+	p.targetUUID = parsedTargetUUID
 	return nil
 }

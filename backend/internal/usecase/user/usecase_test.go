@@ -18,8 +18,8 @@ var testUUID = id.GenerateUUID()
 type stubUserRepo struct {
 	userByEmail    *domainUser.User
 	userByEmailErr error
-	userByID       *domainUser.User
-	userByIDErr    error
+	userByUUID     *domainUser.User
+	userByUUIDErr  error
 }
 
 func (s *stubUserRepo) FindByEmail(ctx context.Context, email primitive.Email) (*domainUser.User, error) {
@@ -29,11 +29,11 @@ func (s *stubUserRepo) FindByEmail(ctx context.Context, email primitive.Email) (
 	return s.userByEmail, nil
 }
 
-func (s *stubUserRepo) FindByID(ctx context.Context, id primitive.ID) (*domainUser.User, error) {
-	if s.userByIDErr != nil {
-		return nil, s.userByIDErr
+func (s *stubUserRepo) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domainUser.User, error) {
+	if s.userByUUIDErr != nil {
+		return nil, s.userByUUIDErr
 	}
-	return s.userByID, nil
+	return s.userByUUID, nil
 }
 
 func (s *stubUserRepo) FindContactNotificationUsers(ctx context.Context) ([]*domainUser.ContactNotificationUser, error) {
@@ -47,7 +47,7 @@ type stubSessionRepo struct {
 	deleteByUUIDErr error
 	deleteByUserErr error
 	created         *domainSession.Session
-	deletedUserID   primitive.ID
+	deletedUserUUID primitive.UUID
 }
 
 func (s *stubSessionRepo) Create(ctx context.Context, sess *domainSession.Session) (*domainSession.Session, error) {
@@ -69,8 +69,8 @@ func (s *stubSessionRepo) DeleteByUUID(ctx context.Context, uuid primitive.UUID)
 	return s.deleteByUUIDErr
 }
 
-func (s *stubSessionRepo) DeleteByUserID(ctx context.Context, userID primitive.ID) error {
-	s.deletedUserID = userID
+func (s *stubSessionRepo) DeleteByUserUUID(ctx context.Context, userUUID primitive.UUID) error {
+	s.deletedUserUUID = userUUID
 	return s.deleteByUserErr
 }
 
@@ -165,8 +165,8 @@ func TestLogin(t *testing.T) {
 		if sess == nil || sess.UUID().Value() != testUUID {
 			t.Fatalf("unexpected session: %+v", sess)
 		}
-		if sessionRepo.deletedUserID.Value() != 1 {
-			t.Fatalf("expected deleted user id=1, got %d", sessionRepo.deletedUserID.Value())
+		if sessionRepo.deletedUserUUID.Value() != testUUID {
+			t.Fatalf("expected deleted user uuid=%s, got %s", testUUID, sessionRepo.deletedUserUUID.Value())
 		}
 		if sessionRepo.created == nil {
 			t.Fatalf("expected session create called")
@@ -229,8 +229,8 @@ func TestGetBySessionToken(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected hash error: %v", err)
 		}
-		userRepo := &stubUserRepo{userByID: mustUser(1, testUUID, "name", "mail@example.com", hash, true)}
-		sessionUC := &stubSessionUC{resolveRes: mustSession(1, testUUID, 1, time.Now())}
+		userRepo := &stubUserRepo{userByUUID: mustUser(1, testUUID, "name", "mail@example.com", hash, true)}
+		sessionUC := &stubSessionUC{resolveRes: mustSession(1, testUUID, testUUID, time.Now())}
 		uc := New(userRepo, &stubSessionRepo{}, sessionUC, &stubPasswordHasher{verifyOK: true}, &stubUUIDGen{uuid: testUUID}, &stubClock{now: time.Now()}, &stubTxManager{})
 
 		u, err := uc.GetBySessionToken(context.Background(), testUUID)
@@ -281,8 +281,8 @@ func mustUser(id uint, uuidStr string, name string, email string, hash domainUse
 	return user
 }
 
-func mustSession(id uint, uuidStr string, userID uint, createdAt time.Time) *domainSession.Session {
-	sess, err := domainSession.Rebuild(id, uuidStr, userID, createdAt)
+func mustSession(id uint, uuidStr string, userUUID string, createdAt time.Time) *domainSession.Session {
+	sess, err := domainSession.Rebuild(id, uuidStr, userUUID, createdAt)
 	if err != nil {
 		panic(err)
 	}

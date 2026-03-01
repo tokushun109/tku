@@ -29,13 +29,13 @@ type productBaseRow struct {
 }
 
 type productTagRow struct {
-	ProductID uint   `db:"product_id"`
-	TagUUID   string `db:"tag_uuid"`
-	TagName   string `db:"tag_name"`
+	ProductUUID string `db:"product_uuid"`
+	TagUUID     string `db:"tag_uuid"`
+	TagName     string `db:"tag_name"`
 }
 
 type productImageRow struct {
-	ProductID    uint   `db:"product_id"`
+	ProductUUID  string `db:"product_uuid"`
 	UUID         string `db:"uuid"`
 	Name         string `db:"name"`
 	MimeType     string `db:"mime_type"`
@@ -44,7 +44,7 @@ type productImageRow struct {
 }
 
 type productSiteDetailRow struct {
-	ProductID     uint   `db:"product_id"`
+	ProductUUID   string `db:"product_uuid"`
 	UUID          string `db:"uuid"`
 	DetailURL     string `db:"detail_url"`
 	SalesSiteUUID string `db:"sales_site_uuid"`
@@ -57,7 +57,7 @@ type categoryRow struct {
 }
 
 type productCSVRow struct {
-	ID           uint           `db:"id"`
+	UUID         string         `db:"uuid"`
 	Name         string         `db:"name"`
 	Price        int            `db:"price"`
 	CategoryName sql.NullString `db:"category_name"`
@@ -83,8 +83,8 @@ func (r *ProductQueryReader) ListProducts(ctx context.Context, q usecaseProductQ
 			t.uuid AS target_uuid,
 			t.name AS target_name
 		FROM product p
-		LEFT JOIN category c ON c.id = p.category_id AND c.deleted_at IS NULL
-		LEFT JOIN target t ON t.id = p.target_id AND t.deleted_at IS NULL
+		LEFT JOIN category c ON c.uuid = p.category_uuid AND c.deleted_at IS NULL
+		LEFT JOIN target t ON t.uuid = p.target_uuid AND t.deleted_at IS NULL
 		WHERE p.deleted_at IS NULL
 	`
 	args := make([]any, 0, 2)
@@ -231,8 +231,8 @@ func (r *ProductQueryReader) GetProductByUUID(ctx context.Context, productUUID s
 			t.uuid AS target_uuid,
 			t.name AS target_name
 		FROM product p
-		LEFT JOIN category c ON c.id = p.category_id AND c.deleted_at IS NULL
-		LEFT JOIN target t ON t.id = p.target_id AND t.deleted_at IS NULL
+		LEFT JOIN category c ON c.uuid = p.category_uuid AND c.deleted_at IS NULL
+		LEFT JOIN target t ON t.uuid = p.target_uuid AND t.deleted_at IS NULL
 		WHERE p.uuid = ? AND p.deleted_at IS NULL
 		`,
 		productUUID,
@@ -259,14 +259,14 @@ func (r *ProductQueryReader) ExportProductsCSV(
 	rows := []productCSVRow{}
 	query := `
 		SELECT
-			p.id,
+			p.uuid,
 			p.name,
 			p.price,
 			c.name AS category_name,
 			t.name AS target_name
 		FROM product p
-		LEFT JOIN category c ON c.id = p.category_id AND c.deleted_at IS NULL
-		LEFT JOIN target t ON t.id = p.target_id AND t.deleted_at IS NULL
+		LEFT JOIN category c ON c.uuid = p.category_uuid AND c.deleted_at IS NULL
+		LEFT JOIN target t ON t.uuid = p.target_uuid AND t.deleted_at IS NULL
 		WHERE p.deleted_at IS NULL
 		ORDER BY p.created_at DESC, p.id DESC
 	`
@@ -277,7 +277,7 @@ func (r *ProductQueryReader) ExportProductsCSV(
 	result := make([]*usecaseProductQuery.ProductCSVRow, 0, len(rows))
 	for _, row := range rows {
 		result = append(result, &usecaseProductQuery.ProductCSVRow{
-			ID:           row.ID,
+			UUID:         row.UUID,
 			Name:         row.Name,
 			Price:        row.Price,
 			CategoryName: mysqlutil.NullStringOrEmpty(row.CategoryName),
@@ -321,47 +321,50 @@ func (r *ProductQueryReader) fillChildren(ctx context.Context, products []*useca
 		return nil
 	}
 
-	productIDs := make([]uint, 0, len(products))
-	productIndex := make(map[uint]int, len(products))
+	productUUIDs := make([]string, 0, len(products))
+	productIndex := make(map[string]int, len(products))
 	for i, product := range products {
-		productIDs = append(productIDs, product.ID)
-		productIndex[product.ID] = i
+		productUUIDs = append(productUUIDs, product.UUID)
+		productIndex[product.UUID] = i
 	}
 
-	tagsByProductID, err := r.loadTags(ctx, productIDs)
+	tagsByProductUUID, err := r.loadTags(ctx, productUUIDs)
 	if err != nil {
 		return err
 	}
-	imagesByProductID, err := r.loadImages(ctx, productIDs)
+	imagesByProductUUID, err := r.loadImages(ctx, productUUIDs)
 	if err != nil {
 		return err
 	}
-	siteDetailsByProductID, err := r.loadSiteDetails(ctx, productIDs)
+	siteDetailsByProductUUID, err := r.loadSiteDetails(ctx, productUUIDs)
 	if err != nil {
 		return err
 	}
 
-	for productID, tags := range tagsByProductID {
-		products[productIndex[productID]].Tags = tags
+	for productUUID, tags := range tagsByProductUUID {
+		products[productIndex[productUUID]].Tags = tags
 	}
-	for productID, images := range imagesByProductID {
-		products[productIndex[productID]].ProductImages = images
+	for productUUID, images := range imagesByProductUUID {
+		products[productIndex[productUUID]].ProductImages = images
 	}
-	for productID, siteDetails := range siteDetailsByProductID {
-		products[productIndex[productID]].SiteDetails = siteDetails
+	for productUUID, siteDetails := range siteDetailsByProductUUID {
+		products[productIndex[productUUID]].SiteDetails = siteDetails
 	}
 
 	return nil
 }
 
-func (r *ProductQueryReader) loadTags(ctx context.Context, productIDs []uint) (map[uint][]usecaseProductQuery.Classification, error) {
+func (r *ProductQueryReader) loadTags(ctx context.Context, productUUIDs []string) (map[string][]usecaseProductQuery.Classification, error) {
 	query, args, err := sqlx.In(
-		`SELECT ptt.product_id, t.uuid AS tag_uuid, t.name AS tag_name
+		`SELECT
+			ptt.product_uuid AS product_uuid,
+			ptt.tag_uuid AS tag_uuid,
+			t.name AS tag_name
 		 FROM product_to_tag ptt
-		 INNER JOIN tag t ON t.id = ptt.tag_id AND t.deleted_at IS NULL
-		 WHERE ptt.deleted_at IS NULL AND ptt.product_id IN (?)
-		 ORDER BY ptt.id ASC`,
-		productIDs,
+		 INNER JOIN tag t ON ptt.tag_uuid = t.uuid AND t.deleted_at IS NULL
+		 WHERE ptt.deleted_at IS NULL AND ptt.product_uuid IN (?)
+		 ORDER BY ptt.created_at ASC, ptt.tag_uuid ASC`,
+		productUUIDs,
 	)
 	if err != nil {
 		return nil, err
@@ -373,9 +376,9 @@ func (r *ProductQueryReader) loadTags(ctx context.Context, productIDs []uint) (m
 		return nil, err
 	}
 
-	result := make(map[uint][]usecaseProductQuery.Classification, len(productIDs))
+	result := make(map[string][]usecaseProductQuery.Classification, len(productUUIDs))
 	for _, row := range rows {
-		result[row.ProductID] = append(result[row.ProductID], usecaseProductQuery.Classification{
+		result[row.ProductUUID] = append(result[row.ProductUUID], usecaseProductQuery.Classification{
 			UUID: row.TagUUID,
 			Name: row.TagName,
 		})
@@ -383,15 +386,15 @@ func (r *ProductQueryReader) loadTags(ctx context.Context, productIDs []uint) (m
 	return result, nil
 }
 
-func (r *ProductQueryReader) loadImages(ctx context.Context, productIDs []uint) (map[uint][]usecaseProductQuery.ProductImage, error) {
+func (r *ProductQueryReader) loadImages(ctx context.Context, productUUIDs []string) (map[string][]usecaseProductQuery.ProductImage, error) {
 	query, args, err := sqlx.In(
 		`
-		SELECT pi.product_id, pi.uuid, pi.name, pi.mime_type, pi.path, pi.display_order
+		SELECT pi.product_uuid, pi.uuid, pi.name, pi.mime_type, pi.path, pi.display_order
 		FROM product_image pi
-		WHERE pi.deleted_at IS NULL AND pi.product_id IN (?)
+		WHERE pi.deleted_at IS NULL AND pi.product_uuid IN (?)
 		ORDER BY pi.display_order DESC, pi.id ASC
 		`,
-		productIDs,
+		productUUIDs,
 	)
 	if err != nil {
 		return nil, err
@@ -403,9 +406,9 @@ func (r *ProductQueryReader) loadImages(ctx context.Context, productIDs []uint) 
 		return nil, err
 	}
 
-	result := make(map[uint][]usecaseProductQuery.ProductImage, len(productIDs))
+	result := make(map[string][]usecaseProductQuery.ProductImage, len(productUUIDs))
 	for _, row := range rows {
-		result[row.ProductID] = append(result[row.ProductID], usecaseProductQuery.ProductImage{
+		result[row.ProductUUID] = append(result[row.ProductUUID], usecaseProductQuery.ProductImage{
 			UUID:         row.UUID,
 			Name:         row.Name,
 			MimeType:     row.MimeType,
@@ -417,19 +420,19 @@ func (r *ProductQueryReader) loadImages(ctx context.Context, productIDs []uint) 
 	return result, nil
 }
 
-func (r *ProductQueryReader) loadSiteDetails(ctx context.Context, productIDs []uint) (map[uint][]usecaseProductQuery.SiteDetail, error) {
+func (r *ProductQueryReader) loadSiteDetails(ctx context.Context, productUUIDs []string) (map[string][]usecaseProductQuery.SiteDetail, error) {
 	query, args, err := sqlx.In(
 		`SELECT
-			sd.product_id,
+			sd.product_uuid AS product_uuid,
 			sd.uuid,
 			sd.detail_url,
-			ss.uuid AS sales_site_uuid,
+			sd.sales_site_uuid AS sales_site_uuid,
 			ss.name AS sales_site_name
 		 FROM site_detail sd
-		 INNER JOIN sales_site ss ON ss.id = sd.sales_site_id AND ss.deleted_at IS NULL
-		 WHERE sd.deleted_at IS NULL AND sd.product_id IN (?)
+		 INNER JOIN sales_site ss ON sd.sales_site_uuid = ss.uuid AND ss.deleted_at IS NULL
+		 WHERE sd.deleted_at IS NULL AND sd.product_uuid IN (?)
 		 ORDER BY sd.detail_url ASC, sd.id ASC`,
-		productIDs,
+		productUUIDs,
 	)
 	if err != nil {
 		return nil, err
@@ -441,9 +444,9 @@ func (r *ProductQueryReader) loadSiteDetails(ctx context.Context, productIDs []u
 		return nil, err
 	}
 
-	result := make(map[uint][]usecaseProductQuery.SiteDetail, len(productIDs))
+	result := make(map[string][]usecaseProductQuery.SiteDetail, len(productUUIDs))
 	for _, row := range rows {
-		result[row.ProductID] = append(result[row.ProductID], usecaseProductQuery.SiteDetail{
+		result[row.ProductUUID] = append(result[row.ProductUUID], usecaseProductQuery.SiteDetail{
 			UUID:      row.UUID,
 			DetailURL: row.DetailURL,
 			SalesSite: usecaseProductQuery.SalesSite{
@@ -460,7 +463,7 @@ func (r *ProductQueryReader) listUsedCategories(ctx context.Context) ([]usecaseP
 	query := `
 		SELECT c.uuid, c.name
 		FROM category c
-		INNER JOIN product p ON p.category_id = c.id AND p.deleted_at IS NULL
+		INNER JOIN product p ON p.category_uuid = c.uuid AND p.deleted_at IS NULL
 		WHERE c.deleted_at IS NULL
 		GROUP BY c.id, c.uuid, c.name
 		ORDER BY c.id ASC
@@ -524,14 +527,14 @@ func (r *ProductQueryReader) listCarouselBaseRows(
 			t.uuid AS target_uuid,
 			t.name AS target_name
 		FROM product p
-		LEFT JOIN category c ON c.id = p.category_id AND c.deleted_at IS NULL
-		LEFT JOIN target t ON t.id = p.target_id AND t.deleted_at IS NULL
+		LEFT JOIN category c ON c.uuid = p.category_uuid AND c.deleted_at IS NULL
+		LEFT JOIN target t ON t.uuid = p.target_uuid AND t.deleted_at IS NULL
 		WHERE p.deleted_at IS NULL
 		  AND p.is_active = 1
 		  AND EXISTS (
 		      SELECT 1
 		      FROM product_image pi
-		      WHERE pi.product_id = p.id AND pi.deleted_at IS NULL
+		      WHERE pi.product_uuid = p.uuid AND pi.deleted_at IS NULL
 		  )
 	`
 
