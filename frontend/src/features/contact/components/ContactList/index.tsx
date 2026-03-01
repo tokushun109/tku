@@ -45,7 +45,7 @@ export const ContactList = ({ contacts }: Props) => {
                     <div className={styles['empty-message']}>お問い合わせがありません</div>
                 ) : (
                     <Virtuoso
-                        computeItemKey={(_index, contact) => contact.id}
+                        computeItemKey={(_index, contact) => contact.uuid}
                         data={contacts}
                         itemContent={(_index, contact) => (
                             <ListItem onClick={() => handleContactClick(contact)}>

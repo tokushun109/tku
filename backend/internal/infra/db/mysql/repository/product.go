@@ -97,9 +97,9 @@ func (r *ProductRepository) FindByUUID(ctx context.Context, uuid primitive.UUID)
 func (r *ProductRepository) Update(ctx context.Context, p *domain.Product) (bool, error) {
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
-		`UPDATE product
-		 SET name = ?, description = ?, price = ?, is_active = ?, is_recommend = ?, category_uuid = ?, target_uuid = ?, category_id = NULL, target_id = NULL, updated_at = NOW()
-		 WHERE uuid = ? AND deleted_at IS NULL`,
+			`UPDATE product
+			 SET name = ?, description = ?, price = ?, is_active = ?, is_recommend = ?, category_uuid = ?, target_uuid = ?, updated_at = NOW()
+			 WHERE uuid = ? AND deleted_at IS NULL`,
 		p.Name().Value(),
 		domainVO.ToValuePtr(p.Description()),
 		p.Price().Value(),

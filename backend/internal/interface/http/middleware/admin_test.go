@@ -44,7 +44,7 @@ func TestAdminMiddleware(t *testing.T) {
 		}))
 
 		req := httptest.NewRequest(http.MethodPost, "/api/category", nil)
-		req = req.WithContext(ContextWithAuthenticatedUser(req.Context(), AuthenticatedUser{UserID: 1, IsAdmin: false}))
+		req = req.WithContext(ContextWithAuthenticatedUser(req.Context(), AuthenticatedUser{IsAdmin: false}))
 		rr := httptest.NewRecorder()
 
 		h.ServeHTTP(rr, req)
@@ -61,7 +61,7 @@ func TestAdminMiddleware(t *testing.T) {
 		}))
 
 		req := httptest.NewRequest(http.MethodPost, "/api/category", nil)
-		req = req.WithContext(ContextWithAuthenticatedUser(req.Context(), AuthenticatedUser{UserID: 1, IsAdmin: true}))
+		req = req.WithContext(ContextWithAuthenticatedUser(req.Context(), AuthenticatedUser{IsAdmin: true}))
 		rr := httptest.NewRecorder()
 
 		h.ServeHTTP(rr, req)

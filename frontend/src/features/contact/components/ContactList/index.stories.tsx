@@ -8,7 +8,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 
 // テスト用のモックデータ生成関数
 const createMockContact = (id: number, overrides: Partial<IContactListItem> = {}): IContactListItem => ({
-    id,
+    uuid: `00000000-0000-4000-8000-${String(id).padStart(12, '0')}`,
     name: `テストユーザー${id}`,
     company: `テスト会社${id}`,
     phoneNumber: `090-0000-000${id}`,

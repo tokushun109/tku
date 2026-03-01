@@ -163,9 +163,9 @@ func (r *TargetRepository) Delete(ctx context.Context, uuid primitive.UUID) (boo
 
 	if _, err := tx.ExecContext(
 		ctx,
-		`UPDATE product
-		 SET target_uuid = NULL, target_id = NULL
-		 WHERE target_uuid = ?`,
+			`UPDATE product
+			 SET target_uuid = NULL
+			 WHERE target_uuid = ?`,
 		uuid.Value(),
 	); err != nil {
 		return false, err

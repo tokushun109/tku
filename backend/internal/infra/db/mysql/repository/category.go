@@ -163,9 +163,9 @@ func (r *CategoryRepository) Delete(ctx context.Context, uuid primitive.UUID) (b
 
 	if _, err := tx.ExecContext(
 		ctx,
-		`UPDATE product
-		 SET category_uuid = NULL, category_id = NULL
-		 WHERE category_uuid = ?`,
+			`UPDATE product
+			 SET category_uuid = NULL
+			 WHERE category_uuid = ?`,
 		uuid.Value(),
 	); err != nil {
 		return false, err
