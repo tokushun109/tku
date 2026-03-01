@@ -127,6 +127,24 @@ func (s *stubTagRepoForDuplicate) FindByUUID(ctx context.Context, uuid primitive
 	return nil, nil
 }
 
+func (s *stubTagRepoForDuplicate) FindByUUIDs(ctx context.Context, uuids []primitive.UUID) ([]*domainTag.Tag, error) {
+	if s.findErr != nil {
+		return nil, s.findErr
+	}
+
+	tags := make([]*domainTag.Tag, 0, len(uuids))
+	for _, uuid := range uuids {
+		tag, err := s.FindByUUID(ctx, uuid)
+		if err != nil {
+			return nil, err
+		}
+		if tag != nil {
+			tags = append(tags, tag)
+		}
+	}
+	return tags, nil
+}
+
 func (s *stubTagRepoForDuplicate) ExistsByName(ctx context.Context, name domainTag.TagName) (bool, error) {
 	if s.byName == nil {
 		return false, nil

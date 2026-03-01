@@ -17,31 +17,51 @@ import (
 	usecaseProduct "github.com/tokushun109/tku/backend/internal/usecase/product"
 )
 
-func (s *Service) resolveCategoryUUID(rawUUID string) (*string, error) {
+func (s *Service) resolveCategoryUUID(ctx context.Context, rawUUID string) (*string, error) {
 	trimmed := strings.TrimSpace(rawUUID)
 	if trimmed == "" {
 		return nil, nil
 	}
 
-	if _, err := primitive.NewUUID(trimmed); err != nil {
+	uuid, err := primitive.NewUUID(trimmed)
+	if err != nil {
 		return nil, usecase.NewAppError(usecase.ErrInvalidInput)
 	}
+
+	category, err := s.categoryRepo.FindByUUID(ctx, uuid)
+	if err != nil {
+		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
+	}
+	if category == nil {
+		return nil, usecase.NewAppError(usecase.ErrInvalidInput)
+	}
+
 	return &trimmed, nil
 }
 
-func (s *Service) resolveTargetUUID(rawUUID string) (*string, error) {
+func (s *Service) resolveTargetUUID(ctx context.Context, rawUUID string) (*string, error) {
 	trimmed := strings.TrimSpace(rawUUID)
 	if trimmed == "" {
 		return nil, nil
 	}
 
-	if _, err := primitive.NewUUID(trimmed); err != nil {
+	uuid, err := primitive.NewUUID(trimmed)
+	if err != nil {
 		return nil, usecase.NewAppError(usecase.ErrInvalidInput)
 	}
+
+	target, err := s.targetRepo.FindByUUID(ctx, uuid)
+	if err != nil {
+		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
+	}
+	if target == nil {
+		return nil, usecase.NewAppError(usecase.ErrInvalidInput)
+	}
+
 	return &trimmed, nil
 }
 
-func (s *Service) resolveTagUUIDs(rawUUIDs []string) ([]primitive.UUID, error) {
+func (s *Service) resolveTagUUIDs(ctx context.Context, rawUUIDs []string) ([]primitive.UUID, error) {
 	if len(rawUUIDs) == 0 {
 		return []primitive.UUID{}, nil
 	}
@@ -59,6 +79,15 @@ func (s *Service) resolveTagUUIDs(rawUUIDs []string) ([]primitive.UUID, error) {
 		seen[uuid] = struct{}{}
 		tagUUIDs = append(tagUUIDs, uuid)
 	}
+
+	tags, err := s.tagRepo.FindByUUIDs(ctx, tagUUIDs)
+	if err != nil {
+		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
+	}
+	if len(tags) != len(tagUUIDs) {
+		return nil, usecase.NewAppError(usecase.ErrInvalidInput)
+	}
+
 	return tagUUIDs, nil
 }
 
@@ -241,14 +270,23 @@ func (s *Service) findSalesSiteByName(ctx context.Context, rawName string) (*dom
 	return s.salesSiteRepo.FindByName(ctx, name)
 }
 
-func (s *Service) buildSiteDetails(_ context.Context, productUUID primitive.UUID, inputs []usecaseProduct.SiteDetailInput) ([]*domainSiteDetail.SiteDetail, error) {
+func (s *Service) buildSiteDetails(ctx context.Context, productUUID primitive.UUID, inputs []usecaseProduct.SiteDetailInput) ([]*domainSiteDetail.SiteDetail, error) {
 	details := make([]*domainSiteDetail.SiteDetail, 0, len(inputs))
 	for _, input := range inputs {
 		salesSiteUUID := strings.TrimSpace(input.SalesSiteUUID)
 		if salesSiteUUID == "" {
 			return nil, usecase.ErrInvalidInput
 		}
-		if _, err := primitive.NewUUID(salesSiteUUID); err != nil {
+		uuid, err := primitive.NewUUID(salesSiteUUID)
+		if err != nil {
+			return nil, usecase.ErrInvalidInput
+		}
+
+		salesSite, err := s.salesSiteRepo.FindByUUID(ctx, uuid)
+		if err != nil {
+			return nil, err
+		}
+		if salesSite == nil {
 			return nil, usecase.ErrInvalidInput
 		}
 

@@ -77,11 +77,11 @@ func New(
 }
 
 func (s *Service) Create(ctx context.Context, input usecaseProduct.CreateProductInput) (primitive.UUID, error) {
-	categoryUUID, err := s.resolveCategoryUUID(input.CategoryUUID)
+	categoryUUID, err := s.resolveCategoryUUID(ctx, input.CategoryUUID)
 	if err != nil {
 		return "", err
 	}
-	targetUUID, err := s.resolveTargetUUID(input.TargetUUID)
+	targetUUID, err := s.resolveTargetUUID(ctx, input.TargetUUID)
 	if err != nil {
 		return "", err
 	}
@@ -104,7 +104,7 @@ func (s *Service) Create(ctx context.Context, input usecaseProduct.CreateProduct
 		return "", usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 
-	tagUUIDs, err := s.resolveTagUUIDs(input.TagUUIDs)
+	tagUUIDs, err := s.resolveTagUUIDs(ctx, input.TagUUIDs)
 	if err != nil {
 		return "", err
 	}
@@ -286,11 +286,11 @@ func (s *Service) Update(ctx context.Context, productUUID string, input usecaseP
 		return usecase.NewAppError(usecase.ErrNotFound)
 	}
 
-	categoryUUID, err := s.resolveCategoryUUID(input.CategoryUUID)
+	categoryUUID, err := s.resolveCategoryUUID(ctx, input.CategoryUUID)
 	if err != nil {
 		return err
 	}
-	targetUUID, err := s.resolveTargetUUID(input.TargetUUID)
+	targetUUID, err := s.resolveTargetUUID(ctx, input.TargetUUID)
 	if err != nil {
 		return err
 	}
@@ -310,7 +310,7 @@ func (s *Service) Update(ctx context.Context, productUUID string, input usecaseP
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 
-	tagUUIDs, err := s.resolveTagUUIDs(input.TagUUIDs)
+	tagUUIDs, err := s.resolveTagUUIDs(ctx, input.TagUUIDs)
 	if err != nil {
 		return err
 	}
