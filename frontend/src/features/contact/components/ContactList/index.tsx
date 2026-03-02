@@ -7,6 +7,7 @@ import { Virtuoso } from 'react-virtuoso'
 import { Dialog } from '@/components/bases/Dialog'
 import { ListItem } from '@/components/bases/ListItem'
 import { IContactListItem } from '@/features/contact/type'
+import { formatDateToJST } from '@/utils/date'
 
 import styles from './styles.module.scss'
 
@@ -28,16 +29,6 @@ export const ContactList = ({ contacts }: Props) => {
         setSelectedContact(null)
     }
 
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleString('ja-JP', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-        })
-    }
-
     return (
         <div className={styles['contact-list']}>
             <div className={styles['list-content']}>
@@ -56,7 +47,7 @@ export const ContactList = ({ contacts }: Props) => {
                                             {contact.name}
                                             {contact.company && <span className={styles['company']}>({contact.company})</span>}
                                         </div>
-                                        <div className={styles['contact-date']}>{formatDate(contact.createdAt)}</div>
+                                        <div className={styles['contact-date']}>{formatDateToJST(contact.createdAt)}</div>
                                     </div>
                                     <div className={styles['contact-email']}>
                                         <Email className={styles['icon']} fontSize="small" />
@@ -106,7 +97,7 @@ export const ContactList = ({ contacts }: Props) => {
                         )}
                         <div className={styles['detail-row']}>
                             <label className={styles['detail-label']}>受信日時</label>
-                            <div className={styles['detail-value']}>{formatDate(selectedContact.createdAt)}</div>
+                            <div className={styles['detail-value']}>{formatDateToJST(selectedContact.createdAt)}</div>
                         </div>
                         <div className={styles['detail-row']}>
                             <label className={styles['detail-label']}>お問い合わせ内容</label>
