@@ -6,6 +6,10 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 
 const mockProductsByCategory: IProductsByCategory = {
     category: { uuid: '1', name: 'ピアス' },
+    pageInfo: {
+        hasMore: true,
+        nextCursor: 'next-cursor',
+    },
     products: [
         {
             uuid: '1',
@@ -91,6 +95,9 @@ const mockProductsByCategory: IProductsByCategory = {
 const meta: Meta<typeof ProductsByCategoryDisplay> = {
     component: ProductsByCategoryDisplay,
     args: {
+        hasMore: true,
+        isLoadingMore: false,
+        onClickMoreButton: () => {},
         productsByCategory: mockProductsByCategory,
     },
     parameters: {
@@ -107,6 +114,7 @@ export const Default: Story = {}
 
 export const FewProducts: Story = {
     args: {
+        hasMore: false,
         productsByCategory: {
             ...mockProductsByCategory,
             products: mockProductsByCategory.products.slice(0, 3),
@@ -116,6 +124,7 @@ export const FewProducts: Story = {
 
 export const ExactlyFourProducts: Story = {
     args: {
+        hasMore: false,
         productsByCategory: {
             ...mockProductsByCategory,
             products: mockProductsByCategory.products.slice(0, 4),
@@ -125,6 +134,7 @@ export const ExactlyFourProducts: Story = {
 
 export const ManyProducts: Story = {
     args: {
+        hasMore: true,
         productsByCategory: {
             ...mockProductsByCategory,
             products: [
@@ -162,8 +172,13 @@ export const ManyProducts: Story = {
 
 export const NecklaceCategory: Story = {
     args: {
+        hasMore: true,
         productsByCategory: {
             category: { uuid: '2', name: 'ネックレス' },
+            pageInfo: {
+                hasMore: true,
+                nextCursor: 'next-cursor',
+            },
             products: [
                 {
                     uuid: '1',

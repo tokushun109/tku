@@ -20,7 +20,7 @@ const (
 
 type Usecase interface {
 	List(ctx context.Context, mode string, category string, target string) ([]*Product, error)
-	ListByCategory(ctx context.Context, category string, target string) ([]*CategoryProducts, error)
+	ListByCategory(ctx context.Context, q ListCategoryProductsQuery) ([]*CategoryProducts, error)
 	ListCarousel(ctx context.Context) ([]*CarouselItem, error)
 	Get(ctx context.Context, productUUID string) (*Product, error)
 	ExportCSV(ctx context.Context) ([]*ProductCSVRow, error)
@@ -61,21 +61,32 @@ func (s *Service) List(ctx context.Context, mode string, category string, target
 	return products, nil
 }
 
-func (s *Service) ListByCategory(ctx context.Context, category string, target string) ([]*CategoryProducts, error) {
-	trimmedCategory := strings.TrimSpace(category)
-	trimmedTarget := strings.TrimSpace(target)
+func (s *Service) ListByCategory(ctx context.Context, q ListCategoryProductsQuery) ([]*CategoryProducts, error) {
+	trimmedCategory := strings.TrimSpace(q.Category)
+	trimmedCursor := strings.TrimSpace(q.Cursor)
+	trimmedTarget := strings.TrimSpace(q.Target)
 
-	if trimmedCategory == "" || trimmedTarget == "" {
+	if trimmedCategory == "" || trimmedTarget == "" || q.Limit <= 0 {
+		return nil, usecase.NewAppError(usecase.ErrInvalidInput)
+	}
+	if trimmedCategory == "all" && trimmedCursor != "" {
 		return nil, usecase.NewAppError(usecase.ErrInvalidInput)
 	}
 
-	categoryProducts, err := s.queryReader.ListCategoryProducts(ctx, ListCategoryProductsQuery{
+	query := ListCategoryProductsQuery{
 		Category: trimmedCategory,
+		Cursor:   trimmedCursor,
+		Limit:    q.Limit,
 		Target:   trimmedTarget,
-	})
+	}
+
+	categoryProducts, err := s.queryReader.ListCategoryProducts(ctx, query)
 	if err != nil {
 		if errors.Is(err, ErrCategoryNotFound) {
 			return nil, usecase.NewAppError(usecase.ErrNotFound)
+		}
+		if errors.Is(err, ErrInvalidCursor) {
+			return nil, usecase.NewAppError(usecase.ErrInvalidInput)
 		}
 		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}

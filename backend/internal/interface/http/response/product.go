@@ -43,6 +43,7 @@ type CreateProductResponse struct {
 
 type CategoryProductsResponse struct {
 	Category ProductClassificationResponse `json:"category"`
+	PageInfo CursorPageInfoResponse        `json:"pageInfo"`
 	Products []*ProductResponse            `json:"products"`
 }
 

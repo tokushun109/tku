@@ -36,6 +36,7 @@ describe('Product Page Integration Test', () => {
         mockGetProductsByCategory.mockResolvedValue([
             {
                 category: { name: 'イヤリング', uuid: 'earrings-uuid' },
+                pageInfo: { hasMore: false, nextCursor: '' },
                 products: [
                     {
                         uuid: 'earrings-women-1',
@@ -61,6 +62,7 @@ describe('Product Page Integration Test', () => {
             },
             {
                 category: { name: 'リング', uuid: 'rings-uuid' },
+                pageInfo: { hasMore: false, nextCursor: '' },
                 products: [
                     {
                         uuid: 'rings-men-1',
@@ -138,6 +140,7 @@ describe('Product Page Integration Test', () => {
         mockGetProductsByCategory.mockResolvedValue([
             {
                 category: { name: 'イヤリング', uuid: 'earrings-uuid' },
+                pageInfo: { hasMore: false, nextCursor: '' },
                 products: [
                     {
                         uuid: 'earrings-women-1',
@@ -201,6 +204,7 @@ describe('Product Page Integration Test', () => {
         mockGetProductsByCategory.mockResolvedValue([
             {
                 category: { name: 'イヤリング', uuid: 'earrings-uuid' },
+                pageInfo: { hasMore: false, nextCursor: '' },
                 products: [
                     {
                         uuid: 'earrings-women-1',

@@ -3,9 +3,12 @@ package query
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 
+	dbcursor "github.com/tokushun109/tku/backend/internal/infra/db/cursor"
 	"github.com/tokushun109/tku/backend/internal/infra/db/mysql/mysqlutil"
 	usecaseProductQuery "github.com/tokushun109/tku/backend/internal/usecase/product/query"
 )
@@ -19,6 +22,7 @@ type productBaseRow struct {
 	UUID         string         `db:"uuid"`
 	Name         string         `db:"name"`
 	Description  sql.NullString `db:"description"`
+	CreatedAt    time.Time      `db:"created_at"`
 	Price        int            `db:"price"`
 	IsActive     bool           `db:"is_active"`
 	IsRecommend  bool           `db:"is_recommend"`
@@ -99,7 +103,7 @@ func (r *ProductQueryReader) ListProducts(ctx context.Context, q usecaseProductQ
 		query += ` AND t.uuid = ?`
 		args = append(args, q.Target)
 	}
-	query += ` ORDER BY p.created_at DESC`
+	query += ` ORDER BY p.created_at DESC, p.id DESC`
 
 	rows := []productBaseRow{}
 	if err := r.db.SelectContext(ctx, &rows, query, args...); err != nil {
@@ -119,15 +123,6 @@ func (r *ProductQueryReader) ListProducts(ctx context.Context, q usecaseProductQ
 }
 
 func (r *ProductQueryReader) ListCategoryProducts(ctx context.Context, q usecaseProductQuery.ListCategoryProductsQuery) ([]*usecaseProductQuery.CategoryProducts, error) {
-	products, err := r.ListProducts(ctx, usecaseProductQuery.ListProductsQuery{
-		Mode:     "active",
-		Category: q.Category,
-		Target:   q.Target,
-	})
-	if err != nil {
-		return nil, err
-	}
-
 	if q.Category != "all" {
 		foundCategory, found, err := r.findCategoryByUUID(ctx, q.Category)
 		if err != nil {
@@ -137,9 +132,15 @@ func (r *ProductQueryReader) ListCategoryProducts(ctx context.Context, q usecase
 			return nil, usecaseProductQuery.ErrCategoryNotFound
 		}
 
+		products, pageInfo, err := r.listCategoryProductPage(ctx, q.Category, q.Target, q.Limit, q.Cursor)
+		if err != nil {
+			return nil, err
+		}
+
 		return []*usecaseProductQuery.CategoryProducts{
 			{
 				Category: foundCategory,
+				PageInfo: pageInfo,
 				Products: products,
 			},
 		}, nil
@@ -153,20 +154,112 @@ func (r *ProductQueryReader) ListCategoryProducts(ctx context.Context, q usecase
 		return []*usecaseProductQuery.CategoryProducts{}, nil
 	}
 
-	productsByCategoryUUID := make(map[string][]*usecaseProductQuery.Product, len(categories))
-	for _, product := range products {
-		productsByCategoryUUID[product.Category.UUID] = append(productsByCategoryUUID[product.Category.UUID], product)
-	}
-
 	result := make([]*usecaseProductQuery.CategoryProducts, 0, len(categories))
 	for _, category := range categories {
+		products, pageInfo, err := r.listCategoryProductPage(ctx, category.UUID, q.Target, q.Limit, "")
+		if err != nil {
+			return nil, err
+		}
+
 		result = append(result, &usecaseProductQuery.CategoryProducts{
 			Category: category,
-			Products: productsByCategoryUUID[category.UUID],
+			PageInfo: pageInfo,
+			Products: products,
 		})
 	}
 
 	return result, nil
+}
+
+func (r *ProductQueryReader) listCategoryProductPage(
+	ctx context.Context,
+	categoryUUID string,
+	target string,
+	limit int,
+	cursor string,
+) ([]*usecaseProductQuery.Product, usecaseProductQuery.PageInfo, error) {
+	if limit <= 0 {
+		return []*usecaseProductQuery.Product{}, usecaseProductQuery.PageInfo{}, nil
+	}
+
+	query := `
+		SELECT
+			p.id,
+			p.uuid,
+			p.name,
+			p.description,
+			p.created_at,
+			p.price,
+			p.is_active,
+			p.is_recommend,
+			c.uuid AS category_uuid,
+			c.name AS category_name,
+			t.uuid AS target_uuid,
+			t.name AS target_name
+		FROM product p
+		LEFT JOIN category c ON c.uuid = p.category_uuid AND c.deleted_at IS NULL
+		LEFT JOIN target t ON t.uuid = p.target_uuid AND t.deleted_at IS NULL
+		WHERE p.deleted_at IS NULL
+		  AND p.is_active = 1
+		  AND c.uuid = ?
+	`
+
+	args := make([]any, 0, 5)
+	args = append(args, categoryUUID)
+	if target != "all" {
+		query += ` AND t.uuid = ?`
+		args = append(args, target)
+	}
+
+	if cursor != "" {
+		cursorValue, err := dbcursor.Decode(cursor)
+		if err != nil {
+			if errors.Is(err, dbcursor.ErrInvalid) {
+				return nil, usecaseProductQuery.PageInfo{}, usecaseProductQuery.ErrInvalidCursor
+			}
+			return nil, usecaseProductQuery.PageInfo{}, err
+		}
+
+		query += ` AND (p.created_at < ? OR (p.created_at = ? AND p.id < ?))`
+		args = append(args, cursorValue.CreatedAt, cursorValue.CreatedAt, cursorValue.ID)
+	}
+
+	query += ` ORDER BY p.created_at DESC, p.id DESC LIMIT ?`
+	args = append(args, limit+1)
+
+	rows := []productBaseRow{}
+	if err := r.db.SelectContext(ctx, &rows, query, args...); err != nil {
+		return nil, usecaseProductQuery.PageInfo{}, err
+	}
+
+	hasMore := len(rows) > limit
+	if hasMore {
+		rows = rows[:limit]
+	}
+
+	products := buildProductsFromRows(rows)
+	if len(products) == 0 {
+		return products, usecaseProductQuery.PageInfo{}, nil
+	}
+
+	if err := r.fillChildren(ctx, products); err != nil {
+		return nil, usecaseProductQuery.PageInfo{}, err
+	}
+
+	pageInfo := usecaseProductQuery.PageInfo{}
+	if hasMore {
+		nextCursor, err := dbcursor.Encode(rows[len(rows)-1].CreatedAt, rows[len(rows)-1].ID)
+		if err != nil {
+			return nil, usecaseProductQuery.PageInfo{}, err
+		}
+
+		pageInfo = usecaseProductQuery.PageInfo{
+			HasMore:    true,
+			NextCursor: nextCursor,
+		}
+	}
+
+	return products, pageInfo, nil
 }
 
 func (r *ProductQueryReader) ListCarouselItems(ctx context.Context, q usecaseProductQuery.ListCarouselQuery) ([]*usecaseProductQuery.CarouselItem, error) {

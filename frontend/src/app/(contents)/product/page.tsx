@@ -4,6 +4,7 @@ import { getCategories } from '@/apis/category'
 import { getProductsByCategory } from '@/apis/product'
 import { getTargets } from '@/apis/target'
 import ProductTemplate from '@/app/(contents)/product/template'
+import { INITIAL_CATEGORY_PRODUCT_LIMIT } from '@/features/product/constants'
 
 export const dynamic = 'force-dynamic'
 
@@ -30,7 +31,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 const Product = async () => {
-    const productsByCategory = await getProductsByCategory({ category: 'all', target: 'all' })
+    const productsByCategory = await getProductsByCategory({
+        category: 'all',
+        limit: INITIAL_CATEGORY_PRODUCT_LIMIT,
+        target: 'all',
+    })
     const categories = await getCategories({ mode: 'used' })
     const targets = await getTargets({ mode: 'used' })
     return <ProductTemplate categories={categories} productsByCategory={productsByCategory} targets={targets} />

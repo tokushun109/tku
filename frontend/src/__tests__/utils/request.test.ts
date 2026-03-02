@@ -45,13 +45,15 @@ describe('request utils', () => {
             expect(result.get('isVisible')).toBe('false')
         })
 
-        it('nullとundefinedを文字列として変換する', () => {
+        it('nullとundefinedはクエリパラメータに含めない', () => {
             const result = convertObjectToURLSearchParams({
                 nullValue: null,
                 undefinedValue: undefined,
             })
-            expect(result.get('nullValue')).toBe('null')
-            expect(result.get('undefinedValue')).toBe('undefined')
+            expect(result.get('nullValue')).toBeNull()
+            expect(result.get('undefinedValue')).toBeNull()
+            expect(result.has('nullValue')).toBe(false)
+            expect(result.has('undefinedValue')).toBe(false)
         })
 
         it('空文字列を処理する', () => {

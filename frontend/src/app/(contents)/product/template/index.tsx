@@ -1,14 +1,14 @@
 'use client'
 
 import { KeyboardArrowDown } from '@mui/icons-material'
-import { useState } from 'react'
 
 import { Breadcrumbs } from '@/components/bases/Breadcrumbs'
-import { Select, SelectOption } from '@/components/bases/Select'
+import { Select } from '@/components/bases/Select'
 import { IClassification } from '@/features/classification/type'
 import { ProductsByCategoryDisplay } from '@/features/product/components/ProductsByCategoryDisplay'
 import { IProductsByCategory } from '@/features/product/type'
 
+import { useProductTemplate } from './hooks'
 import styles from './styles.module.scss'
 
 type Props = {
@@ -17,36 +17,10 @@ type Props = {
     targets: IClassification[]
 }
 
-interface IFilteredCondition {
-    category: SelectOption | undefined
-    target: SelectOption | undefined
-}
-
-const ProductTemplate = ({ productsByCategory, categories, targets }: Props) => {
-    // 絞りこみ条件
-    const [filteredCondition, setFilteredCondition] = useState<IFilteredCondition>({ category: undefined, target: undefined })
-
-    // 絞り込んだ後の商品リスト
-    const filteredProductsByCategory = ((): IProductsByCategory[] => {
-        let result: IProductsByCategory[] = productsByCategory
-        // categoryによる絞り込み
-        result = filteredCondition.category
-            ? productsByCategory.filter((v) => v.category.uuid === filteredCondition.category!.value)
-            : productsByCategory
-
-        // targetによる絞り込み
-        result = result.map((v) => ({
-            ...v,
-            products: v.products.filter((product) => {
-                return filteredCondition.target ? product.target.uuid === filteredCondition.target!.value : true
-            }),
-        }))
-        return result
-    })()
-
-    const onSelect = (option: SelectOption | undefined, key: keyof IFilteredCondition) => {
-        setFilteredCondition({ ...filteredCondition, [key]: option })
-    }
+const ProductTemplate = ({ productsByCategory: initialProductsByCategory, categories, targets }: Props) => {
+    const { isFetchingProducts, loadingCategoryUUIDs, onClickMore, onSelect, visibleProductsByCategory } = useProductTemplate({
+        initialProductsByCategory,
+    })
 
     return (
         <div className={styles['container']}>
@@ -74,7 +48,7 @@ const ProductTemplate = ({ productsByCategory, categories, targets }: Props) => 
             </div>
             <div className={styles['product-area']}>
                 {(() => {
-                    if (filteredProductsByCategory.length === 0) {
+                    if (!isFetchingProducts && visibleProductsByCategory.length === 0) {
                         return (
                             <div className={styles['product-area__no-product-message']}>
                                 該当する商品が
@@ -83,11 +57,17 @@ const ProductTemplate = ({ productsByCategory, categories, targets }: Props) => 
                             </div>
                         )
                     } else {
-                        return filteredProductsByCategory.map((v) => {
-                            if (v.products.length === 0) return null
+                        return visibleProductsByCategory.map((v) => {
                             return (
                                 <div className={styles['product-area__products-by-category']} key={v.category.uuid}>
-                                    <ProductsByCategoryDisplay productsByCategory={v} />
+                                    <ProductsByCategoryDisplay
+                                        hasMore={v.pageInfo.hasMore}
+                                        isLoadingMore={loadingCategoryUUIDs.includes(v.category.uuid)}
+                                        onClickMoreButton={() => {
+                                            void onClickMore(v.category.uuid)
+                                        }}
+                                        productsByCategory={v}
+                                    />
                                 </div>
                             )
                         })

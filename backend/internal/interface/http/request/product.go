@@ -3,9 +3,15 @@ package request
 import (
 	"errors"
 	"net/http"
+	"strconv"
 	"strings"
 
 	usecaseProduct "github.com/tokushun109/tku/backend/internal/usecase/product"
+)
+
+const (
+	defaultCategoryProductLimit = 4
+	maxCategoryProductLimit     = 20
 )
 
 type ProductClassificationRequest struct {
@@ -66,6 +72,8 @@ type ListProductQuery struct {
 
 type ListCategoryProductQuery struct {
 	Category string
+	Cursor   string
+	Limit    int
 	Target   string
 }
 
@@ -89,11 +97,26 @@ func ParseListProductQuery(r *http.Request) (ListProductQuery, error) {
 func ParseListCategoryProductQuery(r *http.Request) (ListCategoryProductQuery, error) {
 	q := r.URL.Query()
 	category := strings.TrimSpace(q.Get("category"))
+	cursor := strings.TrimSpace(q.Get("cursor"))
+	limit := defaultCategoryProductLimit
 	target := strings.TrimSpace(q.Get("target"))
 
 	if category == "" || target == "" {
 		return ListCategoryProductQuery{}, errors.New("invalid query")
 	}
 
-	return ListCategoryProductQuery{Category: category, Target: target}, nil
+	if rawLimit := strings.TrimSpace(q.Get("limit")); rawLimit != "" {
+		parsedLimit, err := strconv.Atoi(rawLimit)
+		if err != nil || parsedLimit <= 0 || parsedLimit > maxCategoryProductLimit {
+			return ListCategoryProductQuery{}, errors.New("invalid limit")
+		}
+		limit = parsedLimit
+	}
+
+	return ListCategoryProductQuery{
+		Category: category,
+		Cursor:   cursor,
+		Limit:    limit,
+		Target:   target,
+	}, nil
 }

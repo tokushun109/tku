@@ -15,6 +15,7 @@ import (
 	"github.com/tokushun109/tku/backend/internal/interface/http/response"
 	"github.com/tokushun109/tku/backend/internal/usecase"
 	usecaseProduct "github.com/tokushun109/tku/backend/internal/usecase/product"
+	usecaseProductQuery "github.com/tokushun109/tku/backend/internal/usecase/product/query"
 )
 
 const maxProductCSVSize = 5 << 20 // 5MB
@@ -51,7 +52,12 @@ func (h *ProductHandler) ListByCategory(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	categoryProducts, err := h.productUC.ListByCategory(r.Context(), q.Category, q.Target)
+	categoryProducts, err := h.productUC.ListByCategory(r.Context(), usecaseProductQuery.ListCategoryProductsQuery{
+		Category: q.Category,
+		Cursor:   q.Cursor,
+		Limit:    q.Limit,
+		Target:   q.Target,
+	})
 	if err != nil {
 		response.WriteAppError(w, err)
 		return

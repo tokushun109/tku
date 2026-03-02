@@ -6,6 +6,8 @@ import { convertObjectToURLSearchParams } from '@/utils/request'
 
 export interface IGetProductsByCategoryParams {
     category: 'all' | string
+    cursor?: string
+    limit: number
     target: 'all' | string
 }
 
