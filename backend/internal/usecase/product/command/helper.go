@@ -107,6 +107,7 @@ func (s *Service) findOrCreateCategoryByName(
 				cache[key] = found
 				return found, nil
 			}
+			return nil, fmt.Errorf("category was duplicated but not found: %s", name.Value())
 		}
 		return nil, err
 	}
@@ -153,6 +154,7 @@ func (s *Service) findOrCreateTargetByName(
 				cache[key] = found
 				return found, nil
 			}
+			return nil, fmt.Errorf("target was duplicated but not found: %s", name.Value())
 		}
 		return nil, err
 	}
