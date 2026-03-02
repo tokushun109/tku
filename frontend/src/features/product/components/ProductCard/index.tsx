@@ -50,7 +50,7 @@ export const ProductCard = ({ product, onEdit, onDelete, admin = false }: Props)
                     {product.productImages.length > 0 ? (
                         <Image alt={product.name} src={product.productImages[0].apiPath} />
                     ) : (
-                        <Image alt="no-image" src="/image/gray-image.png" />
+                        <Image alt="no-image" src="" />
                     )}
                     {product.category.uuid && (
                         <div className={styles['product-category']}>
