@@ -22,7 +22,7 @@ func NewSalesSiteRepository(db *sqlx.DB) *SalesSiteRepository {
 func (r *SalesSiteRepository) Create(ctx context.Context, s *domain.SalesSite) (*domain.SalesSite, error) {
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
-		`INSERT INTO sales_site (uuid, name, url, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())`,
+		`INSERT INTO sales_site (uuid, name, url, created_at, updated_at) VALUES (?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
 		s.UUID().Value(), s.Name().Value(), s.URL().Value(),
 	)
 	if err != nil {
@@ -100,7 +100,7 @@ func (r *SalesSiteRepository) FindByUUID(ctx context.Context, uuid primitive.UUI
 func (r *SalesSiteRepository) Update(ctx context.Context, s *domain.SalesSite) (bool, error) {
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
-		`UPDATE sales_site SET name = ?, url = ?, updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`,
+		`UPDATE sales_site SET name = ?, url = ?, updated_at = UTC_TIMESTAMP() WHERE uuid = ? AND deleted_at IS NULL`,
 		s.Name().Value(),
 		s.URL().Value(),
 		s.UUID().Value(),
@@ -133,7 +133,7 @@ func (r *SalesSiteRepository) Delete(ctx context.Context, uuid primitive.UUID) (
 		return false, err
 	}
 
-	res, err := tx.ExecContext(ctx, `UPDATE sales_site SET deleted_at = NOW(), updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value())
+	res, err := tx.ExecContext(ctx, `UPDATE sales_site SET deleted_at = UTC_TIMESTAMP(), updated_at = UTC_TIMESTAMP() WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value())
 	if err != nil {
 		return false, err
 	}

@@ -9,5 +9,5 @@ func NewClock() *Clock {
 }
 
 func (c *Clock) Now() time.Time {
-	return time.Now()
+	return time.Now().UTC()
 }

@@ -52,7 +52,7 @@ func (r *CreatorRepository) UpdateProfile(ctx context.Context, c *domain.Creator
 
 	result, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
-		`UPDATE creator SET name = ?, introduction = ?, updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`,
+		`UPDATE creator SET name = ?, introduction = ?, updated_at = UTC_TIMESTAMP() WHERE uuid = ? AND deleted_at IS NULL`,
 		c.Name().Value(),
 		introduction,
 		c.UUID().Value(),
@@ -76,7 +76,7 @@ func (r *CreatorRepository) UpdateLogo(
 ) (bool, error) {
 	result, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
-		`UPDATE creator SET mime_type = ?, logo = ?, updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`,
+		`UPDATE creator SET mime_type = ?, logo = ?, updated_at = UTC_TIMESTAMP() WHERE uuid = ? AND deleted_at IS NULL`,
 		mimeType.Value(),
 		logoPath.Value(),
 		creatorUUID.Value(),

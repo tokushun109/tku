@@ -22,7 +22,7 @@ func NewTagRepository(db *sqlx.DB) *TagRepository {
 func (r *TagRepository) Create(ctx context.Context, t *domain.Tag) (*domain.Tag, error) {
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
-		`INSERT INTO tag (uuid, name, created_at, updated_at) VALUES (?, ?, NOW(), NOW())`,
+		`INSERT INTO tag (uuid, name, created_at, updated_at) VALUES (?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
 		t.UUID().Value(), t.Name().Value(),
 	)
 	if err != nil {
@@ -141,7 +141,7 @@ func (r *TagRepository) ExistsByName(ctx context.Context, name domain.TagName) (
 func (r *TagRepository) Update(ctx context.Context, t *domain.Tag) (bool, error) {
 	res, err := getExecutor(ctx, r.db).ExecContext(
 		ctx,
-		`UPDATE tag SET name = ?, updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`,
+		`UPDATE tag SET name = ?, updated_at = UTC_TIMESTAMP() WHERE uuid = ? AND deleted_at IS NULL`,
 		t.Name().Value(),
 		t.UUID().Value(),
 	)
@@ -173,7 +173,7 @@ func (r *TagRepository) Delete(ctx context.Context, uuid primitive.UUID) (bool, 
 		return false, err
 	}
 
-	res, err := tx.ExecContext(ctx, `UPDATE tag SET deleted_at = NOW(), updated_at = NOW() WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value())
+	res, err := tx.ExecContext(ctx, `UPDATE tag SET deleted_at = UTC_TIMESTAMP(), updated_at = UTC_TIMESTAMP() WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value())
 	if err != nil {
 		return false, err
 	}

@@ -57,18 +57,17 @@ func (r *ContactRepository) FindAll(ctx context.Context) ([]*domain.Contact, err
 func (r *ContactRepository) Create(ctx context.Context, contact *domain.Contact) (*domain.Contact, error) {
 	company := domainVO.ToValuePtr(contact.Company())
 	phoneNumber := domainVO.ToValuePtr(contact.PhoneNumber())
-	createdAt := time.Now()
+	executor := getExecutor(ctx, r.db)
 
-	res, err := getExecutor(ctx, r.db).ExecContext(
+	res, err := executor.ExecContext(
 		ctx,
-		`INSERT INTO contact (uuid, name, company, phone_number, email, content, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())`,
+		`INSERT INTO contact (uuid, name, company, phone_number, email, content, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
 		contact.UUID().Value(),
 		contact.Name().Value(),
 		company,
 		phoneNumber,
 		contact.Email().Value(),
 		contact.Content().Value(),
-		createdAt,
 	)
 	if err != nil {
 		return nil, err
@@ -79,6 +78,21 @@ func (r *ContactRepository) Create(ctx context.Context, contact *domain.Contact)
 		return nil, err
 	}
 
+	var row struct {
+		CreatedAt sql.NullTime `db:"created_at"`
+	}
+	if err := executor.GetContext(
+		ctx,
+		&row,
+		`SELECT created_at FROM contact WHERE id = ?`,
+		lastID,
+	); err != nil {
+		return nil, err
+	}
+	if !row.CreatedAt.Valid {
+		return nil, fmt.Errorf("invalid contact row: created_at is null")
+	}
+
 	created, err := domain.Rebuild(
 		uint(lastID),
 		contact.UUID().Value(),
@@ -87,7 +101,7 @@ func (r *ContactRepository) Create(ctx context.Context, contact *domain.Contact)
 		domainVO.ToValueOrEmpty(contact.PhoneNumber()),
 		contact.Email().Value(),
 		contact.Content().Value(),
-		createdAt,
+		row.CreatedAt.Time,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("invalid contact row: %w", err)
