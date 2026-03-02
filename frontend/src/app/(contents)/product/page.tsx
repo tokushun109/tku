@@ -30,7 +30,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 const Product = async () => {
-    const productsByCategory = await getProductsByCategory({ mode: 'active', category: 'all', target: 'all' })
+    const productsByCategory = await getProductsByCategory({ category: 'all', target: 'all' })
     const categories = await getCategories({ mode: 'used' })
     const targets = await getTargets({ mode: 'used' })
     return <ProductTemplate categories={categories} productsByCategory={productsByCategory} targets={targets} />

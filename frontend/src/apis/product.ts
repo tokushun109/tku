@@ -3,6 +3,11 @@ import { IProduct, IProductsByCategory, IThumbnail } from '@/features/product/ty
 import { ApiError } from '@/utils/error'
 import { convertObjectToURLSearchParams } from '@/utils/request'
 
+export interface IGetProductsByCategoryParams {
+    category: 'all' | string
+    target: 'all' | string
+}
+
 export interface IGetProductsParams {
     category: 'all' | string
     mode: 'all' | 'active'
@@ -10,7 +15,7 @@ export interface IGetProductsParams {
 }
 
 /** カテゴリーごとの商品リストを取得 */
-export const getProductsByCategory = async (params: IGetProductsParams): Promise<IProductsByCategory[]> => {
+export const getProductsByCategory = async (params: IGetProductsByCategoryParams): Promise<IProductsByCategory[]> => {
     try {
         const query = convertObjectToURLSearchParams(params)
         const res = await fetch(`${getApiBaseUrl()}/category/product?${query}`, {

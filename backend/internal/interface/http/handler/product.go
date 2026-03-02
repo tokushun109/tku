@@ -50,7 +50,7 @@ func (h *ProductHandler) ListByCategory(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	categoryProducts, err := h.productUC.ListByCategory(r.Context(), q.Mode, q.Category, q.Target)
+	categoryProducts, err := h.productUC.ListByCategory(r.Context(), q.Category, q.Target)
 	if err != nil {
 		response.WriteAppError(w, err)
 		return

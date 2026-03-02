@@ -120,7 +120,7 @@ func (r *ProductQueryReader) ListProducts(ctx context.Context, q usecaseProductQ
 
 func (r *ProductQueryReader) ListCategoryProducts(ctx context.Context, q usecaseProductQuery.ListCategoryProductsQuery) ([]*usecaseProductQuery.CategoryProducts, error) {
 	products, err := r.ListProducts(ctx, usecaseProductQuery.ListProductsQuery{
-		Mode:     q.Mode,
+		Mode:     "active",
 		Category: q.Category,
 		Target:   q.Target,
 	})

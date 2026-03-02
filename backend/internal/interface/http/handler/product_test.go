@@ -21,7 +21,6 @@ type stubProductUC struct {
 	listByCategoryRes    []*usecaseProductQuery.CategoryProducts
 	listByCategoryCalled bool
 	listByCategoryReq    struct {
-		mode     string
 		category string
 		target   string
 	}
@@ -60,12 +59,10 @@ func (s *stubProductUC) List(ctx context.Context, mode string, category string, 
 
 func (s *stubProductUC) ListByCategory(
 	ctx context.Context,
-	mode string,
 	category string,
 	target string,
 ) ([]*usecaseProductQuery.CategoryProducts, error) {
 	s.listByCategoryCalled = true
-	s.listByCategoryReq.mode = mode
 	s.listByCategoryReq.category = category
 	s.listByCategoryReq.target = target
 	if s.listByCategoryErr != nil {
@@ -149,7 +146,7 @@ func TestProductListByCategory(t *testing.T) {
 		uc := &stubProductUC{}
 		h := NewProductHandler(uc)
 
-		req := httptest.NewRequest(http.MethodGet, "/api/category/product?mode=invalid&category=all&target=all", nil)
+		req := httptest.NewRequest(http.MethodGet, "/api/category/product?category=all", nil)
 		rr := httptest.NewRecorder()
 
 		h.ListByCategory(rr, req)
@@ -176,7 +173,7 @@ func TestProductListByCategory(t *testing.T) {
 		}
 		h := NewProductHandler(uc)
 
-		req := httptest.NewRequest(http.MethodGet, "/api/category/product?mode=active&category=all&target=all", nil)
+		req := httptest.NewRequest(http.MethodGet, "/api/category/product?category=all&target=all", nil)
 		rr := httptest.NewRecorder()
 
 		h.ListByCategory(rr, req)
@@ -187,7 +184,7 @@ func TestProductListByCategory(t *testing.T) {
 		if !uc.listByCategoryCalled {
 			t.Fatalf("usecase should be called")
 		}
-		if uc.listByCategoryReq.mode != "active" || uc.listByCategoryReq.category != "all" || uc.listByCategoryReq.target != "all" {
+		if uc.listByCategoryReq.category != "all" || uc.listByCategoryReq.target != "all" {
 			t.Fatalf("unexpected query args: %+v", uc.listByCategoryReq)
 		}
 

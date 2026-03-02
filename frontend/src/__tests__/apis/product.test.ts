@@ -18,7 +18,6 @@ describe('product API', () => {
         it('正常にカテゴリごとの商品リストを取得する', async () => {
             const result = await getProductsByCategory({
                 category: 'all',
-                mode: 'all',
                 target: 'all',
             })
 
@@ -35,13 +34,11 @@ describe('product API', () => {
         it('パラメータを変更しても同じデータが返される（検索機能なし）', async () => {
             const result1 = await getProductsByCategory({
                 category: 'all',
-                mode: 'all',
                 target: 'all',
             })
 
             const result2 = await getProductsByCategory({
                 category: 'earrings',
-                mode: 'active',
                 target: 'women',
             })
 
@@ -59,7 +56,6 @@ describe('product API', () => {
             await expect(
                 getProductsByCategory({
                     category: 'all',
-                    mode: 'all',
                     target: 'all',
                 }),
             ).rejects.toThrow(ApiError)
@@ -75,7 +71,6 @@ describe('product API', () => {
             await expect(
                 getProductsByCategory({
                     category: 'all',
-                    mode: 'all',
                     target: 'all',
                 }),
             ).rejects.toThrow('カテゴリーごとの商品リストの取得に失敗しました')
@@ -93,14 +88,13 @@ describe('product API', () => {
 
             await getProductsByCategory({
                 category: 'earrings',
-                mode: 'active',
                 target: 'women',
             })
 
             expect(capturedRequest).toBeDefined()
             const url = new URL(capturedRequest!.url)
             expect(url.searchParams.get('category')).toBe('earrings')
-            expect(url.searchParams.get('mode')).toBe('active')
+            expect(url.searchParams.get('mode')).toBeNull()
             expect(url.searchParams.get('target')).toBe('women')
         })
     })
