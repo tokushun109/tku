@@ -14,6 +14,12 @@ describe('Image', () => {
         expect(screen.getByAltText('sample')).toHaveAttribute('src', 'https://example.com/product.png')
     })
 
+    it('srcの前後の空白を取り除いて描画する', () => {
+        render(<Image alt="trimmed" src="  https://example.com/trimmed.png  " />)
+
+        expect(screen.getByAltText('trimmed')).toHaveAttribute('src', 'https://example.com/trimmed.png')
+    })
+
     it('priority指定時はNextImageへpriorityを渡してlazy loadを外す', () => {
         render(<Image alt="priority" priority src="https://example.com/priority.png" />)
 

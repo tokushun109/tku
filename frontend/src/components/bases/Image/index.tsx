@@ -13,14 +13,15 @@ export const Image = ({ src, alt, priority = false }: Props) => {
     const [isLoading, setIsLoading] = useState<boolean>(true)
     const [hasError, setHasError] = useState<boolean>(false)
     const containerRef = useRef<HTMLDivElement>(null)
+    const normalizedSrc = src.trim()
 
     // srcが変わったら状態を初期化
     useEffect(() => {
         setHasError(false)
-        setIsLoading(src !== '')
-    }, [src])
+        setIsLoading(normalizedSrc !== '')
+    }, [normalizedSrc])
 
-    const shouldRenderImage = src !== '' && !hasError
+    const shouldRenderImage = normalizedSrc !== '' && !hasError
 
     useEffect(() => {
         if (!shouldRenderImage) {
@@ -40,7 +41,7 @@ export const Image = ({ src, alt, priority = false }: Props) => {
 
         setHasError(true)
         setIsLoading(false)
-    }, [shouldRenderImage, src])
+    }, [shouldRenderImage, normalizedSrc])
 
     return (
         <div className={styles['container']} ref={containerRef}>
@@ -59,7 +60,7 @@ export const Image = ({ src, alt, priority = false }: Props) => {
                     }}
                     priority={priority}
                     sizes="100%"
-                    src={src}
+                    src={normalizedSrc}
                     style={{ opacity: isLoading ? 0 : 1 }}
                 />
             )}
