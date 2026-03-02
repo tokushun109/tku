@@ -17,12 +17,13 @@ type Usecase interface {
 }
 
 type Service struct {
-	repo    domain.Repository
-	uuidGen usecase.UUIDGenerator
+	repo      domain.Repository
+	uuidGen   usecase.UUIDGenerator
+	txManager usecase.TxManager
 }
 
-func New(repo domain.Repository, uuidGen usecase.UUIDGenerator) *Service {
-	return &Service{repo: repo, uuidGen: uuidGen}
+func New(repo domain.Repository, uuidGen usecase.UUIDGenerator, txManager usecase.TxManager) *Service {
+	return &Service{repo: repo, uuidGen: uuidGen, txManager: txManager}
 }
 
 func (s *Service) List(ctx context.Context) ([]*domain.Tag, error) {
@@ -53,6 +54,9 @@ func (s *Service) Create(ctx context.Context, name string) error {
 	}
 
 	if _, err := s.repo.Create(ctx, t); err != nil {
+		if errors.Is(err, domain.ErrNameDuplicated) {
+			return usecase.NewAppErrorWithMessage(usecase.ErrConflict, domain.ErrNameDuplicated.Error())
+		}
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 	return nil
@@ -95,6 +99,9 @@ func (s *Service) Update(ctx context.Context, uuidStr string, name string) error
 
 	updated, err := s.repo.Update(ctx, current)
 	if err != nil {
+		if errors.Is(err, domain.ErrNameDuplicated) {
+			return usecase.NewAppErrorWithMessage(usecase.ErrConflict, domain.ErrNameDuplicated.Error())
+		}
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 	if !updated {
@@ -109,8 +116,12 @@ func (s *Service) Delete(ctx context.Context, uuidStr string) error {
 		return usecase.NewAppError(usecase.ErrInvalidInput)
 	}
 
-	deleted, err := s.repo.Delete(ctx, uuid)
-	if err != nil {
+	var deleted bool
+	if err := s.txManager.WithinTransaction(ctx, func(txCtx context.Context) error {
+		var err error
+		deleted, err = s.repo.Delete(txCtx, uuid)
+		return err
+	}); err != nil {
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 	if !deleted {

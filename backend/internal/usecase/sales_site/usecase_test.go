@@ -18,6 +18,7 @@ type stubRepo struct {
 	findAllErr error
 	createErr  error
 	created    *domain.SalesSite
+	findByName *domain.SalesSite
 	findByUUID *domain.SalesSite
 	findByErr  error
 	updateOK   bool
@@ -32,6 +33,12 @@ type stubUUIDGen struct {
 
 func (g *stubUUIDGen) New() string {
 	return g.uuid
+}
+
+type stubTxManager struct{}
+
+func (s *stubTxManager) WithinTransaction(ctx context.Context, fn func(ctx context.Context) error) error {
+	return fn(ctx)
 }
 
 func (s *stubRepo) Create(ctx context.Context, salesSite *domain.SalesSite) (*domain.SalesSite, error) {
@@ -53,7 +60,7 @@ func (s *stubRepo) FindByName(ctx context.Context, name domain.SalesSiteName) (*
 	if s.findByErr != nil {
 		return nil, s.findByErr
 	}
-	return s.findByUUID, nil
+	return s.findByName, nil
 }
 
 func (s *stubRepo) FindByUUID(ctx context.Context, uuid primitive.UUID) (*domain.SalesSite, error) {
@@ -82,7 +89,7 @@ func TestListSalesSites(t *testing.T) {
 
 		s := mustSalesSite(testUUID, "Creema", "https://www.creema.jp")
 		repo := &stubRepo{findAll: []*domain.SalesSite{s}}
-		uc := New(repo, &stubUUIDGen{uuid: testUUID})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID}, &stubTxManager{})
 
 		res, err := uc.List(context.Background())
 		if err != nil {
@@ -95,7 +102,7 @@ func TestListSalesSites(t *testing.T) {
 	t.Run("リポジトリでエラーが発生したなら内部エラーを返す", func(t *testing.T) {
 
 		repo := &stubRepo{findAllErr: errors.New("db error")}
-		uc := New(repo, &stubUUIDGen{uuid: testUUID})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID}, &stubTxManager{})
 
 		_, err := uc.List(context.Background())
 		if err == nil || !errors.Is(err, usecase.ErrInternal) {
@@ -108,7 +115,7 @@ func TestCreateSalesSite(t *testing.T) {
 	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
 
 		repo := &stubRepo{}
-		uc := New(repo, &stubUUIDGen{uuid: testUUID})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID}, &stubTxManager{})
 
 		if err := uc.Create(context.Background(), "Creema", "https://www.creema.jp"); err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -123,7 +130,7 @@ func TestCreateSalesSite(t *testing.T) {
 	t.Run("名前が不正なときバリデーションエラーで失敗する", func(t *testing.T) {
 
 		repo := &stubRepo{}
-		uc := New(repo, &stubUUIDGen{uuid: testUUID})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID}, &stubTxManager{})
 
 		err := uc.Create(context.Background(), "", "https://www.creema.jp")
 		if err == nil {
@@ -136,7 +143,7 @@ func TestCreateSalesSite(t *testing.T) {
 	t.Run("URLが不正なときバリデーションエラーで失敗する", func(t *testing.T) {
 
 		repo := &stubRepo{}
-		uc := New(repo, &stubUUIDGen{uuid: testUUID})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID}, &stubTxManager{})
 
 		err := uc.Create(context.Background(), "Creema", "not-url")
 		if err == nil {
@@ -149,7 +156,7 @@ func TestCreateSalesSite(t *testing.T) {
 	t.Run("作成処理でエラーが発生したなら内部エラーを返す", func(t *testing.T) {
 
 		repo := &stubRepo{createErr: errors.New("db error")}
-		uc := New(repo, &stubUUIDGen{uuid: testUUID})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID}, &stubTxManager{})
 
 		err := uc.Create(context.Background(), "Creema", "https://www.creema.jp")
 		if err == nil {
@@ -168,7 +175,7 @@ func TestUpdateSalesSite(t *testing.T) {
 			findByUUID: mustSalesSite(testUUID, "old", "https://old.example.com"),
 			updateOK:   true,
 		}
-		uc := New(repo, &stubUUIDGen{uuid: testUUID})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID}, &stubTxManager{})
 
 		if err := uc.Update(context.Background(), testUUID, "new", "https://new.example.com"); err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -177,7 +184,7 @@ func TestUpdateSalesSite(t *testing.T) {
 	t.Run("UUIDが不正なときバリデーションエラーで失敗する", func(t *testing.T) {
 
 		repo := &stubRepo{}
-		uc := New(repo, &stubUUIDGen{uuid: testUUID})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID}, &stubTxManager{})
 
 		err := uc.Update(context.Background(), "bad-uuid", "new", "https://new.example.com")
 		if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
@@ -187,7 +194,7 @@ func TestUpdateSalesSite(t *testing.T) {
 	t.Run("名前が不正なときバリデーションエラーで失敗する", func(t *testing.T) {
 
 		repo := &stubRepo{findByUUID: mustSalesSite(testUUID, "old", "https://old.example.com")}
-		uc := New(repo, &stubUUIDGen{uuid: testUUID})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID}, &stubTxManager{})
 
 		err := uc.Update(context.Background(), testUUID, "", "https://new.example.com")
 		if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
@@ -197,7 +204,7 @@ func TestUpdateSalesSite(t *testing.T) {
 	t.Run("URLが不正なときバリデーションエラーで失敗する", func(t *testing.T) {
 
 		repo := &stubRepo{findByUUID: mustSalesSite(testUUID, "old", "https://old.example.com")}
-		uc := New(repo, &stubUUIDGen{uuid: testUUID})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID}, &stubTxManager{})
 
 		err := uc.Update(context.Background(), testUUID, "new", "not-url")
 		if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
@@ -207,7 +214,7 @@ func TestUpdateSalesSite(t *testing.T) {
 	t.Run("対象が見つからないならNotFoundエラーを返す", func(t *testing.T) {
 
 		repo := &stubRepo{findByUUID: nil}
-		uc := New(repo, &stubUUIDGen{uuid: testUUID})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID}, &stubTxManager{})
 
 		err := uc.Update(context.Background(), testUUID, "new", "https://new.example.com")
 		if err == nil || !errors.Is(err, usecase.ErrNotFound) {
@@ -220,7 +227,7 @@ func TestUpdateSalesSite(t *testing.T) {
 			findByUUID: mustSalesSite(testUUID, "old", "https://old.example.com"),
 			updateErr:  errors.New("db error"),
 		}
-		uc := New(repo, &stubUUIDGen{uuid: testUUID})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID}, &stubTxManager{})
 
 		err := uc.Update(context.Background(), testUUID, "new", "https://new.example.com")
 		if err == nil || !errors.Is(err, usecase.ErrInternal) {
@@ -233,7 +240,7 @@ func TestDeleteSalesSite(t *testing.T) {
 	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
 
 		repo := &stubRepo{deleteOK: true}
-		uc := New(repo, &stubUUIDGen{uuid: testUUID})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID}, &stubTxManager{})
 
 		if err := uc.Delete(context.Background(), testUUID); err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -242,7 +249,7 @@ func TestDeleteSalesSite(t *testing.T) {
 	t.Run("UUIDが不正なときバリデーションエラーで失敗する", func(t *testing.T) {
 
 		repo := &stubRepo{}
-		uc := New(repo, &stubUUIDGen{uuid: testUUID})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID}, &stubTxManager{})
 
 		err := uc.Delete(context.Background(), "bad-uuid")
 		if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
@@ -252,7 +259,7 @@ func TestDeleteSalesSite(t *testing.T) {
 	t.Run("対象が見つからないならNotFoundエラーを返す", func(t *testing.T) {
 
 		repo := &stubRepo{deleteOK: false}
-		uc := New(repo, &stubUUIDGen{uuid: testUUID})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID}, &stubTxManager{})
 
 		err := uc.Delete(context.Background(), testUUID)
 		if err == nil || !errors.Is(err, usecase.ErrNotFound) {
@@ -262,7 +269,7 @@ func TestDeleteSalesSite(t *testing.T) {
 	t.Run("リポジトリでエラーが発生したなら内部エラーを返す", func(t *testing.T) {
 
 		repo := &stubRepo{deleteErr: errors.New("db error")}
-		uc := New(repo, &stubUUIDGen{uuid: testUUID})
+		uc := New(repo, &stubUUIDGen{uuid: testUUID}, &stubTxManager{})
 
 		err := uc.Delete(context.Background(), testUUID)
 		if err == nil || !errors.Is(err, usecase.ErrInternal) {

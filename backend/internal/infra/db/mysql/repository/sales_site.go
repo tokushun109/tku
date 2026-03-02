@@ -26,6 +26,9 @@ func (r *SalesSiteRepository) Create(ctx context.Context, s *domain.SalesSite) (
 		s.UUID().Value(), s.Name().Value(), s.URL().Value(),
 	)
 	if err != nil {
+		if isDuplicateEntryError(err) {
+			return nil, domain.ErrNameDuplicated
+		}
 		return nil, err
 	}
 
@@ -71,7 +74,7 @@ func (r *SalesSiteRepository) FindByName(ctx context.Context, name domain.SalesS
 		URL  string `db:"url"`
 	}
 	var rrow row
-	if err := getExecutor(ctx, r.db).GetContext(ctx, &rrow, `SELECT id, uuid, name, url FROM sales_site WHERE name = ? AND deleted_at IS NULL`, name.Value()); err != nil {
+	if err := getExecutor(ctx, r.db).GetContext(ctx, &rrow, `SELECT id, uuid, name, url FROM sales_site WHERE active_name = ? LIMIT 1`, name.Value()); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
@@ -106,6 +109,9 @@ func (r *SalesSiteRepository) Update(ctx context.Context, s *domain.SalesSite) (
 		s.UUID().Value(),
 	)
 	if err != nil {
+		if isDuplicateEntryError(err) {
+			return false, domain.ErrNameDuplicated
+		}
 		return false, err
 	}
 	affected, err := res.RowsAffected()
@@ -116,15 +122,9 @@ func (r *SalesSiteRepository) Update(ctx context.Context, s *domain.SalesSite) (
 }
 
 func (r *SalesSiteRepository) Delete(ctx context.Context, uuid primitive.UUID) (bool, error) {
-	tx, err := r.db.BeginTxx(ctx, nil)
-	if err != nil {
-		return false, err
-	}
-	defer func() {
-		_ = tx.Rollback()
-	}()
+	executor := getExecutor(ctx, r.db)
 
-	if _, err := tx.ExecContext(
+	if _, err := executor.ExecContext(
 		ctx,
 		`DELETE FROM site_detail
 		 WHERE sales_site_uuid = ?`,
@@ -133,15 +133,12 @@ func (r *SalesSiteRepository) Delete(ctx context.Context, uuid primitive.UUID) (
 		return false, err
 	}
 
-	res, err := tx.ExecContext(ctx, `UPDATE sales_site SET deleted_at = UTC_TIMESTAMP(), updated_at = UTC_TIMESTAMP() WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value())
+	res, err := executor.ExecContext(ctx, `UPDATE sales_site SET deleted_at = UTC_TIMESTAMP(), updated_at = UTC_TIMESTAMP() WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value())
 	if err != nil {
 		return false, err
 	}
 	affected, err := res.RowsAffected()
 	if err != nil {
-		return false, err
-	}
-	if err := tx.Commit(); err != nil {
 		return false, err
 	}
 	return affected > 0, nil

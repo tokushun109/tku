@@ -25,6 +25,9 @@ func (r *TargetRepository) Create(ctx context.Context, t *domain.Target) (*domai
 		t.UUID().Value(), t.Name().Value(),
 	)
 	if err != nil {
+		if isDuplicateEntryError(err) {
+			return nil, domain.ErrNameDuplicated
+		}
 		return nil, err
 	}
 
@@ -114,7 +117,7 @@ func (r *TargetRepository) FindByName(ctx context.Context, name domain.TargetNam
 	if err := getExecutor(ctx, r.db).GetContext(
 		ctx,
 		&rrow,
-		`SELECT id, uuid, name FROM target WHERE name = ? AND deleted_at IS NULL LIMIT 1`,
+		`SELECT id, uuid, name FROM target WHERE active_name = ? LIMIT 1`,
 		name.Value(),
 	); err != nil {
 		if err == sql.ErrNoRows {
@@ -128,7 +131,7 @@ func (r *TargetRepository) FindByName(ctx context.Context, name domain.TargetNam
 
 func (r *TargetRepository) ExistsByName(ctx context.Context, name domain.TargetName) (bool, error) {
 	var count int64
-	if err := getExecutor(ctx, r.db).GetContext(ctx, &count, `SELECT COUNT(1) FROM target WHERE name = ? AND deleted_at IS NULL`, name.Value()); err != nil {
+	if err := getExecutor(ctx, r.db).GetContext(ctx, &count, `SELECT COUNT(1) FROM target WHERE active_name = ?`, name.Value()); err != nil {
 		return false, err
 	}
 	return count > 0, nil
@@ -142,6 +145,9 @@ func (r *TargetRepository) Update(ctx context.Context, t *domain.Target) (bool, 
 		t.UUID().Value(),
 	)
 	if err != nil {
+		if isDuplicateEntryError(err) {
+			return false, domain.ErrNameDuplicated
+		}
 		return false, err
 	}
 	affected, err := res.RowsAffected()
@@ -152,15 +158,9 @@ func (r *TargetRepository) Update(ctx context.Context, t *domain.Target) (bool, 
 }
 
 func (r *TargetRepository) Delete(ctx context.Context, uuid primitive.UUID) (bool, error) {
-	tx, err := r.db.BeginTxx(ctx, nil)
-	if err != nil {
-		return false, err
-	}
-	defer func() {
-		_ = tx.Rollback()
-	}()
+	executor := getExecutor(ctx, r.db)
 
-	if _, err := tx.ExecContext(
+	if _, err := executor.ExecContext(
 		ctx,
 		`UPDATE product
 			 SET target_uuid = NULL
@@ -170,15 +170,12 @@ func (r *TargetRepository) Delete(ctx context.Context, uuid primitive.UUID) (boo
 		return false, err
 	}
 
-	res, err := tx.ExecContext(ctx, `UPDATE target SET deleted_at = UTC_TIMESTAMP(), updated_at = UTC_TIMESTAMP() WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value())
+	res, err := executor.ExecContext(ctx, `UPDATE target SET deleted_at = UTC_TIMESTAMP(), updated_at = UTC_TIMESTAMP() WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value())
 	if err != nil {
 		return false, err
 	}
 	affected, err := res.RowsAffected()
 	if err != nil {
-		return false, err
-	}
-	if err := tx.Commit(); err != nil {
 		return false, err
 	}
 	return affected > 0, nil

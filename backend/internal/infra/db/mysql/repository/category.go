@@ -25,6 +25,9 @@ func (r *CategoryRepository) Create(ctx context.Context, c *domain.Category) (*d
 		c.UUID().Value(), c.Name().Value(),
 	)
 	if err != nil {
+		if isDuplicateEntryError(err) {
+			return nil, domain.ErrNameDuplicated
+		}
 		return nil, err
 	}
 
@@ -114,7 +117,7 @@ func (r *CategoryRepository) FindByName(ctx context.Context, name domain.Categor
 	if err := getExecutor(ctx, r.db).GetContext(
 		ctx,
 		&rrow,
-		`SELECT id, uuid, name FROM category WHERE name = ? AND deleted_at IS NULL LIMIT 1`,
+		`SELECT id, uuid, name FROM category WHERE active_name = ? LIMIT 1`,
 		name.Value(),
 	); err != nil {
 		if err == sql.ErrNoRows {
@@ -128,7 +131,7 @@ func (r *CategoryRepository) FindByName(ctx context.Context, name domain.Categor
 
 func (r *CategoryRepository) ExistsByName(ctx context.Context, name domain.CategoryName) (bool, error) {
 	var count int64
-	if err := getExecutor(ctx, r.db).GetContext(ctx, &count, `SELECT COUNT(1) FROM category WHERE name = ? AND deleted_at IS NULL`, name.Value()); err != nil {
+	if err := getExecutor(ctx, r.db).GetContext(ctx, &count, `SELECT COUNT(1) FROM category WHERE active_name = ?`, name.Value()); err != nil {
 		return false, err
 	}
 	return count > 0, nil
@@ -142,6 +145,9 @@ func (r *CategoryRepository) Update(ctx context.Context, c *domain.Category) (bo
 		c.UUID().Value(),
 	)
 	if err != nil {
+		if isDuplicateEntryError(err) {
+			return false, domain.ErrNameDuplicated
+		}
 		return false, err
 	}
 	affected, err := res.RowsAffected()
@@ -152,15 +158,9 @@ func (r *CategoryRepository) Update(ctx context.Context, c *domain.Category) (bo
 }
 
 func (r *CategoryRepository) Delete(ctx context.Context, uuid primitive.UUID) (bool, error) {
-	tx, err := r.db.BeginTxx(ctx, nil)
-	if err != nil {
-		return false, err
-	}
-	defer func() {
-		_ = tx.Rollback()
-	}()
+	executor := getExecutor(ctx, r.db)
 
-	if _, err := tx.ExecContext(
+	if _, err := executor.ExecContext(
 		ctx,
 		`UPDATE product
 			 SET category_uuid = NULL
@@ -170,15 +170,12 @@ func (r *CategoryRepository) Delete(ctx context.Context, uuid primitive.UUID) (b
 		return false, err
 	}
 
-	res, err := tx.ExecContext(ctx, `UPDATE category SET deleted_at = UTC_TIMESTAMP(), updated_at = UTC_TIMESTAMP() WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value())
+	res, err := executor.ExecContext(ctx, `UPDATE category SET deleted_at = UTC_TIMESTAMP(), updated_at = UTC_TIMESTAMP() WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value())
 	if err != nil {
 		return false, err
 	}
 	affected, err := res.RowsAffected()
 	if err != nil {
-		return false, err
-	}
-	if err := tx.Commit(); err != nil {
 		return false, err
 	}
 	return affected > 0, nil

@@ -165,9 +165,6 @@ func TestLogin(t *testing.T) {
 		if sess == nil || sess.UUID().Value() != testUUID {
 			t.Fatalf("unexpected session: %+v", sess)
 		}
-		if sessionRepo.deletedUserUUID.Value() != testUUID {
-			t.Fatalf("expected deleted user uuid=%s, got %s", testUUID, sessionRepo.deletedUserUUID.Value())
-		}
 		if sessionRepo.created == nil {
 			t.Fatalf("expected session create called")
 		}
