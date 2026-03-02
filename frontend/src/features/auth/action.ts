@@ -1,6 +1,7 @@
 'use server'
 
 import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
 
 import { getCurrentUser, login, logout } from '@/apis/auth'
 
@@ -72,6 +73,8 @@ export async function logoutAction(): Promise<void> {
         const cookieStore = await cookies()
         cookieStore.delete('__sess__')
     }
+
+    redirect('/admin/login')
 }
 
 // 管理者セッションチェック用のServer Action
