@@ -1,42 +1,68 @@
 import NextImage from 'next/image'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import styles from './styles.module.scss'
 
 type Props = {
     alt: string
+    priority?: boolean
     src: string
 }
 
-export const Image = ({ src, alt }: Props) => {
+export const Image = ({ src, alt, priority = false }: Props) => {
     const [isLoading, setIsLoading] = useState<boolean>(true)
-    const [displaySrc, setDisplaySrc] = useState<string>(src)
+    const [hasError, setHasError] = useState<boolean>(false)
+    const containerRef = useRef<HTMLDivElement>(null)
 
-    // srcが変わったらdisplaySrcも更新
+    // srcが変わったら状態を初期化
     useEffect(() => {
-        setDisplaySrc(src)
-        setIsLoading(true)
+        setHasError(false)
+        setIsLoading(src !== '')
     }, [src])
 
-    // 一時的にローカルの画像APIではグレースケール画像を表示
-    const isLocalApi = process.env.NODE_ENV === 'development' && src.includes('http://minio')
+    const shouldRenderImage = src !== '' && !hasError
+
+    useEffect(() => {
+        if (!shouldRenderImage) {
+            return
+        }
+
+        const imageElement = containerRef.current?.querySelector('img')
+
+        if (!imageElement || !imageElement.complete) {
+            return
+        }
+
+        if (imageElement.naturalWidth > 0) {
+            setIsLoading(false)
+            return
+        }
+
+        setHasError(true)
+        setIsLoading(false)
+    }, [shouldRenderImage, src])
 
     return (
-        <div className={styles['container']}>
-            <NextImage
-                alt={alt}
-                className={styles['image']}
-                fill
-                loading="lazy"
-                onError={() => {
-                    setDisplaySrc('/image/gray-image.png')
-                }}
-                onLoad={() => {
-                    setIsLoading(false)
-                }}
-                sizes="100%"
-                src={isLocalApi || isLoading ? '/image/gray-image.png' : displaySrc}
-            />
+        <div className={styles['container']} ref={containerRef}>
+            {shouldRenderImage && (
+                <NextImage
+                    alt={alt}
+                    className={styles['image']}
+                    fill
+                    loading={priority ? undefined : 'lazy'}
+                    onError={() => {
+                        setHasError(true)
+                        setIsLoading(false)
+                    }}
+                    onLoad={() => {
+                        setIsLoading(false)
+                    }}
+                    priority={priority}
+                    sizes="100%"
+                    src={src}
+                    style={{ opacity: isLoading ? 0 : 1 }}
+                />
+            )}
         </div>
     )
 }
