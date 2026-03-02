@@ -66,7 +66,7 @@ func newUsecases(repos *repositories, qrs *queries, cfg *config.Config, txManage
 	if err := requireNonNil("clock", clock); err != nil {
 		return nil, err
 	}
-	passwordHasher := cryptoInfra.NewPasswordHasherSHA1()
+	passwordHasher := cryptoInfra.NewPasswordHasherBcrypt()
 	if err := requireNonNil("passwordHasher", passwordHasher); err != nil {
 		return nil, err
 	}
