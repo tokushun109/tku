@@ -1,8 +1,8 @@
 import { http, HttpResponse } from 'msw'
-import { describe, it, expect, beforeEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getApiBaseUrl } from '@/apis/baseUrl'
-import { getProductsByCategory, getProduct, getCarouselImages } from '@/apis/product'
+import { getCarouselImages, getProduct, getProducts, getProductsByCategory } from '@/apis/product'
 import { ApiError } from '@/utils/error'
 
 import { server } from '../mocks/server'
@@ -14,11 +14,14 @@ describe('product API', () => {
         server.resetHandlers()
     })
 
+    afterEach(() => {
+        vi.restoreAllMocks()
+    })
+
     describe('getProductsByCategory', () => {
         it('正常にカテゴリごとの商品リストを取得する', async () => {
             const result = await getProductsByCategory({
                 category: 'all',
-                mode: 'all',
                 target: 'all',
             })
 
@@ -35,13 +38,11 @@ describe('product API', () => {
         it('パラメータを変更しても同じデータが返される（検索機能なし）', async () => {
             const result1 = await getProductsByCategory({
                 category: 'all',
-                mode: 'all',
                 target: 'all',
             })
 
             const result2 = await getProductsByCategory({
                 category: 'earrings',
-                mode: 'active',
                 target: 'women',
             })
 
@@ -59,7 +60,6 @@ describe('product API', () => {
             await expect(
                 getProductsByCategory({
                     category: 'all',
-                    mode: 'all',
                     target: 'all',
                 }),
             ).rejects.toThrow(ApiError)
@@ -75,7 +75,6 @@ describe('product API', () => {
             await expect(
                 getProductsByCategory({
                     category: 'all',
-                    mode: 'all',
                     target: 'all',
                 }),
             ).rejects.toThrow('カテゴリーごとの商品リストの取得に失敗しました')
@@ -93,14 +92,13 @@ describe('product API', () => {
 
             await getProductsByCategory({
                 category: 'earrings',
-                mode: 'active',
                 target: 'women',
             })
 
             expect(capturedRequest).toBeDefined()
             const url = new URL(capturedRequest!.url)
             expect(url.searchParams.get('category')).toBe('earrings')
-            expect(url.searchParams.get('mode')).toBe('active')
+            expect(url.searchParams.get('mode')).toBeNull()
             expect(url.searchParams.get('target')).toBe('women')
         })
     })
@@ -230,6 +228,34 @@ describe('product API', () => {
             await getProduct('specific-uuid-123')
 
             expect(capturedUuid).toBe('specific-uuid-123')
+        })
+    })
+
+    describe('getProducts', () => {
+        it('管理画面用一覧取得はCookie付きでリクエストする', async () => {
+            const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+                new Response(JSON.stringify([]), {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    status: 200,
+                }),
+            )
+
+            const result = await getProducts({
+                category: 'all',
+                mode: 'all',
+                target: 'all',
+            })
+
+            const [requestUrl, requestInit] = fetchSpy.mock.calls[0]
+            const url = new URL(requestUrl as string)
+
+            expect(url.searchParams.get('category')).toBe('all')
+            expect(url.searchParams.get('mode')).toBe('all')
+            expect(url.searchParams.get('target')).toBe('all')
+            expect(requestInit?.credentials).toBe('include')
+            expect(result).toEqual([])
         })
     })
 

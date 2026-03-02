@@ -9,7 +9,6 @@ type ListProductsQuery struct {
 }
 
 type ListCategoryProductsQuery struct {
-	Mode     string
 	Category string
 	Target   string
 }

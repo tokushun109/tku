@@ -243,10 +243,10 @@ func TestListCarousel(t *testing.T) {
 }
 
 func TestListProductsByCategory(t *testing.T) {
-	t.Run("modeが不正なときバリデーションエラーで失敗する", func(t *testing.T) {
+	t.Run("categoryまたはtargetが不正なときバリデーションエラーで失敗する", func(t *testing.T) {
 		s := &Service{}
 
-		_, err := s.ListByCategory(context.Background(), "invalid", "all", "all")
+		_, err := s.ListByCategory(context.Background(), "", "all")
 		if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
 			t.Fatalf("expected ErrInvalidInput, got %v", err)
 		}
@@ -259,7 +259,7 @@ func TestListProductsByCategory(t *testing.T) {
 			},
 		}
 
-		_, err := s.ListByCategory(context.Background(), "all", id.GenerateUUID(), "all")
+		_, err := s.ListByCategory(context.Background(), id.GenerateUUID(), "all")
 		if err == nil || !errors.Is(err, usecase.ErrNotFound) {
 			t.Fatalf("expected ErrNotFound, got %v", err)
 		}
@@ -272,7 +272,7 @@ func TestListProductsByCategory(t *testing.T) {
 			},
 		}
 
-		_, err := s.ListByCategory(context.Background(), "all", "all", "all")
+		_, err := s.ListByCategory(context.Background(), "all", "all")
 		if err == nil || !errors.Is(err, usecase.ErrInternal) {
 			t.Fatalf("expected ErrInternal, got %v", err)
 		}
@@ -298,7 +298,7 @@ func TestListProductsByCategory(t *testing.T) {
 			storage: &stubStorage{presignErr: errors.New("s3 error")},
 		}
 
-		_, err := s.ListByCategory(context.Background(), "all", "all", "all")
+		_, err := s.ListByCategory(context.Background(), "all", "all")
 		if err == nil || !errors.Is(err, usecase.ErrInternal) {
 			t.Fatalf("expected ErrInternal, got %v", err)
 		}
@@ -328,7 +328,7 @@ func TestListProductsByCategory(t *testing.T) {
 			storage: &stubStorage{presignURL: "https://signed.example.com/path"},
 		}
 
-		categoryProducts, err := s.ListByCategory(context.Background(), "active", "all", "all")
+		categoryProducts, err := s.ListByCategory(context.Background(), "all", "all")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}

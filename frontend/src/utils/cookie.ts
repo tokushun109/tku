@@ -24,18 +24,26 @@ export const getCookieHeaderForAPI = async (): Promise<string | undefined> => {
 }
 
 /**
- * Server ComponentsでのAPI fetchリクエスト用のheadersオブジェクトを作成する
- * Cookieヘッダーを自動的に含める
+ * API fetchリクエスト用のheadersオブジェクトを作成する
+ * Server ComponentsではCookieヘッダーを自動的に含める
  *
  * @param additionalHeaders - 追加のヘッダー
  * @returns fetch用のheadersオブジェクト
  */
 export const createAPIHeaders = async (additionalHeaders: Record<string, string> = {}): Promise<Record<string, string>> => {
+    const baseHeaders = {
+        'Content-Type': 'application/json',
+        ...additionalHeaders,
+    }
+
+    if (typeof window !== 'undefined') {
+        return baseHeaders
+    }
+
     const cookieHeader = await getCookieHeaderForAPI()
 
     return {
-        'Content-Type': 'application/json',
-        ...additionalHeaders,
+        ...baseHeaders,
         ...(cookieHeader && { Cookie: cookieHeader }),
     }
 }

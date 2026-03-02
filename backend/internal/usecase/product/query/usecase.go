@@ -20,7 +20,7 @@ const (
 
 type Usecase interface {
 	List(ctx context.Context, mode string, category string, target string) ([]*Product, error)
-	ListByCategory(ctx context.Context, mode string, category string, target string) ([]*CategoryProducts, error)
+	ListByCategory(ctx context.Context, category string, target string) ([]*CategoryProducts, error)
 	ListCarousel(ctx context.Context) ([]*CarouselItem, error)
 	Get(ctx context.Context, productUUID string) (*Product, error)
 	ExportCSV(ctx context.Context) ([]*ProductCSVRow, error)
@@ -61,16 +61,15 @@ func (s *Service) List(ctx context.Context, mode string, category string, target
 	return products, nil
 }
 
-func (s *Service) ListByCategory(ctx context.Context, mode string, category string, target string) ([]*CategoryProducts, error) {
+func (s *Service) ListByCategory(ctx context.Context, category string, target string) ([]*CategoryProducts, error) {
 	trimmedCategory := strings.TrimSpace(category)
 	trimmedTarget := strings.TrimSpace(target)
 
-	if !isValidListMode(mode) || trimmedCategory == "" || trimmedTarget == "" {
+	if trimmedCategory == "" || trimmedTarget == "" {
 		return nil, usecase.NewAppError(usecase.ErrInvalidInput)
 	}
 
 	categoryProducts, err := s.queryReader.ListCategoryProducts(ctx, ListCategoryProductsQuery{
-		Mode:     mode,
 		Category: trimmedCategory,
 		Target:   trimmedTarget,
 	})

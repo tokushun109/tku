@@ -11,17 +11,27 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/gorilla/mux"
 	"github.com/tokushun109/tku/backend/internal/domain/primitive"
+	"github.com/tokushun109/tku/backend/internal/interface/http/middleware"
 	usecaseProduct "github.com/tokushun109/tku/backend/internal/usecase/product"
 	usecaseProductQuery "github.com/tokushun109/tku/backend/internal/usecase/product/query"
 )
 
 type stubProductUC struct {
+	listErr    error
+	listRes    []*usecaseProductQuery.Product
+	listCalled bool
+	listReq    struct {
+		mode     string
+		category string
+		target   string
+	}
+
 	listByCategoryErr    error
 	listByCategoryRes    []*usecaseProductQuery.CategoryProducts
 	listByCategoryCalled bool
 	listByCategoryReq    struct {
-		mode     string
 		category string
 		target   string
 	}
@@ -29,6 +39,11 @@ type stubProductUC struct {
 	listCarouselErr    error
 	listCarouselRes    []*usecaseProductQuery.CarouselItem
 	listCarouselCalled bool
+
+	getErr    error
+	getRes    *usecaseProductQuery.Product
+	getCalled bool
+	getReq    string
 
 	createErr       error
 	createRes       primitive.UUID
@@ -55,17 +70,22 @@ type stubProductUC struct {
 }
 
 func (s *stubProductUC) List(ctx context.Context, mode string, category string, target string) ([]*usecaseProductQuery.Product, error) {
-	return nil, nil
+	s.listCalled = true
+	s.listReq.mode = mode
+	s.listReq.category = category
+	s.listReq.target = target
+	if s.listErr != nil {
+		return nil, s.listErr
+	}
+	return s.listRes, nil
 }
 
 func (s *stubProductUC) ListByCategory(
 	ctx context.Context,
-	mode string,
 	category string,
 	target string,
 ) ([]*usecaseProductQuery.CategoryProducts, error) {
 	s.listByCategoryCalled = true
-	s.listByCategoryReq.mode = mode
 	s.listByCategoryReq.category = category
 	s.listByCategoryReq.target = target
 	if s.listByCategoryErr != nil {
@@ -83,7 +103,12 @@ func (s *stubProductUC) ListCarousel(ctx context.Context) ([]*usecaseProductQuer
 }
 
 func (s *stubProductUC) Get(ctx context.Context, productUUID string) (*usecaseProductQuery.Product, error) {
-	return nil, nil
+	s.getCalled = true
+	s.getReq = productUUID
+	if s.getErr != nil {
+		return nil, s.getErr
+	}
+	return s.getRes, nil
 }
 
 func (s *stubProductUC) Create(ctx context.Context, input usecaseProduct.CreateProductInput) (primitive.UUID, error) {
@@ -149,7 +174,7 @@ func TestProductListByCategory(t *testing.T) {
 		uc := &stubProductUC{}
 		h := NewProductHandler(uc)
 
-		req := httptest.NewRequest(http.MethodGet, "/api/category/product?mode=invalid&category=all&target=all", nil)
+		req := httptest.NewRequest(http.MethodGet, "/api/category/product?category=all", nil)
 		rr := httptest.NewRecorder()
 
 		h.ListByCategory(rr, req)
@@ -176,7 +201,7 @@ func TestProductListByCategory(t *testing.T) {
 		}
 		h := NewProductHandler(uc)
 
-		req := httptest.NewRequest(http.MethodGet, "/api/category/product?mode=active&category=all&target=all", nil)
+		req := httptest.NewRequest(http.MethodGet, "/api/category/product?category=all&target=all", nil)
 		rr := httptest.NewRecorder()
 
 		h.ListByCategory(rr, req)
@@ -187,7 +212,7 @@ func TestProductListByCategory(t *testing.T) {
 		if !uc.listByCategoryCalled {
 			t.Fatalf("usecase should be called")
 		}
-		if uc.listByCategoryReq.mode != "active" || uc.listByCategoryReq.category != "all" || uc.listByCategoryReq.target != "all" {
+		if uc.listByCategoryReq.category != "all" || uc.listByCategoryReq.target != "all" {
 			t.Fatalf("unexpected query args: %+v", uc.listByCategoryReq)
 		}
 
@@ -272,6 +297,77 @@ func TestProductListCarousel(t *testing.T) {
 		}
 		if product["uuid"] != "product-uuid" {
 			t.Fatalf("unexpected product uuid: %v", product["uuid"])
+		}
+	})
+}
+
+func TestProductGet(t *testing.T) {
+	t.Run("公開中の商品は未認証でも取得できる", func(t *testing.T) {
+		uc := &stubProductUC{
+			getRes: &usecaseProductQuery.Product{
+				UUID:     "product-uuid",
+				Name:     "product name",
+				IsActive: true,
+			},
+		}
+		h := NewProductHandler(uc)
+
+		req := httptest.NewRequest(http.MethodGet, "/api/product/product-uuid", nil)
+		req = mux.SetURLVars(req, map[string]string{"product_uuid": "product-uuid"})
+		rr := httptest.NewRecorder()
+
+		h.Get(rr, req)
+
+		if rr.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d", rr.Code)
+		}
+		if !uc.getCalled || uc.getReq != "product-uuid" {
+			t.Fatalf("unexpected get call: called=%v req=%q", uc.getCalled, uc.getReq)
+		}
+	})
+
+	t.Run("非公開商品は未認証だとNotFoundを返す", func(t *testing.T) {
+		uc := &stubProductUC{
+			getRes: &usecaseProductQuery.Product{
+				UUID:     "product-uuid",
+				Name:     "product name",
+				IsActive: false,
+			},
+		}
+		h := NewProductHandler(uc)
+
+		req := httptest.NewRequest(http.MethodGet, "/api/product/product-uuid", nil)
+		req = mux.SetURLVars(req, map[string]string{"product_uuid": "product-uuid"})
+		rr := httptest.NewRecorder()
+
+		h.Get(rr, req)
+
+		if rr.Code != http.StatusNotFound {
+			t.Fatalf("expected 404, got %d", rr.Code)
+		}
+	})
+
+	t.Run("非公開商品でも管理者は取得できる", func(t *testing.T) {
+		uc := &stubProductUC{
+			getRes: &usecaseProductQuery.Product{
+				UUID:     "product-uuid",
+				Name:     "product name",
+				IsActive: false,
+			},
+		}
+		h := NewProductHandler(uc)
+
+		req := httptest.NewRequest(http.MethodGet, "/api/product/product-uuid", nil)
+		req = mux.SetURLVars(req, map[string]string{"product_uuid": "product-uuid"})
+		req = req.WithContext(middleware.ContextWithAuthenticatedUser(req.Context(), middleware.AuthenticatedUser{
+			IsAdmin: true,
+		}))
+		rr := httptest.NewRecorder()
+
+		h.Get(rr, req)
+
+		if rr.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d", rr.Code)
 		}
 	})
 }

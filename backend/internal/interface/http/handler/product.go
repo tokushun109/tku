@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/tokushun109/tku/backend/internal/interface/http/middleware"
 	"github.com/tokushun109/tku/backend/internal/interface/http/presenter"
 	"github.com/tokushun109/tku/backend/internal/interface/http/request"
 	"github.com/tokushun109/tku/backend/internal/interface/http/response"
@@ -50,7 +51,7 @@ func (h *ProductHandler) ListByCategory(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	categoryProducts, err := h.productUC.ListByCategory(r.Context(), q.Mode, q.Category, q.Target)
+	categoryProducts, err := h.productUC.ListByCategory(r.Context(), q.Category, q.Target)
 	if err != nil {
 		response.WriteAppError(w, err)
 		return
@@ -116,6 +117,11 @@ func (h *ProductHandler) Get(w http.ResponseWriter, r *http.Request) {
 	product, err := h.productUC.Get(r.Context(), productUUID)
 	if err != nil {
 		response.WriteAppError(w, err)
+		return
+	}
+	authUser, _ := middleware.AuthenticatedUserFromContext(r.Context())
+	if !product.IsActive && !authUser.IsAdmin {
+		response.WriteAppError(w, usecase.NewAppError(usecase.ErrNotFound))
 		return
 	}
 
