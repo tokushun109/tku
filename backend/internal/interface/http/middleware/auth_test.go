@@ -15,6 +15,7 @@ import (
 
 type stubUserUC struct {
 	user *domainUser.User
+	err  error
 }
 
 func (s *stubUserUC) Login(ctx context.Context, email string, password string) (*domainSession.Session, error) {
@@ -22,6 +23,9 @@ func (s *stubUserUC) Login(ctx context.Context, email string, password string) (
 }
 
 func (s *stubUserUC) GetBySessionToken(ctx context.Context, token string) (*domainUser.User, error) {
+	if s.err != nil {
+		return nil, s.err
+	}
 	if token == "" {
 		return nil, usecase.NewAppError(usecase.ErrUnauthorized)
 	}
@@ -62,15 +66,7 @@ func TestAuthMiddleware(t *testing.T) {
 		}
 	})
 	t.Run("有効な入力を渡したとき処理に成功する", func(t *testing.T) {
-
-		uuid, err := primitive.NewUUID("11111111-1111-4111-8111-111111111111")
-		if err != nil {
-			t.Fatalf("unexpected uuid error: %v", err)
-		}
-		user, err := domainUser.Rebuild(1, uuid.Value(), "admin", "admin@example.com", "hash", true)
-		if err != nil {
-			t.Fatalf("unexpected user rebuild error: %v", err)
-		}
+		user := mustBuildUser(t, true)
 		auth := NewAuthMiddleware(&stubUserUC{user: user})
 		h := auth.RequireSession(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			authUser, ok := AuthenticatedUserFromContext(r.Context())
@@ -95,4 +91,76 @@ func TestAuthMiddleware(t *testing.T) {
 			t.Fatalf("expected 200, got %d", rr.Code)
 		}
 	})
+	t.Run("任意認証は認証情報なしでも処理を継続する", func(t *testing.T) {
+		auth := NewAuthMiddleware(&stubUserUC{})
+		h := auth.OptionalSession(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if _, ok := AuthenticatedUserFromContext(r.Context()); ok {
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			w.WriteHeader(http.StatusOK)
+		}))
+
+		req := httptest.NewRequest(http.MethodGet, "/api/product/test", nil)
+		rr := httptest.NewRecorder()
+
+		h.ServeHTTP(rr, req)
+
+		if rr.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d", rr.Code)
+		}
+	})
+	t.Run("任意認証は有効なセッションなら認証ユーザーを設定する", func(t *testing.T) {
+		user := mustBuildUser(t, true)
+		auth := NewAuthMiddleware(&stubUserUC{user: user})
+		h := auth.OptionalSession(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			authUser, ok := AuthenticatedUserFromContext(r.Context())
+			if !ok || !authUser.IsAdmin {
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			w.WriteHeader(http.StatusOK)
+		}))
+
+		req := httptest.NewRequest(http.MethodGet, "/api/product/test", nil)
+		req.AddCookie(&http.Cookie{Name: "__sess__", Value: "token"})
+		rr := httptest.NewRecorder()
+
+		h.ServeHTTP(rr, req)
+
+		if rr.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d", rr.Code)
+		}
+	})
+	t.Run("任意認証は内部エラーを返す", func(t *testing.T) {
+		auth := NewAuthMiddleware(&stubUserUC{err: usecase.NewAppError(usecase.ErrInternal)})
+		h := auth.OptionalSession(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+		}))
+
+		req := httptest.NewRequest(http.MethodGet, "/api/product/test", nil)
+		req.AddCookie(&http.Cookie{Name: "__sess__", Value: "token"})
+		rr := httptest.NewRecorder()
+
+		h.ServeHTTP(rr, req)
+
+		if rr.Code != http.StatusInternalServerError {
+			t.Fatalf("expected 500, got %d", rr.Code)
+		}
+	})
+}
+
+func mustBuildUser(t *testing.T, isAdmin bool) *domainUser.User {
+	t.Helper()
+
+	uuid, err := primitive.NewUUID("11111111-1111-4111-8111-111111111111")
+	if err != nil {
+		t.Fatalf("unexpected uuid error: %v", err)
+	}
+	user, err := domainUser.Rebuild(1, uuid.Value(), "admin", "admin@example.com", "hash", isAdmin)
+	if err != nil {
+		t.Fatalf("unexpected user rebuild error: %v", err)
+	}
+
+	return user
 }

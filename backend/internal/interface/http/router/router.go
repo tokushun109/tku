@@ -81,9 +81,8 @@ func NewRouter(
 	// product
 	r.HandleFunc("/api/carousel_image", productHandler.ListCarousel).Methods(http.MethodGet)
 	r.HandleFunc("/api/category/product", productHandler.ListByCategory).Methods(http.MethodGet)
-	// TODO: requireAdminを一覧につけるようにする(フロントエンドの対応も必要)
-	r.HandleFunc("/api/product", productHandler.List).Methods(http.MethodGet)
-	r.HandleFunc("/api/product/{product_uuid}", productHandler.Get).Methods(http.MethodGet)
+	r.Handle("/api/product", requireAdmin(productHandler.List)).Methods(http.MethodGet)
+	r.Handle("/api/product/{product_uuid}", auth.OptionalSession(http.HandlerFunc(productHandler.Get))).Methods(http.MethodGet)
 	r.Handle("/api/product", requireAdmin(productHandler.Create)).Methods(http.MethodPost)
 	r.Handle("/api/product/duplicate", requireAdmin(productHandler.Duplicate)).Methods(http.MethodPost)
 	r.Handle("/api/product/{product_uuid}", requireAdmin(productHandler.Update)).Methods(http.MethodPut)

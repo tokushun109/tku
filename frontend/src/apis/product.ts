@@ -1,5 +1,6 @@
 import { getApiBaseUrl } from '@/apis/baseUrl'
 import { IProduct, IProductsByCategory, IThumbnail } from '@/features/product/type'
+import { createAPIHeaders } from '@/utils/cookie'
 import { ApiError } from '@/utils/error'
 import { convertObjectToURLSearchParams } from '@/utils/request'
 
@@ -39,11 +40,11 @@ export const getProductsByCategory = async (params: IGetProductsByCategoryParams
 /** 商品詳細を取得 */
 export const getProduct = async (uuid: string): Promise<IProduct> => {
     try {
+        const headers = await createAPIHeaders()
         const res = await fetch(`${getApiBaseUrl()}/product/${uuid}`, {
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers,
             method: 'GET',
+            credentials: 'include',
         })
 
         if (!res.ok) throw new ApiError(res)
@@ -86,11 +87,11 @@ export interface IProductImageDisplayOrderParams {
 export const getProducts = async (params: IGetProductsParams): Promise<IProduct[]> => {
     try {
         const query = convertObjectToURLSearchParams(params)
+        const headers = await createAPIHeaders()
         const res = await fetch(`${getApiBaseUrl()}/product?${query}`, {
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers,
             method: 'GET',
+            credentials: 'include',
         })
 
         if (!res.ok) throw new ApiError(res)
