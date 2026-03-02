@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"strings"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/tokushun109/tku/backend/internal/domain/primitive"
@@ -147,10 +148,13 @@ func (r *ProductRepository) Delete(ctx context.Context, uuid primitive.UUID) (bo
 }
 
 func (r *ProductRepository) ReplaceTags(ctx context.Context, productUUID primitive.UUID, tagUUIDs []primitive.UUID) error {
-	if _, err := getExecutor(ctx, r.db).ExecContext(
+	executor := getExecutor(ctx, r.db)
+	productUUIDValue := productUUID.Value()
+
+	if _, err := executor.ExecContext(
 		ctx,
 		`DELETE FROM product_to_tag WHERE product_uuid = ?`,
-		productUUID.Value(),
+		productUUIDValue,
 	); err != nil {
 		return err
 	}
@@ -158,15 +162,22 @@ func (r *ProductRepository) ReplaceTags(ctx context.Context, productUUID primiti
 		return nil
 	}
 
-	for _, tagUUID := range tagUUIDs {
-		if _, err := getExecutor(ctx, r.db).ExecContext(
-			ctx,
-			`INSERT INTO product_to_tag (product_uuid, tag_uuid, created_at, updated_at) VALUES (?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
-			productUUID.Value(),
-			tagUUID.Value(),
-		); err != nil {
-			return err
+	const insertQueryPrefix = `INSERT INTO product_to_tag (product_uuid, tag_uuid, created_at, updated_at) VALUES `
+
+	var queryBuilder strings.Builder
+	queryBuilder.WriteString(insertQueryPrefix)
+
+	args := make([]interface{}, 0, len(tagUUIDs)*2)
+	for i, tagUUID := range tagUUIDs {
+		if i > 0 {
+			queryBuilder.WriteString(", ")
 		}
+		queryBuilder.WriteString("(?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())")
+		args = append(args, productUUIDValue, tagUUID.Value())
+	}
+
+	if _, err := executor.ExecContext(ctx, queryBuilder.String(), args...); err != nil {
+		return err
 	}
 	return nil
 }
