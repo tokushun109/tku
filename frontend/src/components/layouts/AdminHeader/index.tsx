@@ -25,14 +25,7 @@ const AdminHeader = ({ isLoggedIn = true }: Props) => {
 
     const handleLogout = async () => {
         setDialogVisible(false)
-        try {
-            await logoutAction()
-            router.push('/admin/login')
-        } catch (error) {
-            console.error('Logout error:', error)
-            // エラーが発生してもログインページにリダイレクト
-            router.push('/admin/login')
-        }
+        await logoutAction()
     }
 
     const handleNavigationClick = (link: string) => {

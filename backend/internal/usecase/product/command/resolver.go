@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -114,7 +115,17 @@ func (s *Service) resolveOrCreateTagUUIDsByNames(ctx context.Context, rawNames [
 			}
 			tag, err = s.tagRepo.Create(ctx, newTag)
 			if err != nil {
-				return nil, err
+				if errors.Is(err, domainTag.ErrNameDuplicated) {
+					tag, err = s.tagRepo.FindByName(ctx, tagName)
+					if err != nil {
+						return nil, err
+					}
+					if tag == nil {
+						return nil, fmt.Errorf("tag was duplicated but not found: %s", tagName.Value())
+					}
+				} else {
+					return nil, err
+				}
 			}
 			if tag == nil {
 				return nil, fmt.Errorf("created tag was not returned: %s", tagName.Value())

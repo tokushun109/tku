@@ -80,9 +80,6 @@ func (s *Service) Login(ctx context.Context, email string, password string) (*do
 		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 	if err := s.txManager.WithinTransaction(ctx, func(txCtx context.Context) error {
-		if err := s.sessionRepo.DeleteByUserUUID(txCtx, u.UUID()); err != nil {
-			return err
-		}
 		createdSession, err := s.sessionRepo.Create(txCtx, sess)
 		if err != nil {
 			return err

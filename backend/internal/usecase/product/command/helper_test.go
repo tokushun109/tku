@@ -24,10 +24,15 @@ const (
 )
 
 type helperCategoryRepoStub struct {
-	byUUID map[string]*domainCategory.Category
+	byUUID    map[string]*domainCategory.Category
+	byName    map[string]*domainCategory.Category
+	createErr error
 }
 
 func (s *helperCategoryRepoStub) Create(ctx context.Context, c *domainCategory.Category) (*domainCategory.Category, error) {
+	if s.createErr != nil {
+		return nil, s.createErr
+	}
 	return c, nil
 }
 
@@ -47,7 +52,10 @@ func (s *helperCategoryRepoStub) FindByUUID(ctx context.Context, uuid primitive.
 }
 
 func (s *helperCategoryRepoStub) FindByName(ctx context.Context, name domainCategory.CategoryName) (*domainCategory.Category, error) {
-	return nil, nil
+	if s.byName == nil {
+		return nil, nil
+	}
+	return s.byName[name.Value()], nil
 }
 
 func (s *helperCategoryRepoStub) ExistsByName(ctx context.Context, name domainCategory.CategoryName) (bool, error) {
@@ -63,10 +71,15 @@ func (s *helperCategoryRepoStub) Delete(ctx context.Context, uuid primitive.UUID
 }
 
 type helperTargetRepoStub struct {
-	byUUID map[string]*domainTarget.Target
+	byUUID    map[string]*domainTarget.Target
+	byName    map[string]*domainTarget.Target
+	createErr error
 }
 
 func (s *helperTargetRepoStub) Create(ctx context.Context, t *domainTarget.Target) (*domainTarget.Target, error) {
+	if s.createErr != nil {
+		return nil, s.createErr
+	}
 	return t, nil
 }
 
@@ -86,7 +99,10 @@ func (s *helperTargetRepoStub) FindByUUID(ctx context.Context, uuid primitive.UU
 }
 
 func (s *helperTargetRepoStub) FindByName(ctx context.Context, name domainTarget.TargetName) (*domainTarget.Target, error) {
-	return nil, nil
+	if s.byName == nil {
+		return nil, nil
+	}
+	return s.byName[name.Value()], nil
 }
 
 func (s *helperTargetRepoStub) ExistsByName(ctx context.Context, name domainTarget.TargetName) (bool, error) {
@@ -245,5 +261,51 @@ func TestBuildSiteDetailsReturnsInvalidInputWhenSalesSiteDoesNotExist(t *testing
 	})
 	if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
 		t.Fatalf("expected ErrInvalidInput, got %v", err)
+	}
+}
+
+func TestFindOrCreateCategoryByNameReturnsDetailedErrorWhenDuplicatedButNotFound(t *testing.T) {
+	categoryName, err := domainCategory.NewCategoryName("category")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	s := &Service{
+		categoryRepo: &helperCategoryRepoStub{
+			createErr: domainCategory.ErrNameDuplicated,
+		},
+		uuidGen: &helperUUIDGenStub{},
+	}
+
+	_, err = s.findOrCreateCategoryByName(context.Background(), categoryName, map[string]*domainCategory.Category{})
+	if err == nil {
+		t.Fatalf("expected error")
+	}
+	expected := "category was duplicated but not found: category"
+	if err.Error() != expected {
+		t.Fatalf("expected %q, got %q", expected, err.Error())
+	}
+}
+
+func TestFindOrCreateTargetByNameReturnsDetailedErrorWhenDuplicatedButNotFound(t *testing.T) {
+	targetName, err := domainTarget.NewTargetName("target")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	s := &Service{
+		targetRepo: &helperTargetRepoStub{
+			createErr: domainTarget.ErrNameDuplicated,
+		},
+		uuidGen: &helperUUIDGenStub{},
+	}
+
+	_, err = s.findOrCreateTargetByName(context.Background(), targetName, map[string]*domainTarget.Target{})
+	if err == nil {
+		t.Fatalf("expected error")
+	}
+	expected := "target was duplicated but not found: target"
+	if err.Error() != expected {
+		t.Fatalf("expected %q, got %q", expected, err.Error())
 	}
 }

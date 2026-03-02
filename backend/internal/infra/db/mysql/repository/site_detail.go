@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"strings"
 
 	"github.com/jmoiron/sqlx"
 
@@ -18,7 +19,9 @@ func NewSiteDetailRepository(db *sqlx.DB) *SiteDetailRepository {
 }
 
 func (r *SiteDetailRepository) ReplaceByProductUUID(ctx context.Context, productUUID primitive.UUID, details []*domain.SiteDetail) error {
-	if _, err := getExecutor(ctx, r.db).ExecContext(
+	executor := getExecutor(ctx, r.db)
+
+	if _, err := executor.ExecContext(
 		ctx,
 		`DELETE FROM site_detail WHERE product_uuid = ?`,
 		productUUID.Value(),
@@ -29,18 +32,28 @@ func (r *SiteDetailRepository) ReplaceByProductUUID(ctx context.Context, product
 		return nil
 	}
 
+	const insertQueryPrefix = `INSERT INTO site_detail (uuid, detail_url, product_uuid, sales_site_uuid, created_at, updated_at) VALUES `
+
+	var queryBuilder strings.Builder
+	queryBuilder.WriteString(insertQueryPrefix)
+
+	args := make([]interface{}, 0, len(details)*4)
 	for _, detail := range details {
-		if _, err := getExecutor(ctx, r.db).ExecContext(
-			ctx,
-			`INSERT INTO site_detail (uuid, detail_url, product_uuid, sales_site_uuid, created_at, updated_at)
-			 VALUES (?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
+		if len(args) > 0 {
+			queryBuilder.WriteString(", ")
+		}
+		queryBuilder.WriteString("(?, ?, ?, ?, UTC_TIMESTAMP(6), UTC_TIMESTAMP(6))")
+		args = append(
+			args,
 			detail.UUID().Value(),
 			detail.DetailURL().Value(),
 			detail.ProductUUID().Value(),
 			detail.SalesSiteUUID().Value(),
-		); err != nil {
-			return err
-		}
+		)
+	}
+
+	if _, err := executor.ExecContext(ctx, queryBuilder.String(), args...); err != nil {
+		return err
 	}
 	return nil
 }

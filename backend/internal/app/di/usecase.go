@@ -118,11 +118,11 @@ func newUsecases(repos *repositories, qrs *queries, cfg *config.Config, txManage
 
 	ucs := &usecases{
 		health:      usecaseHealth.New(repos.health),
-		category:    usecaseCategory.New(repos.category, uuidGen),
-		target:      usecaseTarget.New(repos.target, uuidGen),
-		tag:         usecaseTag.New(repos.tag, uuidGen),
+		category:    usecaseCategory.New(repos.category, uuidGen, txManager),
+		target:      usecaseTarget.New(repos.target, uuidGen, txManager),
+		tag:         usecaseTag.New(repos.tag, uuidGen, txManager),
 		sns:         usecaseSns.New(repos.sns, uuidGen),
-		salesSite:   usecaseSalesSite.New(repos.salesSite, uuidGen),
+		salesSite:   usecaseSalesSite.New(repos.salesSite, uuidGen, txManager),
 		skillMarket: usecaseSkillMarket.New(repos.skillMarket, uuidGen),
 		creator:     usecaseCreator.New(repos.creator, storage, uuidGen),
 		contact:     usecaseContact.New(repos.contact, contactNotifier, uuidGen),

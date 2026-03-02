@@ -26,6 +26,9 @@ func (r *TagRepository) Create(ctx context.Context, t *domain.Tag) (*domain.Tag,
 		t.UUID().Value(), t.Name().Value(),
 	)
 	if err != nil {
+		if isDuplicateEntryError(err) {
+			return nil, domain.ErrNameDuplicated
+		}
 		return nil, err
 	}
 
@@ -69,7 +72,7 @@ func (r *TagRepository) FindByName(ctx context.Context, name domain.TagName) (*d
 		Name string `db:"name"`
 	}
 	var rrow row
-	if err := getExecutor(ctx, r.db).GetContext(ctx, &rrow, `SELECT id, uuid, name FROM tag WHERE name = ? AND deleted_at IS NULL`, name.Value()); err != nil {
+	if err := getExecutor(ctx, r.db).GetContext(ctx, &rrow, `SELECT id, uuid, name FROM tag WHERE active_name = ? LIMIT 1`, name.Value()); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
@@ -132,7 +135,7 @@ func (r *TagRepository) FindByUUIDs(ctx context.Context, uuids []primitive.UUID)
 
 func (r *TagRepository) ExistsByName(ctx context.Context, name domain.TagName) (bool, error) {
 	var count int64
-	if err := getExecutor(ctx, r.db).GetContext(ctx, &count, `SELECT COUNT(1) FROM tag WHERE name = ? AND deleted_at IS NULL`, name.Value()); err != nil {
+	if err := getExecutor(ctx, r.db).GetContext(ctx, &count, `SELECT COUNT(1) FROM tag WHERE active_name = ?`, name.Value()); err != nil {
 		return false, err
 	}
 	return count > 0, nil
@@ -146,6 +149,9 @@ func (r *TagRepository) Update(ctx context.Context, t *domain.Tag) (bool, error)
 		t.UUID().Value(),
 	)
 	if err != nil {
+		if isDuplicateEntryError(err) {
+			return false, domain.ErrNameDuplicated
+		}
 		return false, err
 	}
 	affected, err := res.RowsAffected()
@@ -156,15 +162,9 @@ func (r *TagRepository) Update(ctx context.Context, t *domain.Tag) (bool, error)
 }
 
 func (r *TagRepository) Delete(ctx context.Context, uuid primitive.UUID) (bool, error) {
-	tx, err := r.db.BeginTxx(ctx, nil)
-	if err != nil {
-		return false, err
-	}
-	defer func() {
-		_ = tx.Rollback()
-	}()
+	executor := getExecutor(ctx, r.db)
 
-	if _, err := tx.ExecContext(
+	if _, err := executor.ExecContext(
 		ctx,
 		`DELETE FROM product_to_tag
 		 WHERE tag_uuid = ?`,
@@ -173,15 +173,12 @@ func (r *TagRepository) Delete(ctx context.Context, uuid primitive.UUID) (bool, 
 		return false, err
 	}
 
-	res, err := tx.ExecContext(ctx, `UPDATE tag SET deleted_at = UTC_TIMESTAMP(), updated_at = UTC_TIMESTAMP() WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value())
+	res, err := executor.ExecContext(ctx, `UPDATE tag SET deleted_at = UTC_TIMESTAMP(), updated_at = UTC_TIMESTAMP() WHERE uuid = ? AND deleted_at IS NULL`, uuid.Value())
 	if err != nil {
 		return false, err
 	}
 	affected, err := res.RowsAffected()
 	if err != nil {
-		return false, err
-	}
-	if err := tx.Commit(); err != nil {
 		return false, err
 	}
 	return affected > 0, nil

@@ -23,9 +23,13 @@ func NewSessionRepository(db *sqlx.DB) *SessionRepository {
 func (r *SessionRepository) Create(ctx context.Context, s *domain.Session) (*domain.Session, error) {
 	executor := getExecutor(ctx, r.db)
 
-	res, err := executor.ExecContext(
+	_, err := executor.ExecContext(
 		ctx,
-		`INSERT INTO session (uuid, user_uuid, created_at) VALUES (?, ?, UTC_TIMESTAMP())`,
+		`INSERT INTO session (uuid, user_uuid, created_at)
+		 VALUES (?, ?, UTC_TIMESTAMP())
+		 ON DUPLICATE KEY UPDATE
+		     uuid = VALUES(uuid),
+		     created_at = VALUES(created_at)`,
 		s.UUID().Value(),
 		s.UserUUID().Value(),
 	)
@@ -33,24 +37,22 @@ func (r *SessionRepository) Create(ctx context.Context, s *domain.Session) (*dom
 		return nil, err
 	}
 
-	lastID, err := res.LastInsertId()
-	if err != nil {
-		return nil, err
-	}
-
 	var row struct {
+		ID        uint      `db:"id"`
+		UUID      string    `db:"uuid"`
+		UserUUID  string    `db:"user_uuid"`
 		CreatedAt time.Time `db:"created_at"`
 	}
 	if err := executor.GetContext(
 		ctx,
 		&row,
-		`SELECT created_at FROM session WHERE id = ?`,
-		lastID,
+		`SELECT id, uuid, user_uuid, created_at FROM session WHERE user_uuid = ?`,
+		s.UserUUID().Value(),
 	); err != nil {
 		return nil, err
 	}
 
-	created, err := domain.Rebuild(uint(lastID), s.UUID().Value(), s.UserUUID().Value(), row.CreatedAt)
+	created, err := domain.Rebuild(row.ID, row.UUID, row.UserUUID, row.CreatedAt)
 	if err != nil {
 		return nil, fmt.Errorf("invalid session row: %w", err)
 	}

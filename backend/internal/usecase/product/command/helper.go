@@ -98,6 +98,17 @@ func (s *Service) findOrCreateCategoryByName(
 	}
 	created, err := s.categoryRepo.Create(ctx, newCategory)
 	if err != nil {
+		if errors.Is(err, domainCategory.ErrNameDuplicated) {
+			found, findErr := s.categoryRepo.FindByName(ctx, name)
+			if findErr != nil {
+				return nil, findErr
+			}
+			if found != nil {
+				cache[key] = found
+				return found, nil
+			}
+			return nil, fmt.Errorf("category was duplicated but not found: %s", name.Value())
+		}
 		return nil, err
 	}
 	if created == nil {
@@ -134,6 +145,17 @@ func (s *Service) findOrCreateTargetByName(
 	}
 	created, err := s.targetRepo.Create(ctx, newTarget)
 	if err != nil {
+		if errors.Is(err, domainTarget.ErrNameDuplicated) {
+			found, findErr := s.targetRepo.FindByName(ctx, name)
+			if findErr != nil {
+				return nil, findErr
+			}
+			if found != nil {
+				cache[key] = found
+				return found, nil
+			}
+			return nil, fmt.Errorf("target was duplicated but not found: %s", name.Value())
+		}
 		return nil, err
 	}
 	if created == nil {
