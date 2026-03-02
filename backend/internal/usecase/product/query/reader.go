@@ -10,6 +10,8 @@ type ListProductsQuery struct {
 
 type ListCategoryProductsQuery struct {
 	Category string
+	Cursor   string
+	Limit    int
 	Target   string
 }
 

@@ -33,6 +33,8 @@ type stubProductUC struct {
 	listByCategoryCalled bool
 	listByCategoryReq    struct {
 		category string
+		cursor   string
+		limit    int
 		target   string
 	}
 
@@ -82,12 +84,13 @@ func (s *stubProductUC) List(ctx context.Context, mode string, category string, 
 
 func (s *stubProductUC) ListByCategory(
 	ctx context.Context,
-	category string,
-	target string,
+	q usecaseProductQuery.ListCategoryProductsQuery,
 ) ([]*usecaseProductQuery.CategoryProducts, error) {
 	s.listByCategoryCalled = true
-	s.listByCategoryReq.category = category
-	s.listByCategoryReq.target = target
+	s.listByCategoryReq.category = q.Category
+	s.listByCategoryReq.cursor = q.Cursor
+	s.listByCategoryReq.limit = q.Limit
+	s.listByCategoryReq.target = q.Target
 	if s.listByCategoryErr != nil {
 		return nil, s.listByCategoryErr
 	}
@@ -195,13 +198,17 @@ func TestProductListByCategory(t *testing.T) {
 						UUID: "category-uuid",
 						Name: "Category",
 					},
+					PageInfo: usecaseProductQuery.PageInfo{
+						HasMore:    true,
+						NextCursor: "next-cursor",
+					},
 					Products: []*usecaseProductQuery.Product{},
 				},
 			},
 		}
 		h := NewProductHandler(uc)
 
-		req := httptest.NewRequest(http.MethodGet, "/api/category/product?category=all&target=all", nil)
+		req := httptest.NewRequest(http.MethodGet, "/api/category/product?category=category-uuid&target=all&limit=8&cursor=next-cursor", nil)
 		rr := httptest.NewRecorder()
 
 		h.ListByCategory(rr, req)
@@ -212,8 +219,11 @@ func TestProductListByCategory(t *testing.T) {
 		if !uc.listByCategoryCalled {
 			t.Fatalf("usecase should be called")
 		}
-		if uc.listByCategoryReq.category != "all" || uc.listByCategoryReq.target != "all" {
+		if uc.listByCategoryReq.category != "category-uuid" || uc.listByCategoryReq.target != "all" {
 			t.Fatalf("unexpected query args: %+v", uc.listByCategoryReq)
+		}
+		if uc.listByCategoryReq.limit != 8 || uc.listByCategoryReq.cursor != "next-cursor" {
+			t.Fatalf("unexpected pagination args: %+v", uc.listByCategoryReq)
 		}
 
 		var res []map[string]any
@@ -229,6 +239,13 @@ func TestProductListByCategory(t *testing.T) {
 		}
 		if category["uuid"] != "category-uuid" {
 			t.Fatalf("unexpected category uuid: %v", category["uuid"])
+		}
+		pageInfo, ok := res[0]["pageInfo"].(map[string]any)
+		if !ok {
+			t.Fatalf("expected pageInfo object")
+		}
+		if pageInfo["hasMore"] != true || pageInfo["nextCursor"] != "next-cursor" {
+			t.Fatalf("unexpected pageInfo: %+v", pageInfo)
 		}
 	})
 }

@@ -120,21 +120,56 @@ const mockProducts: IProduct[] = [
     },
 ]
 
-// 固定のテストデータ（パラメータに関わらず同じデータを返す）
-const mockProductsByCategory: IProductsByCategory[] = [
-    {
-        category: mockCategories.earrings,
-        products: [mockProducts[0], mockProducts[1]],
-    },
-    {
-        category: mockCategories.rings,
-        products: [mockProducts[2]],
-    },
-    {
-        category: mockCategories.necklaces,
-        products: [mockProducts[3]],
-    },
-]
+const createNextCursor = (nextIndex: number): string => `cursor-${nextIndex}`
+
+const parseCursor = (cursor: string | null): number => {
+    if (!cursor?.startsWith('cursor-')) return 0
+
+    const nextIndex = Number(cursor.replace('cursor-', ''))
+    return Number.isFinite(nextIndex) && nextIndex > 0 ? nextIndex : 0
+}
+
+const createProductsByCategoryResponse = (request: Request): IProductsByCategory[] => {
+    const url = new URL(request.url)
+    const category = url.searchParams.get('category') || 'all'
+    const target = url.searchParams.get('target') || 'all'
+    const limit = Number(url.searchParams.get('limit') || '4')
+    const pageSize = Number.isFinite(limit) && limit > 0 ? limit : 4
+
+    const activeProducts = mockProducts.filter((product) => product.isActive)
+    const filteredProducts = activeProducts.filter((product) => {
+        return target === 'all' ? true : product.target.uuid === target
+    })
+
+    const buildCategoryProducts = (
+        currentCategory: (typeof mockCategories)[keyof typeof mockCategories],
+        currentCursor: string | null,
+    ): IProductsByCategory => {
+        const categoryProducts = filteredProducts.filter((product) => product.category.uuid === currentCategory.uuid)
+        const startIndex = parseCursor(currentCursor)
+        const products = categoryProducts.slice(startIndex, startIndex + pageSize)
+        const nextIndex = startIndex + products.length
+        const hasMore = nextIndex < categoryProducts.length
+
+        return {
+            category: currentCategory,
+            pageInfo: {
+                hasMore,
+                nextCursor: hasMore ? createNextCursor(nextIndex) : '',
+            },
+            products,
+        }
+    }
+
+    if (category !== 'all') {
+        const selectedCategory = Object.values(mockCategories).find((currentCategory) => currentCategory.uuid === category)
+        if (!selectedCategory) return []
+
+        return [buildCategoryProducts(selectedCategory, url.searchParams.get('cursor'))]
+    }
+
+    return Object.values(mockCategories).map((currentCategory) => buildCategoryProducts(currentCategory, null))
+}
 
 const mockThumbnails: IThumbnail[] = [
     {
@@ -177,8 +212,8 @@ const mockSalesTarget: ISite = {
 // APIハンドラーの定義
 export const handlers = [
     // 商品関連のAPI
-    http.get(`${apiBaseUrl}/category/product`, () => {
-        return HttpResponse.json(mockProductsByCategory)
+    http.get(`${apiBaseUrl}/category/product`, ({ request }) => {
+        return HttpResponse.json(createProductsByCategoryResponse(request))
     }),
 
     // 全商品一覧取得API（管理画面用）

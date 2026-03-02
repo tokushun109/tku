@@ -3,7 +3,9 @@ export const convertObjectToURLSearchParams = (params: object): URLSearchParams 
     const result = new URLSearchParams()
 
     for (const [key, value] of Object.entries(params)) {
-        result.set(key, value)
+        if (value === undefined || value === null) continue
+
+        result.set(key, `${value}`)
     }
 
     return result

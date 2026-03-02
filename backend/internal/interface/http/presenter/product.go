@@ -70,6 +70,7 @@ func ToCategoryProductsResponse(categoryProducts *usecaseProductQuery.CategoryPr
 	if categoryProducts == nil {
 		return &response.CategoryProductsResponse{
 			Category: response.ProductClassificationResponse{},
+			PageInfo: response.CursorPageInfoResponse{},
 			Products: []*response.ProductResponse{},
 		}
 	}
@@ -78,6 +79,10 @@ func ToCategoryProductsResponse(categoryProducts *usecaseProductQuery.CategoryPr
 		Category: response.ProductClassificationResponse{
 			UUID: categoryProducts.Category.UUID,
 			Name: categoryProducts.Category.Name,
+		},
+		PageInfo: response.CursorPageInfoResponse{
+			HasMore:    categoryProducts.PageInfo.HasMore,
+			NextCursor: categoryProducts.PageInfo.NextCursor,
 		},
 		Products: ToProductResponses(categoryProducts.Products),
 	}

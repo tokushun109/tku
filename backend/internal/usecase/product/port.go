@@ -14,7 +14,7 @@ const (
 
 type QueryUsecase interface {
 	List(ctx context.Context, mode string, category string, target string) ([]*usecaseProductQuery.Product, error)
-	ListByCategory(ctx context.Context, category string, target string) ([]*usecaseProductQuery.CategoryProducts, error)
+	ListByCategory(ctx context.Context, q usecaseProductQuery.ListCategoryProductsQuery) ([]*usecaseProductQuery.CategoryProducts, error)
 	ListCarousel(ctx context.Context) ([]*usecaseProductQuery.CarouselItem, error)
 	Get(ctx context.Context, productUUID string) (*usecaseProductQuery.Product, error)
 	ExportCSV(ctx context.Context) ([]*usecaseProductQuery.ProductCSVRow, error)
@@ -54,8 +54,8 @@ func (s *Service) List(ctx context.Context, mode string, category string, target
 	return s.queryUC.List(ctx, mode, category, target)
 }
 
-func (s *Service) ListByCategory(ctx context.Context, category string, target string) ([]*usecaseProductQuery.CategoryProducts, error) {
-	return s.queryUC.ListByCategory(ctx, category, target)
+func (s *Service) ListByCategory(ctx context.Context, q usecaseProductQuery.ListCategoryProductsQuery) ([]*usecaseProductQuery.CategoryProducts, error) {
+	return s.queryUC.ListByCategory(ctx, q)
 }
 
 func (s *Service) ListCarousel(ctx context.Context) ([]*usecaseProductQuery.CarouselItem, error) {

@@ -40,8 +40,14 @@ type Product struct {
 	SiteDetails   []SiteDetail
 }
 
+type PageInfo struct {
+	HasMore    bool
+	NextCursor string
+}
+
 type CategoryProducts struct {
 	Category Classification
+	PageInfo PageInfo
 	Products []*Product
 }
 

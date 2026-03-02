@@ -30,8 +30,14 @@ export interface IProduct {
     uuid: string
 }
 
+export interface IProductsByCategoryPageInfo {
+    hasMore: boolean
+    nextCursor: string
+}
+
 export interface IProductsByCategory {
     category: IClassification
+    pageInfo: IProductsByCategoryPageInfo
     products: IProduct[]
 }
 

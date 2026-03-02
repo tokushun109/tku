@@ -22,6 +22,7 @@ describe('product API', () => {
         it('正常にカテゴリごとの商品リストを取得する', async () => {
             const result = await getProductsByCategory({
                 category: 'all',
+                limit: 4,
                 target: 'all',
             })
 
@@ -30,24 +31,40 @@ describe('product API', () => {
             expect(result.find((cat) => cat.category.name === 'リング')).toBeDefined()
             expect(result.find((cat) => cat.category.name === 'ネックレス')).toBeDefined()
 
-            // イヤリングカテゴリには2つの商品がある
+            // 公開画面ではアクティブ商品のみ返る
             const earringsCategory = result.find((cat) => cat.category.name === 'イヤリング')
-            expect(earringsCategory?.products).toHaveLength(2)
+            expect(earringsCategory?.products).toHaveLength(1)
+            expect(earringsCategory?.pageInfo).toEqual({
+                hasMore: false,
+                nextCursor: '',
+            })
         })
 
-        it('パラメータを変更しても同じデータが返される（検索機能なし）', async () => {
-            const result1 = await getProductsByCategory({
-                category: 'all',
-                target: 'all',
+        it('カテゴリとターゲットで絞り込んだ結果を取得できる', async () => {
+            const result = await getProductsByCategory({
+                category: 'rings-uuid',
+                limit: 4,
+                target: 'men-uuid',
             })
 
-            const result2 = await getProductsByCategory({
-                category: 'earrings',
-                target: 'women',
-            })
-
-            // パラメータが異なっても同じデータが返される
-            expect(result1).toEqual(result2)
+            expect(result).toEqual([
+                {
+                    category: {
+                        name: 'リング',
+                        uuid: 'rings-uuid',
+                    },
+                    pageInfo: {
+                        hasMore: false,
+                        nextCursor: '',
+                    },
+                    products: [
+                        expect.objectContaining({
+                            name: '男性向けリング1',
+                            uuid: 'rings-men-1',
+                        }),
+                    ],
+                },
+            ])
         })
 
         it('APIエラーの場合、ApiErrorが投げられる', async () => {
@@ -60,6 +77,7 @@ describe('product API', () => {
             await expect(
                 getProductsByCategory({
                     category: 'all',
+                    limit: 4,
                     target: 'all',
                 }),
             ).rejects.toThrow(ApiError)
@@ -75,6 +93,7 @@ describe('product API', () => {
             await expect(
                 getProductsByCategory({
                     category: 'all',
+                    limit: 4,
                     target: 'all',
                 }),
             ).rejects.toThrow('カテゴリーごとの商品リストの取得に失敗しました')
@@ -91,15 +110,40 @@ describe('product API', () => {
             )
 
             await getProductsByCategory({
-                category: 'earrings',
-                target: 'women',
+                category: 'earrings-uuid',
+                cursor: 'next-cursor',
+                limit: 8,
+                target: 'women-uuid',
             })
 
             expect(capturedRequest).toBeDefined()
             const url = new URL(capturedRequest!.url)
-            expect(url.searchParams.get('category')).toBe('earrings')
+            expect(url.searchParams.get('category')).toBe('earrings-uuid')
+            expect(url.searchParams.get('cursor')).toBe('next-cursor')
+            expect(url.searchParams.get('limit')).toBe('8')
             expect(url.searchParams.get('mode')).toBeNull()
-            expect(url.searchParams.get('target')).toBe('women')
+            expect(url.searchParams.get('target')).toBe('women-uuid')
+        })
+
+        it('cursor未指定時はクエリパラメータに含めない', async () => {
+            let capturedRequest: Request | undefined
+
+            server.use(
+                http.get(`${apiBaseUrl}/category/product`, ({ request }) => {
+                    capturedRequest = request
+                    return HttpResponse.json([])
+                }),
+            )
+
+            await getProductsByCategory({
+                category: 'all',
+                limit: 4,
+                target: 'all',
+            })
+
+            expect(capturedRequest).toBeDefined()
+            const url = new URL(capturedRequest!.url)
+            expect(url.searchParams.has('cursor')).toBe(false)
         })
     })
 
