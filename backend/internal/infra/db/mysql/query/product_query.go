@@ -360,9 +360,9 @@ func (r *ProductQueryReader) loadTags(ctx context.Context, productUUIDs []string
 			ptt.product_uuid AS product_uuid,
 			ptt.tag_uuid AS tag_uuid,
 			t.name AS tag_name
-		 FROM product_to_tag ptt
-		 INNER JOIN tag t ON ptt.tag_uuid = t.uuid AND t.deleted_at IS NULL
-		 WHERE ptt.deleted_at IS NULL AND ptt.product_uuid IN (?)
+			 FROM product_to_tag ptt
+			 INNER JOIN tag t ON ptt.tag_uuid = t.uuid AND t.deleted_at IS NULL
+			 WHERE ptt.product_uuid IN (?)
 		 ORDER BY ptt.created_at ASC, ptt.tag_uuid ASC`,
 		productUUIDs,
 	)
