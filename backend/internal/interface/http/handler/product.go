@@ -119,8 +119,8 @@ func (h *ProductHandler) Get(w http.ResponseWriter, r *http.Request) {
 		response.WriteAppError(w, err)
 		return
 	}
-	authUser, ok := middleware.AuthenticatedUserFromContext(r.Context())
-	if !product.IsActive && (!ok || !authUser.IsAdmin) {
+	authUser, _ := middleware.AuthenticatedUserFromContext(r.Context())
+	if !product.IsActive && !authUser.IsAdmin {
 		response.WriteAppError(w, usecase.NewAppError(usecase.ErrNotFound))
 		return
 	}
