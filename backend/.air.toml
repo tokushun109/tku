@@ -5,7 +5,7 @@ tmp_dir = "tmp"
 cmd = "go build -o ./tmp/main ./cmd/api"
 bin = "./tmp/main"
 exclude_dir = ["tmp", "bin", "img"]
-include_ext = ["go", "tpl", "tmpl", "html", "txt"]
+include_ext = ["go", "mod", "sum", "tpl", "tmpl", "html", "txt"]
 
 [log]
 time = true
