@@ -1,111 +1,102 @@
 # CLAUDE.md
 
-このファイルは、このリポジトリでコードを扱う際の Claude Code (claude.ai/code)向けのガイドラインです。
+このファイルは、このリポジトリで作業するエージェント向けのルートガイドです。  
+詳細な規約は各ディレクトリ配下の `CLAUDE.md` を参照し、このファイルでは全体像と作業導線をまとめます。
 
-## Claude Code 設定
+## 基本設定
 
-**重要**
-
-- Claude の回答は日本語で行ってください。
-- /fix-issue のカスタムコマンドが実行されたときは../.claude/commands/fix-issue.md の中身を全て確認してください。
+- 回答は日本語で行う
+- `/fix-issue` のカスタムコマンドが実行された場合は `../.claude/commands/fix-issue.md` を確認する
 
 ## プロジェクト概要
 
-ハンドメイドアクセサリー作家「tku」の商品販売サイト（tocoriri.com）です。プロジェクト構成：
+ハンドメイドアクセサリー作家「tku」の商品販売サイト（`tocoriri.com`）です。
 
-- **フロントエンド**: Next.js + TypeScript による SSR/SPA ハイブリッド
-- **バックエンド**: Go REST API with sqlx、Railway にデプロイ
-- **データベース**: MySQL with golang-migrate によるスキーマ管理
-- **インフラ**: CDK for Terraform による AWS リソース管理
+- **frontend**: Next.js + TypeScript による公開サイト / 管理画面
+- **backend**: Go 製 REST API
+- **database**: MySQL（`golang-migrate` でスキーマ管理）
+- **infra**: CDK for Terraform による運用系 Lambda / EventBridge 管理
 
-## 開発コマンド
+## リポジトリ構成
 
-### ローカル開発（Docker）
-
-```bash
-# 全サービス起動（API、Frontend、Database）
-docker-compose up
-
-# サービスアクセス:
-# - フロントエンド: http://localhost:3000
-# - バックエンドAPI: http://localhost:8080
-# - データベース: localhost:3306
+```text
+tku/
+├── frontend/   # Next.js アプリ
+├── backend/    # Go API
+└── infra/      # 定期実行タスクなどの IaC
 ```
 
-### 各ディレクトリ固有の開発コマンド
+## ローカル開発
 
-詳細は各ディレクトリの CLAUDE.md ファイルを参照：
+### 全体起動
 
-- **frontend/**: `/frontend/CLAUDE.md` - Next.js + TypeScript
-- **backend/**: `/backend/CLAUDE.md` - Go REST API
-- **infra/**: `/infra/CLAUDE.md` - CDK for Terraform
+```bash
+docker-compose up
+```
 
-## プロジェクトアーキテクチャ
+起動対象:
 
-詳細なプロジェクト構造は各ディレクトリの CLAUDE.md ファイルを参照：
+- フロントエンド: `http://localhost:3000`
+- バックエンド API: `http://localhost:8080`
+- MySQL: `localhost:3306`
+- MinIO: `http://localhost:9000`
 
-- **frontend/**: `/frontend/CLAUDE.md` - Next.js + TypeScript 構造
-- **backend/**: `/backend/CLAUDE.md` - Go REST API 構造
-- **infra/**: `/infra/CLAUDE.md` - AWS インフラ構造
+### 補足
 
-### 主要機能
+- backend のローカル開発では `backend/.env` を利用する
+- Docker 構成には `db` / `migrate` / `minio` / `api` / `frontend` が含まれる
+- ローカルでも S3 互換ストレージを使った検証ができる
 
-- **商品管理**: ハンドメイドアクセサリーの CRUD 操作
-- **画像アップロード**: S3 連携による商品画像管理
-- **管理ダッシュボード**: CSV 一括編集機能付きコンテンツ管理
-- **Web スクレイピング**: Creema マーケットプレイス連携による商品データ取得
-- **お問い合わせフォーム**: SendGrid 連携によるメール通知
-- **SEO**: SNS シェア用動的 OGP 生成
+## アーキテクチャの要点
 
-### デプロイ
+### frontend
 
-- **フロントエンド**: AWS Amplify にデプロイ
-- **バックエンド**: Railway にデプロイ
-- **Lambda 関数**: CDK for Terraform による定期実行
-  - フロントエンドの warmup 用 Lambda（5 分ごと実行）
-  - バックエンドのヘルスチェック用 Lambda（1 時間ごと実行）
-- 詳細は各ディレクトリの CLAUDE.md を参照
+- App Router ベースの SSR / SPA ハイブリッド
+- 公開サイトと管理画面を同一アプリ内で運用
+- Storybook / Vitest を使った UI 品質管理
 
-## 重要な注意事項
+### backend
 
-- 日本語の EC サイト（コンテンツは日本語）
-- **フロントエンド**: Next.js + TypeScript による SSR/SPA ハイブリッド（初回レンダリングは SSR、その後は SPA 的なルーティング）
-- **バックエンド**: フレームワークなしの Go + Gorilla Mux
-- データベースマイグレーションはバージョン管理され Railway で実行予定
-- 画像は S3 に UUID ベースで保存
+- フレームワークに依存しすぎない Go + Gorilla Mux
+- `domain / usecase / interface / infra` で責務分離
+- `internal/app/di` を Composition Root として依存関係を集約
+- product は Query / Command を分離
+- S3 / SendGrid / Creema 連携を usecase から抽象化
 
-## 開発方針
+### infra
 
-### フロントエンド開発について
+- CDK for Terraform による運用タスク管理
+- フロントエンド warmup 用 Lambda
+- API ヘルスチェック用 Lambda
 
-- **技術スタック**: Next.js + TypeScript による SSR/SPA ハイブリッド（初回レンダリングは SSR、その後はクライアントサイドルーティング）
-- **UI/UX**: レスポンシブデザインによるモバイルファースト設計
-- **状態管理**: React の標準的な状態管理パターンを採用
+## 主要機能
 
-## 各ディレクトリ固有の詳細情報
+- 商品管理（CRUD）
+- 商品画像アップロード
+- CSV による商品データ入出力
+- Creema 商品情報を使った複製補助
+- 管理者ログイン / セッション認証
+- お問い合わせ保存 + メール通知
+- 動的 OGP を含む SEO 対応
 
-各ディレクトリでの開発における詳細なガイドラインは、それぞれの CLAUDE.md ファイルを参照してください：
+## デプロイ / 運用
 
-- **frontend/**: `/frontend/CLAUDE.md` - Next.js + TypeScript の開発規約とガイドライン
-- **backend/**: `/backend/CLAUDE.md` - Go REST API の開発ガイドライン
-- **infra/**: `/infra/CLAUDE.md` - CDK for Terraform のインフラ開発ガイドライン
+- フロントエンド: AWS Amplify
+- バックエンド: Railway
+- 商品画像: AWS S3
+- お問い合わせ通知: SendGrid
+- 定期実行: AWS Lambda + EventBridge
 
-## Git 操作における重要な注意事項
+## ディレクトリ別ガイド
 
-### .gitignore の厳格な遵守
+- `frontend/CLAUDE.md`: フロントエンドの開発規約
+- `backend/CLAUDE.md`: バックエンドの構成・実装ルール
+- `infra/CLAUDE.md`: インフラ変更時の注意点
 
-- **絶対禁止**: `.gitignore`で除外されているファイル・ディレクトリを**一切コミットしない**
-- **強制追加禁止**: `git add -f`による強制追加は**絶対に使用しない**
-- **対象ファイル例**:
-  - `.vscode/settings.json`（個人設定ファイル）
-  - `node_modules/`（依存関係）
-  - `dist/`, `build/`（ビルド成果物）
-  - `.env*`（環境変数ファイル）
-  - ログファイル、一時ファイル
+## 作業時の注意事項
 
-### 理由
-
-- **個人設定の混入防止**: 開発者個人の設定が他の開発者に影響することを防ぐ
-- **リポジトリサイズの制御**: 不要なファイルによるリポジトリ肥大化を防ぐ
-- **セキュリティ**: 機密情報や環境固有の設定の漏洩を防ぐ
-- **ビルド環境の一貫性**: ビルド成果物は CI/CD で生成し、環境間の一貫性を保つ
+- 日本語サイトのため、コンテンツや UI 文言は日本語前提で扱う
+- `.gitignore` 対象は絶対にコミットしない
+- `git add -f` は使用しない
+- `.env*`、ビルド成果物、個人設定ファイルはコミットしない
+- 大きな構成変更を行う場合は、各ディレクトリ配下の `CLAUDE.md` と `docs/` を先に確認する
