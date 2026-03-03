@@ -1,10 +1,11 @@
 # CLAUDE.md - Infrastructure
 
-このファイルは、infraディレクトリでのインフラ開発における Claude Code (claude.ai/code)向けのガイドラインです。
+このファイルは、`infra/` ディレクトリで作業する開発者とエージェント向けの補助ガイドです。
 
 ## プロジェクト概要
 
-CDK for Terraform によるAWSリソース管理。VPC、ECS、RDS、Lambda などのクラウドインフラをコードで管理しています。
+`infra/` では、CDK for Terraform を使って運用系の AWS リソースを管理しています。  
+現在の主な対象は、フロントエンド warmup 用 Lambda と、バックエンド API ヘルスチェック用 Lambda、およびそれらの定期実行設定です。
 
 ## 開発コマンド
 
@@ -15,7 +16,7 @@ pnpm install
 # TypeScript コンパイル
 pnpm build
 
-# Terraform設定生成
+# Terraform 設定生成
 pnpm synth
 
 # インフラ変更計画
@@ -37,89 +38,56 @@ pnpm test
 
 ## 管理対象リソース
 
-### ネットワーク
-- **VPC**: Virtual Private Cloud
-- **サブネット**: Public/Private サブネット
-- **インターネットゲートウェイ**: 外部接続
-- **NAT ゲートウェイ**: Private サブネットからの外部接続
-- **セキュリティグループ**: ファイアウォール設定
+### Lambda
 
-### コンピューティング
-- **ECS**: Elastic Container Service
-  - クラスター設定
-  - サービス定義
-  - タスク定義
-- **ECR**: Elastic Container Registry
-  - Docker イメージ保存
+- **warmup**
+  - フロントエンドの応答性維持を目的に定期実行する
+- **health-check**
+  - API の生存確認を目的に定期実行する
 
-### データベース
-- **RDS**: Relational Database Service
-  - MySQL インスタンス
-  - セキュリティ設定
-  - バックアップ設定
+### EventBridge
 
-### ストレージ
-- **S3**: Simple Storage Service
-  - 画像ファイル保存
-  - 静的ファイル配信
-
-### その他
-- **ALB**: Application Load Balancer
-- **Route53**: DNS 管理
-- **CloudFront**: CDN
-- **Certificate Manager**: SSL/TLS 証明書
+- warmup Lambda のスケジュール実行
+- health-check Lambda のスケジュール実行
 
 ## ディレクトリ構造
 
-```
+```text
 infra/
-├── main.ts              # CDK for Terraform のメインエントリーポイント
-├── resources/           # AWSリソースの定義
-│   ├── asm/            # AWS Systems Manager関連
-│   ├── ec2/            # EC2関連（userData等）
-│   ├── ecs/            # ECS関連（クラスター、サービス、タスク定義）
-│   ├── eventBridge/    # EventBridge関連
-│   ├── lambda/         # Lambda関数定義とハンドラー
-│   └── network/        # VPC、サブネット、セキュリティグループ等
-├── libs/                # ユーティリティライブラリ
-│   ├── compile.ts      # コンパイル関連ユーティリティ
-│   ├── convert.ts      # データ変換ユーティリティ
-│   ├── date.ts         # 日付操作ユーティリティ
-│   └── task.ts         # タスク関連ユーティリティ
-├── cdktf.json           # CDK for Terraform設定ファイル
-├── tsconfig.json        # TypeScript設定
-├── package.json         # パッケージ管理
-└── cdktf.out/           # 生成されるTerraformファイル（ビルド成果物）
+├── main.ts                         # スタック定義
+├── resources/
+│   ├── eventBridge/               # EventBridge ルール定義
+│   ├── lambda/                    # Lambda 定義とハンドラー
+│   │   └── handlers/
+│   │       ├── warmup/           # warmup 実処理
+│   │       └── healthCheck/      # health-check 実処理
+│   ├── ecs/                       # Lambda から参照する設定ファイル等
+│   ├── asm/
+│   ├── ec2/
+│   └── network/
+├── libs/                          # 補助ユーティリティ
+├── cdktf.json
+├── tsconfig.json
+└── package.json
 ```
 
-## 開発方針
+## 実装の要点
 
-### 環境管理
-- **開発環境**: development
-- **本番環境**: production
-- 環境ごとの設定ファイルで管理
-
-### セキュリティ
-- **最小権限の原則**: 必要最小限のアクセス権限
-- **暗号化**: データの暗号化（保存時・転送時）
-- **ネットワーク分離**: Public/Private サブネットの適切な分離
-
-### 運用
-- **モニタリング**: CloudWatch による監視
-- **ログ**: 構造化ログの実装
-- **バックアップ**: 定期的なデータバックアップ
-- **災害復旧**: Multi-AZ 構成
+- `main.ts` では `ap-northeast-1` を対象リージョンとしてスタックを組み立てる
+- warmup は日本時間の稼働帯を考慮し、5 分間隔で実行する
+- health-check は日本時間の稼働帯を考慮し、1 時間間隔で実行する
+- スケジュールは UTC ベースの cron で記述しているため、変更時は時差を必ず確認する
 
 ## デプロイフロー
 
-1. **計画確認**: `cdktf plan` で変更内容確認
-2. **レビュー**: インフラ変更のコードレビュー
-3. **適用**: `cdktf apply` で変更適用
-4. **検証**: デプロイ後の動作確認
+1. `cdktf plan` で差分を確認する
+2. コードレビューで意図した変更だけが含まれているか確認する
+3. `cdktf apply` で適用する
+4. Lambda とスケジュールの動作を確認する
 
 ## 注意事項
 
-- **本番環境への変更**: 必ず staging 環境で事前検証
-- **状態管理**: Terraform State の適切な管理
-- **コスト最適化**: 使用していないリソースの定期的な見直し
-- **セキュリティ**: 定期的なセキュリティ監査の実施
+- 適用前に `cdktf plan` を必ず確認する
+- cron を変更する場合は、日本時間と UTC の対応を確認する
+- Lambda ハンドラー変更時は、対象 URL や必要な環境変数の影響も確認する
+- 実装済みリソースとドキュメントの乖離を作らない

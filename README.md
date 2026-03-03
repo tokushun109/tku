@@ -1,98 +1,185 @@
-## サイト説明
+## サイト概要
 
-ハンドメイドアクセサリーを制作・販売している**とこりり**のサイトです
+ハンドメイドアクセサリー作家 **とこりり** の作品紹介・販売サイトです。
+公開サイトとして運用しつつ、個人開発のポートフォリオとしても「設計」「保守性」「実運用を意識した実装」を示せる構成にしています。
 
 ## URL
 
 <https://tocoriri.com>
 
+## このリポジトリで重視していること
+
+- 単なる LP ではなく、`frontend / backend / infra` を分離したフルスタック構成
+- 実運用しやすい管理画面と、更新効率を上げる運用機能
+- 一度作って終わりではなく、継続的に保守しやすいアーキテクチャ
+- ローカルでも本番に近い構成を再現できる開発環境
+
 ## プロジェクト構成
 
-```
+```text
 tku/
-├── frontend/          # Next.js フロントエンドアプリケーション
-├── backend/           # Go REST API サーバー
-└── infra/             # CDK for Terraform インフラコード
+├── frontend/          # Next.js フロントエンド
+├── backend/           # Go REST API
+└── infra/             # CDK for Terraform による運用系インフラ
 ```
 
-## ディレクトリ別の技術構成
+## 技術スタック
 
-### frontend/ - Next.js フロントエンドアプリケーション
+### frontend
 
-| 内容                              | 補足                                                                                                                                                                                                                                                                                 |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Next.js + TypeScript を使って作成 | SSR/SPA ハイブリッドによる最適化されたパフォーマンス                                                                                                                                                                                                                                 |
-| TypeScript を使用                 | 型安全な開発と保守性の向上を図る                                                                                                                                                                                                                                                     |
-| 管理画面も自作                    | - 管理者のログイン機能<br/>- 商品情報、カテゴリー、販売サイトなどの作成、更新 <br/>などの基本動作から <br>- CSV を使った一括編集 <br/>- Creema(ハンドメイドアクセサリーサイト)の情報をスクレイピングし、そちらから商品情報を作成する <br/>など管理者の使いやすさを考慮した機能も実装 |
-| レスポンシブデザイン              | モバイルファーストによる設計で、スマートフォンから PC まで最適化された UI/UX                                                                                                                                                                                                         |
-| OGP も動的に変更されるように実装  | 動的に OGP が変更されるように実装しており、SNS でシェアした時もページにあった表示がされるように実装                                                                                                                                                                                  |
-| アニメーションの実装              | 操作性重視の程よいアニメーションを意識して実装                                                                                                                                                                                                                                       |
-| デプロイ先                        | AWS Amplify でホスティング、Git 連携による自動デプロイと SSR/SPA の最適化                                                                                                                                                                                                            |
+- Next.js 15 + TypeScript
+- App Router による SSR / SPA ハイブリッド構成
+- Sass（CSS Modules）
+- React Hook Form + Zod
+- Storybook / Vitest / Testing Library
 
-### backend/ - Go REST API サーバー
+### backend
 
-| 内容                                     | 補足                                                               |
-| ---------------------------------------- | ------------------------------------------------------------------ |
-| 使用言語は Go                            | フレームワークは使用せずに作成を行っている                         |
-| DB アクセスは sqlx を使用                | Gorilla Mux を使って、RESTful API を作成                           |
-| お問い合わせに対するメール送信機能も実装 | SendGrid を使用して作成                                            |
-| デプロイ先                               | Railway でホスティング、コンテナベースの自動デプロイとスケーリング |
-| テーブルの ver は golang-migrate で管理  | Railway 上で migrate を実行して DB の migration を管理             |
+- Go 1.25
+- Gorilla Mux
+- sqlx + MySQL
+- golang-migrate
+- AWS S3
+- SendGrid
 
-### infra/ - CDK for Terraform インフラコード
+### infra
 
-| 内容                                          | 補足                                                       |
-| --------------------------------------------- | ---------------------------------------------------------- |
-| 主要なインフラは CDK for Terraform でコード化 | AWS リソースの管理と Lambda 関数の定期実行タスクを実装     |
-| Lambda 関数による定期実行                     | フロントエンドの lambda warmup・バックエンドヘルスチェック |
+- CDK for Terraform
+- AWS Lambda
+- EventBridge
 
-## 開発手法
+## 実装上の強み
 
-| 内容                           | 補足                                                                    |
-| ------------------------------ | ----------------------------------------------------------------------- |
-| ハイブリッド開発アプローチ     | 基盤設計・コア実装は手動開発、技術移行・リファクタリングでAI活用        |
-| 技術スタック移行での AI 活用   | Vue.js → Next.js 移行時に Claude Code を活用し効率的な技術移行を実現   |
-| 品質保証とコードレビュー       | AI による一貫したコーディング規約チェックと人的レビューの組み合わせ     |
+### 1. 管理画面まで含めて自作
+
+- 商品、カテゴリ、タグ、販売サイトなどの CRUD を管理画面から操作可能
+- 管理者ログイン、セッション管理、管理者権限チェックを実装
+- CSV による商品データのエクスポート / インポートに対応
+
+### 2. 商品運用を楽にする機能を実装
+
+- Creema の商品ページをもとに、商品情報を複製する補助機能を実装
+- 商品画像は S3 に保存し、UUID ベースで管理
+- カルーセル用の表示データやカテゴリ別一覧など、公開側で使いやすい API を用意
+
+### 3. 自作コンポーネントを軸にしたフロントエンド実装
+
+- 主要な UI コンポーネントの大体を自作し、デザインと振る舞いを細かく調整
+- `components` と `features` を分け、画面単位ではなく再利用可能な部品として設計
+- 公開サイトと管理画面を同一アプリ内で運用し、機能追加や改修を一元管理
+- Next.js 15 + App Router により、SEO と操作性を両立しやすい構成
+- Storybook / Vitest / Testing Library により、UI の確認と品質管理を継続しやすい
+
+### 4. DDD / Clean Architecture を前提にした backend 設計
+
+- DDD / Clean Architecture を意識して責務を分離
+- `domain` / `usecase` / `interface` / `infra` のレイヤを分割
+- `internal/app/di` に Composition Root を置き、依存関係を集約
+- product は Query / Command を分離し、読み取りと更新の責務を整理
+
+### 5. 実運用を意識した安全性
+
+- 管理系 API は認証・管理者権限・Origin 検証を組み合わせて保護
+- お問い合わせは保存だけでなく、SendGrid 連携で通知まで実装
+- スキーマ変更は golang-migrate で履歴管理
+
+### 6. ローカル再現性の高い開発環境
+
+- `docker-compose` で frontend / backend / MySQL をまとめて起動可能
+- ローカルでは MinIO を使って S3 互換ストレージも再現
+- migrate コンテナを分離し、マイグレーションの適用フローも本番に寄せている
+
+## ディレクトリ別の概要
+
+### `frontend/`
+
+- 公開サイトと管理画面を含む Next.js アプリケーション
+- レスポンシブ対応、動的 OGP、適度なアニメーションを実装
+- コンポーネント設計と Storybook によって UI を管理しやすく整理
+
+### `backend/`
+
+- フレームワークに依存しすぎない Go 製 REST API
+- 商品、画像、作家情報、問い合わせ、認証などの API を提供
+- 外部連携（S3 / SendGrid / Creema）を usecase から抽象化して組み込み
+
+### `infra/`
+
+- 定期実行の運用タスクを CDK for Terraform で管理
+- フロントエンドの warmup と、バックエンドのヘルスチェックを自動化
+
+## 品質面
+
+- backend はドメイン・ユースケース・HTTP 層を含めてテストを整備
+- マイグレーションファイルを継続的に積み上げ、スキーマ変更履歴を管理
+- AI を補助的に活用しつつ、設計判断と最終レビューは手動で実施
+
+## 開発コマンド
+
+### ルート
+
+```bash
+docker-compose up
+```
+
+### frontend
+
+```bash
+cd frontend
+pnpm install
+pnpm dev
+pnpm build
+pnpm lint
+pnpm test
+```
+
+### backend
+
+```bash
+cd backend
+go build ./...
+go test ./...
+```
+
+### infra
+
+```bash
+cd infra
+pnpm install
+pnpm build
+pnpm synth
+```
 
 ## インフラ構成
 
 ```mermaid
 graph TD
-    %% ユーザー・外部サービス
     User[ユーザー]
-    SendGrid[SendGrid<br/>メール送信]
+    SendGrid[SendGrid]
 
-    %% フロントエンド
-    Amplify[AWS Amplify<br/>Next.js + TypeScript<br/>SSR/SPA ハイブリッド]
+    Amplify[AWS Amplify<br/>Next.js]
 
-    %% Railway Platform
-    subgraph Railway[Railway Platform]
-        API[Go REST API<br/>sqlx + Gorilla Mux]
-        MySQL[(MySQL Database<br/>golang-migrate)]
+    subgraph Railway[Railway]
+        API[Go REST API]
+        MySQL[(MySQL)]
     end
 
-    %% AWS Infrastructure
-    S3[AWS S3<br/>商品画像保存<br/>UUID ベース]
-    Lambda1[Lambda関数<br/>Amplify Warmup<br/>5分間隔]
-    Lambda2[Lambda関数<br/>Railway ヘルスチェック<br/>1時間間隔]
+    S3[AWS S3<br/>商品画像保存]
+    Warmup[Lambda<br/>フロントエンド warmup]
+    Health[Lambda<br/>API health check]
+    CDK[CDK for Terraform]
 
-    %% CDK for Terraform
-    CDK[CDK for Terraform<br/>インフラ管理]
-
-    %% 接続関係
     User --> Amplify
     Amplify --> API
     API --> MySQL
     API --> S3
     API --> SendGrid
 
-    Lambda1 --> Amplify
-    Lambda2 --> Railway
-    CDK --> Lambda1
-    CDK --> Lambda2
-    CDK --> S3
+    Warmup --> Amplify
+    Health --> API
+    CDK --> Warmup
+    CDK --> Health
 
-    %% スタイル
     classDef frontend fill:#b3e5fc
     classDef backend fill:#ffcc80
     classDef infra fill:#c8e6c9
@@ -100,6 +187,6 @@ graph TD
 
     class Amplify frontend
     class API,MySQL backend
-    class S3,Lambda1,Lambda2,CDK infra
+    class S3,Warmup,Health,CDK infra
     class SendGrid external
 ```
