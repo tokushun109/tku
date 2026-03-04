@@ -70,7 +70,7 @@ tku/
 - Next.js 15 + App Router により、SEO と操作性を両立しやすい構成
 - Storybook / Vitest / Testing Library により、UI の確認と品質管理を継続しやすい
 
-### 4. DDD / Clean Architecture を前提にした backend 設計
+### 4. DDD / Clean Architecture を前提にしたバックエンド設計
 
 - DDD / Clean Architecture を意識して責務を分離
 - `domain` / `usecase` / `interface` / `infra` のレイヤを分割
@@ -137,6 +137,7 @@ pnpm test
 
 ```bash
 cd backend
+go run ./cmd/api
 go build ./...
 go test ./...
 ```
