@@ -70,7 +70,7 @@ tku/
 - Next.js 15 + App Router により、SEO と操作性を両立しやすい構成
 - Storybook / Vitest / Testing Library により、UI の確認と品質管理を継続しやすい
 
-### 4. DDD / Clean Architecture を前提にした backend 設計
+### 4. DDD / Clean Architecture を前提にしたバックエンド設計
 
 - DDD / Clean Architecture を意識して責務を分離
 - `domain` / `usecase` / `interface` / `infra` のレイヤを分割
@@ -110,6 +110,7 @@ tku/
 
 ## 品質面
 
+- frontend は TypeScript と ESLint による静的検証に加え、Storybook とテストで UI 品質を確認
 - backend はドメイン・ユースケース・HTTP 層を含めてテストを整備
 - マイグレーションファイルを継続的に積み上げ、スキーマ変更履歴を管理
 - AI を補助的に活用しつつ、設計判断と最終レビューは手動で実施
@@ -124,31 +125,29 @@ docker-compose up
 
 ### frontend
 
-```bash
-cd frontend
-pnpm install
-pnpm dev
-pnpm build
-pnpm lint
-pnpm test
-```
+`cd frontend` のうえで、用途に応じて以下を実行します。
+
+- 依存関係のインストール: `pnpm install`
+- 開発サーバー起動: `pnpm dev`
+- 本番ビルド: `pnpm build`
+- Lint 実行: `pnpm lint`
+- テスト実行: `pnpm test`
 
 ### backend
 
-```bash
-cd backend
-go build ./...
-go test ./...
-```
+`cd backend` のうえで、用途に応じて以下を実行します。
+
+- 起動: `go run ./cmd/api`
+- ビルド確認: `go build ./...`
+- テスト実行: `go test ./...`
 
 ### infra
 
-```bash
-cd infra
-pnpm install
-pnpm build
-pnpm synth
-```
+`cd infra` のうえで、用途に応じて以下を実行します。
+
+- 依存関係のインストール: `pnpm install`
+- TypeScript のビルド: `pnpm build`
+- CDK for Terraform の synth 実行: `pnpm synth`
 
 ## インフラ構成
 
