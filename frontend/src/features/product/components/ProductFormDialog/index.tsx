@@ -336,7 +336,6 @@ export const ProductFormDialog = ({
             cancelOption={{
                 label: 'キャンセル',
                 onClick: handleClose,
-                disabled: isSubmitting,
             }}
             closeOnBackdropClick={false}
             confirmOption={{
