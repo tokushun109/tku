@@ -18,6 +18,9 @@ const meta: Meta<typeof Dialog> = {
         },
     },
     argTypes: {
+        closeOnBackdropClick: {
+            control: { type: 'boolean' },
+        },
         isOpen: {
             control: { type: 'boolean' },
         },
@@ -73,6 +76,18 @@ export const NoButtons: Story = {
     args: {
         title: '情報',
         children: <p>このダイアログにはボタンがありません。背景をクリックして閉じてください。</p>,
+    },
+}
+
+export const BackdropClickDisabled: Story = {
+    args: {
+        title: '背景クリックで閉じない',
+        closeOnBackdropClick: false,
+        children: <p>背景をクリックしても閉じません。明示的な操作で閉じるダイアログ向けです。</p>,
+        confirmOption: {
+            label: '閉じる',
+            onClick: () => console.log('ダイアログを閉じました'),
+        },
     },
 }
 
