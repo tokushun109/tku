@@ -172,15 +172,10 @@ describe('Admin Product Page Integration Test', () => {
     it('商品追加ダイアログをキャンセルで閉じられる', async () => {
         render(<AdminProductTemplate {...defaultProps} initialProducts={mockProductData} />)
 
-        await waitFor(() => {
-            expect(screen.getByText('追加')).toBeInTheDocument()
-        })
+        const addButton = await screen.findByText('追加')
+        fireEvent.click(addButton)
 
-        fireEvent.click(screen.getByText('追加'))
-
-        await waitFor(() => {
-            expect(screen.getByText('商品を追加')).toBeInTheDocument()
-        })
+        await screen.findByText('商品を追加')
 
         fireEvent.click(screen.getByRole('button', { name: 'キャンセル' }))
 
