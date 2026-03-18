@@ -165,6 +165,27 @@ describe('Admin Product Page Integration Test', () => {
             // ダイアログ内のCreemaオプションが表示されているか確認
             expect(screen.getByText('Creemaから複製')).toBeInTheDocument()
             expect(screen.getByText('手動で入力')).toBeInTheDocument()
+            expect(screen.getByRole('button', { name: 'キャンセル' })).toBeInTheDocument()
+        })
+    })
+
+    it('商品追加ダイアログをキャンセルで閉じられる', async () => {
+        render(<AdminProductTemplate {...defaultProps} initialProducts={mockProductData} />)
+
+        await waitFor(() => {
+            expect(screen.getByText('追加')).toBeInTheDocument()
+        })
+
+        fireEvent.click(screen.getByText('追加'))
+
+        await waitFor(() => {
+            expect(screen.getByText('商品を追加')).toBeInTheDocument()
+        })
+
+        fireEvent.click(screen.getByRole('button', { name: 'キャンセル' }))
+
+        await waitFor(() => {
+            expect(screen.queryByText('商品を追加')).not.toBeInTheDocument()
         })
     })
 

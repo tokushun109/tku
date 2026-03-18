@@ -333,6 +333,12 @@ export const ProductFormDialog = ({
 
     return (
         <Dialog
+            cancelOption={{
+                label: 'キャンセル',
+                onClick: handleClose,
+                disabled: isSubmitting,
+            }}
+            closeOnBackdropClick={false}
             confirmOption={{
                 label: isSubmitting ? '送信中...' : isEdit ? '更新' : createProductType === CreateProductType.Duplicate ? '複製' : '追加',
                 onClick:

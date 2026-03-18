@@ -15,6 +15,7 @@ interface DialogButtonOption {
 interface Props {
     cancelOption?: DialogButtonOption
     children: React.ReactNode
+    closeOnBackdropClick?: boolean
     confirmOption?: DialogButtonOption
     isOpen: boolean
     onClose: () => void
@@ -22,10 +23,11 @@ interface Props {
     wide?: boolean
 }
 
-export const Dialog = ({ isOpen, onClose, title, children, confirmOption, cancelOption, wide = false }: Props) => {
+export const Dialog = ({ isOpen, onClose, title, children, confirmOption, cancelOption, closeOnBackdropClick = true, wide = false }: Props) => {
     if (!isOpen) return null
 
     const handleBackdropClick = () => {
+        if (!closeOnBackdropClick) return
         onClose()
     }
 
