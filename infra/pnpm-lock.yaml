@@ -10,13 +10,13 @@ importers:
     dependencies:
       '@cdktf/provider-aws':
         specifier: 21.22.1
-        version: 21.22.1(cdktf@0.21.0(constructs@10.4.5))(constructs@10.4.5)
+        version: 21.22.1(cdktf@0.21.0(constructs@10.5.1))(constructs@10.5.1)
       cdktf:
         specifier: ^0.21.0
-        version: 0.21.0(constructs@10.4.5)
+        version: 0.21.0(constructs@10.5.1)
       constructs:
         specifier: ^10.4.2
-        version: 10.4.5
+        version: 10.5.1
       dotenv:
         specifier: ^17.2.1
         version: 17.2.3
@@ -852,8 +852,8 @@ packages:
   concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
 
-  constructs@10.4.5:
-    resolution: {integrity: sha512-fOoP70YLevMZr5avJHx2DU3LNYmC6wM8OwdrNewMZou1kZnPGOeVzBrRjZNgFDHUlulYUjkpFRSpTE3D+n+ZSg==}
+  constructs@10.5.1:
+    resolution: {integrity: sha512-f/TfFXiS3G/yVIXDjOQn9oTlyu9Wo7Fxyjj7lb8r92iO81jR2uST+9MstxZTmDGx/CgIbxCXkFXgupnLTNxQZg==}
 
   convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
@@ -1871,10 +1871,10 @@ snapshots:
 
   '@bcoe/v8-coverage@0.2.3': {}
 
-  '@cdktf/provider-aws@21.22.1(cdktf@0.21.0(constructs@10.4.5))(constructs@10.4.5)':
+  '@cdktf/provider-aws@21.22.1(cdktf@0.21.0(constructs@10.5.1))(constructs@10.5.1)':
     dependencies:
-      cdktf: 0.21.0(constructs@10.4.5)
-      constructs: 10.4.5
+      cdktf: 0.21.0(constructs@10.5.1)
+      constructs: 10.5.1
 
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
@@ -2482,9 +2482,9 @@ snapshots:
 
   caniuse-lite@1.0.30001751: {}
 
-  cdktf@0.21.0(constructs@10.4.5):
+  cdktf@0.21.0(constructs@10.5.1):
     dependencies:
-      constructs: 10.4.5
+      constructs: 10.5.1
 
   chalk@4.1.2:
     dependencies:
@@ -2517,7 +2517,7 @@ snapshots:
 
   concat-map@0.0.1: {}
 
-  constructs@10.4.5: {}
+  constructs@10.5.1: {}
 
   convert-source-map@2.0.0: {}
 
