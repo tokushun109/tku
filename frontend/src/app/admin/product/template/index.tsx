@@ -14,6 +14,7 @@ import { Dialog } from '@/components/bases/Dialog'
 import { IClassification } from '@/features/classification/type'
 import { ProductCard } from '@/features/product/components/ProductCard'
 import { ProductFormDialog } from '@/features/product/components/ProductFormDialog'
+import { EXISTING_PRODUCT_IMAGE_ID_PREFIX } from '@/features/product/constants'
 import { ICreemaDuplicateForm } from '@/features/product/product/type'
 import { IProduct, IProductForm } from '@/features/product/type'
 import { ISite } from '@/features/site/type'
@@ -149,26 +150,24 @@ export const AdminProductTemplate = ({
                 // 編集時：まず基本データを更新、その後画像順序更新（必要な場合）
                 let productDataToUpdate = { ...productData, uuid: updateItem.uuid }
 
-                // 既存画像の順序更新処理（並び替えが行われた場合）
-                if (data.isImageOrderChanged && data.imageItems) {
-                    const existingItems = data.imageItems.filter((item) => !item.isNewUpload)
-                    const updatedProductImages = updateItem.productImages.map((image) => {
-                        const reorderedItem = existingItems.find((item) => item.src === image.apiPath)
-                        if (reorderedItem && reorderedItem.displayOrder) {
-                            // 並び替え後の位置に基づいて100から降順で計算
-                            return {
-                                ...image,
-                                displayOrder: 100 - (reorderedItem.displayOrder - 1),
-                            }
-                        }
-                        return {
-                            ...image,
-                            displayOrder: image.displayOrder, // 並び替えされていない場合は既存の値を維持
-                        }
-                    })
+                if (data.imageItems) {
+                    // モーダル上で削除・並び替え後に残っている既存画像だけを更新対象にする。
+                    // PUTに含めなかった既存画像はバックエンド側で削除される。
+                    const existingItems = data.imageItems.filter((item) => !item.isNewUpload && item.id.startsWith(EXISTING_PRODUCT_IMAGE_ID_PREFIX))
+                    const existingItemMap = new Map(existingItems.map((item) => [item.id.replace(EXISTING_PRODUCT_IMAGE_ID_PREFIX, ''), item]))
 
-                    // 順序更新されたproductImagesを含める
-                    productDataToUpdate.productImages = updatedProductImages
+                    productDataToUpdate.productImages = updateItem.productImages
+                        .filter((image) => existingItemMap.has(image.uuid))
+                        .map((image) => {
+                            const imageItem = existingItemMap.get(image.uuid)
+                            if (data.isImageOrderChanged && imageItem?.displayOrder) {
+                                return {
+                                    ...image,
+                                    displayOrder: 100 - (imageItem.displayOrder - 1),
+                                }
+                            }
+                            return image
+                        })
                 }
 
                 await updateProduct(updateItem.uuid, productDataToUpdate)
@@ -181,7 +180,9 @@ export const AdminProductTemplate = ({
 
             // 画像をアップロードする場合の処理
             if (data.uploadImages && data.uploadImages.length > 0) {
-                const existingImagesCount = updateItem?.productImages?.length || 0
+                const existingImagesCount = data.imageItems
+                    ? data.imageItems.filter((item) => !item.isNewUpload && item.id.startsWith(EXISTING_PRODUCT_IMAGE_ID_PREFIX)).length
+                    : updateItem?.productImages?.length || 0
                 const hasOrderChanged = data.isImageOrderChanged || false
 
                 // 新規画像の優先順位を計算
