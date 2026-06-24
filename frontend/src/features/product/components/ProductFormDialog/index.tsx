@@ -18,6 +18,7 @@ import { MultipleImageInput } from '@/components/bases/MultipleImageInput'
 import { SelectForm, SelectFormOption } from '@/components/bases/SelectForm'
 import { TextArea } from '@/components/bases/TextArea'
 import { IClassification } from '@/features/classification/type'
+import { EXISTING_PRODUCT_IMAGE_ID_PREFIX } from '@/features/product/constants'
 import { ISite } from '@/features/site/type'
 import { ColorType, FontSizeType } from '@/types'
 
@@ -167,7 +168,7 @@ export const ProductFormDialog = ({
             // 既存画像をImageItemsに変換
             const existingImages: ImageItem[] =
                 updateItem?.productImages?.map((image, _index) => ({
-                    id: `existing-${image.uuid}`,
+                    id: `${EXISTING_PRODUCT_IMAGE_ID_PREFIX}${image.uuid}`,
                     src: image.apiPath,
                     isNewUpload: false,
                     displayOrder: image.displayOrder,

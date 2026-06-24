@@ -2,7 +2,7 @@ import { fireEvent } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getCategories } from '@/apis/category'
-import { deleteProduct, getProducts } from '@/apis/product'
+import { deleteProduct, getProducts, updateProduct } from '@/apis/product'
 import { getSalesSiteList } from '@/apis/salesSite'
 import { getTags } from '@/apis/tag'
 import { getTargets } from '@/apis/target'
@@ -30,6 +30,7 @@ const mockGetSalesSiteList = vi.mocked(getSalesSiteList)
 const mockGetTags = vi.mocked(getTags)
 const mockGetTargets = vi.mocked(getTargets)
 const mockDeleteProduct = vi.mocked(deleteProduct)
+const mockUpdateProduct = vi.mocked(updateProduct)
 
 const mockProductData = [
     {
@@ -48,6 +49,12 @@ const mockProductData = [
                 apiPath: '/image/product-1.jpg',
                 name: 'product-1.jpg',
                 displayOrder: 1,
+            },
+            {
+                uuid: 'image-2',
+                apiPath: '/image/product-1-2.jpg',
+                name: 'product-1-2.jpg',
+                displayOrder: 2,
             },
         ],
         siteDetails: [],
@@ -199,6 +206,46 @@ describe('Admin Product Page Integration Test', () => {
         // クリックイベントが実行できることを確認
         fireEvent.click(productCards[0])
         // 実際のダイアログの開閉確認は統合テストの範囲外とする
+    })
+
+    it('商品編集で既存画像を削除すると更新payloadから対象画像だけ除外される', async () => {
+        mockUpdateProduct.mockResolvedValue(undefined)
+
+        render(<AdminProductTemplate {...defaultProps} initialProducts={mockProductData} />)
+
+        fireEvent.click(await screen.findByText('テスト商品1'))
+
+        await waitFor(() => {
+            expect(screen.getByText('商品を編集')).toBeInTheDocument()
+            expect(screen.getAllByAltText('プレビュー')).toHaveLength(2)
+        })
+
+        const firstPreview = screen.getAllByAltText('プレビュー')[0]
+        const deleteButton = firstPreview.parentElement?.parentElement?.querySelector('button')
+
+        expect(deleteButton).toBeInTheDocument()
+        fireEvent.click(deleteButton as HTMLButtonElement)
+
+        await waitFor(() => {
+            expect(screen.getAllByAltText('プレビュー')).toHaveLength(1)
+        })
+
+        fireEvent.click(screen.getByRole('button', { name: '更新' }))
+
+        await waitFor(() => {
+            expect(mockUpdateProduct).toHaveBeenCalled()
+        })
+
+        expect(mockUpdateProduct).toHaveBeenCalledWith(
+            'product-1',
+            expect.objectContaining({
+                productImages: [
+                    expect.objectContaining({
+                        uuid: 'image-2',
+                    }),
+                ],
+            }),
+        )
     })
 
     it('商品削除機能が正常に動作する', async () => {
