@@ -5,7 +5,7 @@ import "io"
 type CreateProductInput struct {
 	Name         string
 	Description  string
-	Price        int
+	Price        *int
 	IsActive     bool
 	IsRecommend  bool
 	CategoryUUID string
@@ -17,7 +17,7 @@ type CreateProductInput struct {
 type UpdateProductInput struct {
 	Name          string
 	Description   string
-	Price         int
+	Price         *int
 	IsActive      bool
 	IsRecommend   bool
 	CategoryUUID  string
@@ -50,7 +50,7 @@ type ProductImageBlob struct {
 type ProductCSVInputRow struct {
 	UUID         string
 	Name         string
-	Price        int
+	Price        *int
 	CategoryName string
 	TargetName   string
 }

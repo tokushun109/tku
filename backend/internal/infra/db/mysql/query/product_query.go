@@ -23,7 +23,7 @@ type productBaseRow struct {
 	Name         string         `db:"name"`
 	Description  sql.NullString `db:"description"`
 	CreatedAt    time.Time      `db:"created_at"`
-	Price        int            `db:"price"`
+	Price        sql.NullInt64  `db:"price"`
 	IsActive     bool           `db:"is_active"`
 	IsRecommend  bool           `db:"is_recommend"`
 	CategoryUUID sql.NullString `db:"category_uuid"`
@@ -63,7 +63,7 @@ type categoryRow struct {
 type productCSVRow struct {
 	UUID         string         `db:"uuid"`
 	Name         string         `db:"name"`
-	Price        int            `db:"price"`
+	Price        sql.NullInt64  `db:"price"`
 	CategoryName sql.NullString `db:"category_name"`
 	TargetName   sql.NullString `db:"target_name"`
 }
@@ -372,7 +372,7 @@ func (r *ProductQueryReader) ExportProductsCSV(
 		result = append(result, &usecaseProductQuery.ProductCSVRow{
 			UUID:         row.UUID,
 			Name:         row.Name,
-			Price:        row.Price,
+			Price:        mysqlutil.NullInt64ToPtr(row.Price),
 			CategoryName: mysqlutil.NullStringOrEmpty(row.CategoryName),
 			TargetName:   mysqlutil.NullStringOrEmpty(row.TargetName),
 		})
@@ -389,7 +389,7 @@ func buildProductsFromRows(rows []productBaseRow) []*usecaseProductQuery.Product
 			UUID:        row.UUID,
 			Name:        row.Name,
 			Description: mysqlutil.NullStringOrEmpty(row.Description),
-			Price:       row.Price,
+			Price:       mysqlutil.NullInt64ToPtr(row.Price),
 			IsActive:    row.IsActive,
 			IsRecommend: row.IsRecommend,
 			Category: usecaseProductQuery.Classification{

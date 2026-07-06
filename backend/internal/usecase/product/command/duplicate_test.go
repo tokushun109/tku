@@ -312,7 +312,7 @@ func TestDuplicateProduct(t *testing.T) {
 			result: &usecaseProduct.DuplicateProductData{
 				Name:        "sample product",
 				Description: "desc",
-				Price:       1200,
+				Price:       intPtr(1200),
 				Tags:        []string{"Silver", "silver", "Ring"},
 				Images: []usecaseProduct.DuplicateProductImage{
 					{Name: "main.png", Data: []byte{0x89, 'P', 'N', 'G', '\r', '\n', 0x1a, '\n'}},
@@ -391,7 +391,7 @@ func TestDuplicateProduct(t *testing.T) {
 			result: &usecaseProduct.DuplicateProductData{
 				Name:        "sample product",
 				Description: "desc",
-				Price:       1200,
+				Price:       intPtr(1200),
 				Images: []usecaseProduct.DuplicateProductImage{
 					{Name: "main.png", Data: []byte{0x89, 'P', 'N', 'G', '\r', '\n', 0x1a, '\n'}},
 					{Name: "sub.png", Data: []byte{0x89, 'P', 'N', 'G', '\r', '\n', 0x1a, '\n'}},

@@ -99,7 +99,7 @@ func (s *Scraper) Duplicate(ctx context.Context, rawURL string) (*usecaseProduct
 	product := &usecaseProduct.DuplicateProductData{
 		Name:        strings.TrimSpace(document.Find("title").Text()),
 		Description: strings.TrimSpace(document.Find(descriptionSelector).Text()),
-		Price:       price,
+		Price:       &price,
 		Tags:        extractTags(document),
 		Images:      make([]usecaseProduct.DuplicateProductImage, 0),
 	}

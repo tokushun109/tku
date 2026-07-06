@@ -83,10 +83,14 @@ func (h *ProductHandler) ExportCSV(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, row := range rows {
+		priceText := ""
+		if row.Price != nil {
+			priceText = strconv.Itoa(*row.Price)
+		}
 		if err := csvWriter.Write([]string{
 			row.UUID,
 			row.Name,
-			strconv.Itoa(row.Price),
+			priceText,
 			row.CategoryName,
 			row.TargetName,
 		}); err != nil {

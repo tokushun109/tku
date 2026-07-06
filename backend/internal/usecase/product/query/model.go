@@ -30,7 +30,7 @@ type Product struct {
 	UUID          string
 	Name          string
 	Description   string
-	Price         int
+	Price         *int
 	IsActive      bool
 	IsRecommend   bool
 	Category      Classification
@@ -59,7 +59,7 @@ type CarouselItem struct {
 type ProductCSVRow struct {
 	UUID         string
 	Name         string
-	Price        int
+	Price        *int
 	CategoryName string
 	TargetName   string
 }

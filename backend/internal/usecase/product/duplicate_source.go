@@ -9,7 +9,7 @@ type DuplicateSource interface {
 type DuplicateProductData struct {
 	Name        string
 	Description string
-	Price       int
+	Price       *int
 	Tags        []string
 	Images      []DuplicateProductImage
 }

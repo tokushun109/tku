@@ -22,7 +22,7 @@ type productRow struct {
 	UUID         string         `db:"uuid"`
 	Name         string         `db:"name"`
 	Description  sql.NullString `db:"description"`
-	Price        int            `db:"price"`
+	Price        sql.NullInt64  `db:"price"`
 	IsActive     bool           `db:"is_active"`
 	IsRecommend  bool           `db:"is_recommend"`
 	CategoryUUID sql.NullString `db:"category_uuid"`
@@ -41,7 +41,7 @@ func (r *ProductRepository) Create(ctx context.Context, p *domain.Product) (*dom
 		p.UUID().Value(),
 		p.Name().Value(),
 		domainVO.ToValuePtr(p.Description()),
-		p.Price().Value(),
+		domainVO.ToValuePtr(p.Price()),
 		p.IsActive(),
 		p.IsRecommend(),
 		domainVO.ToValuePtr(p.CategoryUUID()),
@@ -63,7 +63,7 @@ func (r *ProductRepository) Create(ctx context.Context, p *domain.Product) (*dom
 		p.UUID().Value(),
 		p.Name().Value(),
 		domainVO.ToValueOrEmpty(p.Description()),
-		p.Price().Value(),
+		domainVO.ToValuePtr(p.Price()),
 		p.IsActive(),
 		p.IsRecommend(),
 		domainVO.ToValuePtr(p.CategoryUUID()),
@@ -112,7 +112,7 @@ func (r *ProductRepository) Update(ctx context.Context, p *domain.Product) (bool
 			 WHERE uuid = ? AND deleted_at IS NULL`,
 		p.Name().Value(),
 		domainVO.ToValuePtr(p.Description()),
-		p.Price().Value(),
+		domainVO.ToValuePtr(p.Price()),
 		p.IsActive(),
 		p.IsRecommend(),
 		domainVO.ToValuePtr(p.CategoryUUID()),
@@ -202,7 +202,7 @@ func toDomainProduct(row productRow) (*domain.Product, error) {
 		row.UUID,
 		row.Name,
 		description,
-		row.Price,
+		mysqlutil.NullInt64ToPtr(row.Price),
 		row.IsActive,
 		row.IsRecommend,
 		categoryUUID,

@@ -242,7 +242,7 @@ func TestCreateProductImagesWithEmptyFiles(t *testing.T) {
 			productUUID,
 			"sample product",
 			"",
-			1000,
+			intPtr(1000),
 			true,
 			false,
 			nil,
@@ -298,7 +298,7 @@ func TestUploadCSV(t *testing.T) {
 			id.GenerateUUID(),
 			"old product",
 			"",
-			1000,
+			intPtr(1000),
 			true,
 			false,
 			nil,
@@ -329,7 +329,7 @@ func TestUploadCSV(t *testing.T) {
 			{
 				UUID:         product.UUID().Value(),
 				Name:         "new product",
-				Price:        2500,
+				Price:        intPtr(2500),
 				CategoryName: "new category",
 				TargetName:   "new target",
 			},
@@ -373,7 +373,7 @@ func TestUploadCSV(t *testing.T) {
 			{
 				UUID:         "",
 				Name:         "product",
-				Price:        1000,
+				Price:        intPtr(1000),
 				CategoryName: "category",
 				TargetName:   "target",
 			},
@@ -394,7 +394,7 @@ func TestUploadCSV(t *testing.T) {
 			id.GenerateUUID(),
 			"old product",
 			"",
-			1000,
+			intPtr(1000),
 			true,
 			false,
 			&currentCategoryUUID,
@@ -425,7 +425,7 @@ func TestUploadCSV(t *testing.T) {
 			{
 				UUID:         product.UUID().Value(),
 				Name:         "new product",
-				Price:        2500,
+				Price:        intPtr(2500),
 				CategoryName: "",
 				TargetName:   "",
 			},
@@ -467,7 +467,7 @@ func TestUploadCSV(t *testing.T) {
 			{
 				UUID:         id.GenerateUUID(),
 				Name:         "product",
-				Price:        1000,
+				Price:        intPtr(1000),
 				CategoryName: "category",
 				TargetName:   "target",
 			},
@@ -481,6 +481,10 @@ func TestUploadCSV(t *testing.T) {
 	})
 }
 
+func intPtr(v int) *int {
+	return &v
+}
+
 func mustNewProduct(t *testing.T, uuid string) *domainProduct.Product {
 	t.Helper()
 
@@ -488,7 +492,7 @@ func mustNewProduct(t *testing.T, uuid string) *domainProduct.Product {
 		uuid,
 		"sample product",
 		"",
-		1000,
+		intPtr(1000),
 		true,
 		false,
 		nil,

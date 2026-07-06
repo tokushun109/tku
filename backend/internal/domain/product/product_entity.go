@@ -10,7 +10,7 @@ type Product struct {
 	uuid         primitive.UUID
 	name         ProductName
 	description  *ProductDescription
-	price        ProductPrice
+	price        *ProductPrice
 	isActive     bool
 	isRecommend  bool
 	categoryUUID *primitive.UUID
@@ -21,7 +21,7 @@ func New(
 	rawUUID string,
 	name string,
 	description string,
-	price int,
+	price *int,
 	isActive bool,
 	isRecommend bool,
 	categoryUUID *string,
@@ -39,7 +39,7 @@ func Rebuild(
 	rawUUID string,
 	name string,
 	description string,
-	price int,
+	price *int,
 	isActive bool,
 	isRecommend bool,
 	categoryUUID *string,
@@ -61,7 +61,7 @@ func newWithValidatedValues(
 	rawUUID string,
 	name string,
 	description string,
-	price int,
+	price *int,
 	isActive bool,
 	isRecommend bool,
 	categoryUUID *string,
@@ -79,7 +79,7 @@ func newWithValidatedValues(
 	if err != nil {
 		return nil, err
 	}
-	productPrice, err := NewProductPrice(price)
+	productPrice, err := domainVO.ParseOptionalValue(price, NewProductPrice)
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +120,7 @@ func (p *Product) Description() *ProductDescription {
 	return p.description
 }
 
-func (p *Product) Price() ProductPrice {
+func (p *Product) Price() *ProductPrice {
 	return p.price
 }
 
@@ -143,7 +143,7 @@ func (p *Product) TargetUUID() *primitive.UUID {
 func (p *Product) ChangeProduct(
 	name string,
 	description string,
-	price int,
+	price *int,
 	isActive bool,
 	isRecommend bool,
 	categoryUUID *string,
@@ -157,7 +157,7 @@ func (p *Product) ChangeProduct(
 	if err != nil {
 		return err
 	}
-	productPrice, err := NewProductPrice(price)
+	productPrice, err := domainVO.ParseOptionalValue(price, NewProductPrice)
 	if err != nil {
 		return err
 	}

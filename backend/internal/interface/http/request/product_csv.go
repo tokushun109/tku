@@ -19,7 +19,7 @@ var (
 type ProductCSVRow struct {
 	UUID         string
 	Name         string
-	Price        int
+	Price        *int
 	CategoryName string
 	TargetName   string
 }
@@ -102,9 +102,13 @@ func parseProductCSVRecord(record []string, columnMap map[string]int, lineNo int
 		return ProductCSVRow{}, fmt.Errorf("%w: line=%d", errInvalidCSVRecord, lineNo)
 	}
 
-	price, err := strconv.Atoi(priceText)
-	if err != nil {
-		return ProductCSVRow{}, fmt.Errorf("%w: line=%d", errInvalidCSVRecord, lineNo)
+	var price *int
+	if priceText != "" {
+		parsedPrice, err := strconv.Atoi(priceText)
+		if err != nil {
+			return ProductCSVRow{}, fmt.Errorf("%w: line=%d", errInvalidCSVRecord, lineNo)
+		}
+		price = &parsedPrice
 	}
 
 	return ProductCSVRow{

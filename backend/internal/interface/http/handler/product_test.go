@@ -467,7 +467,7 @@ func TestProductExportCSV(t *testing.T) {
 				{
 					UUID:         "11111111-1111-4111-8111-111111111111",
 					Name:         "product",
-					Price:        1200,
+					Price:        intPtr(1200),
 					CategoryName: "category",
 					TargetName:   "target",
 				},
@@ -565,4 +565,8 @@ func newProductCSVUploadRequest(t *testing.T, fileName string, fileData []byte) 
 	req := httptest.NewRequest(http.MethodPost, "/api/csv/product", &body)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	return req
+}
+
+func intPtr(v int) *int {
+	return &v
 }
