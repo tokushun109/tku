@@ -4,7 +4,12 @@ import z from 'zod'
 export const ProductSchema = z.object({
     name: z.string().min(1, '商品名は必須項目です').max(50, '50文字以内で入力してください'),
     description: z.string().optional(),
-    price: z.number().min(1, '価格は1円以上で入力してください').max(1000000, '価格は100万円以下で入力してください').nullable(),
+    price: z
+        .number()
+        .int('価格は整数で入力してください')
+        .min(1, '価格は1円以上で入力してください')
+        .max(1000000, '価格は100万円以下で入力してください')
+        .nullable(),
     isActive: z.boolean(),
     isRecommend: z.boolean(),
     categoryUuid: z.string().optional(),
