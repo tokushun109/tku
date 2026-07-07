@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation'
 import { Chip } from '@/components/bases/Chip'
 import { Image } from '@/components/bases/Image'
 import { ColorType, FontSizeType } from '@/types'
-import { numToPrice } from '@/utils/convert'
 
 import styles from './styles.module.scss'
 import { IThumbnail } from '../../type'
@@ -36,11 +35,6 @@ const ProductThumbnail = ({ item }: Props) => {
                 </div>
             </div>
             <div className={styles['name']}>{item.product.name}</div>
-            {item.product.price != null && (
-                <div className={styles['price']}>
-                    {numToPrice(item.product.price)} <span>(税込)</span>
-                </div>
-            )}
         </div>
     )
 }

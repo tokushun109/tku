@@ -30,21 +30,4 @@
             font-size: $font-medium;
         }
     }
-
-    .price {
-        color: $black-text-color;
-        font-size: $font-xlarge;
-
-        span {
-            font-size: 12px;
-        }
-
-        @include media(sm) {
-            font-size: $font-large;
-
-            span {
-                font-size: $font-medium;
-            }
-        }
-    }
 }

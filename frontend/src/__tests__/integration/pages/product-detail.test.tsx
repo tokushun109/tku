@@ -79,11 +79,7 @@ describe('Product Detail Page Integration Test', () => {
         // 商品情報の表示を確認
         await waitFor(() => {
             expect(screen.getAllByText('女性向けイヤリング1')).toHaveLength(2)
-            expect(
-                screen.getAllByText((_, element) => {
-                    return element?.textContent === '￥1,500(税込)'
-                }),
-            ).toHaveLength(2)
+            expect(screen.getByText('価格は各販売サイトにてご確認ください')).toBeInTheDocument()
             expect(screen.getByText(/女性向けイヤリング1の詳細/)).toBeInTheDocument()
             expect(screen.getByText(/日常使いにも特別な日にもお使いいただけます。/)).toBeInTheDocument()
         })
@@ -139,11 +135,7 @@ describe('Product Detail Page Integration Test', () => {
         // 商品情報の表示を確認
         await waitFor(() => {
             expect(screen.getAllByText('女性向けイヤリング1')).toHaveLength(2)
-            expect(
-                screen.getAllByText((_, element) => {
-                    return element?.textContent === '￥1,500(税込)'
-                }),
-            ).toHaveLength(2)
+            expect(screen.getByText('価格は各販売サイトにてご確認ください')).toBeInTheDocument()
         })
 
         // エラーが発生しないことを確認

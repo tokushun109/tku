@@ -3,7 +3,6 @@ import { Chip } from '@/components/bases/Chip'
 import { ProductImageGallery } from '@/features/product/components/ProductImageGallery'
 import { IProduct } from '@/features/product/type'
 import { ColorType, FontSizeType } from '@/types'
-import { formatPrice } from '@/utils/price'
 
 import styles from './styles.module.scss'
 
@@ -80,14 +79,9 @@ export const ProductDetail = ({ product }: Props) => {
                         </div>
                     )}
 
-                    {product.price != null && (
-                        <div className={styles['price-area']}>
-                            <p className={styles['price']}>
-                                ￥{formatPrice(product.price)}
-                                <span className={styles['tax-label']}>(税込)</span>
-                            </p>
-                        </div>
-                    )}
+                    <div className={styles['price-area']}>
+                        <p className={styles['price-notice']}>価格は各販売サイトにてご確認ください</p>
+                    </div>
                 </div>
             </div>
         </div>
