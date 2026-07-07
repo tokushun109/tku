@@ -5,8 +5,8 @@ applications:
           phases:
               preBuild:
                   commands:
-                      - nvm install 22
-                      - nvm use 22
+                      - node --version
+                      - npm --version
                       - corepack enable pnpm
                       - pnpm install --frozen-lockfile
               build:
