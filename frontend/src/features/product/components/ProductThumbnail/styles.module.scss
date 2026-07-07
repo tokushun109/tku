@@ -24,10 +24,10 @@
         color: $text-color;
         text-overflow: ellipsis;
         white-space: nowrap;
-        font-size: $font-large;
+        font-size: $font-xlarge;
 
         @include media(sm) {
-            font-size: $font-medium;
+            font-size: $font-large;
         }
     }
 }
