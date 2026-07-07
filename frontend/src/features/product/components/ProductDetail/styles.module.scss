@@ -94,21 +94,15 @@
 }
 
 .price-area {
-    margin-top: 32px;
+    margin-top: 8px;
     text-align: right;
 
-    .price {
-        color: $title-primary-color;
-        font-weight: $title-font-weight;
-        font-size: 45px;
+    .price-notice {
+        color: $text-color;
+        font-size: $font-medium;
 
         @include media(sm) {
-            font-size: 30px;
+            font-size: $font-small;
         }
-    }
-
-    .tax-label {
-        font-size: $font-medium;
-        margin-left: 8px;
     }
 }

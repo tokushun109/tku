@@ -101,8 +101,9 @@ describe('Product Page Integration Test', () => {
         await waitFor(() => {
             expect(screen.getByText('女性向けイヤリング1')).toBeInTheDocument()
             expect(screen.getByText('男性向けリング1')).toBeInTheDocument()
-            expect(screen.getByText('¥1,500')).toBeInTheDocument()
-            expect(screen.getByText('¥3,000')).toBeInTheDocument()
+            // 商品一覧では価格を表示しない
+            expect(screen.queryByText('¥1,500')).not.toBeInTheDocument()
+            expect(screen.queryByText('¥3,000')).not.toBeInTheDocument()
         })
     })
 
@@ -184,8 +185,9 @@ describe('Product Page Integration Test', () => {
         await waitFor(() => {
             expect(screen.getByText('女性向けイヤリング1')).toBeInTheDocument()
             expect(screen.getByText('女性向けイヤリング2')).toBeInTheDocument()
-            expect(screen.getByText('¥1,500')).toBeInTheDocument()
-            expect(screen.getByText('¥2,000')).toBeInTheDocument()
+            // 商品一覧では価格を表示しない
+            expect(screen.queryByText('¥1,500')).not.toBeInTheDocument()
+            expect(screen.queryByText('¥2,000')).not.toBeInTheDocument()
         })
     })
 

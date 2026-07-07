@@ -19,7 +19,7 @@ import (
 type normalizedProductCSVRow struct {
 	uuid         string
 	name         string
-	price        int
+	price        *int
 	categoryName *domainCategory.CategoryName
 	targetName   *domainTarget.TargetName
 }
@@ -37,9 +37,14 @@ func normalizeProductCSVRows(rows []usecaseProduct.ProductCSVInputRow) ([]normal
 			return nil, fmt.Errorf("row %d: %w", i+1, err)
 		}
 
-		productPrice, err := domainProduct.NewProductPrice(row.Price)
-		if err != nil {
-			return nil, fmt.Errorf("row %d: %w", i+1, err)
+		var price *int
+		if row.Price != nil {
+			productPrice, err := domainProduct.NewProductPrice(*row.Price)
+			if err != nil {
+				return nil, fmt.Errorf("row %d: %w", i+1, err)
+			}
+			priceValue := productPrice.Value()
+			price = &priceValue
 		}
 
 		var categoryName *domainCategory.CategoryName
@@ -63,7 +68,7 @@ func normalizeProductCSVRows(rows []usecaseProduct.ProductCSVInputRow) ([]normal
 		result = append(result, normalizedProductCSVRow{
 			uuid:         productUUID.Value(),
 			name:         productName.Value(),
-			price:        productPrice.Value(),
+			price:        price,
 			categoryName: categoryName,
 			targetName:   targetName,
 		})

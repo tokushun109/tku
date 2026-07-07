@@ -27,7 +27,7 @@ type ProductResponse struct {
 	UUID          string                          `json:"uuid"`
 	Name          string                          `json:"name"`
 	Description   string                          `json:"description"`
-	Price         int                             `json:"price"`
+	Price         *int                            `json:"price"`
 	IsRecommend   bool                            `json:"isRecommend"`
 	IsActive      bool                            `json:"isActive"`
 	Category      ProductClassificationResponse   `json:"category"`

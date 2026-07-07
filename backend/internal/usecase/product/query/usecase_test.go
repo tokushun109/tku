@@ -459,7 +459,7 @@ func TestExportCSV(t *testing.T) {
 					{
 						UUID:         "11111111-1111-4111-8111-111111111111",
 						Name:         "product",
-						Price:        1000,
+						Price:        intPtr(1000),
 						CategoryName: "cat",
 						TargetName:   "target",
 					},
@@ -478,4 +478,8 @@ func TestExportCSV(t *testing.T) {
 			t.Fatalf("unexpected name: %s", rows[0].Name)
 		}
 	})
+}
+
+func intPtr(v int) *int {
+	return &v
 }
