@@ -80,12 +80,14 @@ export const ProductDetail = ({ product }: Props) => {
                         </div>
                     )}
 
-                    <div className={styles['price-area']}>
-                        <p className={styles['price']}>
-                            ￥{formatPrice(product.price)}
-                            <span className={styles['tax-label']}>(税込)</span>
-                        </p>
-                    </div>
+                    {product.price != null && (
+                        <div className={styles['price-area']}>
+                            <p className={styles['price']}>
+                                ￥{formatPrice(product.price)}
+                                <span className={styles['tax-label']}>(税込)</span>
+                            </p>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

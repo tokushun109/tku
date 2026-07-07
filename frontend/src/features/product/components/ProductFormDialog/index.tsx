@@ -82,7 +82,7 @@ export const ProductFormDialog = ({
         defaultValues: {
             name: '',
             description: '',
-            price: 0,
+            price: null,
             isActive: true,
             isRecommend: false,
             categoryUuid: '',
@@ -144,7 +144,7 @@ export const ProductFormDialog = ({
             reset({
                 name: updateItem?.name || '',
                 description: updateItem?.description || '',
-                price: updateItem?.price || 0,
+                price: updateItem?.price ?? null,
                 isActive: updateItem?.isActive ?? true,
                 isRecommend: updateItem?.isRecommend ?? false,
                 categoryUuid: updateItem?.category?.uuid || '',
@@ -410,17 +410,20 @@ export const ProductFormDialog = ({
 
                     <div className={styles['form-row']}>
                         <Input
-                            {...register('price', { valueAsNumber: true })}
+                            {...register('price', {
+                                setValueAs: (value) => (value === '' || value === null || value === undefined ? null : Number(value)),
+                            })}
                             error={errors.price?.message}
                             id="price"
-                            label="税込価格"
+                            label="税込価格（任意）"
                             max={1000000}
                             min={1}
-                            placeholder="0"
-                            required
+                            placeholder="未設定"
                             type="number"
                         />
-                        <p className={styles['price-value']}>¥{watchedPrice ? watchedPrice.toLocaleString() : '0'}</p>
+                        <p className={styles['price-value']}>
+                            {typeof watchedPrice === 'number' && !Number.isNaN(watchedPrice) ? `¥${watchedPrice.toLocaleString()}` : '未設定'}
+                        </p>
                     </div>
 
                     <div className={styles['form-row']}>

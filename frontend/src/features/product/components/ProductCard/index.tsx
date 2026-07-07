@@ -82,10 +82,12 @@ export const ProductCard = ({ product, onEdit, onDelete, admin = false }: Props)
                                 </button>
                             </div>
                         )}
-                        <div className={styles['price']}>
-                            ¥{product.price.toLocaleString()}
-                            <span className={styles['tax-label']}>税込</span>
-                        </div>
+                        {product.price != null && (
+                            <div className={styles['price']}>
+                                ¥{product.price.toLocaleString()}
+                                <span className={styles['tax-label']}>税込</span>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

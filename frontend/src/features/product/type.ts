@@ -22,7 +22,7 @@ export interface IProduct {
     isActive: boolean
     isRecommend: boolean
     name: string
-    price: number
+    price: number | null
     productImages: IProductImage[]
     siteDetails: ISiteDetail[]
     tags: IClassification[]

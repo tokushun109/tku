@@ -36,9 +36,11 @@ const ProductThumbnail = ({ item }: Props) => {
                 </div>
             </div>
             <div className={styles['name']}>{item.product.name}</div>
-            <div className={styles['price']}>
-                {numToPrice(item.product.price)} <span>(税込)</span>
-            </div>
+            {item.product.price != null && (
+                <div className={styles['price']}>
+                    {numToPrice(item.product.price)} <span>(税込)</span>
+                </div>
+            )}
         </div>
     )
 }
