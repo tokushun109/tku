@@ -66,38 +66,6 @@ is_version_installed() {
     asdf where "$tool" "$version" >/dev/null 2>&1
 }
 
-# 指定バージョン以外の古いインストールを削除する関数
-cleanup_old_versions() {
-    local tool=$1
-    local specified_version=$2
-    local installed_versions
-    local old_versions_found=false
-
-    installed_versions=$(asdf list "$tool" 2>/dev/null | sed 's/^[ *]*//' | awk 'NF {print $1}')
-
-    if [ -z "$installed_versions" ]; then
-        echo "  🧹 クリーンアップ対象なし: $tool のインストール済みバージョンがありません"
-        return
-    fi
-
-    while IFS= read -r installed_version; do
-        if [ -z "$installed_version" ] || [ "$installed_version" = "$specified_version" ]; then
-            continue
-        fi
-
-        old_versions_found=true
-        echo "  🗑️  未使用バージョンをアンインストール中: $tool $installed_version"
-        asdf uninstall "$tool" "$installed_version" || echo "  ⚠️  警告: $tool $installed_version のアンインストールに失敗しました（継続します）"
-    done <<< "$installed_versions"
-
-    if [ "$old_versions_found" = "false" ]; then
-        echo "  ✅ $tool の未使用バージョンはありません"
-    else
-        echo "  🔧 $tool のshimを再構築しています..."
-        asdf reshim "$tool" || echo "  ⚠️  警告: $tool のshim再構築に失敗しました（継続します）"
-    fi
-}
-
 # Node.js関連の追加パッケージをインストールする関数
 install_node_packages() {
     echo "📦 Node.js追加パッケージをインストール中..."
@@ -176,8 +144,6 @@ while IFS= read -r line || [ -n "$line" ]; do
     else
         echo "  ✅ $tool は既に最新です"
     fi
-
-    cleanup_old_versions "$tool" "$specified_version"
 
     echo ""
 done < .tool-versions
