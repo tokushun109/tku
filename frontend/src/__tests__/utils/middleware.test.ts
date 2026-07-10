@@ -50,7 +50,7 @@ describe('middleware', () => {
 
         const response = await middleware(
             createRequest('/admin/product', {
-                'x-forwarded-for': '203.0.113.1, 198.51.100.1',
+                'x-forwarded-for': '198.51.100.1, 203.0.113.1',
             }),
         )
 
@@ -58,6 +58,20 @@ describe('middleware', () => {
         expect(response.headers.get('location')).toBe('https://tocoriri.com/admin/login')
         expect(mockedHealthCheck).toHaveBeenCalledTimes(1)
         expect(mockedGetCurrentUser).not.toHaveBeenCalled()
+    })
+
+    it('x-forwarded-forの先頭だけが許可IPならNotFoundページへrewriteする', async () => {
+        process.env.MY_IP_ADDRESS = '203.0.113.1'
+
+        const response = await middleware(
+            createRequest('/admin/product', {
+                'x-forwarded-for': '203.0.113.1, 198.51.100.1',
+            }),
+        )
+
+        expect(response.status).toBe(404)
+        expect(response.headers.get('x-middleware-rewrite')).toBe('https://tocoriri.com/not-found')
+        expect(mockedHealthCheck).not.toHaveBeenCalled()
     })
 
     it('ENVがlocalならMY_IP_ADDRESSが設定済みでもadminのIP制限を行わない', async () => {
@@ -71,15 +85,15 @@ describe('middleware', () => {
         expect(mockedHealthCheck).toHaveBeenCalledTimes(1)
     })
 
-    it('MY_IP_ADDRESSが未設定ならadminのIP制限を行わない', async () => {
+    it('local以外でMY_IP_ADDRESSが未設定ならNotFoundページへrewriteする', async () => {
         const response = await middleware(
             createRequest('/admin/product', {
                 'x-forwarded-for': '198.51.100.1',
             }),
         )
 
-        expect(response.status).toBe(307)
-        expect(response.headers.get('location')).toBe('https://tocoriri.com/admin/login')
-        expect(mockedHealthCheck).toHaveBeenCalledTimes(1)
+        expect(response.status).toBe(404)
+        expect(response.headers.get('x-middleware-rewrite')).toBe('https://tocoriri.com/not-found')
+        expect(mockedHealthCheck).not.toHaveBeenCalled()
     })
 })

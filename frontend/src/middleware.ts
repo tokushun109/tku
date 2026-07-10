@@ -51,12 +51,18 @@ function getNormalizedIP(ip: string) {
 /**
  * クライアントIPをリクエストヘッダから取得する。
  *
- * x-forwarded-for は複数IPが入るため、最初の値をクライアントIPとして優先する。
+ * x-forwarded-for は複数IPが入るため、プロキシが最後に追加した末尾の値を優先する。
  * 取得できない場合は x-real-ip を参照する。
  */
 function getClientIP(request: NextRequest) {
-    const forwardedFor = request.headers.get('x-forwarded-for')?.split(',')[0]
-    const forwardedIP = forwardedFor ? getNormalizedIP(forwardedFor) : ''
+    const forwardedIPs =
+        request.headers
+            .get('x-forwarded-for')
+            ?.split(',')
+            .map((ip) => getNormalizedIP(ip))
+            .filter(Boolean) ?? []
+
+    const forwardedIP = forwardedIPs.at(-1) ?? ''
     if (forwardedIP) {
         return forwardedIP
     }
@@ -68,7 +74,7 @@ function getClientIP(request: NextRequest) {
  * admin配下へのアクセスを許可するIPかどうかを判定する。
  *
  * ENV=local の場合は、ローカル直アクセスでIPヘッダを取得できないため許可する。
- * MY_IP_ADDRESS が未設定、または空の値だけの場合もローカル開発を妨げないよう許可する。
+ * local以外でMY_IP_ADDRESSが未設定、または空の値だけの場合は設定漏れとして拒否する。
  * カンマ区切りで複数IPを指定できる。
  */
 function canAccessAdmin(request: NextRequest) {
@@ -78,7 +84,7 @@ function canAccessAdmin(request: NextRequest) {
 
     const allowedIP = process.env.MY_IP_ADDRESS
     if (!allowedIP) {
-        return true
+        return false
     }
 
     const allowedIPs = allowedIP
@@ -87,7 +93,7 @@ function canAccessAdmin(request: NextRequest) {
         .filter(Boolean)
 
     if (allowedIPs.length === 0) {
-        return true
+        return false
     }
 
     return allowedIPs.includes(getClientIP(request))
