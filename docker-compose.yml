@@ -87,7 +87,9 @@ services:
       context: ./frontend
       dockerfile: ./docker/Dockerfile
     container_name: frontend
-    env_file: ./frontend/.env
+    env_file:
+      - path: ./frontend/.env
+        required: false
     depends_on:
       - api
     command: sh ./docker/script/local/command.sh
