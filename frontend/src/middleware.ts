@@ -61,12 +61,12 @@ function getForwardedIPs(request: NextRequest) {
 /**
  * クライアントIPをリクエストヘッダから取得する。
  *
- * x-forwarded-for は複数IPが入るため、プロキシが最後に追加した末尾の値を優先する。
+ * x-forwarded-for は複数IPが入るため、最初に追加された先頭の値を優先する。
  * 取得できない場合は x-real-ip を参照する。
  */
 function getClientIP(request: NextRequest) {
     const forwardedIPs = getForwardedIPs(request)
-    const forwardedIP = forwardedIPs.at(-1) ?? ''
+    const forwardedIP = forwardedIPs.at(0) ?? ''
     if (forwardedIP) {
         return forwardedIP
     }
@@ -85,15 +85,6 @@ function canAccessAdmin(request: NextRequest) {
     if (process.env.ENV === 'local') {
         return true
     }
-
-    const forwardedIPs = getForwardedIPs(request)
-    // eslint-disable-next-line no-console
-    console.log({
-        forwardedForCount: forwardedIPs.length,
-        forwardedIPLast4List: forwardedIPs.map((ip) => ip.slice(-4)),
-        hasRealIP: Boolean(request.headers.get('x-real-ip')),
-        clientIPLast4: getClientIP(request).slice(-4),
-    })
 
     const allowedIP = process.env.MY_IP_ADDRESS
     if (!allowedIP) {

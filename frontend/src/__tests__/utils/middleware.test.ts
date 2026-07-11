@@ -50,7 +50,7 @@ describe('middleware', () => {
 
         const response = await middleware(
             createRequest('/admin/product', {
-                'x-forwarded-for': '198.51.100.1, 203.0.113.1',
+                'x-forwarded-for': '203.0.113.1, 198.51.100.1',
             }),
         )
 
@@ -60,12 +60,12 @@ describe('middleware', () => {
         expect(mockedGetCurrentUser).not.toHaveBeenCalled()
     })
 
-    it('x-forwarded-forの先頭だけが許可IPならNotFoundページへrewriteする', async () => {
+    it('x-forwarded-forの末尾だけが許可IPならNotFoundページへrewriteする', async () => {
         process.env.MY_IP_ADDRESS = '203.0.113.1'
 
         const response = await middleware(
             createRequest('/admin/product', {
-                'x-forwarded-for': '203.0.113.1, 198.51.100.1',
+                'x-forwarded-for': '198.51.100.1, 203.0.113.1',
             }),
         )
 
