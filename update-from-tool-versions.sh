@@ -5,6 +5,34 @@ set -e
 echo "=== 🔧 asdfツールバージョン更新スクリプト ==="
 echo ""
 
+CLEANUP_OLD_VERSIONS=false
+
+usage() {
+    echo "Usage: $0 [--cleanup]"
+    echo ""
+    echo "Options:"
+    echo "  --cleanup    .tool-versions で指定されていない asdf バージョンも削除します"
+    echo "  -h, --help   このヘルプを表示します"
+}
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --cleanup)
+            CLEANUP_OLD_VERSIONS=true
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        *)
+            echo "❌ エラー: 不明な引数です: $1"
+            usage
+            exit 1
+            ;;
+    esac
+    shift
+done
+
 echo "🍺 Homebrewを更新中..."
 echo "Homebrewパッケージリストを更新しています..."
 brew update
@@ -150,18 +178,12 @@ while IFS= read -r line || [ -n "$line" ]; do
     if [ "$current_version" != "$specified_version" ] || [ "$installed_flag" != "true" ]; then
         echo "  🔄 バージョンの差異または未インストールを検出しました。更新中..."
 
-        # 古いバージョンがインストールされている場合はアンインストール
-        if [ "$current_version" != "$specified_version" ] && \
-           [ "$current_version" != "not-installed" ] && \
-           [ "$current_version" != "No version is set" ] && \
-           is_version_installed "$tool" "$current_version"; then
-            echo "  🗑️  古いバージョンをアンインストール中: $current_version"
-            asdf uninstall $tool $current_version || echo "  ⚠️  警告: $tool $current_version のアンインストールに失敗しました（未インストールの可能性があります）"
+        if [ "$installed_flag" != "true" ]; then
+            echo "  📦 バージョンをインストール中: $specified_version"
+            asdf install $tool $specified_version
+        else
+            echo "  📦 指定バージョンは既にインストール済みです"
         fi
-
-        # 新しいバージョンをインストール
-        echo "  📦 バージョンをインストール中: $specified_version"
-        asdf install $tool $specified_version
 
         # グローバルバージョンを設定
         echo "  🔧 グローバルバージョンを設定中: $specified_version"
@@ -177,7 +199,11 @@ while IFS= read -r line || [ -n "$line" ]; do
         echo "  ✅ $tool は既に最新です"
     fi
 
-    cleanup_old_versions "$tool" "$specified_version"
+    if [ "$CLEANUP_OLD_VERSIONS" = "true" ]; then
+        cleanup_old_versions "$tool" "$specified_version"
+    else
+        echo "  ℹ️  古いバージョンのクリーンアップはスキップしました（実行する場合は --cleanup を指定）"
+    fi
 
     echo ""
 done < .tool-versions
