@@ -90,6 +90,7 @@ function canAccessAdmin(request: NextRequest) {
     // eslint-disable-next-line no-console
     console.log({
         forwardedForCount: forwardedIPs.length,
+        forwardedIPLast4List: forwardedIPs.map((ip) => ip.slice(-4)),
         hasRealIP: Boolean(request.headers.get('x-real-ip')),
         clientIPLast4: getClientIP(request).slice(-4),
     })
