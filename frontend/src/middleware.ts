@@ -48,6 +48,16 @@ function getNormalizedIP(ip: string) {
     return maybeIPv4WithPort?.[1] ?? trimmedIP
 }
 
+function getForwardedIPs(request: NextRequest) {
+    return (
+        request.headers
+            .get('x-forwarded-for')
+            ?.split(',')
+            .map((ip) => getNormalizedIP(ip))
+            .filter(Boolean) ?? []
+    )
+}
+
 /**
  * クライアントIPをリクエストヘッダから取得する。
  *
@@ -55,13 +65,7 @@ function getNormalizedIP(ip: string) {
  * 取得できない場合は x-real-ip を参照する。
  */
 function getClientIP(request: NextRequest) {
-    const forwardedIPs =
-        request.headers
-            .get('x-forwarded-for')
-            ?.split(',')
-            .map((ip) => getNormalizedIP(ip))
-            .filter(Boolean) ?? []
-
+    const forwardedIPs = getForwardedIPs(request)
     const forwardedIP = forwardedIPs.at(-1) ?? ''
     if (forwardedIP) {
         return forwardedIP
@@ -81,6 +85,14 @@ function canAccessAdmin(request: NextRequest) {
     if (process.env.ENV === 'local') {
         return true
     }
+
+    const forwardedIPs = getForwardedIPs(request)
+    // eslint-disable-next-line no-console
+    console.log({
+        forwardedForCount: forwardedIPs.length,
+        hasRealIP: Boolean(request.headers.get('x-real-ip')),
+        clientIPLast4: getClientIP(request).slice(-4),
+    })
 
     const allowedIP = process.env.MY_IP_ADDRESS
     if (!allowedIP) {
