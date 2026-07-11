@@ -5,10 +5,16 @@ const apiBaseUrl = process.env.API_BASE_URL ? process.env.API_BASE_URL : default
 const browserBaseUrl = process.env.BROWSER_BASE_URL ? process.env.BROWSER_BASE_URL : defaultApiBaseUrl
 const domainUrl = process.env.DOMAIN_URL ? process.env.DOMAIN_URL : `http://localhost:${process.env.PORT ? process.env.PORT : '3000'}`
 const isProduction = process.env.NODE_ENV === 'production'
+const defaultImageSourceUrls = ['http://localhost', 'http://minio', domainUrl, 'https://tku-api-ck57lb-prod.s3.ap-northeast-1.amazonaws.com']
+const imageSourceUrls = process.env.IMAGE_SOURCE_URLS
+    ? process.env.IMAGE_SOURCE_URLS.split(',')
+          .map((url) => url.trim())
+          .filter(Boolean)
+    : defaultImageSourceUrls
 
 const getOrigin = (url: string): string | undefined => {
     try {
-        return new URL(url).origin
+        return new URL(url, domainUrl).origin
     } catch {
         return undefined
     }
@@ -17,6 +23,44 @@ const getOrigin = (url: string): string | undefined => {
 const unique = (values: string[]): string[] => Array.from(new Set(values))
 
 const apiOrigins = unique([apiBaseUrl, browserBaseUrl].map((url) => getOrigin(url)).filter((origin): origin is string => Boolean(origin)))
+const imageOrigins = unique(imageSourceUrls.map((url) => getOrigin(url)).filter((origin): origin is string => Boolean(origin)))
+
+const isHttpsOrigin = (origin: string): boolean => {
+    try {
+        return new URL(origin).protocol === 'https:'
+    } catch {
+        return false
+    }
+}
+
+const shouldUpgradeInsecureRequests = (): boolean => {
+    const pageOrigin = getOrigin(domainUrl)
+    const subresourceOrigins = unique([...apiOrigins, ...imageOrigins])
+
+    return Boolean(pageOrigin) && isProduction && isHttpsOrigin(pageOrigin as string) && subresourceOrigins.every((origin) => isHttpsOrigin(origin))
+}
+
+const toContentSecurityPolicySource = (origin: string): string => {
+    const url = new URL(origin)
+
+    if (url.protocol === 'http:' && ['localhost', 'minio'].includes(url.hostname)) {
+        return `${url.protocol}//${url.hostname}:*`
+    }
+
+    return origin
+}
+
+const imageContentSecurityPolicySources = unique(imageOrigins.map((origin) => toContentSecurityPolicySource(origin)))
+
+const imageRemotePatterns = imageOrigins.map((origin) => {
+    const url = new URL(origin)
+
+    return {
+        protocol: url.protocol.replace(':', '') as 'http' | 'https',
+        hostname: url.hostname,
+        pathname: '**',
+    }
+})
 
 const buildContentSecurityPolicy = (): string => {
     const scriptSources = ["'self'", "'unsafe-inline'", 'https://www.googletagmanager.com', 'https://www.google-analytics.com']
@@ -40,10 +84,7 @@ const buildContentSecurityPolicy = (): string => {
             "'self'",
             'data:',
             'blob:',
-            'http://localhost:*',
-            'http://minio:*',
-            'https://tocoriri.com',
-            'https://tku-api-ck57lb-prod.s3.ap-northeast-1.amazonaws.com',
+            ...imageContentSecurityPolicySources,
             'https://www.google-analytics.com',
             'https://www.googletagmanager.com',
         ],
@@ -52,7 +93,7 @@ const buildContentSecurityPolicy = (): string => {
         ['media-src', "'self'", 'blob:'],
         ['worker-src', "'self'", 'blob:'],
         ['manifest-src', "'self'"],
-        ...(isProduction ? [['upgrade-insecure-requests']] : []),
+        ...(shouldUpgradeInsecureRequests() ? [['upgrade-insecure-requests']] : []),
     ]
 
     return directives.map((directive) => directive.join(' ')).join('; ')
@@ -77,28 +118,7 @@ const nextConfig: NextConfig = {
         prependData: '@use "sass:color"; @use "@/styles/variables.scss" as *; @use "@/styles/mixins.scss" as *; @use "@/styles/layouts.scss" as *;',
     },
     images: {
-        remotePatterns: [
-            {
-                protocol: 'http',
-                hostname: 'localhost',
-                pathname: '**',
-            },
-            {
-                protocol: 'http',
-                hostname: 'minio',
-                pathname: '**',
-            },
-            {
-                protocol: 'https',
-                hostname: 'tocoriri.com',
-                pathname: '**',
-            },
-            {
-                protocol: 'https',
-                hostname: 'tku-api-ck57lb-prod.s3.ap-northeast-1.amazonaws.com',
-                pathname: '**',
-            },
-        ],
+        remotePatterns: imageRemotePatterns,
     },
     env: {
         API_BASE_URL: apiBaseUrl,
