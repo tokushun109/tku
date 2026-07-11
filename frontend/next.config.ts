@@ -12,6 +12,7 @@ const imageSourceUrls = process.env.IMAGE_SOURCE_URLS
           .filter(Boolean)
     : defaultImageSourceUrls
 
+/** URL文字列からCSPに利用するoriginを抽出する。 */
 const getOrigin = (url: string): string | undefined => {
     try {
         return new URL(url, domainUrl).origin
@@ -20,11 +21,13 @@ const getOrigin = (url: string): string | undefined => {
     }
 }
 
+/** 配列の重複値を取り除く。 */
 const unique = (values: string[]): string[] => Array.from(new Set(values))
 
 const apiOrigins = unique([apiBaseUrl, browserBaseUrl].map((url) => getOrigin(url)).filter((origin): origin is string => Boolean(origin)))
 const imageOrigins = unique(imageSourceUrls.map((url) => getOrigin(url)).filter((origin): origin is string => Boolean(origin)))
 
+/** originがHTTPSで配信されるかを判定する。 */
 const isHttpsOrigin = (origin: string): boolean => {
     try {
         return new URL(origin).protocol === 'https:'
@@ -33,6 +36,7 @@ const isHttpsOrigin = (origin: string): boolean => {
     }
 }
 
+/** HTTPS配信だけで構成される本番環境かを判定する。 */
 const shouldUpgradeInsecureRequests = (): boolean => {
     const pageOrigin = getOrigin(domainUrl)
     const subresourceOrigins = unique([...apiOrigins, ...imageOrigins])
@@ -40,6 +44,7 @@ const shouldUpgradeInsecureRequests = (): boolean => {
     return Boolean(pageOrigin) && isProduction && isHttpsOrigin(pageOrigin as string) && subresourceOrigins.every((origin) => isHttpsOrigin(origin))
 }
 
+/** originをCSPのsource表記へ変換する。 */
 const toContentSecurityPolicySource = (origin: string): string => {
     const url = new URL(origin)
 
@@ -62,6 +67,7 @@ const imageRemotePatterns = imageOrigins.map((origin) => {
     }
 })
 
+/** Next.jsレスポンスに設定するCSP文字列を生成する。 */
 const buildContentSecurityPolicy = (): string => {
     const scriptSources = ["'self'", "'unsafe-inline'", 'https://www.googletagmanager.com', 'https://www.google-analytics.com']
     const connectSources = ["'self'", ...apiOrigins, 'https://www.google-analytics.com', 'https://region1.google-analytics.com']
