@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { ProductSearchToolbar } from '.'
+import { ProductSearchDialog } from '.'
 
 import type { MultiSelectFormOption } from '@/components/bases/MultiSelectForm'
 import type { SelectFormOption } from '@/components/bases/SelectForm'
@@ -49,34 +49,25 @@ const defaultFilters: ToolbarFilters = {
     tags: [],
 }
 
-const countActiveFilters = (filters: ToolbarFilters) =>
-    [
-        filters.category !== 'all',
-        filters.tags.length > 0,
-        filters.minPrice !== '',
-        filters.maxPrice !== '',
-        filters.activeStatus !== 'all',
-        filters.recommendStatus !== 'all',
-    ].filter(Boolean).length
-
-const InteractiveToolbar = ({
+const InteractiveDialog = ({
     initialFilters = defaultFilters,
     isClearDisabled = false,
 }: {
     initialFilters?: ToolbarFilters
     isClearDisabled?: boolean
 }) => {
+    const [isOpen, setIsOpen] = useState<boolean>(true)
     const [searchText, setSearchText] = useState<string>('')
     const [filters, setFilters] = useState<ToolbarFilters>(initialFilters)
 
     return (
-        <ProductSearchToolbar
-            activeFilterCount={countActiveFilters(filters)}
+        <ProductSearchDialog
             activeStatusOptions={activeStatusOptions}
             activeStatusValue={filters.activeStatus}
             categoryOptions={categoryOptions}
             categoryValue={filters.category}
             isClearDisabled={isClearDisabled}
+            isOpen={isOpen}
             maxPriceValue={filters.maxPrice}
             minPriceValue={filters.minPrice}
             onActiveStatusChange={(value) => {
@@ -88,6 +79,9 @@ const InteractiveToolbar = ({
             onClear={() => {
                 setSearchText('')
                 setFilters(defaultFilters)
+            }}
+            onClose={() => {
+                setIsOpen(false)
             }}
             onMaxPriceChange={(value) => {
                 setFilters((current) => ({ ...current, maxPrice: value }))
@@ -115,20 +109,20 @@ const InteractiveToolbar = ({
     )
 }
 
-const meta: Meta<typeof ProductSearchToolbar> = {
-    component: ProductSearchToolbar,
+const meta: Meta<typeof ProductSearchDialog> = {
+    component: ProductSearchDialog,
 }
 
 export default meta
-type Story = StoryObj<typeof ProductSearchToolbar>
+type Story = StoryObj<typeof ProductSearchDialog>
 
 export const Default: Story = {
-    render: () => <InteractiveToolbar />,
+    render: () => <InteractiveDialog />,
 }
 
 export const WithActiveFilters: Story = {
     render: () => (
-        <InteractiveToolbar
+        <InteractiveDialog
             initialFilters={{
                 activeStatus: 'active',
                 category: 'bracelet',
@@ -142,5 +136,5 @@ export const WithActiveFilters: Story = {
 }
 
 export const ClearDisabled: Story = {
-    render: () => <InteractiveToolbar isClearDisabled />,
+    render: () => <InteractiveDialog isClearDisabled />,
 }

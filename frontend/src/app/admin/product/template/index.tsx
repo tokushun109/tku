@@ -1,6 +1,6 @@
 'use client'
 
-import { Add, Close, Search } from '@mui/icons-material'
+import { Add, ExpandMore, FilterList } from '@mui/icons-material'
 import { type FormEvent, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -20,13 +20,11 @@ import { getTags } from '@/apis/tag'
 import { getTargets } from '@/apis/target'
 import { Button } from '@/components/bases/Button'
 import { Dialog } from '@/components/bases/Dialog'
-import { Input } from '@/components/bases/Input'
-import { MultiSelectForm } from '@/components/bases/MultiSelectForm'
 import { Pagination } from '@/components/bases/Pagination'
-import { SelectForm } from '@/components/bases/SelectForm'
 import { IClassification } from '@/features/classification/type'
 import { ProductCard } from '@/features/product/components/ProductCard'
 import { ProductFormDialog } from '@/features/product/components/ProductFormDialog'
+import { ProductSearchDialog } from '@/features/product/components/ProductSearchDialog'
 import { EXISTING_PRODUCT_IMAGE_ID_PREFIX } from '@/features/product/constants'
 import { ICreemaDuplicateForm } from '@/features/product/product/type'
 import { IProduct, IProductForm, IProductList } from '@/features/product/type'
@@ -99,6 +97,7 @@ export const AdminProductTemplate = ({
     const [keyword, setKeyword] = useState<string>('')
     const [searchFilters, setSearchFilters] = useState<ProductSearchFilters>(defaultSearchFilters)
     const [appliedFilters, setAppliedFilters] = useState<ProductSearchFilters>(defaultSearchFilters)
+    const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false)
 
     const buildProductListParams = (page: number, nextKeyword: string, nextFilters: ProductSearchFilters): IGetProductsParams => {
         const params: IGetProductsParams = {
@@ -358,7 +357,12 @@ export const AdminProductTemplate = ({
         const nextFilters = { ...searchFilters }
         setKeyword(nextKeyword)
         setAppliedFilters(nextFilters)
+        setIsFilterOpen(false)
         await fetchData(1, nextKeyword, nextFilters)
+    }
+
+    const handleCloseFilter = () => {
+        setIsFilterOpen(false)
     }
 
     const handleClearSearch = async () => {
@@ -393,21 +397,27 @@ export const AdminProductTemplate = ({
         searchFilters.activeStatus !== ProductActiveStatus.All ||
         searchFilters.recommendStatus !== ProductRecommendStatus.All
 
-    const categoryOptions = [
-        { label: 'すべてのカテゴリ', value: 'all' },
-        ...categories.map((category) => ({ label: category.name, value: category.uuid })),
-    ]
+    const categoryOptions = [{ label: 'すべて', value: 'all' }, ...categories.map((category) => ({ label: category.name, value: category.uuid }))]
     const tagOptions = tags.map((tag) => ({ label: tag.name, value: tag.uuid }))
     const activeStatusOptions = [
-        { label: '公開状態すべて', value: ProductActiveStatus.All },
+        { label: 'すべて', value: ProductActiveStatus.All },
         { label: '公開中', value: ProductActiveStatus.Active },
         { label: '非公開', value: ProductActiveStatus.Inactive },
     ]
     const recommendStatusOptions = [
-        { label: 'おすすめ状態すべて', value: ProductRecommendStatus.All },
+        { label: 'すべて', value: ProductRecommendStatus.All },
         { label: 'おすすめ', value: ProductRecommendStatus.Recommended },
         { label: 'おすすめ以外', value: ProductRecommendStatus.NotRecommended },
     ]
+
+    const activeFilterCount = [
+        keyword !== '',
+        appliedFilters.category !== 'all',
+        appliedFilters.tagUuids.length > 0,
+        appliedFilters.minPrice !== '' || appliedFilters.maxPrice !== '',
+        appliedFilters.activeStatus !== ProductActiveStatus.All,
+        appliedFilters.recommendStatus !== ProductRecommendStatus.All,
+    ].filter(Boolean).length
 
     const emptyMessage = hasAppliedSearch ? '該当する商品がありません' : '登録されていません'
     const isClearDisabled = isLoading || (!hasAppliedSearch && !hasDraftSearch)
@@ -418,6 +428,25 @@ export const AdminProductTemplate = ({
                 <h1 className={styles['page-title']}>商品一覧</h1>
                 <div className={styles['header-actions']}>
                     <div className={styles['product-count']}>{pageInfo.total}件の商品</div>
+                    <Button
+                        aria-expanded={isFilterOpen}
+                        aria-label="絞り込み"
+                        contrast
+                        onClick={() => {
+                            setIsFilterOpen((current) => !current)
+                        }}
+                        outlined
+                    >
+                        <div className={styles['filter-button-content']}>
+                            <FilterList fontSize="small" />
+                            絞り込み
+                            {activeFilterCount > 0 && <span className={styles['filter-badge']}>{activeFilterCount}</span>}
+                            <ExpandMore
+                                className={`${styles['filter-chevron']} ${isFilterOpen ? styles['filter-chevron-open'] : ''}`}
+                                fontSize="small"
+                            />
+                        </div>
+                    </Button>
                     <Button onClick={handleCreate}>
                         <div className={styles['add-button-content']}>
                             <Add className={styles['add-icon']} fontSize="small" />
@@ -426,95 +455,44 @@ export const AdminProductTemplate = ({
                     </Button>
                 </div>
             </div>
-            <form className={styles['search-form']} onSubmit={handleSearchSubmit}>
-                <div className={styles['search-grid']}>
-                    <Input
-                        aria-label="商品名で検索"
-                        className={styles['search-input']}
-                        onChange={(event) => {
-                            setSearchText(event.target.value)
-                        }}
-                        placeholder="商品名で検索"
-                        value={searchText}
-                    />
-                    <SelectForm
-                        id="admin-product-category-filter"
-                        onChange={(value) => {
-                            handleFilterChange({ category: value ?? 'all' })
-                        }}
-                        options={categoryOptions}
-                        placeholder="カテゴリ"
-                        value={searchFilters.category}
-                    />
-                    <MultiSelectForm
-                        id="admin-product-tag-filter"
-                        onChange={(value) => {
-                            handleFilterChange({ tagUuids: value })
-                        }}
-                        options={tagOptions}
-                        placeholder="タグ"
-                        value={searchFilters.tagUuids}
-                    />
-                    <Input
-                        aria-label="最低価格"
-                        inputMode="numeric"
-                        min={0}
-                        onChange={(event) => {
-                            handleFilterChange({ minPrice: event.target.value })
-                        }}
-                        placeholder="最低価格"
-                        type="number"
-                        value={searchFilters.minPrice}
-                    />
-                    <Input
-                        aria-label="最高価格"
-                        inputMode="numeric"
-                        min={0}
-                        onChange={(event) => {
-                            handleFilterChange({ maxPrice: event.target.value })
-                        }}
-                        placeholder="最高価格"
-                        type="number"
-                        value={searchFilters.maxPrice}
-                    />
-                    <SelectForm
-                        id="admin-product-active-status-filter"
-                        onChange={(value) => {
-                            handleFilterChange({ activeStatus: value ?? ProductActiveStatus.All })
-                        }}
-                        options={activeStatusOptions}
-                        placeholder="公開状態"
-                        value={searchFilters.activeStatus}
-                    />
-                    <SelectForm
-                        id="admin-product-recommend-status-filter"
-                        onChange={(value) => {
-                            handleFilterChange({ recommendStatus: value ?? ProductRecommendStatus.All })
-                        }}
-                        options={recommendStatusOptions}
-                        placeholder="おすすめ状態"
-                        value={searchFilters.recommendStatus}
-                    />
-                </div>
-                <div className={styles['search-actions']}>
-                    <div className={styles['search-action']}>
-                        <Button disabled={isLoading} fullWidth type="submit">
-                            <div className={styles['search-button-content']}>
-                                <Search className={styles['search-icon']} fontSize="small" />
-                                検索
-                            </div>
-                        </Button>
-                    </div>
-                    <div className={styles['search-action']}>
-                        <Button contrast disabled={isClearDisabled} fullWidth onClick={handleClearSearch} type="button">
-                            <div className={styles['search-button-content']}>
-                                <Close className={styles['search-icon']} fontSize="small" />
-                                クリア
-                            </div>
-                        </Button>
-                    </div>
-                </div>
-            </form>
+            <ProductSearchDialog
+                activeStatusOptions={activeStatusOptions}
+                activeStatusValue={searchFilters.activeStatus}
+                categoryOptions={categoryOptions}
+                categoryValue={searchFilters.category}
+                isClearDisabled={isClearDisabled}
+                isOpen={isFilterOpen}
+                isSearchDisabled={isLoading}
+                maxPriceValue={searchFilters.maxPrice}
+                minPriceValue={searchFilters.minPrice}
+                onActiveStatusChange={(value) => {
+                    handleFilterChange({ activeStatus: (value as ProductActiveStatus) || ProductActiveStatus.All })
+                }}
+                onCategoryChange={(value) => {
+                    handleFilterChange({ category: value || 'all' })
+                }}
+                onClear={handleClearSearch}
+                onClose={handleCloseFilter}
+                onMaxPriceChange={(value) => {
+                    handleFilterChange({ maxPrice: value })
+                }}
+                onMinPriceChange={(value) => {
+                    handleFilterChange({ minPrice: value })
+                }}
+                onRecommendStatusChange={(value) => {
+                    handleFilterChange({ recommendStatus: (value as ProductRecommendStatus) || ProductRecommendStatus.All })
+                }}
+                onSearchTextChange={setSearchText}
+                onSubmit={handleSearchSubmit}
+                onTagsChange={(value) => {
+                    handleFilterChange({ tagUuids: value })
+                }}
+                recommendStatusOptions={recommendStatusOptions}
+                recommendStatusValue={searchFilters.recommendStatus}
+                searchText={searchText}
+                tagOptions={tagOptions}
+                tagValue={searchFilters.tagUuids}
+            />
             <div className={styles['product-content']}>
                 {isLoading ? (
                     <div className={styles['loading']}>読み込み中...</div>

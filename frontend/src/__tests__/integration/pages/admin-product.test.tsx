@@ -1,4 +1,4 @@
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, within } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getCategories } from '@/apis/category'
@@ -201,6 +201,7 @@ describe('Admin Product Page Integration Test', () => {
 
         render(<AdminProductTemplate {...defaultProps} initialProductList={createProductList(mockProductData, { total: 21, totalPages: 2 })} />)
 
+        fireEvent.click(screen.getByRole('button', { name: '絞り込み' }))
         fireEvent.change(screen.getByLabelText('商品名で検索'), { target: { value: ' テスト商品 ' } })
         fireEvent.click(screen.getByRole('button', { name: '検索' }))
 
@@ -235,6 +236,7 @@ describe('Admin Product Page Integration Test', () => {
 
         render(<AdminProductTemplate {...defaultProps} initialProductList={createProductList(mockProductData)} />)
 
+        fireEvent.click(screen.getByRole('button', { name: '絞り込み' }))
         fireEvent.change(screen.getByLabelText('商品名で検索'), { target: { value: '存在しない商品' } })
         fireEvent.click(screen.getByRole('button', { name: '検索' }))
 
@@ -242,6 +244,7 @@ describe('Admin Product Page Integration Test', () => {
             expect(screen.getByText('該当する商品がありません')).toBeInTheDocument()
         })
 
+        fireEvent.click(screen.getByRole('button', { name: '絞り込み' }))
         fireEvent.click(screen.getByRole('button', { name: 'クリア' }))
 
         await waitFor(() => {
@@ -260,17 +263,27 @@ describe('Admin Product Page Integration Test', () => {
 
         render(<AdminProductTemplate {...defaultProps} initialProductList={createProductList(mockProductData)} />)
 
-        fireEvent.click(screen.getByText('すべてのカテゴリ'))
-        fireEvent.click(screen.getAllByText('イヤリング')[0])
-        fireEvent.click(screen.getAllByText('タグ')[0])
-        fireEvent.click(screen.getAllByText('タグ1')[0])
-        fireEvent.change(screen.getByLabelText('最低価格'), { target: { value: '1000' } })
-        fireEvent.change(screen.getByLabelText('最高価格'), { target: { value: '2000' } })
-        fireEvent.click(screen.getByText('公開状態すべて'))
-        fireEvent.click(screen.getByText('公開中'))
-        fireEvent.click(screen.getByText('おすすめ状態すべて'))
-        fireEvent.click(screen.getAllByText('おすすめ')[0])
-        fireEvent.click(screen.getByRole('button', { name: '検索' }))
+        fireEvent.click(screen.getByRole('button', { name: '絞り込み' }))
+
+        // 各フィルターはラベルからトリガーを辿って開き、開いたフィールド内で選択肢をクリックする
+        const filterForm = screen.getByLabelText('商品名で検索').closest('form') as HTMLElement
+        const filterDialog = within(filterForm)
+        const selectFilterOption = (labelText: string, optionText: string) => {
+            const field = filterDialog.getByText(labelText).parentElement as HTMLElement
+            fireEvent.click(field.querySelector('[class*="select-trigger"]') as HTMLElement)
+            const option = within(field)
+                .getAllByText(optionText)
+                .find((element) => element.className.includes('option'))
+            fireEvent.click(option as HTMLElement)
+        }
+
+        selectFilterOption('カテゴリ', 'イヤリング')
+        selectFilterOption('タグ', 'タグ1')
+        fireEvent.change(filterDialog.getByLabelText('最低価格'), { target: { value: '1000' } })
+        fireEvent.change(filterDialog.getByLabelText('最高価格'), { target: { value: '2000' } })
+        selectFilterOption('公開状態', '公開中')
+        selectFilterOption('おすすめ', 'おすすめ')
+        fireEvent.click(filterDialog.getByRole('button', { name: '検索' }))
 
         await waitFor(() => {
             expect(mockGetProducts).toHaveBeenCalledWith({
