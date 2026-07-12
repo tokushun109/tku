@@ -31,11 +31,23 @@
 }
 
 .search-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.search-grid {
     display: grid;
-    grid-template-columns: minmax(240px, 420px) auto auto;
+    grid-template-columns: minmax(220px, 2fr) minmax(180px, 1fr) minmax(220px, 1.4fr) repeat(2, minmax(120px, 0.8fr));
     gap: 8px;
     align-items: start;
-    margin-bottom: 16px;
+}
+
+.search-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .search-input {
@@ -123,7 +135,15 @@
     }
 
     .search-form {
+        gap: 8px;
+    }
+
+    .search-grid {
         grid-template-columns: 1fr;
+    }
+
+    .search-actions {
+        flex-direction: column;
     }
 
     .search-button,

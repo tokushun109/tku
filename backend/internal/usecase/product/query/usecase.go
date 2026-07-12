@@ -44,6 +44,8 @@ func New(queryReader Reader, storage usecase.Storage) *Service {
 func (s *Service) List(ctx context.Context, q ListProductsQuery) (*ProductPage, error) {
 	trimmedCategory := strings.TrimSpace(q.Category)
 	trimmedKeyword := strings.TrimSpace(q.Keyword)
+	trimmedActiveStatus := strings.TrimSpace(q.ActiveStatus)
+	trimmedRecommendStatus := strings.TrimSpace(q.RecommendStatus)
 	trimmedTarget := strings.TrimSpace(q.Target)
 
 	if !isValidListMode(q.Mode) || trimmedCategory == "" || trimmedTarget == "" || q.Page <= 0 || q.Limit <= 0 {
@@ -52,14 +54,28 @@ func (s *Service) List(ctx context.Context, q ListProductsQuery) (*ProductPage, 
 	if len([]rune(trimmedKeyword)) > maxProductKeywordLength {
 		return nil, usecase.NewAppError(usecase.ErrInvalidInput)
 	}
+	if !isValidProductActiveStatus(trimmedActiveStatus) || !isValidProductRecommendStatus(trimmedRecommendStatus) {
+		return nil, usecase.NewAppError(usecase.ErrInvalidInput)
+	}
+	if q.MinPrice != nil && *q.MinPrice < 0 || q.MaxPrice != nil && *q.MaxPrice < 0 {
+		return nil, usecase.NewAppError(usecase.ErrInvalidInput)
+	}
+	if q.MinPrice != nil && q.MaxPrice != nil && *q.MinPrice > *q.MaxPrice {
+		return nil, usecase.NewAppError(usecase.ErrInvalidInput)
+	}
 
 	productPage, err := s.queryReader.ListProducts(ctx, ListProductsQuery{
-		Mode:     q.Mode,
-		Category: trimmedCategory,
-		Keyword:  trimmedKeyword,
-		Limit:    q.Limit,
-		Page:     q.Page,
-		Target:   trimmedTarget,
+		Mode:            q.Mode,
+		ActiveStatus:    normalizeAllStatus(trimmedActiveStatus),
+		Category:        trimmedCategory,
+		Keyword:         trimmedKeyword,
+		Limit:           q.Limit,
+		MaxPrice:        q.MaxPrice,
+		MinPrice:        q.MinPrice,
+		Page:            q.Page,
+		RecommendStatus: normalizeAllStatus(trimmedRecommendStatus),
+		TagUUIDs:        normalizeUUIDs(q.TagUUIDs),
+		Target:          trimmedTarget,
 	})
 	if err != nil {
 		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
@@ -202,4 +218,31 @@ func isValidListMode(mode string) bool {
 	default:
 		return false
 	}
+}
+
+func isValidProductActiveStatus(status string) bool {
+	return status == "" || status == "all" || status == "active" || status == "inactive"
+}
+
+func isValidProductRecommendStatus(status string) bool {
+	return status == "" || status == "all" || status == "recommended" || status == "not_recommended"
+}
+
+func normalizeAllStatus(status string) string {
+	if status == "" {
+		return "all"
+	}
+	return status
+}
+
+func normalizeUUIDs(uuids []string) []string {
+	normalized := make([]string, 0, len(uuids))
+	for _, uuid := range uuids {
+		trimmedUUID := strings.TrimSpace(uuid)
+		if trimmedUUID == "" {
+			continue
+		}
+		normalized = append(normalized, trimmedUUID)
+	}
+	return normalized
 }

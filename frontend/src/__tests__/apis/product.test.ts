@@ -298,22 +298,32 @@ describe('product API', () => {
             )
 
             const result = await getProducts({
+                activeStatus: 'active',
                 category: 'all',
                 keyword: 'ピアス',
                 limit: 20,
+                maxPrice: 3000,
+                minPrice: 1000,
                 mode: 'all',
                 page: 1,
+                recommendStatus: 'recommended',
+                tagUuids: ['tag-1', 'tag-2'],
                 target: 'all',
             })
 
             const [requestUrl, requestInit] = fetchSpy.mock.calls[0]
             const url = new URL(requestUrl as string)
 
+            expect(url.searchParams.get('activeStatus')).toBe('active')
             expect(url.searchParams.get('category')).toBe('all')
             expect(url.searchParams.get('keyword')).toBe('ピアス')
             expect(url.searchParams.get('limit')).toBe('20')
+            expect(url.searchParams.get('maxPrice')).toBe('3000')
+            expect(url.searchParams.get('minPrice')).toBe('1000')
             expect(url.searchParams.get('mode')).toBe('all')
             expect(url.searchParams.get('page')).toBe('1')
+            expect(url.searchParams.get('recommendStatus')).toBe('recommended')
+            expect(url.searchParams.get('tagUuids')).toBe('tag-1,tag-2')
             expect(url.searchParams.get('target')).toBe('all')
             expect(requestInit?.credentials).toBe('include')
             expect(result).toEqual({

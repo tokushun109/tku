@@ -68,12 +68,17 @@ type UpdateProductRequest struct {
 }
 
 type ListProductQuery struct {
-	Mode     string
-	Category string
-	Keyword  string
-	Limit    int
-	Page     int
-	Target   string
+	Mode            string
+	ActiveStatus    string
+	Category        string
+	Keyword         string
+	Limit           int
+	MaxPrice        *int
+	MinPrice        *int
+	Page            int
+	RecommendStatus string
+	TagUUIDs        []string
+	Target          string
 }
 
 type ListCategoryProductQuery struct {
@@ -86,10 +91,15 @@ type ListCategoryProductQuery struct {
 func ParseListProductQuery(r *http.Request) (ListProductQuery, error) {
 	q := r.URL.Query()
 	mode := strings.TrimSpace(q.Get("mode"))
+	activeStatus := strings.TrimSpace(q.Get("activeStatus"))
 	category := strings.TrimSpace(q.Get("category"))
 	keyword := strings.TrimSpace(q.Get("keyword"))
 	limit := defaultProductLimit
+	var maxPrice *int
+	var minPrice *int
 	page := 1
+	recommendStatus := strings.TrimSpace(q.Get("recommendStatus"))
+	tagUUIDs := parseCSVQuery(q.Get("tagUuids"))
 	target := strings.TrimSpace(q.Get("target"))
 
 	if len([]rune(keyword)) > maxProductKeywordLength {
@@ -112,15 +122,64 @@ func ParseListProductQuery(r *http.Request) (ListProductQuery, error) {
 		limit = parsedLimit
 	}
 
+	if rawMinPrice := strings.TrimSpace(q.Get("minPrice")); rawMinPrice != "" {
+		parsedMinPrice, err := strconv.Atoi(rawMinPrice)
+		if err != nil || parsedMinPrice < 0 {
+			return ListProductQuery{}, errors.New("invalid min price")
+		}
+		minPrice = &parsedMinPrice
+	}
+
+	if rawMaxPrice := strings.TrimSpace(q.Get("maxPrice")); rawMaxPrice != "" {
+		parsedMaxPrice, err := strconv.Atoi(rawMaxPrice)
+		if err != nil || parsedMaxPrice < 0 {
+			return ListProductQuery{}, errors.New("invalid max price")
+		}
+		maxPrice = &parsedMaxPrice
+	}
+
+	if minPrice != nil && maxPrice != nil && *minPrice > *maxPrice {
+		return ListProductQuery{}, errors.New("invalid price range")
+	}
+
 	switch mode {
 	case usecaseProduct.ListModeAll, usecaseProduct.ListModeActive:
 		if category == "" || target == "" {
 			return ListProductQuery{}, errors.New("invalid query")
 		}
-		return ListProductQuery{Mode: mode, Category: category, Keyword: keyword, Limit: limit, Page: page, Target: target}, nil
+		return ListProductQuery{
+			Mode:            mode,
+			ActiveStatus:    activeStatus,
+			Category:        category,
+			Keyword:         keyword,
+			Limit:           limit,
+			MaxPrice:        maxPrice,
+			MinPrice:        minPrice,
+			Page:            page,
+			RecommendStatus: recommendStatus,
+			TagUUIDs:        tagUUIDs,
+			Target:          target,
+		}, nil
 	default:
 		return ListProductQuery{}, errors.New("invalid mode")
 	}
+}
+
+func parseCSVQuery(raw string) []string {
+	if strings.TrimSpace(raw) == "" {
+		return []string{}
+	}
+
+	parts := strings.Split(raw, ",")
+	values := make([]string, 0, len(parts))
+	for _, part := range parts {
+		value := strings.TrimSpace(part)
+		if value == "" {
+			continue
+		}
+		values = append(values, value)
+	}
+	return values
 }
 
 func ParseListCategoryProductQuery(r *http.Request) (ListCategoryProductQuery, error) {

@@ -3,12 +3,17 @@ package query
 import "context"
 
 type ListProductsQuery struct {
-	Mode     string
-	Category string
-	Keyword  string
-	Limit    int
-	Page     int
-	Target   string
+	Mode            string
+	ActiveStatus    string
+	Category        string
+	Keyword         string
+	Limit           int
+	MaxPrice        *int
+	MinPrice        *int
+	Page            int
+	RecommendStatus string
+	TagUUIDs        []string
+	Target          string
 }
 
 type ListCategoryProductsQuery struct {

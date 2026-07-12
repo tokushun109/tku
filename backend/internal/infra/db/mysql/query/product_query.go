@@ -78,6 +78,18 @@ func escapeLikeKeyword(keyword string) string {
 	return replacer.Replace(keyword)
 }
 
+func placeholders(count int) string {
+	if count <= 0 {
+		return ""
+	}
+
+	values := make([]string, count)
+	for i := range values {
+		values[i] = "?"
+	}
+	return strings.Join(values, ",")
+}
+
 func (r *ProductQueryReader) ListProducts(ctx context.Context, q usecaseProductQuery.ListProductsQuery) (*usecaseProductQuery.ProductPage, error) {
 	if q.Page <= 0 || q.Limit <= 0 {
 		return &usecaseProductQuery.ProductPage{
@@ -99,6 +111,18 @@ func (r *ProductQueryReader) ListProducts(ctx context.Context, q usecaseProductQ
 	if q.Mode == "active" {
 		fromWhereQuery += ` AND p.is_active = 1`
 	}
+	switch q.ActiveStatus {
+	case "active":
+		fromWhereQuery += ` AND p.is_active = 1`
+	case "inactive":
+		fromWhereQuery += ` AND p.is_active = 0`
+	}
+	switch q.RecommendStatus {
+	case "recommended":
+		fromWhereQuery += ` AND p.is_recommend = 1`
+	case "not_recommended":
+		fromWhereQuery += ` AND p.is_recommend = 0`
+	}
 	if q.Category != "all" {
 		fromWhereQuery += ` AND c.uuid = ?`
 		args = append(args, q.Category)
@@ -110,6 +134,26 @@ func (r *ProductQueryReader) ListProducts(ctx context.Context, q usecaseProductQ
 	if q.Keyword != "" {
 		fromWhereQuery += ` AND p.name LIKE ? ESCAPE '\\'`
 		args = append(args, "%"+escapeLikeKeyword(q.Keyword)+"%")
+	}
+	if q.MinPrice != nil {
+		fromWhereQuery += ` AND p.price >= ?`
+		args = append(args, *q.MinPrice)
+	}
+	if q.MaxPrice != nil {
+		fromWhereQuery += ` AND p.price <= ?`
+		args = append(args, *q.MaxPrice)
+	}
+	if len(q.TagUUIDs) > 0 {
+		fromWhereQuery += ` AND EXISTS (
+			SELECT 1
+			FROM product_to_tag ptt
+			INNER JOIN tag tg ON tg.uuid = ptt.tag_uuid AND tg.deleted_at IS NULL
+			WHERE ptt.product_uuid = p.uuid
+			  AND tg.uuid IN (` + placeholders(len(q.TagUUIDs)) + `)
+		)`
+		for _, tagUUID := range q.TagUUIDs {
+			args = append(args, tagUUID)
+		}
 	}
 
 	var total int

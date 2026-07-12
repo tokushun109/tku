@@ -12,11 +12,16 @@ export interface IGetProductsByCategoryParams {
 }
 
 export interface IGetProductsParams {
+    activeStatus?: string
     category: 'all' | string
     keyword?: string
     limit?: number
+    maxPrice?: number
+    minPrice?: number
     mode: 'all' | 'active'
     page?: number
+    recommendStatus?: string
+    tagUuids?: string[]
     target: 'all' | string
 }
 

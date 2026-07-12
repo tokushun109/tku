@@ -9,3 +9,11 @@ func TestEscapeLikeKeyword(t *testing.T) {
 		t.Fatalf("expected %q, got %q", want, got)
 	}
 }
+
+func TestPlaceholders(t *testing.T) {
+	got := placeholders(3)
+	want := "?,?,?"
+	if got != want {
+		t.Fatalf("expected %q, got %q", want, got)
+	}
+}

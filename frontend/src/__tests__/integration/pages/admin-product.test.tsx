@@ -247,10 +247,42 @@ describe('Admin Product Page Integration Test', () => {
         await waitFor(() => {
             expect(mockGetProducts).toHaveBeenLastCalledWith({
                 category: 'all',
-                keyword: undefined,
                 limit: 20,
                 mode: 'all',
                 page: 1,
+                target: 'all',
+            })
+        })
+    })
+
+    it('カテゴリ・タグ・価格・ステータスで検索できる', async () => {
+        mockGetProducts.mockResolvedValueOnce(createProductList([mockProductData[0]], { page: 1, total: 1, totalPages: 1 }))
+
+        render(<AdminProductTemplate {...defaultProps} initialProductList={createProductList(mockProductData)} />)
+
+        fireEvent.click(screen.getByText('すべてのカテゴリ'))
+        fireEvent.click(screen.getAllByText('イヤリング')[0])
+        fireEvent.click(screen.getAllByText('タグ')[0])
+        fireEvent.click(screen.getAllByText('タグ1')[0])
+        fireEvent.change(screen.getByLabelText('最低価格'), { target: { value: '1000' } })
+        fireEvent.change(screen.getByLabelText('最高価格'), { target: { value: '2000' } })
+        fireEvent.click(screen.getByText('公開状態すべて'))
+        fireEvent.click(screen.getByText('公開中'))
+        fireEvent.click(screen.getByText('おすすめ状態すべて'))
+        fireEvent.click(screen.getAllByText('おすすめ')[0])
+        fireEvent.click(screen.getByRole('button', { name: '検索' }))
+
+        await waitFor(() => {
+            expect(mockGetProducts).toHaveBeenCalledWith({
+                activeStatus: 'active',
+                category: 'category-1',
+                limit: 20,
+                maxPrice: 2000,
+                minPrice: 1000,
+                mode: 'all',
+                page: 1,
+                recommendStatus: 'recommended',
+                tagUuids: ['tag-1'],
                 target: 'all',
             })
         })
