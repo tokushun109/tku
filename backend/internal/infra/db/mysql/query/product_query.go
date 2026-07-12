@@ -107,6 +107,22 @@ func (r *ProductQueryReader) ListProducts(ctx context.Context, q usecaseProductQ
 		return nil, err
 	}
 
+	totalPages := 0
+	if total > 0 {
+		totalPages = (total + q.Limit - 1) / q.Limit
+	}
+	if total == 0 || q.Page > totalPages {
+		return &usecaseProductQuery.ProductPage{
+			PageInfo: usecaseProductQuery.OffsetPageInfo{
+				Page:       q.Page,
+				Limit:      q.Limit,
+				Total:      total,
+				TotalPages: totalPages,
+			},
+			Products: []*usecaseProductQuery.Product{},
+		}, nil
+	}
+
 	offset := (q.Page - 1) * q.Limit
 	query := `
 		SELECT
@@ -134,11 +150,6 @@ func (r *ProductQueryReader) ListProducts(ctx context.Context, q usecaseProductQ
 		if err := r.fillChildren(ctx, products); err != nil {
 			return nil, err
 		}
-	}
-
-	totalPages := 0
-	if total > 0 {
-		totalPages = (total + q.Limit - 1) / q.Limit
 	}
 
 	return &usecaseProductQuery.ProductPage{
