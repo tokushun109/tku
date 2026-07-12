@@ -16,6 +16,7 @@ const (
 
 	defaultProductImagePresignTTL = 30 * time.Minute
 	defaultCarouselLimit          = 5
+	maxProductKeywordLength       = 100
 )
 
 type Usecase interface {
@@ -42,15 +43,20 @@ func New(queryReader Reader, storage usecase.Storage) *Service {
 
 func (s *Service) List(ctx context.Context, q ListProductsQuery) (*ProductPage, error) {
 	trimmedCategory := strings.TrimSpace(q.Category)
+	trimmedKeyword := strings.TrimSpace(q.Keyword)
 	trimmedTarget := strings.TrimSpace(q.Target)
 
 	if !isValidListMode(q.Mode) || trimmedCategory == "" || trimmedTarget == "" || q.Page <= 0 || q.Limit <= 0 {
+		return nil, usecase.NewAppError(usecase.ErrInvalidInput)
+	}
+	if len([]rune(trimmedKeyword)) > maxProductKeywordLength {
 		return nil, usecase.NewAppError(usecase.ErrInvalidInput)
 	}
 
 	productPage, err := s.queryReader.ListProducts(ctx, ListProductsQuery{
 		Mode:     q.Mode,
 		Category: trimmedCategory,
+		Keyword:  trimmedKeyword,
 		Limit:    q.Limit,
 		Page:     q.Page,
 		Target:   trimmedTarget,

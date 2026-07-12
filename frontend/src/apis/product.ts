@@ -13,6 +13,7 @@ export interface IGetProductsByCategoryParams {
 
 export interface IGetProductsParams {
     category: 'all' | string
+    keyword?: string
     limit?: number
     mode: 'all' | 'active'
     page?: number

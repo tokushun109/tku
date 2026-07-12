@@ -38,6 +38,7 @@ func (h *ProductHandler) List(w http.ResponseWriter, r *http.Request) {
 	productPage, err := h.productUC.List(r.Context(), usecaseProductQuery.ListProductsQuery{
 		Mode:     q.Mode,
 		Category: q.Category,
+		Keyword:  q.Keyword,
 		Limit:    q.Limit,
 		Page:     q.Page,
 		Target:   q.Target,

@@ -299,6 +299,7 @@ describe('product API', () => {
 
             const result = await getProducts({
                 category: 'all',
+                keyword: 'ピアス',
                 limit: 20,
                 mode: 'all',
                 page: 1,
@@ -309,6 +310,7 @@ describe('product API', () => {
             const url = new URL(requestUrl as string)
 
             expect(url.searchParams.get('category')).toBe('all')
+            expect(url.searchParams.get('keyword')).toBe('ピアス')
             expect(url.searchParams.get('limit')).toBe('20')
             expect(url.searchParams.get('mode')).toBe('all')
             expect(url.searchParams.get('page')).toBe('1')

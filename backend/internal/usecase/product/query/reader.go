@@ -5,6 +5,7 @@ import "context"
 type ListProductsQuery struct {
 	Mode     string
 	Category string
+	Keyword  string
 	Limit    int
 	Page     int
 	Target   string

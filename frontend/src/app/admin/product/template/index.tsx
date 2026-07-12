@@ -1,7 +1,7 @@
 'use client'
 
-import { Add } from '@mui/icons-material'
-import { useState } from 'react'
+import { Add, Close, Search } from '@mui/icons-material'
+import { type FormEvent, useState } from 'react'
 import { toast } from 'sonner'
 
 import { getCategories } from '@/apis/category'
@@ -19,6 +19,7 @@ import { getTags } from '@/apis/tag'
 import { getTargets } from '@/apis/target'
 import { Button } from '@/components/bases/Button'
 import { Dialog } from '@/components/bases/Dialog'
+import { Input } from '@/components/bases/Input'
 import { Pagination } from '@/components/bases/Pagination'
 import { IClassification } from '@/features/classification/type'
 import { ProductCard } from '@/features/product/components/ProductCard'
@@ -58,17 +59,22 @@ export const AdminProductTemplate = ({
     const [updateItem, setUpdateItem] = useState<IProduct | null>(null)
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false)
     const [deleteTargetItem, setDeleteTargetItem] = useState<IProduct | null>(null)
+    const [searchText, setSearchText] = useState<string>('')
+    const [keyword, setKeyword] = useState<string>('')
 
-    const fetchProducts = async (page: number) => {
+    const buildProductListParams = (page: number, nextKeyword: string) => ({
+        mode: 'all' as const,
+        category: 'all',
+        keyword: nextKeyword || undefined,
+        limit: ADMIN_PRODUCT_PAGE_LIMIT,
+        page,
+        target: 'all',
+    })
+
+    const fetchProducts = async (page: number, nextKeyword: string = keyword) => {
         try {
             setIsLoading(true)
-            const productList = await getProducts({
-                mode: 'all',
-                category: 'all',
-                limit: ADMIN_PRODUCT_PAGE_LIMIT,
-                page,
-                target: 'all',
-            })
+            const productList = await getProducts(buildProductListParams(page, nextKeyword))
 
             setProducts(productList.products)
             setPageInfo(productList.pageInfo)
@@ -79,17 +85,11 @@ export const AdminProductTemplate = ({
         }
     }
 
-    const fetchData = async (page: number = pageInfo.page) => {
+    const fetchData = async (page: number = pageInfo.page, nextKeyword: string = keyword) => {
         try {
             setIsLoading(true)
             const [productList, categoriesData, targetsData, tagsData, salesSitesData] = await Promise.all([
-                getProducts({
-                    mode: 'all',
-                    category: 'all',
-                    limit: ADMIN_PRODUCT_PAGE_LIMIT,
-                    page,
-                    target: 'all',
-                }),
+                getProducts(buildProductListParams(page, nextKeyword)),
                 getCategories({ mode: 'all' }),
                 getTargets({ mode: 'all' }),
                 getTags(),
@@ -137,7 +137,7 @@ export const AdminProductTemplate = ({
             await deleteProduct(deleteTargetItem.uuid)
             toast.success(`商品「${deleteTargetItem.name}」を削除しました`)
             const nextPage = products.length === 1 && pageInfo.page > 1 ? pageInfo.page - 1 : pageInfo.page
-            await fetchData(nextPage)
+            await fetchData(nextPage, keyword)
             handleCloseDeleteDialog()
         } catch (error) {
             console.error('商品の削除に失敗しました:', error)
@@ -268,7 +268,7 @@ export const AdminProductTemplate = ({
                 toast.success(`商品「${data.name}」を追加しました`)
             }
 
-            await fetchData(updateItem ? pageInfo.page : 1)
+            await fetchData(updateItem ? pageInfo.page : 1, keyword)
         } catch (error) {
             console.error('商品の保存に失敗しました:', error)
             const errorMessage = '商品の保存に失敗しました。もう一度お試しください。'
@@ -288,7 +288,7 @@ export const AdminProductTemplate = ({
 
             setIsDialogOpen(false)
             toast.success('Creemaから商品を複製しました')
-            await fetchData(1)
+            await fetchData(1, keyword)
         } catch (error) {
             console.error('Creemaからの商品複製に失敗しました:', error)
             const errorMessage = 'Creemaからの商品複製に失敗しました。もう一度お試しください。'
@@ -300,7 +300,23 @@ export const AdminProductTemplate = ({
     }
 
     const handlePageChange = async (page: number) => {
-        await fetchProducts(page)
+        await fetchProducts(page, keyword)
+    }
+
+    const handleSearchSubmit = async (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault()
+
+        const nextKeyword = searchText.trim()
+        setKeyword(nextKeyword)
+        await fetchData(1, nextKeyword)
+    }
+
+    const handleClearSearch = async () => {
+        if (searchText === '' && keyword === '') return
+
+        setSearchText('')
+        setKeyword('')
+        await fetchData(1, '')
     }
 
     return (
@@ -317,13 +333,42 @@ export const AdminProductTemplate = ({
                     </Button>
                 </div>
             </div>
+            <form className={styles['search-form']} onSubmit={handleSearchSubmit}>
+                <Input
+                    aria-label="商品名で検索"
+                    className={styles['search-input']}
+                    onChange={(event) => {
+                        setSearchText(event.target.value)
+                    }}
+                    placeholder="商品名で検索"
+                    value={searchText}
+                />
+                <Button className={styles['search-button']} disabled={isLoading} type="submit">
+                    <div className={styles['search-button-content']}>
+                        <Search className={styles['search-icon']} fontSize="small" />
+                        検索
+                    </div>
+                </Button>
+                <Button
+                    className={styles['clear-button']}
+                    contrast
+                    disabled={isLoading || (searchText === '' && keyword === '')}
+                    onClick={handleClearSearch}
+                    type="button"
+                >
+                    <div className={styles['search-button-content']}>
+                        <Close className={styles['search-icon']} fontSize="small" />
+                        クリア
+                    </div>
+                </Button>
+            </form>
             <div className={styles['product-content']}>
                 {isLoading ? (
                     <div className={styles['loading']}>読み込み中...</div>
                 ) : (
                     <div className={styles['product-list']}>
                         {products.length === 0 ? (
-                            <div className={styles['empty-message']}>登録されていません</div>
+                            <div className={styles['empty-message']}>{keyword ? '該当する商品がありません' : '登録されていません'}</div>
                         ) : (
                             <div className={styles['product-grid']}>
                                 {products.map((product) => (

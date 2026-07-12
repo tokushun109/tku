@@ -25,6 +25,7 @@ type stubProductUC struct {
 	listReq    struct {
 		mode     string
 		category string
+		keyword  string
 		limit    int
 		page     int
 		target   string
@@ -77,6 +78,7 @@ func (s *stubProductUC) List(ctx context.Context, q usecaseProductQuery.ListProd
 	s.listCalled = true
 	s.listReq.mode = q.Mode
 	s.listReq.category = q.Category
+	s.listReq.keyword = q.Keyword
 	s.listReq.limit = q.Limit
 	s.listReq.page = q.Page
 	s.listReq.target = q.Target
@@ -194,6 +196,23 @@ func TestProductList(t *testing.T) {
 		}
 	})
 
+	t.Run("keywordが長すぎるときバリデーションエラーで失敗する", func(t *testing.T) {
+		uc := &stubProductUC{}
+		h := NewProductHandler(uc)
+
+		req := httptest.NewRequest(http.MethodGet, "/api/product?mode=all&category=all&target=all&keyword="+strings.Repeat("a", 101), nil)
+		rr := httptest.NewRecorder()
+
+		h.List(rr, req)
+
+		if rr.Code != http.StatusBadRequest {
+			t.Fatalf("expected 400, got %d", rr.Code)
+		}
+		if uc.listCalled {
+			t.Fatalf("usecase should not be called on invalid query")
+		}
+	})
+
 	t.Run("有効なクエリを渡したときページ情報つきの商品一覧を返す", func(t *testing.T) {
 		uc := &stubProductUC{
 			listRes: &usecaseProductQuery.ProductPage{
@@ -213,7 +232,7 @@ func TestProductList(t *testing.T) {
 		}
 		h := NewProductHandler(uc)
 
-		req := httptest.NewRequest(http.MethodGet, "/api/product?mode=all&category=all&target=all&page=2&limit=20", nil)
+		req := httptest.NewRequest(http.MethodGet, "/api/product?mode=all&category=all&target=all&page=2&limit=20&keyword=%20Product%20", nil)
 		rr := httptest.NewRecorder()
 
 		h.List(rr, req)
@@ -224,7 +243,7 @@ func TestProductList(t *testing.T) {
 		if !uc.listCalled {
 			t.Fatalf("usecase should be called")
 		}
-		if uc.listReq.page != 2 || uc.listReq.limit != 20 {
+		if uc.listReq.page != 2 || uc.listReq.limit != 20 || uc.listReq.keyword != "Product" {
 			t.Fatalf("unexpected pagination args: %+v", uc.listReq)
 		}
 

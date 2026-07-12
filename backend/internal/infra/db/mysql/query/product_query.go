@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -72,6 +73,11 @@ func NewProductQueryReader(db *sqlx.DB) *ProductQueryReader {
 	return &ProductQueryReader{db: db}
 }
 
+func escapeLikeKeyword(keyword string) string {
+	replacer := strings.NewReplacer(`\`, `\\`, `%`, `\%`, `_`, `\_`)
+	return replacer.Replace(keyword)
+}
+
 func (r *ProductQueryReader) ListProducts(ctx context.Context, q usecaseProductQuery.ListProductsQuery) (*usecaseProductQuery.ProductPage, error) {
 	if q.Page <= 0 || q.Limit <= 0 {
 		return &usecaseProductQuery.ProductPage{
@@ -100,6 +106,10 @@ func (r *ProductQueryReader) ListProducts(ctx context.Context, q usecaseProductQ
 	if q.Target != "all" {
 		fromWhereQuery += ` AND t.uuid = ?`
 		args = append(args, q.Target)
+	}
+	if q.Keyword != "" {
+		fromWhereQuery += ` AND p.name LIKE ? ESCAPE '\\'`
+		args = append(args, "%"+escapeLikeKeyword(q.Keyword)+"%")
 	}
 
 	var total int

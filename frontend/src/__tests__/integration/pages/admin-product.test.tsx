@@ -194,6 +194,68 @@ describe('Admin Product Page Integration Test', () => {
         expect(mockGetSalesSiteList).not.toHaveBeenCalled()
     })
 
+    it('商品名で検索でき、検索条件を維持してページ移動できる', async () => {
+        const searchProducts = [mockProductData[0]]
+        mockGetProducts.mockResolvedValueOnce(createProductList(searchProducts, { page: 1, total: 21, totalPages: 2 }))
+        mockGetProducts.mockResolvedValueOnce(createProductList([mockProductData[1]], { page: 2, total: 21, totalPages: 2 }))
+
+        render(<AdminProductTemplate {...defaultProps} initialProductList={createProductList(mockProductData, { total: 21, totalPages: 2 })} />)
+
+        fireEvent.change(screen.getByLabelText('商品名で検索'), { target: { value: ' テスト商品 ' } })
+        fireEvent.click(screen.getByRole('button', { name: '検索' }))
+
+        await waitFor(() => {
+            expect(mockGetProducts).toHaveBeenCalledWith({
+                category: 'all',
+                keyword: 'テスト商品',
+                limit: 20,
+                mode: 'all',
+                page: 1,
+                target: 'all',
+            })
+        })
+
+        fireEvent.click(screen.getByRole('button', { name: '次のページへ' }))
+
+        await waitFor(() => {
+            expect(mockGetProducts).toHaveBeenLastCalledWith({
+                category: 'all',
+                keyword: 'テスト商品',
+                limit: 20,
+                mode: 'all',
+                page: 2,
+                target: 'all',
+            })
+        })
+    })
+
+    it('検索をクリアすると検索条件なしで1ページ目を再取得する', async () => {
+        mockGetProducts.mockResolvedValueOnce(createProductList([], { page: 1, total: 0, totalPages: 0 }))
+        mockGetProducts.mockResolvedValueOnce(createProductList(mockProductData))
+
+        render(<AdminProductTemplate {...defaultProps} initialProductList={createProductList(mockProductData)} />)
+
+        fireEvent.change(screen.getByLabelText('商品名で検索'), { target: { value: '存在しない商品' } })
+        fireEvent.click(screen.getByRole('button', { name: '検索' }))
+
+        await waitFor(() => {
+            expect(screen.getByText('該当する商品がありません')).toBeInTheDocument()
+        })
+
+        fireEvent.click(screen.getByRole('button', { name: 'クリア' }))
+
+        await waitFor(() => {
+            expect(mockGetProducts).toHaveBeenLastCalledWith({
+                category: 'all',
+                keyword: undefined,
+                limit: 20,
+                mode: 'all',
+                page: 1,
+                target: 'all',
+            })
+        })
+    })
+
     it('商品追加ボタンをクリックするとダイアログが開く', async () => {
         render(<AdminProductTemplate {...defaultProps} initialProductList={createProductList(mockProductData)} />)
 

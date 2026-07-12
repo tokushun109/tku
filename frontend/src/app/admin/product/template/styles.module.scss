@@ -30,6 +30,33 @@
     color: $text-color;
 }
 
+.search-form {
+    display: grid;
+    grid-template-columns: minmax(240px, 420px) auto auto;
+    gap: 8px;
+    align-items: start;
+    margin-bottom: 16px;
+}
+
+.search-input {
+    min-height: 44px;
+}
+
+.search-button,
+.clear-button {
+    min-width: 96px;
+    min-height: 44px;
+}
+
+.search-button-content {
+    display: flex;
+    align-items: center;
+}
+
+.search-icon {
+    margin-right: 4px;
+}
+
 .product-content {
     flex: 1;
     overflow-y: auto;
@@ -89,6 +116,21 @@
 }
 
 @include media('sm') {
+    .page-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .search-form {
+        grid-template-columns: 1fr;
+    }
+
+    .search-button,
+    .clear-button {
+        width: 100%;
+    }
+
     .product-grid {
         grid-template-columns: 1fr;
         gap: 16px;
