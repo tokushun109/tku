@@ -11,7 +11,9 @@ import (
 
 const (
 	defaultCategoryProductLimit = 4
+	defaultProductLimit         = 20
 	maxCategoryProductLimit     = 20
+	maxProductLimit             = 100
 )
 
 type ProductClassificationRequest struct {
@@ -67,6 +69,8 @@ type UpdateProductRequest struct {
 type ListProductQuery struct {
 	Mode     string
 	Category string
+	Limit    int
+	Page     int
 	Target   string
 }
 
@@ -81,14 +85,32 @@ func ParseListProductQuery(r *http.Request) (ListProductQuery, error) {
 	q := r.URL.Query()
 	mode := strings.TrimSpace(q.Get("mode"))
 	category := strings.TrimSpace(q.Get("category"))
+	limit := defaultProductLimit
+	page := 1
 	target := strings.TrimSpace(q.Get("target"))
+
+	if rawPage := strings.TrimSpace(q.Get("page")); rawPage != "" {
+		parsedPage, err := strconv.Atoi(rawPage)
+		if err != nil || parsedPage <= 0 {
+			return ListProductQuery{}, errors.New("invalid page")
+		}
+		page = parsedPage
+	}
+
+	if rawLimit := strings.TrimSpace(q.Get("limit")); rawLimit != "" {
+		parsedLimit, err := strconv.Atoi(rawLimit)
+		if err != nil || parsedLimit <= 0 || parsedLimit > maxProductLimit {
+			return ListProductQuery{}, errors.New("invalid limit")
+		}
+		limit = parsedLimit
+	}
 
 	switch mode {
 	case usecaseProduct.ListModeAll, usecaseProduct.ListModeActive:
 		if category == "" || target == "" {
 			return ListProductQuery{}, errors.New("invalid query")
 		}
-		return ListProductQuery{Mode: mode, Category: category, Target: target}, nil
+		return ListProductQuery{Mode: mode, Category: category, Limit: limit, Page: page, Target: target}, nil
 	default:
 		return ListProductQuery{}, errors.New("invalid mode")
 	}

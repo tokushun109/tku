@@ -66,6 +66,25 @@ func ToProductResponses(products []*usecaseProductQuery.Product) []*response.Pro
 	return result
 }
 
+func ToProductListResponse(productPage *usecaseProductQuery.ProductPage) *response.ProductListResponse {
+	if productPage == nil {
+		return &response.ProductListResponse{
+			PageInfo: response.OffsetPageInfoResponse{},
+			Products: []*response.ProductResponse{},
+		}
+	}
+
+	return &response.ProductListResponse{
+		PageInfo: response.OffsetPageInfoResponse{
+			Page:       productPage.PageInfo.Page,
+			Limit:      productPage.PageInfo.Limit,
+			Total:      productPage.PageInfo.Total,
+			TotalPages: productPage.PageInfo.TotalPages,
+		},
+		Products: ToProductResponses(productPage.Products),
+	}
+}
+
 func ToCategoryProductsResponse(categoryProducts *usecaseProductQuery.CategoryProducts) *response.CategoryProductsResponse {
 	if categoryProducts == nil {
 		return &response.CategoryProductsResponse{

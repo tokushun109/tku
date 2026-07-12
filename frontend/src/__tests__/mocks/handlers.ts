@@ -1,7 +1,7 @@
 import { http, HttpResponse } from 'msw'
 
 import { ICreator } from '@/features/creator/type'
-import { IProduct, IProductsByCategory, IThumbnail } from '@/features/product/type'
+import { IProduct, IProductList, IProductsByCategory, IThumbnail } from '@/features/product/type'
 import { ISite } from '@/features/site/type'
 
 const apiBaseUrl = 'http://localhost:8080/api'
@@ -171,6 +171,39 @@ const createProductsByCategoryResponse = (request: Request): IProductsByCategory
     return Object.values(mockCategories).map((currentCategory) => buildCategoryProducts(currentCategory, null))
 }
 
+const createProductListResponse = (request: Request): IProductList => {
+    const url = new URL(request.url)
+    const category = url.searchParams.get('category')
+    const target = url.searchParams.get('target')
+    const page = Number(url.searchParams.get('page') || '1')
+    const limit = Number(url.searchParams.get('limit') || '20')
+    const currentPage = Number.isFinite(page) && page > 0 ? page : 1
+    const pageSize = Number.isFinite(limit) && limit > 0 ? limit : 20
+
+    let filteredProducts = [...mockProducts]
+
+    if (category && category !== 'all') {
+        filteredProducts = filteredProducts.filter((p) => p.category.uuid === category)
+    }
+
+    if (target && target !== 'all') {
+        filteredProducts = filteredProducts.filter((p) => p.target.uuid === target)
+    }
+
+    const startIndex = (currentPage - 1) * pageSize
+    const products = filteredProducts.slice(startIndex, startIndex + pageSize)
+
+    return {
+        pageInfo: {
+            limit: pageSize,
+            page: currentPage,
+            total: filteredProducts.length,
+            totalPages: Math.ceil(filteredProducts.length / pageSize),
+        },
+        products,
+    }
+}
+
 const mockThumbnails: IThumbnail[] = [
     {
         apiPath: '/image/carousel1.jpg',
@@ -220,24 +253,10 @@ export const handlers = [
     http.get(`${apiBaseUrl}/product`, ({ request }) => {
         const url = new URL(request.url)
         const mode = url.searchParams.get('mode')
-        const category = url.searchParams.get('category')
-        const target = url.searchParams.get('target')
 
         // 管理画面用（mode=all）の場合、全商品を返す
         if (mode === 'all') {
-            let filteredProducts = [...mockProducts]
-
-            // カテゴリフィルタ
-            if (category && category !== 'all') {
-                filteredProducts = filteredProducts.filter((p) => p.category.uuid === category)
-            }
-
-            // ターゲットフィルタ
-            if (target && target !== 'all') {
-                filteredProducts = filteredProducts.filter((p) => p.target.uuid === target)
-            }
-
-            return HttpResponse.json(filteredProducts)
+            return HttpResponse.json(createProductListResponse(request))
         }
 
         // 通常の商品一覧（公開中のみ）

@@ -35,6 +35,18 @@ export interface IProductsByCategoryPageInfo {
     nextCursor: string
 }
 
+export interface IProductListPageInfo {
+    limit: number
+    page: number
+    total: number
+    totalPages: number
+}
+
+export interface IProductList {
+    pageInfo: IProductListPageInfo
+    products: IProduct[]
+}
+
 export interface IProductsByCategory {
     category: IClassification
     pageInfo: IProductsByCategoryPageInfo

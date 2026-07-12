@@ -35,13 +35,19 @@ func (h *ProductHandler) List(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	products, err := h.productUC.List(r.Context(), q.Mode, q.Category, q.Target)
+	productPage, err := h.productUC.List(r.Context(), usecaseProductQuery.ListProductsQuery{
+		Mode:     q.Mode,
+		Category: q.Category,
+		Limit:    q.Limit,
+		Page:     q.Page,
+		Target:   q.Target,
+	})
 	if err != nil {
 		response.WriteAppError(w, err)
 		return
 	}
 
-	res := presenter.ToProductResponses(products)
+	res := presenter.ToProductListResponse(productPage)
 	response.WriteJSON(w, http.StatusOK, res)
 }
 

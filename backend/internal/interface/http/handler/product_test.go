@@ -20,11 +20,13 @@ import (
 
 type stubProductUC struct {
 	listErr    error
-	listRes    []*usecaseProductQuery.Product
+	listRes    *usecaseProductQuery.ProductPage
 	listCalled bool
 	listReq    struct {
 		mode     string
 		category string
+		limit    int
+		page     int
 		target   string
 	}
 
@@ -71,11 +73,13 @@ type stubProductUC struct {
 	}
 }
 
-func (s *stubProductUC) List(ctx context.Context, mode string, category string, target string) ([]*usecaseProductQuery.Product, error) {
+func (s *stubProductUC) List(ctx context.Context, q usecaseProductQuery.ListProductsQuery) (*usecaseProductQuery.ProductPage, error) {
 	s.listCalled = true
-	s.listReq.mode = mode
-	s.listReq.category = category
-	s.listReq.target = target
+	s.listReq.mode = q.Mode
+	s.listReq.category = q.Category
+	s.listReq.limit = q.Limit
+	s.listReq.page = q.Page
+	s.listReq.target = q.Target
 	if s.listErr != nil {
 		return nil, s.listErr
 	}
@@ -170,6 +174,76 @@ func (s *stubProductUC) CreateProductImages(
 
 func (s *stubProductUC) DeleteProductImage(ctx context.Context, productUUID string, productImageUUID string) error {
 	return nil
+}
+
+func TestProductList(t *testing.T) {
+	t.Run("クエリが不正なときバリデーションエラーで失敗する", func(t *testing.T) {
+		uc := &stubProductUC{}
+		h := NewProductHandler(uc)
+
+		req := httptest.NewRequest(http.MethodGet, "/api/product?mode=all&category=all&target=all&page=0&limit=20", nil)
+		rr := httptest.NewRecorder()
+
+		h.List(rr, req)
+
+		if rr.Code != http.StatusBadRequest {
+			t.Fatalf("expected 400, got %d", rr.Code)
+		}
+		if uc.listCalled {
+			t.Fatalf("usecase should not be called on invalid query")
+		}
+	})
+
+	t.Run("有効なクエリを渡したときページ情報つきの商品一覧を返す", func(t *testing.T) {
+		uc := &stubProductUC{
+			listRes: &usecaseProductQuery.ProductPage{
+				PageInfo: usecaseProductQuery.OffsetPageInfo{
+					Page:       2,
+					Limit:      20,
+					Total:      21,
+					TotalPages: 2,
+				},
+				Products: []*usecaseProductQuery.Product{
+					{
+						UUID: "product-uuid",
+						Name: "Product",
+					},
+				},
+			},
+		}
+		h := NewProductHandler(uc)
+
+		req := httptest.NewRequest(http.MethodGet, "/api/product?mode=all&category=all&target=all&page=2&limit=20", nil)
+		rr := httptest.NewRecorder()
+
+		h.List(rr, req)
+
+		if rr.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d", rr.Code)
+		}
+		if !uc.listCalled {
+			t.Fatalf("usecase should be called")
+		}
+		if uc.listReq.page != 2 || uc.listReq.limit != 20 {
+			t.Fatalf("unexpected pagination args: %+v", uc.listReq)
+		}
+
+		var res map[string]any
+		if err := json.NewDecoder(rr.Body).Decode(&res); err != nil {
+			t.Fatalf("unexpected decode error: %v", err)
+		}
+		pageInfo, ok := res["pageInfo"].(map[string]any)
+		if !ok {
+			t.Fatalf("expected pageInfo object")
+		}
+		if pageInfo["page"] != float64(2) || pageInfo["total"] != float64(21) || pageInfo["totalPages"] != float64(2) {
+			t.Fatalf("unexpected pageInfo: %+v", pageInfo)
+		}
+		products, ok := res["products"].([]any)
+		if !ok || len(products) != 1 {
+			t.Fatalf("unexpected products: %+v", res["products"])
+		}
+	})
 }
 
 func TestProductListByCategory(t *testing.T) {

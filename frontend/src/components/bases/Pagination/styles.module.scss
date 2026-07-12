@@ -1,0 +1,93 @@
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px 0;
+}
+
+.page-list {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.nav-button,
+.page-button {
+    border: 1px solid #e1e5e9;
+    background-color: $primary-bg-color;
+    color: $title-primary-color;
+    cursor: pointer;
+    transition: $transition;
+
+    &:hover:not(:disabled) {
+        border-color: $primary;
+        color: $primary;
+    }
+
+    &:focus-visible {
+        outline: 2px solid rgba($primary, 0.5);
+        outline-offset: 2px;
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+}
+
+.nav-button {
+    min-width: 80px;
+    min-height: 36px;
+    padding: 0 12px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    font-size: $font-sm-md;
+}
+
+.page-button {
+    width: 36px;
+    height: 36px;
+    border-radius: 4px;
+    font-size: $font-sm-md;
+
+    &.active {
+        border-color: $primary;
+        background-color: $primary;
+        color: $primary-bg-color;
+        opacity: 1;
+    }
+}
+
+.ellipsis {
+    width: 32px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: $text-color;
+}
+
+@include media('sm') {
+    .container {
+        gap: 6px;
+    }
+
+    .nav-button {
+        min-width: 40px;
+        padding: 0 8px;
+
+        span {
+            display: none;
+        }
+    }
+
+    .page-button,
+    .ellipsis {
+        width: 32px;
+        height: 32px;
+    }
+}

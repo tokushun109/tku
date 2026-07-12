@@ -72,7 +72,42 @@ func NewProductQueryReader(db *sqlx.DB) *ProductQueryReader {
 	return &ProductQueryReader{db: db}
 }
 
-func (r *ProductQueryReader) ListProducts(ctx context.Context, q usecaseProductQuery.ListProductsQuery) ([]*usecaseProductQuery.Product, error) {
+func (r *ProductQueryReader) ListProducts(ctx context.Context, q usecaseProductQuery.ListProductsQuery) (*usecaseProductQuery.ProductPage, error) {
+	if q.Page <= 0 || q.Limit <= 0 {
+		return &usecaseProductQuery.ProductPage{
+			PageInfo: usecaseProductQuery.OffsetPageInfo{
+				Page:  q.Page,
+				Limit: q.Limit,
+			},
+			Products: []*usecaseProductQuery.Product{},
+		}, nil
+	}
+
+	fromWhereQuery := `
+		FROM product p
+		LEFT JOIN category c ON c.uuid = p.category_uuid AND c.deleted_at IS NULL
+		LEFT JOIN target t ON t.uuid = p.target_uuid AND t.deleted_at IS NULL
+		WHERE p.deleted_at IS NULL
+	`
+	args := make([]any, 0, 2)
+	if q.Mode == "active" {
+		fromWhereQuery += ` AND p.is_active = 1`
+	}
+	if q.Category != "all" {
+		fromWhereQuery += ` AND c.uuid = ?`
+		args = append(args, q.Category)
+	}
+	if q.Target != "all" {
+		fromWhereQuery += ` AND t.uuid = ?`
+		args = append(args, q.Target)
+	}
+
+	var total int
+	if err := r.db.GetContext(ctx, &total, `SELECT COUNT(*) `+fromWhereQuery, args...); err != nil {
+		return nil, err
+	}
+
+	offset := (q.Page - 1) * q.Limit
 	query := `
 		SELECT
 			p.id,
@@ -86,40 +121,35 @@ func (r *ProductQueryReader) ListProducts(ctx context.Context, q usecaseProductQ
 			c.name AS category_name,
 			t.uuid AS target_uuid,
 			t.name AS target_name
-		FROM product p
-		LEFT JOIN category c ON c.uuid = p.category_uuid AND c.deleted_at IS NULL
-		LEFT JOIN target t ON t.uuid = p.target_uuid AND t.deleted_at IS NULL
-		WHERE p.deleted_at IS NULL
-	`
-	args := make([]any, 0, 2)
-	if q.Mode == "active" {
-		query += ` AND p.is_active = 1`
-	}
-	if q.Category != "all" {
-		query += ` AND c.uuid = ?`
-		args = append(args, q.Category)
-	}
-	if q.Target != "all" {
-		query += ` AND t.uuid = ?`
-		args = append(args, q.Target)
-	}
-	query += ` ORDER BY p.created_at DESC, p.id DESC`
+	` + fromWhereQuery + ` ORDER BY p.created_at DESC, p.id DESC LIMIT ? OFFSET ?`
+	listArgs := append(append([]any{}, args...), q.Limit, offset)
 
 	rows := []productBaseRow{}
-	if err := r.db.SelectContext(ctx, &rows, query, args...); err != nil {
+	if err := r.db.SelectContext(ctx, &rows, query, listArgs...); err != nil {
 		return nil, err
 	}
 
 	products := buildProductsFromRows(rows)
-	if len(products) == 0 {
-		return products, nil
+	if len(products) > 0 {
+		if err := r.fillChildren(ctx, products); err != nil {
+			return nil, err
+		}
 	}
 
-	if err := r.fillChildren(ctx, products); err != nil {
-		return nil, err
+	totalPages := 0
+	if total > 0 {
+		totalPages = (total + q.Limit - 1) / q.Limit
 	}
 
-	return products, nil
+	return &usecaseProductQuery.ProductPage{
+		PageInfo: usecaseProductQuery.OffsetPageInfo{
+			Page:       q.Page,
+			Limit:      q.Limit,
+			Total:      total,
+			TotalPages: totalPages,
+		},
+		Products: products,
+	}, nil
 }
 
 func (r *ProductQueryReader) ListCategoryProducts(ctx context.Context, q usecaseProductQuery.ListCategoryProductsQuery) ([]*usecaseProductQuery.CategoryProducts, error) {

@@ -12,8 +12,9 @@ import (
 )
 
 type stubQueryReader struct {
-	listRes            []*Product
+	listRes            *ProductPage
 	listErr            error
+	listQuery          ListProductsQuery
 	listByCatRes       []*CategoryProducts
 	listByCatErr       error
 	listByCatQuery     ListCategoryProductsQuery
@@ -27,7 +28,8 @@ type stubQueryReader struct {
 	exportCSVErr       error
 }
 
-func (s *stubQueryReader) ListProducts(ctx context.Context, q ListProductsQuery) ([]*Product, error) {
+func (s *stubQueryReader) ListProducts(ctx context.Context, q ListProductsQuery) (*ProductPage, error) {
+	s.listQuery = q
 	if s.listErr != nil {
 		return nil, s.listErr
 	}
@@ -93,7 +95,21 @@ func TestListProducts(t *testing.T) {
 	t.Run("modeが不正なときバリデーションエラーで失敗する", func(t *testing.T) {
 		s := &Service{}
 
-		_, err := s.List(context.Background(), "invalid", "all", "all")
+		_, err := s.List(context.Background(), ListProductsQuery{Mode: "invalid", Category: "all", Limit: 20, Page: 1, Target: "all"})
+		if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
+			t.Fatalf("expected ErrInvalidInput, got %v", err)
+		}
+	})
+
+	t.Run("pageまたはlimitが不正なときバリデーションエラーで失敗する", func(t *testing.T) {
+		s := &Service{}
+
+		_, err := s.List(context.Background(), ListProductsQuery{Mode: "all", Category: "all", Limit: 0, Page: 1, Target: "all"})
+		if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
+			t.Fatalf("expected ErrInvalidInput, got %v", err)
+		}
+
+		_, err = s.List(context.Background(), ListProductsQuery{Mode: "all", Category: "all", Limit: 20, Page: 0, Target: "all"})
 		if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
 			t.Fatalf("expected ErrInvalidInput, got %v", err)
 		}
@@ -106,7 +122,7 @@ func TestListProducts(t *testing.T) {
 			},
 		}
 
-		_, err := s.List(context.Background(), "all", "all", "all")
+		_, err := s.List(context.Background(), ListProductsQuery{Mode: "all", Category: "all", Limit: 20, Page: 1, Target: "all"})
 		if err == nil || !errors.Is(err, usecase.ErrInternal) {
 			t.Fatalf("expected ErrInternal, got %v", err)
 		}
@@ -115,11 +131,13 @@ func TestListProducts(t *testing.T) {
 	t.Run("presignに失敗したとき内部エラーを返す", func(t *testing.T) {
 		s := &Service{
 			queryReader: &stubQueryReader{
-				listRes: []*Product{
-					{
-						UUID: "product-uuid",
-						ProductImages: []ProductImage{
-							{Path: "img/product/path.png"},
+				listRes: &ProductPage{
+					Products: []*Product{
+						{
+							UUID: "product-uuid",
+							ProductImages: []ProductImage{
+								{Path: "img/product/path.png"},
+							},
 						},
 					},
 				},
@@ -127,7 +145,7 @@ func TestListProducts(t *testing.T) {
 			storage: &stubStorage{presignErr: errors.New("s3 error")},
 		}
 
-		_, err := s.List(context.Background(), "all", "all", "all")
+		_, err := s.List(context.Background(), ListProductsQuery{Mode: "all", Category: "all", Limit: 20, Page: 1, Target: "all"})
 		if err == nil || !errors.Is(err, usecase.ErrInternal) {
 			t.Fatalf("expected ErrInternal, got %v", err)
 		}
@@ -136,11 +154,19 @@ func TestListProducts(t *testing.T) {
 	t.Run("有効な入力を渡したとき一覧取得に成功しapiPathが設定される", func(t *testing.T) {
 		s := &Service{
 			queryReader: &stubQueryReader{
-				listRes: []*Product{
-					{
-						UUID: "product-uuid",
-						ProductImages: []ProductImage{
-							{Path: "img/product/path.png"},
+				listRes: &ProductPage{
+					PageInfo: OffsetPageInfo{
+						Page:       2,
+						Limit:      20,
+						Total:      21,
+						TotalPages: 2,
+					},
+					Products: []*Product{
+						{
+							UUID: "product-uuid",
+							ProductImages: []ProductImage{
+								{Path: "img/product/path.png"},
+							},
 						},
 					},
 				},
@@ -148,15 +174,22 @@ func TestListProducts(t *testing.T) {
 			storage: &stubStorage{presignURL: "https://signed.example.com/path"},
 		}
 
-		products, err := s.List(context.Background(), "all", "all", "all")
+		productPage, err := s.List(context.Background(), ListProductsQuery{Mode: "all", Category: "all", Limit: 20, Page: 2, Target: "all"})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if len(products) != 1 || len(products[0].ProductImages) != 1 {
-			t.Fatalf("unexpected products: %+v", products)
+		if productPage.PageInfo.TotalPages != 2 {
+			t.Fatalf("unexpected page info: %+v", productPage.PageInfo)
 		}
-		if products[0].ProductImages[0].APIPath != "https://signed.example.com/path" {
-			t.Fatalf("unexpected api path: %s", products[0].ProductImages[0].APIPath)
+		if len(productPage.Products) != 1 || len(productPage.Products[0].ProductImages) != 1 {
+			t.Fatalf("unexpected products: %+v", productPage.Products)
+		}
+		if productPage.Products[0].ProductImages[0].APIPath != "https://signed.example.com/path" {
+			t.Fatalf("unexpected api path: %s", productPage.Products[0].ProductImages[0].APIPath)
+		}
+		reader := s.queryReader.(*stubQueryReader)
+		if reader.listQuery.Page != 2 || reader.listQuery.Limit != 20 {
+			t.Fatalf("unexpected query: %+v", reader.listQuery)
 		}
 	})
 }

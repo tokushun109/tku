@@ -45,6 +45,18 @@ type PageInfo struct {
 	NextCursor string
 }
 
+type OffsetPageInfo struct {
+	Page       int
+	Limit      int
+	Total      int
+	TotalPages int
+}
+
+type ProductPage struct {
+	PageInfo OffsetPageInfo
+	Products []*Product
+}
+
 type CategoryProducts struct {
 	Category Classification
 	PageInfo PageInfo

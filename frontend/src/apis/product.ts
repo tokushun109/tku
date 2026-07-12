@@ -1,5 +1,5 @@
 import { getApiBaseUrl } from '@/apis/baseUrl'
-import { IProduct, IProductsByCategory, IThumbnail } from '@/features/product/type'
+import { IProduct, IProductList, IProductsByCategory, IThumbnail } from '@/features/product/type'
 import { createAPIHeaders } from '@/utils/cookie'
 import { ApiError } from '@/utils/error'
 import { convertObjectToURLSearchParams } from '@/utils/request'
@@ -13,9 +13,13 @@ export interface IGetProductsByCategoryParams {
 
 export interface IGetProductsParams {
     category: 'all' | string
+    limit?: number
     mode: 'all' | 'active'
+    page?: number
     target: 'all' | string
 }
+
+export const ADMIN_PRODUCT_PAGE_LIMIT = 20
 
 /** カテゴリーごとの商品リストを取得 */
 export const getProductsByCategory = async (params: IGetProductsByCategoryParams): Promise<IProductsByCategory[]> => {
@@ -86,7 +90,7 @@ export interface IProductImageDisplayOrderParams {
 }
 
 /** 商品リストを取得（管理画面用） */
-export const getProducts = async (params: IGetProductsParams): Promise<IProduct[]> => {
+export const getProducts = async (params: IGetProductsParams): Promise<IProductList> => {
     try {
         const query = convertObjectToURLSearchParams(params)
         const headers = await createAPIHeaders()
