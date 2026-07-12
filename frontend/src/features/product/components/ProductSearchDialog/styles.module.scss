@@ -1,0 +1,105 @@
+.search-form {
+    width: 100%;
+}
+
+.search-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: $primary-bg-color;
+    border: 2px solid #e1e5e9;
+    border-radius: 12px;
+    padding: 6px 6px 6px 16px;
+}
+
+.search-bar-field {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    // Input コンポーネントのラッパー（.form-field）を検索バー全幅に広げ、
+    // 余白部分のクリックでも入力欄にフォーカスできるようにする
+    > div {
+        flex: 1;
+        min-width: 0;
+    }
+}
+
+.search-bar-icon {
+    flex: none;
+    color: $secondary;
+}
+
+.search-divider {
+    height: 0;
+    border-top: 1px dashed rgba($primary, 0.2);
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px 16px;
+}
+
+.price-field {
+    grid-column: 1 / -1;
+}
+
+.field-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: $text-color;
+    font-size: 0.95rem;
+}
+
+.price-range {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    > div {
+        flex: 1;
+        min-width: 0;
+    }
+}
+
+.price-separator {
+    flex: none;
+    color: $secondary;
+}
+
+.card-actions {
+    // 最下段（公開状態・おすすめ）のドロップダウンがダイアログ下端でクリップされないよう、
+    // スクロール可能な余白を確保する
+    margin-bottom: 80px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+@include media('sm') {
+    .search-bar {
+        flex-wrap: wrap;
+        padding: 10px 14px;
+    }
+
+    .search-bar-field {
+        flex-basis: 100%;
+    }
+
+    .search-bar > button {
+        flex: 1;
+    }
+
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+}

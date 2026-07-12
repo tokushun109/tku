@@ -1,4 +1,4 @@
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, within } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getCategories } from '@/apis/category'
@@ -192,6 +192,119 @@ describe('Admin Product Page Integration Test', () => {
         expect(mockGetTargets).not.toHaveBeenCalled()
         expect(mockGetTags).not.toHaveBeenCalled()
         expect(mockGetSalesSiteList).not.toHaveBeenCalled()
+    })
+
+    it('商品名で検索でき、検索条件を維持してページ移動できる', async () => {
+        const searchProducts = [mockProductData[0]]
+        mockGetProducts.mockResolvedValueOnce(createProductList(searchProducts, { page: 1, total: 21, totalPages: 2 }))
+        mockGetProducts.mockResolvedValueOnce(createProductList([mockProductData[1]], { page: 2, total: 21, totalPages: 2 }))
+
+        render(<AdminProductTemplate {...defaultProps} initialProductList={createProductList(mockProductData, { total: 21, totalPages: 2 })} />)
+
+        fireEvent.click(screen.getByRole('button', { name: '絞り込み' }))
+        fireEvent.change(screen.getByLabelText('商品名で検索'), { target: { value: ' テスト商品 ' } })
+        fireEvent.click(screen.getByRole('button', { name: '検索' }))
+
+        await waitFor(() => {
+            expect(mockGetProducts).toHaveBeenCalledWith({
+                category: 'all',
+                keyword: 'テスト商品',
+                limit: 20,
+                mode: 'all',
+                page: 1,
+                target: 'all',
+            })
+        })
+
+        fireEvent.click(screen.getByRole('button', { name: '次のページへ' }))
+
+        await waitFor(() => {
+            expect(mockGetProducts).toHaveBeenLastCalledWith({
+                category: 'all',
+                keyword: 'テスト商品',
+                limit: 20,
+                mode: 'all',
+                page: 2,
+                target: 'all',
+            })
+        })
+    })
+
+    it('クリアで検索条件をリセットし、検索ボタンで検索条件なしの1ページ目を取得する', async () => {
+        mockGetProducts.mockResolvedValueOnce(createProductList([], { page: 1, total: 0, totalPages: 0 }))
+        mockGetProducts.mockResolvedValueOnce(createProductList(mockProductData))
+
+        render(<AdminProductTemplate {...defaultProps} initialProductList={createProductList(mockProductData)} />)
+
+        fireEvent.click(screen.getByRole('button', { name: '絞り込み' }))
+        fireEvent.change(screen.getByLabelText('商品名で検索'), { target: { value: '存在しない商品' } })
+        fireEvent.click(screen.getByRole('button', { name: '検索' }))
+
+        await waitFor(() => {
+            expect(screen.getByText('該当する商品がありません')).toBeInTheDocument()
+        })
+
+        // クリアは入力内容をリセットするだけで、検索APIは呼ばない
+        fireEvent.click(screen.getByRole('button', { name: '絞り込み' }))
+        fireEvent.click(screen.getByRole('button', { name: 'クリア' }))
+        expect(screen.getByLabelText('商品名で検索')).toHaveValue('')
+        expect(mockGetProducts).toHaveBeenCalledTimes(1)
+
+        // 検索ボタン押下で初めて検索条件なしの再取得を行う
+        fireEvent.click(screen.getByRole('button', { name: '検索' }))
+
+        await waitFor(() => {
+            expect(mockGetProducts).toHaveBeenLastCalledWith({
+                category: 'all',
+                limit: 20,
+                mode: 'all',
+                page: 1,
+                target: 'all',
+            })
+        })
+    })
+
+    it('カテゴリ・タグ・価格・ステータスで検索できる', async () => {
+        mockGetProducts.mockResolvedValueOnce(createProductList([mockProductData[0]], { page: 1, total: 1, totalPages: 1 }))
+
+        render(<AdminProductTemplate {...defaultProps} initialProductList={createProductList(mockProductData)} />)
+
+        fireEvent.click(screen.getByRole('button', { name: '絞り込み' }))
+
+        // 各フィルターはラベルからトリガーを辿って開き、開いたフィールド内で選択肢をクリックする
+        const filterForm = screen.getByLabelText('商品名で検索').closest('form') as HTMLElement
+        const filterDialog = within(filterForm)
+        const selectFilterOption = (labelText: string, optionText: string) => {
+            const field = filterDialog.getByText(labelText).parentElement as HTMLElement
+            fireEvent.click(field.querySelector('[class*="select-trigger"]') as HTMLElement)
+            const option = within(field)
+                .getAllByText(optionText)
+                .find((element) => element.className.includes('option'))
+            fireEvent.click(option as HTMLElement)
+        }
+
+        selectFilterOption('カテゴリ', 'イヤリング')
+        selectFilterOption('タグ', 'タグ1')
+        fireEvent.change(filterDialog.getByLabelText('最低価格'), { target: { value: '1000' } })
+        fireEvent.change(filterDialog.getByLabelText('最高価格'), { target: { value: '2000' } })
+        selectFilterOption('公開状態', '公開中')
+        selectFilterOption('おすすめ', 'おすすめ')
+        fireEvent.click(screen.getByRole('button', { name: '検索' }))
+
+        await waitFor(() => {
+            expect(mockGetProducts).toHaveBeenCalledWith({
+                activeStatus: 'active',
+                category: 'category-1',
+                limit: 20,
+                maxPrice: 2000,
+                minPrice: 1000,
+                mode: 'all',
+                page: 1,
+                recommendStatus: 'recommended',
+                tagUuids: ['tag-1'],
+                target: 'all',
+            })
+        })
     })
 
     it('商品追加ボタンをクリックするとダイアログが開く', async () => {

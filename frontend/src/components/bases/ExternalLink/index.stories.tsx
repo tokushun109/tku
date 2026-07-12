@@ -22,14 +22,6 @@ export const SalesLink: Story = {
     },
 }
 
-export const WithCustomClass: Story = {
-    args: {
-        href: 'https://example.com',
-        children: 'Styled Link',
-        className: 'custom-link-style',
-    },
-}
-
 export const LongText: Story = {
     args: {
         href: 'https://example.com',

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"io"
+	"strings"
 	"testing"
 	"time"
 
@@ -115,6 +116,55 @@ func TestListProducts(t *testing.T) {
 		}
 	})
 
+	t.Run("keywordが長すぎるときバリデーションエラーで失敗する", func(t *testing.T) {
+		s := &Service{}
+
+		_, err := s.List(context.Background(), ListProductsQuery{
+			Mode:     "all",
+			Category: "all",
+			Keyword:  strings.Repeat("あ", 101),
+			Limit:    20,
+			Page:     1,
+			Target:   "all",
+		})
+		if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
+			t.Fatalf("expected ErrInvalidInput, got %v", err)
+		}
+	})
+
+	t.Run("statusが不正なときバリデーションエラーで失敗する", func(t *testing.T) {
+		s := &Service{}
+
+		_, err := s.List(context.Background(), ListProductsQuery{Mode: "all", ActiveStatus: "invalid", Category: "all", Limit: 20, Page: 1, Target: "all"})
+		if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
+			t.Fatalf("expected ErrInvalidInput, got %v", err)
+		}
+
+		_, err = s.List(context.Background(), ListProductsQuery{Mode: "all", Category: "all", RecommendStatus: "invalid", Limit: 20, Page: 1, Target: "all"})
+		if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
+			t.Fatalf("expected ErrInvalidInput, got %v", err)
+		}
+	})
+
+	t.Run("価格範囲が不正なときバリデーションエラーで失敗する", func(t *testing.T) {
+		s := &Service{}
+		minPrice := 3000
+		maxPrice := 1000
+
+		_, err := s.List(context.Background(), ListProductsQuery{
+			Mode:     "all",
+			Category: "all",
+			Limit:    20,
+			MaxPrice: &maxPrice,
+			MinPrice: &minPrice,
+			Page:     1,
+			Target:   "all",
+		})
+		if err == nil || !errors.Is(err, usecase.ErrInvalidInput) {
+			t.Fatalf("expected ErrInvalidInput, got %v", err)
+		}
+	})
+
 	t.Run("query readerがエラーを返したとき内部エラーを返す", func(t *testing.T) {
 		s := &Service{
 			queryReader: &stubQueryReader{
@@ -173,8 +223,22 @@ func TestListProducts(t *testing.T) {
 			},
 			storage: &stubStorage{presignURL: "https://signed.example.com/path"},
 		}
+		minPrice := 1000
+		maxPrice := 3000
 
-		productPage, err := s.List(context.Background(), ListProductsQuery{Mode: "all", Category: "all", Limit: 20, Page: 2, Target: "all"})
+		productPage, err := s.List(context.Background(), ListProductsQuery{
+			Mode:            "all",
+			ActiveStatus:    "active",
+			Category:        "all",
+			Keyword:         "  ピアス  ",
+			Limit:           20,
+			MaxPrice:        &maxPrice,
+			MinPrice:        &minPrice,
+			Page:            2,
+			RecommendStatus: "recommended",
+			TagUUIDs:        []string{" tag-1 ", "", "tag-2"},
+			Target:          "all",
+		})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -188,8 +252,17 @@ func TestListProducts(t *testing.T) {
 			t.Fatalf("unexpected api path: %s", productPage.Products[0].ProductImages[0].APIPath)
 		}
 		reader := s.queryReader.(*stubQueryReader)
-		if reader.listQuery.Page != 2 || reader.listQuery.Limit != 20 {
+		if reader.listQuery.Page != 2 || reader.listQuery.Limit != 20 || reader.listQuery.Keyword != "ピアス" {
 			t.Fatalf("unexpected query: %+v", reader.listQuery)
+		}
+		if reader.listQuery.ActiveStatus != "active" || reader.listQuery.RecommendStatus != "recommended" {
+			t.Fatalf("unexpected status query: %+v", reader.listQuery)
+		}
+		if reader.listQuery.MinPrice == nil || *reader.listQuery.MinPrice != 1000 || reader.listQuery.MaxPrice == nil || *reader.listQuery.MaxPrice != 3000 {
+			t.Fatalf("unexpected price query: %+v", reader.listQuery)
+		}
+		if len(reader.listQuery.TagUUIDs) != 2 || reader.listQuery.TagUUIDs[0] != "tag-1" || reader.listQuery.TagUUIDs[1] != "tag-2" {
+			t.Fatalf("unexpected tag query: %+v", reader.listQuery)
 		}
 	})
 }

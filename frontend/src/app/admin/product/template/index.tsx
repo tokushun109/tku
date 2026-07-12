@@ -1,6 +1,6 @@
 'use client'
 
-import { Add } from '@mui/icons-material'
+import { Add, ExpandMore, FilterList } from '@mui/icons-material'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -11,6 +11,7 @@ import {
     deleteProduct,
     duplicateProductFromCreema,
     getProducts,
+    type IGetProductsParams,
     updateProduct,
     uploadProductImages,
 } from '@/apis/product'
@@ -23,6 +24,7 @@ import { Pagination } from '@/components/bases/Pagination'
 import { IClassification } from '@/features/classification/type'
 import { ProductCard } from '@/features/product/components/ProductCard'
 import { ProductFormDialog } from '@/features/product/components/ProductFormDialog'
+import { ProductSearchDialog } from '@/features/product/components/ProductSearchDialog'
 import { EXISTING_PRODUCT_IMAGE_ID_PREFIX } from '@/features/product/constants'
 import { ICreemaDuplicateForm } from '@/features/product/product/type'
 import { IProduct, IProductForm, IProductList } from '@/features/product/type'
@@ -36,6 +38,39 @@ interface Props {
     salesSites: ISite[]
     tags: IClassification[]
     targets: IClassification[]
+}
+
+const ProductActiveStatus = {
+    All: 'all',
+    Active: 'active',
+    Inactive: 'inactive',
+} as const
+
+const ProductRecommendStatus = {
+    All: 'all',
+    Recommended: 'recommended',
+    NotRecommended: 'not_recommended',
+} as const
+
+type ProductActiveStatus = (typeof ProductActiveStatus)[keyof typeof ProductActiveStatus]
+type ProductRecommendStatus = (typeof ProductRecommendStatus)[keyof typeof ProductRecommendStatus]
+
+interface ProductSearchFilters {
+    activeStatus: ProductActiveStatus
+    category: string
+    maxPrice: string
+    minPrice: string
+    recommendStatus: ProductRecommendStatus
+    tagUuids: string[]
+}
+
+const defaultSearchFilters: ProductSearchFilters = {
+    activeStatus: ProductActiveStatus.All,
+    category: 'all',
+    maxPrice: '',
+    minPrice: '',
+    recommendStatus: ProductRecommendStatus.All,
+    tagUuids: [],
 }
 
 export const AdminProductTemplate = ({
@@ -58,17 +93,35 @@ export const AdminProductTemplate = ({
     const [updateItem, setUpdateItem] = useState<IProduct | null>(null)
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false)
     const [deleteTargetItem, setDeleteTargetItem] = useState<IProduct | null>(null)
+    const [searchText, setSearchText] = useState<string>('')
+    const [keyword, setKeyword] = useState<string>('')
+    const [searchFilters, setSearchFilters] = useState<ProductSearchFilters>(defaultSearchFilters)
+    const [appliedFilters, setAppliedFilters] = useState<ProductSearchFilters>(defaultSearchFilters)
+    const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false)
 
-    const fetchProducts = async (page: number) => {
+    const buildProductListParams = (page: number, nextKeyword: string, nextFilters: ProductSearchFilters): IGetProductsParams => {
+        const params: IGetProductsParams = {
+            mode: 'all',
+            category: nextFilters.category,
+            limit: ADMIN_PRODUCT_PAGE_LIMIT,
+            page,
+            target: 'all',
+        }
+
+        if (nextKeyword !== '') params.keyword = nextKeyword
+        if (nextFilters.activeStatus !== ProductActiveStatus.All) params.activeStatus = nextFilters.activeStatus
+        if (nextFilters.recommendStatus !== ProductRecommendStatus.All) params.recommendStatus = nextFilters.recommendStatus
+        if (nextFilters.minPrice !== '') params.minPrice = Number(nextFilters.minPrice)
+        if (nextFilters.maxPrice !== '') params.maxPrice = Number(nextFilters.maxPrice)
+        if (nextFilters.tagUuids.length > 0) params.tagUuids = nextFilters.tagUuids
+
+        return params
+    }
+
+    const fetchProducts = async (page: number, nextKeyword: string = keyword, nextFilters: ProductSearchFilters = appliedFilters) => {
         try {
             setIsLoading(true)
-            const productList = await getProducts({
-                mode: 'all',
-                category: 'all',
-                limit: ADMIN_PRODUCT_PAGE_LIMIT,
-                page,
-                target: 'all',
-            })
+            const productList = await getProducts(buildProductListParams(page, nextKeyword, nextFilters))
 
             setProducts(productList.products)
             setPageInfo(productList.pageInfo)
@@ -79,17 +132,11 @@ export const AdminProductTemplate = ({
         }
     }
 
-    const fetchData = async (page: number = pageInfo.page) => {
+    const fetchData = async (page: number = pageInfo.page, nextKeyword: string = keyword, nextFilters: ProductSearchFilters = appliedFilters) => {
         try {
             setIsLoading(true)
             const [productList, categoriesData, targetsData, tagsData, salesSitesData] = await Promise.all([
-                getProducts({
-                    mode: 'all',
-                    category: 'all',
-                    limit: ADMIN_PRODUCT_PAGE_LIMIT,
-                    page,
-                    target: 'all',
-                }),
+                getProducts(buildProductListParams(page, nextKeyword, nextFilters)),
                 getCategories({ mode: 'all' }),
                 getTargets({ mode: 'all' }),
                 getTags(),
@@ -137,7 +184,7 @@ export const AdminProductTemplate = ({
             await deleteProduct(deleteTargetItem.uuid)
             toast.success(`商品「${deleteTargetItem.name}」を削除しました`)
             const nextPage = products.length === 1 && pageInfo.page > 1 ? pageInfo.page - 1 : pageInfo.page
-            await fetchData(nextPage)
+            await fetchData(nextPage, keyword, appliedFilters)
             handleCloseDeleteDialog()
         } catch (error) {
             console.error('商品の削除に失敗しました:', error)
@@ -268,7 +315,7 @@ export const AdminProductTemplate = ({
                 toast.success(`商品「${data.name}」を追加しました`)
             }
 
-            await fetchData(updateItem ? pageInfo.page : 1)
+            await fetchData(updateItem ? pageInfo.page : 1, keyword, appliedFilters)
         } catch (error) {
             console.error('商品の保存に失敗しました:', error)
             const errorMessage = '商品の保存に失敗しました。もう一度お試しください。'
@@ -288,7 +335,7 @@ export const AdminProductTemplate = ({
 
             setIsDialogOpen(false)
             toast.success('Creemaから商品を複製しました')
-            await fetchData(1)
+            await fetchData(1, keyword, appliedFilters)
         } catch (error) {
             console.error('Creemaからの商品複製に失敗しました:', error)
             const errorMessage = 'Creemaからの商品複製に失敗しました。もう一度お試しください。'
@@ -300,8 +347,75 @@ export const AdminProductTemplate = ({
     }
 
     const handlePageChange = async (page: number) => {
-        await fetchProducts(page)
+        await fetchProducts(page, keyword, appliedFilters)
     }
+
+    const handleSearch = async () => {
+        const nextKeyword = searchText.trim()
+        const nextFilters = { ...searchFilters }
+        setKeyword(nextKeyword)
+        setAppliedFilters(nextFilters)
+        setIsFilterOpen(false)
+        await fetchData(1, nextKeyword, nextFilters)
+    }
+
+    const handleCloseFilter = () => {
+        setIsFilterOpen(false)
+    }
+
+    const handleClearSearch = () => {
+        setSearchText('')
+        setSearchFilters(defaultSearchFilters)
+    }
+
+    const handleFilterChange = (nextFilters: Partial<ProductSearchFilters>) => {
+        setSearchFilters((currentFilters) => ({
+            ...currentFilters,
+            ...nextFilters,
+        }))
+    }
+
+    const hasAppliedSearch =
+        keyword !== '' ||
+        appliedFilters.category !== 'all' ||
+        appliedFilters.tagUuids.length > 0 ||
+        appliedFilters.minPrice !== '' ||
+        appliedFilters.maxPrice !== '' ||
+        appliedFilters.activeStatus !== ProductActiveStatus.All ||
+        appliedFilters.recommendStatus !== ProductRecommendStatus.All
+    const hasDraftSearch =
+        searchText !== '' ||
+        searchFilters.category !== 'all' ||
+        searchFilters.tagUuids.length > 0 ||
+        searchFilters.minPrice !== '' ||
+        searchFilters.maxPrice !== '' ||
+        searchFilters.activeStatus !== ProductActiveStatus.All ||
+        searchFilters.recommendStatus !== ProductRecommendStatus.All
+
+    const categoryOptions = [{ label: 'すべて', value: 'all' }, ...categories.map((category) => ({ label: category.name, value: category.uuid }))]
+    const tagOptions = tags.map((tag) => ({ label: tag.name, value: tag.uuid }))
+    const activeStatusOptions = [
+        { label: 'すべて', value: ProductActiveStatus.All },
+        { label: '公開中', value: ProductActiveStatus.Active },
+        { label: '非公開', value: ProductActiveStatus.Inactive },
+    ]
+    const recommendStatusOptions = [
+        { label: 'すべて', value: ProductRecommendStatus.All },
+        { label: 'おすすめ', value: ProductRecommendStatus.Recommended },
+        { label: 'おすすめ以外', value: ProductRecommendStatus.NotRecommended },
+    ]
+
+    const activeFilterCount = [
+        keyword !== '',
+        appliedFilters.category !== 'all',
+        appliedFilters.tagUuids.length > 0,
+        appliedFilters.minPrice !== '' || appliedFilters.maxPrice !== '',
+        appliedFilters.activeStatus !== ProductActiveStatus.All,
+        appliedFilters.recommendStatus !== ProductRecommendStatus.All,
+    ].filter(Boolean).length
+
+    const emptyMessage = hasAppliedSearch ? '該当する商品がありません' : '登録されていません'
+    const isClearDisabled = isLoading || !hasDraftSearch
 
     return (
         <div className={styles['product-container']}>
@@ -309,6 +423,25 @@ export const AdminProductTemplate = ({
                 <h1 className={styles['page-title']}>商品一覧</h1>
                 <div className={styles['header-actions']}>
                     <div className={styles['product-count']}>{pageInfo.total}件の商品</div>
+                    <Button
+                        aria-expanded={isFilterOpen}
+                        aria-label="絞り込み"
+                        contrast
+                        onClick={() => {
+                            setIsFilterOpen((current) => !current)
+                        }}
+                        outlined
+                    >
+                        <div className={styles['filter-button-content']}>
+                            <FilterList fontSize="small" />
+                            絞り込み
+                            {activeFilterCount > 0 && <span className={styles['filter-badge']}>{activeFilterCount}</span>}
+                            <ExpandMore
+                                className={`${styles['filter-chevron']} ${isFilterOpen ? styles['filter-chevron-open'] : ''}`}
+                                fontSize="small"
+                            />
+                        </div>
+                    </Button>
                     <Button onClick={handleCreate}>
                         <div className={styles['add-button-content']}>
                             <Add className={styles['add-icon']} fontSize="small" />
@@ -317,13 +450,51 @@ export const AdminProductTemplate = ({
                     </Button>
                 </div>
             </div>
+            <ProductSearchDialog
+                activeStatusOptions={activeStatusOptions}
+                activeStatusValue={searchFilters.activeStatus}
+                categoryOptions={categoryOptions}
+                categoryValue={searchFilters.category}
+                isClearDisabled={isClearDisabled}
+                isOpen={isFilterOpen}
+                isSearchDisabled={isLoading}
+                maxPriceValue={searchFilters.maxPrice}
+                minPriceValue={searchFilters.minPrice}
+                onActiveStatusChange={(value) => {
+                    handleFilterChange({ activeStatus: (value as ProductActiveStatus) || ProductActiveStatus.All })
+                }}
+                onCategoryChange={(value) => {
+                    handleFilterChange({ category: value || 'all' })
+                }}
+                onClear={handleClearSearch}
+                onClose={handleCloseFilter}
+                onMaxPriceChange={(value) => {
+                    handleFilterChange({ maxPrice: value })
+                }}
+                onMinPriceChange={(value) => {
+                    handleFilterChange({ minPrice: value })
+                }}
+                onRecommendStatusChange={(value) => {
+                    handleFilterChange({ recommendStatus: (value as ProductRecommendStatus) || ProductRecommendStatus.All })
+                }}
+                onSearch={handleSearch}
+                onSearchTextChange={setSearchText}
+                onTagsChange={(value) => {
+                    handleFilterChange({ tagUuids: value })
+                }}
+                recommendStatusOptions={recommendStatusOptions}
+                recommendStatusValue={searchFilters.recommendStatus}
+                searchText={searchText}
+                tagOptions={tagOptions}
+                tagValue={searchFilters.tagUuids}
+            />
             <div className={styles['product-content']}>
                 {isLoading ? (
                     <div className={styles['loading']}>読み込み中...</div>
                 ) : (
                     <div className={styles['product-list']}>
                         {products.length === 0 ? (
-                            <div className={styles['empty-message']}>登録されていません</div>
+                            <div className={styles['empty-message']}>{emptyMessage}</div>
                         ) : (
                             <div className={styles['product-grid']}>
                                 {products.map((product) => (

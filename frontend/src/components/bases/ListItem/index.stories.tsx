@@ -9,11 +9,6 @@ const meta: Meta<typeof ListItem> = {
     args: {
         children: 'リストアイテム',
     },
-    argTypes: {
-        className: {
-            control: { type: 'text' },
-        },
-    },
 }
 
 export default meta
@@ -71,14 +66,6 @@ export const LongContent: Story = {
                 <Delete style={{ cursor: 'pointer', color: '#f44336' }} />
             </>
         ),
-    },
-}
-
-export const CustomClassName: Story = {
-    args: {
-        children: 'カスタムクラス付きアイテム',
-        className: 'custom-item',
-        subItem: 'カスタムスタイルが適用されています',
     },
 }
 

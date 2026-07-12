@@ -36,11 +36,17 @@ func (h *ProductHandler) List(w http.ResponseWriter, r *http.Request) {
 	}
 
 	productPage, err := h.productUC.List(r.Context(), usecaseProductQuery.ListProductsQuery{
-		Mode:     q.Mode,
-		Category: q.Category,
-		Limit:    q.Limit,
-		Page:     q.Page,
-		Target:   q.Target,
+		Mode:            q.Mode,
+		ActiveStatus:    q.ActiveStatus,
+		Category:        q.Category,
+		Keyword:         q.Keyword,
+		Limit:           q.Limit,
+		MaxPrice:        q.MaxPrice,
+		MinPrice:        q.MinPrice,
+		Page:            q.Page,
+		RecommendStatus: q.RecommendStatus,
+		TagUUIDs:        q.TagUUIDs,
+		Target:          q.Target,
 	})
 	if err != nil {
 		response.WriteAppError(w, err)

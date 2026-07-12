@@ -1,16 +1,17 @@
+import styles from './styles.module.scss'
+
 type Props = {
     children: React.ReactNode
-    className?: string
     href: string
 }
 
-export const ExternalLink = ({ children, className, href }: Props) => {
+export const ExternalLink = ({ children, href }: Props) => {
     const handleClick = (e: React.MouseEvent) => {
         e.stopPropagation()
     }
 
     return (
-        <a className={className} href={href} onClick={handleClick} rel="noopener noreferrer" target="_blank">
+        <a className={styles['external-link']} href={href} onClick={handleClick} rel="noopener noreferrer" target="_blank">
             {children}
         </a>
     )

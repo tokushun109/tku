@@ -23,11 +23,17 @@ type stubProductUC struct {
 	listRes    *usecaseProductQuery.ProductPage
 	listCalled bool
 	listReq    struct {
-		mode     string
-		category string
-		limit    int
-		page     int
-		target   string
+		mode            string
+		activeStatus    string
+		category        string
+		keyword         string
+		limit           int
+		maxPrice        *int
+		minPrice        *int
+		page            int
+		recommendStatus string
+		tagUUIDs        []string
+		target          string
 	}
 
 	listByCategoryErr    error
@@ -76,9 +82,15 @@ type stubProductUC struct {
 func (s *stubProductUC) List(ctx context.Context, q usecaseProductQuery.ListProductsQuery) (*usecaseProductQuery.ProductPage, error) {
 	s.listCalled = true
 	s.listReq.mode = q.Mode
+	s.listReq.activeStatus = q.ActiveStatus
 	s.listReq.category = q.Category
+	s.listReq.keyword = q.Keyword
 	s.listReq.limit = q.Limit
+	s.listReq.maxPrice = q.MaxPrice
+	s.listReq.minPrice = q.MinPrice
 	s.listReq.page = q.Page
+	s.listReq.recommendStatus = q.RecommendStatus
+	s.listReq.tagUUIDs = q.TagUUIDs
 	s.listReq.target = q.Target
 	if s.listErr != nil {
 		return nil, s.listErr
@@ -194,6 +206,23 @@ func TestProductList(t *testing.T) {
 		}
 	})
 
+	t.Run("keywordが長すぎるときバリデーションエラーで失敗する", func(t *testing.T) {
+		uc := &stubProductUC{}
+		h := NewProductHandler(uc)
+
+		req := httptest.NewRequest(http.MethodGet, "/api/product?mode=all&category=all&target=all&keyword="+strings.Repeat("a", 101), nil)
+		rr := httptest.NewRecorder()
+
+		h.List(rr, req)
+
+		if rr.Code != http.StatusBadRequest {
+			t.Fatalf("expected 400, got %d", rr.Code)
+		}
+		if uc.listCalled {
+			t.Fatalf("usecase should not be called on invalid query")
+		}
+	})
+
 	t.Run("有効なクエリを渡したときページ情報つきの商品一覧を返す", func(t *testing.T) {
 		uc := &stubProductUC{
 			listRes: &usecaseProductQuery.ProductPage{
@@ -213,7 +242,7 @@ func TestProductList(t *testing.T) {
 		}
 		h := NewProductHandler(uc)
 
-		req := httptest.NewRequest(http.MethodGet, "/api/product?mode=all&category=all&target=all&page=2&limit=20", nil)
+		req := httptest.NewRequest(http.MethodGet, "/api/product?mode=all&category=category-uuid&target=all&page=2&limit=20&keyword=%20Product%20&tagUuids=tag-1,tag-2&minPrice=1000&maxPrice=3000&activeStatus=active&recommendStatus=recommended", nil)
 		rr := httptest.NewRecorder()
 
 		h.List(rr, req)
@@ -224,8 +253,17 @@ func TestProductList(t *testing.T) {
 		if !uc.listCalled {
 			t.Fatalf("usecase should be called")
 		}
-		if uc.listReq.page != 2 || uc.listReq.limit != 20 {
+		if uc.listReq.page != 2 || uc.listReq.limit != 20 || uc.listReq.keyword != "Product" {
 			t.Fatalf("unexpected pagination args: %+v", uc.listReq)
+		}
+		if uc.listReq.category != "category-uuid" || uc.listReq.activeStatus != "active" || uc.listReq.recommendStatus != "recommended" {
+			t.Fatalf("unexpected filter args: %+v", uc.listReq)
+		}
+		if uc.listReq.minPrice == nil || *uc.listReq.minPrice != 1000 || uc.listReq.maxPrice == nil || *uc.listReq.maxPrice != 3000 {
+			t.Fatalf("unexpected price args: %+v", uc.listReq)
+		}
+		if len(uc.listReq.tagUUIDs) != 2 || uc.listReq.tagUUIDs[0] != "tag-1" || uc.listReq.tagUUIDs[1] != "tag-2" {
+			t.Fatalf("unexpected tag args: %+v", uc.listReq)
 		}
 
 		var res map[string]any

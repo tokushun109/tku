@@ -66,9 +66,7 @@ export const SiteList = ({ sites, siteType }: Props) => {
                                 }}
                                 subItem={
                                     item.url ? (
-                                        <ExternalLink className={styles['site-link']} href={item.url}>
-                                            {item.url}
-                                        </ExternalLink>
+                                        <ExternalLink href={item.url}>{item.url}</ExternalLink>
                                     ) : (
                                         <span className={styles['site-url-empty']}>URLが設定されていません</span>
                                     )

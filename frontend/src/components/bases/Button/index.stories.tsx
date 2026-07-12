@@ -11,8 +11,10 @@ const meta: Meta<typeof Button> = {
         colorType: ColorType.Primary,
         contrast: false,
         disabled: false,
+        fullWidth: false,
         noBoxShadow: false,
         outlined: false,
+        pill: false,
         onClick: () => {
             console.log('clickしました')
         },
@@ -28,10 +30,16 @@ const meta: Meta<typeof Button> = {
         disabled: {
             control: { type: 'boolean' },
         },
+        fullWidth: {
+            control: { type: 'boolean' },
+        },
         noBoxShadow: {
             control: { type: 'boolean' },
         },
         outlined: {
+            control: { type: 'boolean' },
+        },
+        pill: {
             control: { type: 'boolean' },
         },
     },
@@ -94,6 +102,36 @@ export const NoBoxShadow: Story = {
         colorType: ColorType.Primary,
         noBoxShadow: true,
     },
+}
+
+export const Pill: Story = {
+    args: {
+        children: 'Pillボタン',
+        colorType: ColorType.Primary,
+        pill: true,
+    },
+}
+
+export const PillContrast: Story = {
+    args: {
+        children: 'Pill Contrast',
+        colorType: ColorType.Primary,
+        contrast: true,
+        pill: true,
+    },
+}
+
+export const FullWidth: Story = {
+    args: {
+        children: '幅いっぱいのボタン',
+        colorType: ColorType.Primary,
+        fullWidth: true,
+    },
+    render: (args) => (
+        <div style={{ width: '320px' }}>
+            <Button {...args} />
+        </div>
+    ),
 }
 
 export const DialogButtons: Story = {
