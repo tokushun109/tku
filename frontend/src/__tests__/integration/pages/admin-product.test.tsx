@@ -100,6 +100,16 @@ const mockSalesSitesData = [
     { uuid: 'site-2', name: 'minne' },
 ]
 
+const createProductList = (products = mockProductData, pageInfo?: { limit?: number; page?: number; total?: number; totalPages?: number }) => ({
+    pageInfo: {
+        limit: pageInfo?.limit ?? 20,
+        page: pageInfo?.page ?? 1,
+        total: pageInfo?.total ?? products.length,
+        totalPages: pageInfo?.totalPages ?? Math.ceil(products.length / 20),
+    },
+    products,
+})
+
 describe('Admin Product Page Integration Test', () => {
     const defaultProps = {
         categories: mockCategoriesData,
@@ -112,7 +122,7 @@ describe('Admin Product Page Integration Test', () => {
         vi.clearAllMocks()
 
         // デフォルトのモック設定
-        mockGetProducts.mockResolvedValue(mockProductData)
+        mockGetProducts.mockResolvedValue(createProductList(mockProductData))
         mockGetCategories.mockResolvedValue(mockCategoriesData)
         mockGetTargets.mockResolvedValue(mockTargetsData)
         mockGetTags.mockResolvedValue(mockTagsData)
@@ -121,7 +131,7 @@ describe('Admin Product Page Integration Test', () => {
 
     it('管理画面商品管理ページが正常に表示される', async () => {
         // コンポーネントをレンダリング
-        render(<AdminProductTemplate {...defaultProps} initialProducts={mockProductData} />)
+        render(<AdminProductTemplate {...defaultProps} initialProductList={createProductList(mockProductData)} />)
 
         // 初期データが表示されることを確認
         await waitFor(() => {
@@ -148,17 +158,44 @@ describe('Admin Product Page Integration Test', () => {
 
     it('商品が0件の場合の表示', async () => {
         // 空のデータを設定
-        mockGetProducts.mockResolvedValue([])
+        mockGetProducts.mockResolvedValue(createProductList([]))
 
-        render(<AdminProductTemplate {...defaultProps} initialProducts={[]} />)
+        render(<AdminProductTemplate {...defaultProps} initialProductList={createProductList([])} />)
 
         // 初期状態で0件が表示されることを確認
         expect(screen.getByText('0件の商品')).toBeInTheDocument()
         expect(screen.getByText('登録されていません')).toBeInTheDocument()
     })
 
+    it('ページネーションで次ページの商品を取得できる', async () => {
+        const nextPageProducts = [mockProductData[1]]
+        mockGetProducts.mockResolvedValue(createProductList(nextPageProducts, { page: 2, total: 21, totalPages: 2 }))
+        mockGetCategories.mockRejectedValue(new Error('Category API Error'))
+
+        render(<AdminProductTemplate {...defaultProps} initialProductList={createProductList([mockProductData[0]], { total: 21, totalPages: 2 })} />)
+
+        fireEvent.click(screen.getByRole('button', { name: '次のページへ' }))
+
+        await waitFor(() => {
+            expect(mockGetProducts).toHaveBeenCalledWith({
+                category: 'all',
+                limit: 20,
+                mode: 'all',
+                page: 2,
+                target: 'all',
+            })
+        })
+        await waitFor(() => {
+            expect(screen.getByText('テスト商品2')).toBeInTheDocument()
+        })
+        expect(mockGetCategories).not.toHaveBeenCalled()
+        expect(mockGetTargets).not.toHaveBeenCalled()
+        expect(mockGetTags).not.toHaveBeenCalled()
+        expect(mockGetSalesSiteList).not.toHaveBeenCalled()
+    })
+
     it('商品追加ボタンをクリックするとダイアログが開く', async () => {
-        render(<AdminProductTemplate {...defaultProps} initialProducts={mockProductData} />)
+        render(<AdminProductTemplate {...defaultProps} initialProductList={createProductList(mockProductData)} />)
 
         await waitFor(() => {
             expect(screen.getByText('追加')).toBeInTheDocument()
@@ -177,7 +214,7 @@ describe('Admin Product Page Integration Test', () => {
     })
 
     it('商品追加ダイアログをキャンセルで閉じられる', async () => {
-        render(<AdminProductTemplate {...defaultProps} initialProducts={mockProductData} />)
+        render(<AdminProductTemplate {...defaultProps} initialProductList={createProductList(mockProductData)} />)
 
         const addButton = await screen.findByText('追加')
         fireEvent.click(addButton)
@@ -192,7 +229,7 @@ describe('Admin Product Page Integration Test', () => {
     })
 
     it('商品編集機能のクリックが正常に動作する', async () => {
-        render(<AdminProductTemplate {...defaultProps} initialProducts={mockProductData} />)
+        render(<AdminProductTemplate {...defaultProps} initialProductList={createProductList(mockProductData)} />)
 
         // 商品カードが表示されるまで待機
         await waitFor(() => {
@@ -211,7 +248,7 @@ describe('Admin Product Page Integration Test', () => {
     it('商品編集で既存画像を削除すると更新payloadから対象画像だけ除外される', async () => {
         mockUpdateProduct.mockResolvedValue(undefined)
 
-        render(<AdminProductTemplate {...defaultProps} initialProducts={mockProductData} />)
+        render(<AdminProductTemplate {...defaultProps} initialProductList={createProductList(mockProductData)} />)
 
         fireEvent.click(await screen.findByText('テスト商品1'))
 
@@ -251,7 +288,7 @@ describe('Admin Product Page Integration Test', () => {
     it('商品削除機能が正常に動作する', async () => {
         mockDeleteProduct.mockResolvedValue(undefined)
 
-        render(<AdminProductTemplate {...defaultProps} initialProducts={mockProductData} />)
+        render(<AdminProductTemplate {...defaultProps} initialProductList={createProductList(mockProductData)} />)
 
         // 商品カードが表示されるまで待機
         await waitFor(() => {
@@ -280,7 +317,7 @@ describe('Admin Product Page Integration Test', () => {
     })
 
     it('削除確認ダイアログでキャンセルできる', async () => {
-        render(<AdminProductTemplate {...defaultProps} initialProducts={mockProductData} />)
+        render(<AdminProductTemplate {...defaultProps} initialProductList={createProductList(mockProductData)} />)
 
         // 商品カードが表示されるまで待機
         await waitFor(() => {
@@ -317,7 +354,7 @@ describe('Admin Product Page Integration Test', () => {
         mockGetProducts.mockRejectedValue(new Error('API Error'))
         mockDeleteProduct.mockResolvedValue(undefined)
 
-        render(<AdminProductTemplate {...defaultProps} initialProducts={mockProductData} />)
+        render(<AdminProductTemplate {...defaultProps} initialProductList={createProductList(mockProductData)} />)
 
         // 初期表示は正常
         await waitFor(() => {
@@ -345,7 +382,7 @@ describe('Admin Product Page Integration Test', () => {
     })
 
     it('新規商品作成が正常に動作する', async () => {
-        render(<AdminProductTemplate {...defaultProps} initialProducts={mockProductData} />)
+        render(<AdminProductTemplate {...defaultProps} initialProductList={createProductList(mockProductData)} />)
 
         await waitFor(() => {
             expect(screen.getByText('追加')).toBeInTheDocument()
@@ -363,7 +400,7 @@ describe('Admin Product Page Integration Test', () => {
     })
 
     it('Creema複製機能が利用できる', async () => {
-        render(<AdminProductTemplate {...defaultProps} initialProducts={mockProductData} />)
+        render(<AdminProductTemplate {...defaultProps} initialProductList={createProductList(mockProductData)} />)
 
         await waitFor(() => {
             expect(screen.getByText('追加')).toBeInTheDocument()
@@ -390,7 +427,7 @@ describe('Admin Product Page Integration Test', () => {
     })
 
     it('データの再取得が正常に動作する', async () => {
-        render(<AdminProductTemplate {...defaultProps} initialProducts={mockProductData} />)
+        render(<AdminProductTemplate {...defaultProps} initialProductList={createProductList(mockProductData)} />)
 
         // 初回データ読み込み完了まで待機
         await waitFor(() => {
@@ -415,7 +452,7 @@ describe('Admin Product Page Integration Test', () => {
                 siteDetails: [],
             },
         ]
-        mockGetProducts.mockResolvedValue(updatedProductData)
+        mockGetProducts.mockResolvedValue(createProductList(updatedProductData))
         mockGetCategories.mockResolvedValue(mockCategoriesData)
         mockGetTargets.mockResolvedValue(mockTargetsData)
         mockGetTags.mockResolvedValue(mockTagsData)
@@ -439,7 +476,7 @@ describe('Admin Product Page Integration Test', () => {
     })
 
     it('商品データの並び順が正しく表示される', async () => {
-        render(<AdminProductTemplate {...defaultProps} initialProducts={mockProductData} />)
+        render(<AdminProductTemplate {...defaultProps} initialProductList={createProductList(mockProductData)} />)
 
         await waitFor(() => {
             expect(screen.getByText('テスト商品1')).toBeInTheDocument()
@@ -453,7 +490,7 @@ describe('Admin Product Page Integration Test', () => {
     })
 
     it('商品の状態（アクティブ/非アクティブ、推奨/非推奨）が正しく表示される', async () => {
-        render(<AdminProductTemplate {...defaultProps} initialProducts={mockProductData} />)
+        render(<AdminProductTemplate {...defaultProps} initialProductList={createProductList(mockProductData)} />)
 
         // 商品データに基づいて状態を確認
         await waitFor(() => {
@@ -466,7 +503,7 @@ describe('Admin Product Page Integration Test', () => {
     })
 
     it('複数の商品を同時に操作できる', async () => {
-        render(<AdminProductTemplate {...defaultProps} initialProducts={mockProductData} />)
+        render(<AdminProductTemplate {...defaultProps} initialProductList={createProductList(mockProductData)} />)
 
         await waitFor(() => {
             expect(screen.getByText('テスト商品1')).toBeInTheDocument()

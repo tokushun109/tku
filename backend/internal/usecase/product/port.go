@@ -13,7 +13,7 @@ const (
 )
 
 type QueryUsecase interface {
-	List(ctx context.Context, mode string, category string, target string) ([]*usecaseProductQuery.Product, error)
+	List(ctx context.Context, q usecaseProductQuery.ListProductsQuery) (*usecaseProductQuery.ProductPage, error)
 	ListByCategory(ctx context.Context, q usecaseProductQuery.ListCategoryProductsQuery) ([]*usecaseProductQuery.CategoryProducts, error)
 	ListCarousel(ctx context.Context) ([]*usecaseProductQuery.CarouselItem, error)
 	Get(ctx context.Context, productUUID string) (*usecaseProductQuery.Product, error)
@@ -50,8 +50,8 @@ func New(queryUC QueryUsecase, commandUC CommandUsecase) *Service {
 	}
 }
 
-func (s *Service) List(ctx context.Context, mode string, category string, target string) ([]*usecaseProductQuery.Product, error) {
-	return s.queryUC.List(ctx, mode, category, target)
+func (s *Service) List(ctx context.Context, q usecaseProductQuery.ListProductsQuery) (*usecaseProductQuery.ProductPage, error) {
+	return s.queryUC.List(ctx, q)
 }
 
 func (s *Service) ListByCategory(ctx context.Context, q usecaseProductQuery.ListCategoryProductsQuery) ([]*usecaseProductQuery.CategoryProducts, error) {

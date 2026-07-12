@@ -278,17 +278,30 @@ describe('product API', () => {
     describe('getProducts', () => {
         it('管理画面用一覧取得はCookie付きでリクエストする', async () => {
             const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-                new Response(JSON.stringify([]), {
-                    headers: {
-                        'Content-Type': 'application/json',
+                new Response(
+                    JSON.stringify({
+                        pageInfo: {
+                            limit: 20,
+                            page: 1,
+                            total: 0,
+                            totalPages: 0,
+                        },
+                        products: [],
+                    }),
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        status: 200,
                     },
-                    status: 200,
-                }),
+                ),
             )
 
             const result = await getProducts({
                 category: 'all',
+                limit: 20,
                 mode: 'all',
+                page: 1,
                 target: 'all',
             })
 
@@ -296,10 +309,20 @@ describe('product API', () => {
             const url = new URL(requestUrl as string)
 
             expect(url.searchParams.get('category')).toBe('all')
+            expect(url.searchParams.get('limit')).toBe('20')
             expect(url.searchParams.get('mode')).toBe('all')
+            expect(url.searchParams.get('page')).toBe('1')
             expect(url.searchParams.get('target')).toBe('all')
             expect(requestInit?.credentials).toBe('include')
-            expect(result).toEqual([])
+            expect(result).toEqual({
+                pageInfo: {
+                    limit: 20,
+                    page: 1,
+                    total: 0,
+                    totalPages: 0,
+                },
+                products: [],
+            })
         })
     })
 

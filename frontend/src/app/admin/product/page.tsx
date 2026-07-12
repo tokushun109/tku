@@ -1,10 +1,11 @@
 import { Metadata } from 'next'
 
 import { getCategories } from '@/apis/category'
-import { getProducts } from '@/apis/product'
+import { ADMIN_PRODUCT_PAGE_LIMIT, getProducts } from '@/apis/product'
 import { getSalesSiteList } from '@/apis/salesSite'
 import { getTags } from '@/apis/tag'
 import { getTargets } from '@/apis/target'
+import { IProductList } from '@/features/product/type'
 
 import { AdminProductTemplate } from './template'
 
@@ -19,11 +20,23 @@ export const metadata: Metadata = {
 }
 
 const AdminProductPage = async () => {
+    const emptyProductList: IProductList = {
+        pageInfo: {
+            limit: ADMIN_PRODUCT_PAGE_LIMIT,
+            page: 1,
+            total: 0,
+            totalPages: 0,
+        },
+        products: [],
+    }
+
     try {
-        const [products, categories, targets, tags, salesSites] = await Promise.all([
+        const [productList, categories, targets, tags, salesSites] = await Promise.all([
             getProducts({
                 mode: 'all',
                 category: 'all',
+                limit: ADMIN_PRODUCT_PAGE_LIMIT,
+                page: 1,
                 target: 'all',
             }),
             getCategories({ mode: 'all' }),
@@ -32,10 +45,10 @@ const AdminProductPage = async () => {
             getSalesSiteList(),
         ])
 
-        return <AdminProductTemplate categories={categories} initialProducts={products} salesSites={salesSites} tags={tags} targets={targets} />
+        return <AdminProductTemplate categories={categories} initialProductList={productList} salesSites={salesSites} tags={tags} targets={targets} />
     } catch (error) {
         console.error('データの取得に失敗しました:', error)
-        return <AdminProductTemplate categories={[]} initialProducts={[]} salesSites={[]} tags={[]} targets={[]} />
+        return <AdminProductTemplate categories={[]} initialProductList={emptyProductList} salesSites={[]} tags={[]} targets={[]} />
     }
 }
 

@@ -19,7 +19,7 @@ const (
 )
 
 type Usecase interface {
-	List(ctx context.Context, mode string, category string, target string) ([]*Product, error)
+	List(ctx context.Context, q ListProductsQuery) (*ProductPage, error)
 	ListByCategory(ctx context.Context, q ListCategoryProductsQuery) ([]*CategoryProducts, error)
 	ListCarousel(ctx context.Context) ([]*CarouselItem, error)
 	Get(ctx context.Context, productUUID string) (*Product, error)
@@ -40,25 +40,34 @@ func New(queryReader Reader, storage usecase.Storage) *Service {
 	}
 }
 
-func (s *Service) List(ctx context.Context, mode string, category string, target string) ([]*Product, error) {
-	if !isValidListMode(mode) || strings.TrimSpace(category) == "" || strings.TrimSpace(target) == "" {
+func (s *Service) List(ctx context.Context, q ListProductsQuery) (*ProductPage, error) {
+	trimmedCategory := strings.TrimSpace(q.Category)
+	trimmedTarget := strings.TrimSpace(q.Target)
+
+	if !isValidListMode(q.Mode) || trimmedCategory == "" || trimmedTarget == "" || q.Page <= 0 || q.Limit <= 0 {
 		return nil, usecase.NewAppError(usecase.ErrInvalidInput)
 	}
 
-	products, err := s.queryReader.ListProducts(ctx, ListProductsQuery{
-		Mode:     mode,
-		Category: category,
-		Target:   target,
+	productPage, err := s.queryReader.ListProducts(ctx, ListProductsQuery{
+		Mode:     q.Mode,
+		Category: trimmedCategory,
+		Limit:    q.Limit,
+		Page:     q.Page,
+		Target:   trimmedTarget,
 	})
 	if err != nil {
 		return nil, usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 
-	if err := s.attachPresignedImageURLs(ctx, products); err != nil {
+	if productPage == nil {
+		return &ProductPage{}, nil
+	}
+
+	if err := s.attachPresignedImageURLs(ctx, productPage.Products); err != nil {
 		return nil, err
 	}
 
-	return products, nil
+	return productPage, nil
 }
 
 func (s *Service) ListByCategory(ctx context.Context, q ListCategoryProductsQuery) ([]*CategoryProducts, error) {

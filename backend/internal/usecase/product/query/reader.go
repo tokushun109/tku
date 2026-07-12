@@ -5,6 +5,8 @@ import "context"
 type ListProductsQuery struct {
 	Mode     string
 	Category string
+	Limit    int
+	Page     int
 	Target   string
 }
 
@@ -22,7 +24,7 @@ type ListCarouselQuery struct {
 type ExportProductsCSVQuery struct{}
 
 type Reader interface {
-	ListProducts(ctx context.Context, q ListProductsQuery) ([]*Product, error)
+	ListProducts(ctx context.Context, q ListProductsQuery) (*ProductPage, error)
 	ListCategoryProducts(ctx context.Context, q ListCategoryProductsQuery) ([]*CategoryProducts, error)
 	ListCarouselItems(ctx context.Context, q ListCarouselQuery) ([]*CarouselItem, error)
 	GetProductByUUID(ctx context.Context, productUUID string) (*Product, error)

@@ -41,6 +41,11 @@ type CreateProductResponse struct {
 	UUID string `json:"uuid"`
 }
 
+type ProductListResponse struct {
+	PageInfo OffsetPageInfoResponse `json:"pageInfo"`
+	Products []*ProductResponse     `json:"products"`
+}
+
 type CategoryProductsResponse struct {
 	Category ProductClassificationResponse `json:"category"`
 	PageInfo CursorPageInfoResponse        `json:"pageInfo"`

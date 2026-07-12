@@ -5,25 +5,34 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { getCategories } from '@/apis/category'
-import { createProduct, deleteProduct, duplicateProductFromCreema, getProducts, updateProduct, uploadProductImages } from '@/apis/product'
+import {
+    ADMIN_PRODUCT_PAGE_LIMIT,
+    createProduct,
+    deleteProduct,
+    duplicateProductFromCreema,
+    getProducts,
+    updateProduct,
+    uploadProductImages,
+} from '@/apis/product'
 import { getSalesSiteList } from '@/apis/salesSite'
 import { getTags } from '@/apis/tag'
 import { getTargets } from '@/apis/target'
 import { Button } from '@/components/bases/Button'
 import { Dialog } from '@/components/bases/Dialog'
+import { Pagination } from '@/components/bases/Pagination'
 import { IClassification } from '@/features/classification/type'
 import { ProductCard } from '@/features/product/components/ProductCard'
 import { ProductFormDialog } from '@/features/product/components/ProductFormDialog'
 import { EXISTING_PRODUCT_IMAGE_ID_PREFIX } from '@/features/product/constants'
 import { ICreemaDuplicateForm } from '@/features/product/product/type'
-import { IProduct, IProductForm } from '@/features/product/type'
+import { IProduct, IProductForm, IProductList } from '@/features/product/type'
 import { ISite } from '@/features/site/type'
 
 import styles from './styles.module.scss'
 
 interface Props {
     categories: IClassification[]
-    initialProducts: IProduct[]
+    initialProductList: IProductList
     salesSites: ISite[]
     tags: IClassification[]
     targets: IClassification[]
@@ -31,12 +40,13 @@ interface Props {
 
 export const AdminProductTemplate = ({
     categories: initialCategories,
-    initialProducts,
+    initialProductList,
     salesSites: initialSalesSites,
     tags: initialTags,
     targets: initialTargets,
 }: Props) => {
-    const [products, setProducts] = useState<IProduct[]>(initialProducts)
+    const [products, setProducts] = useState<IProduct[]>(initialProductList.products)
+    const [pageInfo, setPageInfo] = useState(initialProductList.pageInfo)
     const [categories, setCategories] = useState<IClassification[]>(initialCategories)
     const [targets, setTargets] = useState<IClassification[]>(initialTargets)
     const [tags, setTags] = useState<IClassification[]>(initialTags)
@@ -49,13 +59,35 @@ export const AdminProductTemplate = ({
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false)
     const [deleteTargetItem, setDeleteTargetItem] = useState<IProduct | null>(null)
 
-    const fetchData = async () => {
+    const fetchProducts = async (page: number) => {
         try {
             setIsLoading(true)
-            const [fetchedProducts, categoriesData, targetsData, tagsData, salesSitesData] = await Promise.all([
+            const productList = await getProducts({
+                mode: 'all',
+                category: 'all',
+                limit: ADMIN_PRODUCT_PAGE_LIMIT,
+                page,
+                target: 'all',
+            })
+
+            setProducts(productList.products)
+            setPageInfo(productList.pageInfo)
+        } catch (error) {
+            console.error('商品リストの取得に失敗しました:', error)
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    const fetchData = async (page: number = pageInfo.page) => {
+        try {
+            setIsLoading(true)
+            const [productList, categoriesData, targetsData, tagsData, salesSitesData] = await Promise.all([
                 getProducts({
                     mode: 'all',
                     category: 'all',
+                    limit: ADMIN_PRODUCT_PAGE_LIMIT,
+                    page,
                     target: 'all',
                 }),
                 getCategories({ mode: 'all' }),
@@ -63,7 +95,8 @@ export const AdminProductTemplate = ({
                 getTags(),
                 getSalesSiteList(),
             ])
-            setProducts(fetchedProducts)
+            setProducts(productList.products)
+            setPageInfo(productList.pageInfo)
             setCategories(categoriesData)
             setTargets(targetsData)
             setTags(tagsData)
@@ -103,7 +136,8 @@ export const AdminProductTemplate = ({
         try {
             await deleteProduct(deleteTargetItem.uuid)
             toast.success(`商品「${deleteTargetItem.name}」を削除しました`)
-            await fetchData()
+            const nextPage = products.length === 1 && pageInfo.page > 1 ? pageInfo.page - 1 : pageInfo.page
+            await fetchData(nextPage)
             handleCloseDeleteDialog()
         } catch (error) {
             console.error('商品の削除に失敗しました:', error)
@@ -234,7 +268,7 @@ export const AdminProductTemplate = ({
                 toast.success(`商品「${data.name}」を追加しました`)
             }
 
-            await fetchData()
+            await fetchData(updateItem ? pageInfo.page : 1)
         } catch (error) {
             console.error('商品の保存に失敗しました:', error)
             const errorMessage = '商品の保存に失敗しました。もう一度お試しください。'
@@ -254,7 +288,7 @@ export const AdminProductTemplate = ({
 
             setIsDialogOpen(false)
             toast.success('Creemaから商品を複製しました')
-            await fetchData()
+            await fetchData(1)
         } catch (error) {
             console.error('Creemaからの商品複製に失敗しました:', error)
             const errorMessage = 'Creemaからの商品複製に失敗しました。もう一度お試しください。'
@@ -265,12 +299,16 @@ export const AdminProductTemplate = ({
         }
     }
 
+    const handlePageChange = async (page: number) => {
+        await fetchProducts(page)
+    }
+
     return (
         <div className={styles['product-container']}>
             <div className={styles['page-header']}>
                 <h1 className={styles['page-title']}>商品一覧</h1>
                 <div className={styles['header-actions']}>
-                    <div className={styles['product-count']}>{products.length}件の商品</div>
+                    <div className={styles['product-count']}>{pageInfo.total}件の商品</div>
                     <Button onClick={handleCreate}>
                         <div className={styles['add-button-content']}>
                             <Add className={styles['add-icon']} fontSize="small" />
@@ -295,6 +333,7 @@ export const AdminProductTemplate = ({
                         )}
                     </div>
                 )}
+                <Pagination currentPage={pageInfo.page} disabled={isLoading} onPageChange={handlePageChange} totalPages={pageInfo.totalPages} />
             </div>
 
             <ProductFormDialog
