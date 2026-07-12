@@ -1,4 +1,4 @@
-import { Input } from '.'
+import { Input, InputVariant } from '.'
 
 import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 
@@ -95,4 +95,17 @@ export const FormExample: Story = {
         required: true,
         placeholder: '件名を入力してください',
     },
+}
+
+export const Bare: Story = {
+    args: {
+        label: undefined,
+        placeholder: '商品名で検索',
+        variant: InputVariant.Bare,
+    },
+    render: (args) => (
+        <div style={{ background: '#fff', border: '1px solid #e7e3d5', borderRadius: '999px', maxWidth: '320px', padding: '4px 16px' }}>
+            <Input {...args} />
+        </div>
+    ),
 }

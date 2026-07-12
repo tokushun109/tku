@@ -13,6 +13,7 @@ const meta: Meta<typeof Button> = {
         disabled: false,
         noBoxShadow: false,
         outlined: false,
+        pill: false,
         onClick: () => {
             console.log('clickしました')
         },
@@ -32,6 +33,9 @@ const meta: Meta<typeof Button> = {
             control: { type: 'boolean' },
         },
         outlined: {
+            control: { type: 'boolean' },
+        },
+        pill: {
             control: { type: 'boolean' },
         },
     },
@@ -93,6 +97,23 @@ export const NoBoxShadow: Story = {
         children: 'No Shadow Button',
         colorType: ColorType.Primary,
         noBoxShadow: true,
+    },
+}
+
+export const Pill: Story = {
+    args: {
+        children: 'Pillボタン',
+        colorType: ColorType.Primary,
+        pill: true,
+    },
+}
+
+export const PillContrast: Story = {
+    args: {
+        children: 'Pill Contrast',
+        colorType: ColorType.Primary,
+        contrast: true,
+        pill: true,
     },
 }
 

@@ -36,6 +36,18 @@
         &.error {
             border-color: $danger-color;
         }
+
+        &.input-bare {
+            border: none;
+            background: transparent;
+            border-radius: 0;
+            padding: 10px 0;
+            font-size: 1.05rem;
+
+            &:focus {
+                border: none;
+            }
+        }
     }
 
     .chip-container {

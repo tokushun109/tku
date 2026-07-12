@@ -1,0 +1,124 @@
+.search-form {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    background: transparent;
+}
+
+.search-bar {
+    position: relative;
+    z-index: 11;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: $primary-bg-color;
+    border: 1px solid rgba($primary, 0.18);
+    border-radius: 999px;
+    padding: 6px 6px 6px 20px;
+    box-shadow: 0 2px 10px rgba($primary, 0.06);
+}
+
+.search-bar-field {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.search-bar-icon {
+    flex: none;
+    color: $secondary;
+}
+
+.detail-toggle-content {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.detail-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background-color: $primary;
+    color: $white-text-color;
+    font-size: $font-small;
+    font-weight: 700;
+}
+
+.detail-panel {
+    position: absolute;
+    z-index: 20;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 10px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    transition:
+        opacity 0.18s ease,
+        transform 0.18s ease,
+        visibility 0.18s ease;
+}
+
+.detail-panel-open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px 16px;
+    background-color: $primary-bg-color;
+    border: 1px solid rgba($primary, 0.14);
+    border-radius: 20px;
+    padding: 20px 22px;
+    box-shadow: 0 12px 32px rgba($primary, 0.16);
+}
+
+.price-range {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.price-separator {
+    flex: none;
+    color: $secondary;
+}
+
+@include media('sm') {
+    .search-bar {
+        flex-wrap: wrap;
+        border-radius: 20px;
+        padding: 10px 14px;
+    }
+
+    .search-bar-field {
+        flex-basis: 100%;
+    }
+
+    .search-bar > button {
+        flex: 1;
+    }
+
+    .detail-grid {
+        grid-template-columns: 1fr;
+        padding: 16px;
+    }
+}
