@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 
 	usecaseProduct "github.com/tokushun109/tku/backend/internal/usecase/product"
 )
@@ -102,7 +103,7 @@ func ParseListProductQuery(r *http.Request) (ListProductQuery, error) {
 	tagUUIDs := parseCSVQuery(q.Get("tagUuids"))
 	target := strings.TrimSpace(q.Get("target"))
 
-	if len([]rune(keyword)) > maxProductKeywordLength {
+	if utf8.RuneCountInString(keyword) > maxProductKeywordLength {
 		return ListProductQuery{}, errors.New("invalid keyword")
 	}
 

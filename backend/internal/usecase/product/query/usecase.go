@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/tokushun109/tku/backend/internal/domain/primitive"
 	"github.com/tokushun109/tku/backend/internal/usecase"
@@ -51,7 +52,7 @@ func (s *Service) List(ctx context.Context, q ListProductsQuery) (*ProductPage, 
 	if !isValidListMode(q.Mode) || trimmedCategory == "" || trimmedTarget == "" || q.Page <= 0 || q.Limit <= 0 {
 		return nil, usecase.NewAppError(usecase.ErrInvalidInput)
 	}
-	if len([]rune(trimmedKeyword)) > maxProductKeywordLength {
+	if utf8.RuneCountInString(trimmedKeyword) > maxProductKeywordLength {
 		return nil, usecase.NewAppError(usecase.ErrInvalidInput)
 	}
 	if !isValidProductActiveStatus(trimmedActiveStatus) || !isValidProductRecommendStatus(trimmedRecommendStatus) {

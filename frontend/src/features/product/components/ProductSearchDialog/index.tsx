@@ -8,6 +8,7 @@ import { Dialog } from '@/components/bases/Dialog'
 import { Input, InputVariant } from '@/components/bases/Input'
 import { MultiSelectForm, type MultiSelectFormOption } from '@/components/bases/MultiSelectForm'
 import { SelectForm, type SelectFormOption } from '@/components/bases/SelectForm'
+import { PRODUCT_KEYWORD_MAX_LENGTH } from '@/features/product/constants'
 
 import styles from './styles.module.scss'
 
@@ -85,6 +86,7 @@ export const ProductSearchDialog = ({
                             <Search className={styles['search-bar-icon']} fontSize="small" />
                             <Input
                                 aria-label="商品名で検索"
+                                maxLength={PRODUCT_KEYWORD_MAX_LENGTH}
                                 onChange={(event) => {
                                     onSearchTextChange(event.target.value)
                                 }}

@@ -73,9 +73,12 @@ func NewProductQueryReader(db *sqlx.DB) *ProductQueryReader {
 	return &ProductQueryReader{db: db}
 }
 
+// keywordLikeReplacer は LIKE のワイルドカード（%, _）とエスケープ文字（\）を無効化する。
+// strings.NewReplacer はスレッドセーフで使い回せるため、パッケージ変数として再利用する。
+var keywordLikeReplacer = strings.NewReplacer(`\`, `\\`, `%`, `\%`, `_`, `\_`)
+
 func escapeLikeKeyword(keyword string) string {
-	replacer := strings.NewReplacer(`\`, `\\`, `%`, `\%`, `_`, `\_`)
-	return replacer.Replace(keyword)
+	return keywordLikeReplacer.Replace(keyword)
 }
 
 func placeholders(count int) string {
