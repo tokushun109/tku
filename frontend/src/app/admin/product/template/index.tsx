@@ -1,7 +1,7 @@
 'use client'
 
 import { Add, ExpandMore, FilterList } from '@mui/icons-material'
-import { type FormEvent, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { getCategories } from '@/apis/category'
@@ -350,9 +350,7 @@ export const AdminProductTemplate = ({
         await fetchProducts(page, keyword, appliedFilters)
     }
 
-    const handleSearchSubmit = async (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault()
-
+    const handleSearch = async () => {
         const nextKeyword = searchText.trim()
         const nextFilters = { ...searchFilters }
         setKeyword(nextKeyword)
@@ -482,8 +480,8 @@ export const AdminProductTemplate = ({
                 onRecommendStatusChange={(value) => {
                     handleFilterChange({ recommendStatus: (value as ProductRecommendStatus) || ProductRecommendStatus.All })
                 }}
+                onSearch={handleSearch}
                 onSearchTextChange={setSearchText}
-                onSubmit={handleSearchSubmit}
                 onTagsChange={(value) => {
                     handleFilterChange({ tagUuids: value })
                 }}

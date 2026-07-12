@@ -80,7 +80,7 @@
 .card-actions {
     // 最下段（公開状態・おすすめ）のドロップダウンがダイアログ下端でクリップされないよう、
     // スクロール可能な余白を確保する
-    margin-top: 80px;
+    margin-bottom: 80px;
     display: flex;
     justify-content: flex-end;
 }

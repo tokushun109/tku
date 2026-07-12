@@ -92,11 +92,10 @@ const InteractiveDialog = ({
             onRecommendStatusChange={(value) => {
                 setFilters((current) => ({ ...current, recommendStatus: value }))
             }}
-            onSearchTextChange={setSearchText}
-            onSubmit={(event) => {
-                event.preventDefault()
+            onSearch={() => {
                 console.log('検索', { searchText, filters })
             }}
+            onSearchTextChange={setSearchText}
             onTagsChange={(value) => {
                 setFilters((current) => ({ ...current, tags: value }))
             }}

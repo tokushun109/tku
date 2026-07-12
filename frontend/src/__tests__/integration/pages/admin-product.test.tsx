@@ -283,7 +283,7 @@ describe('Admin Product Page Integration Test', () => {
         fireEvent.change(filterDialog.getByLabelText('最高価格'), { target: { value: '2000' } })
         selectFilterOption('公開状態', '公開中')
         selectFilterOption('おすすめ', 'おすすめ')
-        fireEvent.click(filterDialog.getByRole('button', { name: '検索' }))
+        fireEvent.click(screen.getByRole('button', { name: '検索' }))
 
         await waitFor(() => {
             expect(mockGetProducts).toHaveBeenCalledWith({

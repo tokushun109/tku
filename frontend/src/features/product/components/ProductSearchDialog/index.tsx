@@ -28,8 +28,8 @@ interface Props {
     onMaxPriceChange: (_value: string) => void
     onMinPriceChange: (_value: string) => void
     onRecommendStatusChange: (_value: string) => void
+    onSearch: () => void
     onSearchTextChange: (_value: string) => void
-    onSubmit: (_event: FormEvent<HTMLFormElement>) => void
     onTagsChange: (_value: string[]) => void
     recommendStatusOptions: SelectFormOption<string>[]
     recommendStatusValue: string
@@ -55,8 +55,8 @@ export const ProductSearchDialog = ({
     onMaxPriceChange,
     onMinPriceChange,
     onRecommendStatusChange,
+    onSearch,
     onSearchTextChange,
-    onSubmit,
     onTagsChange,
     recommendStatusOptions,
     recommendStatusValue,
@@ -64,9 +64,21 @@ export const ProductSearchDialog = ({
     tagOptions,
     tagValue,
 }: Props) => {
+    const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault()
+        onSearch()
+    }
+
     return (
-        <Dialog isOpen={isOpen} onClose={onClose} title="絞り込み" wide>
-            <form className={styles['search-form']} onSubmit={onSubmit}>
+        <Dialog
+            cancelOption={{ label: 'キャンセル', onClick: onClose }}
+            confirmOption={{ disabled: isSearchDisabled, label: '検索', onClick: onSearch }}
+            isOpen={isOpen}
+            onClose={onClose}
+            title="絞り込み"
+            wide
+        >
+            <form className={styles['search-form']} onSubmit={handleSubmit}>
                 <div className={styles['search-card']}>
                     <div className={styles['search-bar']}>
                         <div className={styles['search-bar-field']}>
@@ -81,9 +93,6 @@ export const ProductSearchDialog = ({
                                 variant={InputVariant.Bare}
                             />
                         </div>
-                        <Button disabled={isSearchDisabled} type="submit">
-                            検索
-                        </Button>
                     </div>
                     <div className={styles['search-divider']} />
                     <div className={styles['detail-grid']}>
