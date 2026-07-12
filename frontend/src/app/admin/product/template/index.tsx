@@ -363,12 +363,9 @@ export const AdminProductTemplate = ({
         setIsFilterOpen(false)
     }
 
-    const handleClearSearch = async () => {
+    const handleClearSearch = () => {
         setSearchText('')
-        setKeyword('')
         setSearchFilters(defaultSearchFilters)
-        setAppliedFilters(defaultSearchFilters)
-        await fetchData(1, '', defaultSearchFilters)
     }
 
     const handleFilterChange = (nextFilters: Partial<ProductSearchFilters>) => {
@@ -418,7 +415,7 @@ export const AdminProductTemplate = ({
     ].filter(Boolean).length
 
     const emptyMessage = hasAppliedSearch ? '該当する商品がありません' : '登録されていません'
-    const isClearDisabled = isLoading || (!hasAppliedSearch && !hasDraftSearch)
+    const isClearDisabled = isLoading || !hasDraftSearch
 
     return (
         <div className={styles['product-container']}>

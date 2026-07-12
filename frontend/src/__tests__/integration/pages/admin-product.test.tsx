@@ -230,7 +230,7 @@ describe('Admin Product Page Integration Test', () => {
         })
     })
 
-    it('検索をクリアすると検索条件なしで1ページ目を再取得する', async () => {
+    it('クリアで検索条件をリセットし、検索ボタンで検索条件なしの1ページ目を取得する', async () => {
         mockGetProducts.mockResolvedValueOnce(createProductList([], { page: 1, total: 0, totalPages: 0 }))
         mockGetProducts.mockResolvedValueOnce(createProductList(mockProductData))
 
@@ -244,8 +244,14 @@ describe('Admin Product Page Integration Test', () => {
             expect(screen.getByText('該当する商品がありません')).toBeInTheDocument()
         })
 
+        // クリアは入力内容をリセットするだけで、検索APIは呼ばない
         fireEvent.click(screen.getByRole('button', { name: '絞り込み' }))
         fireEvent.click(screen.getByRole('button', { name: 'クリア' }))
+        expect(screen.getByLabelText('商品名で検索')).toHaveValue('')
+        expect(mockGetProducts).toHaveBeenCalledTimes(1)
+
+        // 検索ボタン押下で初めて検索条件なしの再取得を行う
+        fireEvent.click(screen.getByRole('button', { name: '検索' }))
 
         await waitFor(() => {
             expect(mockGetProducts).toHaveBeenLastCalledWith({
