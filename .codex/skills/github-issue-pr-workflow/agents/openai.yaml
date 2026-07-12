@@ -1,0 +1,15 @@
+interface:
+  display_name: "GitHub Issue PR Workflow"
+  short_description: "Issue作成からPRレビュー対応まで一貫して進行"
+  default_prompt: "Use $github-issue-pr-workflow to create an issue, implement the requested change, open a PR, and address review feedback."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "github"
+      description: "GitHub MCP server for issues, branches, pull requests, reviews, and comments."
+      transport: "streamable_http"
+      url: "https://api.githubcopilot.com/mcp/"
+
+policy:
+  allow_implicit_invocation: true

@@ -36,10 +36,19 @@
 }
 
 .loading {
-    text-align: center;
-    padding: 60px 20px;
+    min-height: 420px;
+    padding: 16px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: $text-color;
     font-size: $font-normal;
+    text-align: center;
+}
+
+.product-list {
+    min-height: 420px;
 }
 
 .empty-message {
