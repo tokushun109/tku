@@ -63,13 +63,15 @@ When a change spans frontend/backend/infra, validate each touched area enough to
 ```markdown
 ## 目的/背景
 
-## 変更点
+## 変更点（要点箇条書き）
 
-## 影響範囲
+## 影響範囲（UI/SEO/DB/インフラ）
 
-## 検証
+## 検証手順（実行コマンドと観点）
 
 ## リスクとロールバック
+
+## 参照資料（関連する CLAUDE.md 節、Issue など）
 
 Closes #<issue-number>
 ```
@@ -91,7 +93,7 @@ When the user says reviews are available, or asks Codex to continue after review
 6. Commit and push the updates.
 7. Reply to resolved review threads when the tool surface supports it.
 
-For detailed triage guidance, read `references/review-response.md` only when review feedback exists.
+For detailed triage guidance, read `.codex/skills/github-issue-pr-workflow/references/review-response.md` only when review feedback exists.
 
 ## Tooling Patterns
 
