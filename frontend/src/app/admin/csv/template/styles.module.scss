@@ -33,11 +33,12 @@
     margin: 0 auto;
     width: fit-content;
     gap: 20px;
+}
 
-    .button {
-        margin: 20px 0;
-        min-width: 120px;
-    }
+.csv-button {
+    display: flex;
+    margin: 20px 0;
+    min-width: 120px;
 }
 
 .upload-content {
@@ -64,11 +65,11 @@
         flex-direction: column;
         align-items: center;
         gap: 12px;
+    }
 
-        .button {
-            width: 100%;
-            max-width: 200px;
-            margin: 10px 0;
-        }
+    .csv-button {
+        width: 100%;
+        max-width: 200px;
+        margin: 10px 0;
     }
 }

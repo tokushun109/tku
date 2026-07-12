@@ -11,6 +11,7 @@ const meta: Meta<typeof Button> = {
         colorType: ColorType.Primary,
         contrast: false,
         disabled: false,
+        fullWidth: false,
         noBoxShadow: false,
         outlined: false,
         pill: false,
@@ -27,6 +28,9 @@ const meta: Meta<typeof Button> = {
             control: { type: 'boolean' },
         },
         disabled: {
+            control: { type: 'boolean' },
+        },
+        fullWidth: {
             control: { type: 'boolean' },
         },
         noBoxShadow: {
@@ -115,6 +119,19 @@ export const PillContrast: Story = {
         contrast: true,
         pill: true,
     },
+}
+
+export const FullWidth: Story = {
+    args: {
+        children: '幅いっぱいのボタン',
+        colorType: ColorType.Primary,
+        fullWidth: true,
+    },
+    render: (args) => (
+        <div style={{ width: '320px' }}>
+            <Button {...args} />
+        </div>
+    ),
 }
 
 export const DialogButtons: Story = {

@@ -1,0 +1,9 @@
+.external-link {
+    color: #0066cc;
+    text-decoration: none;
+    word-break: break-all;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}

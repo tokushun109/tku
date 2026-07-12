@@ -54,8 +54,8 @@
     min-height: 44px;
 }
 
-.search-button,
-.clear-button {
+.search-action {
+    display: flex;
     min-width: 96px;
     min-height: 44px;
 }
@@ -146,8 +146,7 @@
         flex-direction: column;
     }
 
-    .search-button,
-    .clear-button {
+    .search-action {
         width: 100%;
     }
 

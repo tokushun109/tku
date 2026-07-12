@@ -115,9 +115,9 @@ export const AdminSeoTemplate = ({ creator: initialCreator }: Props) => {
                             <h2 className={styles['section-title']}>サイト説明</h2>
                             <div className={styles['description-section']}>
                                 <TextArea disabled rows={6} value={creator.introduction} />
-                                <Button className={styles['edit-button']} onClick={() => setIsEditDialogOpen(true)}>
-                                    編集
-                                </Button>
+                                <div className={styles['edit-button']}>
+                                    <Button onClick={() => setIsEditDialogOpen(true)}>編集</Button>
+                                </div>
                             </div>
                         </div>
 

@@ -62,12 +62,16 @@ export const AdminCsvTemplate = () => {
             <div className={styles['divider']} />
             <div className={styles['csv-content']}>
                 <div className={styles['csv-buttons']}>
-                    <Button className={styles['button']} onClick={handleDownload}>
-                        ダウンロード
-                    </Button>
-                    <Button className={styles['button']} onClick={handleUploadDialog}>
-                        アップロード
-                    </Button>
+                    <div className={styles['csv-button']}>
+                        <Button fullWidth onClick={handleDownload}>
+                            ダウンロード
+                        </Button>
+                    </div>
+                    <div className={styles['csv-button']}>
+                        <Button fullWidth onClick={handleUploadDialog}>
+                            アップロード
+                        </Button>
+                    </div>
                 </div>
             </div>
 
@@ -87,9 +91,9 @@ export const AdminCsvTemplate = () => {
             >
                 <div className={styles['upload-content']}>
                     {errorMessage && (
-                        <Message className={styles['error-message']} type={MessageType.Error}>
-                            {errorMessage}
-                        </Message>
+                        <div className={styles['error-message']}>
+                            <Message type={MessageType.Error}>{errorMessage}</Message>
+                        </div>
                     )}
                     <FileInput accept=".csv" label="CSVファイル" onChange={setUploadFile} required value={uploadFile} />
                 </div>

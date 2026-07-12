@@ -497,18 +497,22 @@ export const AdminProductTemplate = ({
                     />
                 </div>
                 <div className={styles['search-actions']}>
-                    <Button className={styles['search-button']} disabled={isLoading} type="submit">
-                        <div className={styles['search-button-content']}>
-                            <Search className={styles['search-icon']} fontSize="small" />
-                            検索
-                        </div>
-                    </Button>
-                    <Button className={styles['clear-button']} contrast disabled={isClearDisabled} onClick={handleClearSearch} type="button">
-                        <div className={styles['search-button-content']}>
-                            <Close className={styles['search-icon']} fontSize="small" />
-                            クリア
-                        </div>
-                    </Button>
+                    <div className={styles['search-action']}>
+                        <Button disabled={isLoading} fullWidth type="submit">
+                            <div className={styles['search-button-content']}>
+                                <Search className={styles['search-icon']} fontSize="small" />
+                                検索
+                            </div>
+                        </Button>
+                    </div>
+                    <div className={styles['search-action']}>
+                        <Button contrast disabled={isClearDisabled} fullWidth onClick={handleClearSearch} type="button">
+                            <div className={styles['search-button-content']}>
+                                <Close className={styles['search-icon']} fontSize="small" />
+                                クリア
+                            </div>
+                        </Button>
+                    </div>
                 </div>
             </form>
             <div className={styles['product-content']}>

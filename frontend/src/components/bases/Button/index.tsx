@@ -8,6 +8,7 @@ interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     children: React.ReactNode
     colorType?: ColorType
     contrast?: boolean
+    fullWidth?: boolean
     noBoxShadow?: boolean
     outlined?: boolean
     pill?: boolean
@@ -17,6 +18,7 @@ export const Button = ({
     children,
     colorType = ColorType.Primary,
     contrast = false,
+    fullWidth = false,
     noBoxShadow = false,
     outlined = false,
     pill = false,
@@ -26,7 +28,10 @@ export const Button = ({
 }: Props) => {
     const getButtonStyles = () => {
         const baseColor = ColorCode[colorType]
-        const shapeStyle = pill ? { borderRadius: '999px' } : {}
+        const shapeStyle = {
+            ...(pill ? { borderRadius: '999px' } : {}),
+            ...(fullWidth ? { width: '100%' } : {}),
+        }
 
         if (!contrast) {
             return {
