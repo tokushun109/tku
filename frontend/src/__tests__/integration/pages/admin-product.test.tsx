@@ -170,6 +170,7 @@ describe('Admin Product Page Integration Test', () => {
     it('ページネーションで次ページの商品を取得できる', async () => {
         const nextPageProducts = [mockProductData[1]]
         mockGetProducts.mockResolvedValue(createProductList(nextPageProducts, { page: 2, total: 21, totalPages: 2 }))
+        mockGetCategories.mockRejectedValue(new Error('Category API Error'))
 
         render(<AdminProductTemplate {...defaultProps} initialProductList={createProductList([mockProductData[0]], { total: 21, totalPages: 2 })} />)
 
@@ -187,6 +188,10 @@ describe('Admin Product Page Integration Test', () => {
         await waitFor(() => {
             expect(screen.getByText('テスト商品2')).toBeInTheDocument()
         })
+        expect(mockGetCategories).not.toHaveBeenCalled()
+        expect(mockGetTargets).not.toHaveBeenCalled()
+        expect(mockGetTags).not.toHaveBeenCalled()
+        expect(mockGetSalesSiteList).not.toHaveBeenCalled()
     })
 
     it('商品追加ボタンをクリックするとダイアログが開く', async () => {

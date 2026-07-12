@@ -59,6 +59,26 @@ export const AdminProductTemplate = ({
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false)
     const [deleteTargetItem, setDeleteTargetItem] = useState<IProduct | null>(null)
 
+    const fetchProducts = async (page: number) => {
+        try {
+            setIsLoading(true)
+            const productList = await getProducts({
+                mode: 'all',
+                category: 'all',
+                limit: ADMIN_PRODUCT_PAGE_LIMIT,
+                page,
+                target: 'all',
+            })
+
+            setProducts(productList.products)
+            setPageInfo(productList.pageInfo)
+        } catch (error) {
+            console.error('商品リストの取得に失敗しました:', error)
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
     const fetchData = async (page: number = pageInfo.page) => {
         try {
             setIsLoading(true)
@@ -280,7 +300,7 @@ export const AdminProductTemplate = ({
     }
 
     const handlePageChange = async (page: number) => {
-        await fetchData(page)
+        await fetchProducts(page)
     }
 
     return (
