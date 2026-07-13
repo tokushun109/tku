@@ -2,6 +2,7 @@
 *.js
 *.js.map
 node_modules
+lambda/dist
 cdktf.out
 cdktf.log
 *terraform.*.tfstate*
