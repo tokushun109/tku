@@ -8,7 +8,7 @@ CDKTF は 2025 年 12 月に非推奨化されたため、AWS・Amplify・Railwa
 - ルート: プロバイダー、共通タグ、環境変数、Stateバックエンドの契約
 - 今後追加するモジュール: AWS runtime、Amplify、Railway
 
-現在はリモートの棚卸し前であるため、リソース定義を意図的に追加していない。実体と異なる定義を先に適用して、Lambda・Amplify・Railwayを再作成する事故を防ぐためである。
+Lambda・EventBridge・LambdaアーカイブS3については、読み取り専用の棚卸し結果をもとに既存のproductionリソースを定義している。import手順は [`IMPORT.md`](./IMPORT.md) を参照する。Amplify・Railway・商品画像S3は、詳細設定を棚卸ししてから追加する。
 
 ## 初期化
 
