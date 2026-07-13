@@ -37,6 +37,11 @@ tofu import 'aws_cloudwatch_event_target.lambda_schedule["warmup"]' tku-warmup-e
 tofu import 'aws_cloudwatch_event_target.lambda_schedule["health_check"]' tku-health-check-event-rule/terraform-20250825214459880600000001
 tofu import 'aws_lambda_permission.eventbridge["warmup"]' tku-warmup/AllowEventBridgeInvokeLambda
 tofu import 'aws_lambda_permission.eventbridge["health_check"]' tku-health-check/AllowEventBridgeInvokeLambda
+
+# Amplify（ap-southeast-1）
+tofu import aws_amplify_app.production d2q4f71iidth8s
+tofu import aws_amplify_branch.production d2q4f71iidth8s/main
+tofu import aws_amplify_domain_association.production d2q4f71iidth8s/tocoriri.com
 ```
 
 ## 確認
