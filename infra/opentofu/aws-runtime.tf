@@ -48,6 +48,40 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "lambda_archive" {
   }
 }
 
+resource "aws_s3_bucket" "product_images" {
+  bucket = "tku-api-ck57lb-prod"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "aws_s3_bucket_ownership_controls" "product_images" {
+  bucket = aws_s3_bucket.product_images.id
+
+  rule {
+    object_ownership = "BucketOwnerEnforced"
+  }
+}
+
+resource "aws_s3_bucket_versioning" "product_images" {
+  bucket = aws_s3_bucket.product_images.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "product_images" {
+  bucket = aws_s3_bucket.product_images.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
 resource "aws_iam_role" "lambda" {
   for_each = local.lambda_functions
 
