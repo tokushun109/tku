@@ -5,6 +5,9 @@ node_modules
 cdktf.out
 cdktf.log
 *terraform.*.tfstate*
+*.tfstate
+*.tfstate.*
+*.tfplan
 .gen
 .terraform
 tsconfig.tsbuildinfo

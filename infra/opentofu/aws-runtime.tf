@@ -87,7 +87,7 @@ resource "aws_lambda_function" "scheduled" {
   lifecycle {
     prevent_destroy = true
     # 既存の環境変数と配布済みアーカイブは、専用のシークレット／デプロイ移行後に管理する。
-    ignore_changes = [environment, s3_key, source_code_hash]
+    ignore_changes = [environment, publish, s3_bucket, s3_key, source_code_hash]
   }
 }
 
