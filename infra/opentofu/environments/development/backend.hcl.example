@@ -1,0 +1,6 @@
+# Copy outside the repository as backend.hcl after the development environment is approved.
+bucket       = "replace-with-opentofu-state-bucket"
+key          = "tku/development/terraform.tfstate"
+region       = "ap-northeast-1"
+encrypt      = true
+use_lockfile = true

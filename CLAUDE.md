@@ -15,7 +15,7 @@
 - **frontend**: Next.js + TypeScript による公開サイト / 管理画面
 - **backend**: Go 製 REST API
 - **database**: MySQL（`golang-migrate` でスキーマ管理）
-- **infra**: CDK for Terraform による運用系 Lambda / EventBridge 管理
+- **infra**: OpenTofu による AWS / Railway / Amplify 管理と運用系 Lambda
 
 ## リポジトリ構成
 
@@ -65,7 +65,7 @@ docker-compose up
 
 ### infra
 
-- CDK for Terraform による運用タスク管理
+- OpenTofu による本番インフラ管理
 - フロントエンド warmup 用 Lambda
 - API ヘルスチェック用 Lambda
 
@@ -91,7 +91,7 @@ docker-compose up
 
 - `frontend/CLAUDE.md`: フロントエンドの開発規約
 - `backend/CLAUDE.md`: バックエンドの構成・実装ルール
-- `infra/CLAUDE.md`: インフラ変更時の注意点
+- `infra/CLAUDE.md`: OpenTofu と Lambda 運用時の注意点
 
 ## 作業時の注意事項
 

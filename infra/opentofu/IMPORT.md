@@ -25,6 +25,10 @@ tofu import 'aws_s3_bucket_public_access_block.lambda_archive["warmup"]' tku-war
 tofu import 'aws_s3_bucket_public_access_block.lambda_archive["health_check"]' tku-health-check-lambda-archive-bucket
 tofu import 'aws_s3_bucket_server_side_encryption_configuration.lambda_archive["warmup"]' tku-warmup-lambda-archive-bucket
 tofu import 'aws_s3_bucket_server_side_encryption_configuration.lambda_archive["health_check"]' tku-health-check-lambda-archive-bucket
+tofu import aws_s3_bucket.product_images tku-api-ck57lb-prod
+tofu import aws_s3_bucket_ownership_controls.product_images tku-api-ck57lb-prod
+tofu import aws_s3_bucket_versioning.product_images tku-api-ck57lb-prod
+tofu import aws_s3_bucket_server_side_encryption_configuration.product_images tku-api-ck57lb-prod
 tofu import 'aws_iam_role.lambda["warmup"]' tku-warmup-lambda-role
 tofu import 'aws_iam_role.lambda["health_check"]' tku-health-check-lambda-role
 tofu import 'aws_iam_role_policy_attachment.lambda_basic_execution["warmup"]' tku-warmup-lambda-role/arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole

@@ -6,6 +6,7 @@ CDKTF は 2025 年 12 月に非推奨化されたため、AWS・Amplify・Railwa
 
 - `bootstrap/`: OpenTofu State用S3バケットを作成する最初の1回だけの構成
 - ルート: プロバイダー、共通タグ、環境変数、Stateバックエンドの契約
+- `environments/`: production / development ごとのState・変数設定テンプレート
 - 今後追加するモジュール: AWS runtime、Amplify、Railway
 
 Lambda・EventBridge・LambdaアーカイブS3については、読み取り専用の棚卸し結果をもとに既存のproductionリソースを定義している。import手順は [`IMPORT.md`](./IMPORT.md) を参照する。Amplify・Railway・商品画像S3は、詳細設定を棚卸ししてから追加する。
@@ -20,12 +21,13 @@ tofu init
 tofu apply -var='state_bucket_name=<globally-unique-name>'
 ```
 
-作成後は、リポジトリ外に `backend.hcl` を作成して各環境のStateを初期化する。
+作成後は、[`environments/`](./environments/) のテンプレートを使って、リポジトリ外に環境ごとの `backend.hcl` と `terraform.tfvars` を作成する。
 
 ```bash
 cd infra/opentofu
-# backend.hcl.example を参照して、リポジトリ外に backend.hcl を作成する
-tofu init -backend-config=/absolute/path/to/backend.hcl
+# environments/production のテンプレートを参照して、リポジトリ外に設定を作成する
+tofu init -reconfigure -backend-config=/absolute/path/to/production/backend.hcl
+tofu plan -var-file=/absolute/path/to/production/terraform.tfvars
 tofu fmt -check -recursive
 tofu validate
 ```
