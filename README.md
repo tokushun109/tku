@@ -20,7 +20,7 @@
 tku/
 ├── frontend/          # Next.js フロントエンド
 ├── backend/           # Go REST API
-└── infra/             # CDK for Terraform による運用系インフラ
+└── infra/             # OpenTofu によるインフラと Lambda 運用コード
 ```
 
 ## 技術スタック
@@ -44,7 +44,7 @@ tku/
 
 ### infra
 
-- CDK for Terraform
+- OpenTofu
 - AWS Lambda
 - EventBridge
 
@@ -105,7 +105,7 @@ tku/
 
 ### `infra/`
 
-- 定期実行の運用タスクを CDK for Terraform で管理
+- OpenTofu で AWS / Railway / Amplify の本番インフラを管理
 - フロントエンドの warmup と、バックエンドのヘルスチェックを自動化
 
 ## 品質面
@@ -143,11 +143,14 @@ docker-compose up
 
 ### infra
 
-`cd infra` のうえで、用途に応じて以下を実行します。
+OpenTofu の操作は `cd infra/opentofu` のうえで行います。
 
-- 依存関係のインストール: `pnpm install`
-- TypeScript のビルド: `pnpm build`
-- CDK for Terraform の synth 実行: `pnpm synth`
+- 初期化: `tofu init -reconfigure -backend-config=backend.hcl`
+- 差分確認: `tofu plan -var-file=production.tfvars`
+- 適用: `tofu apply -var-file=production.tfvars`
+
+Lambda のコードは `cd infra/lambda` のうえで `pnpm install && pnpm build` を実行します。
+生成した ZIP を AWS CLI で対象関数へ更新します。インフラ設定の変更は OpenTofu の `plan` を確認してから適用します。
 
 ## インフラ構成
 
@@ -166,7 +169,7 @@ graph TD
     S3[AWS S3<br/>商品画像保存]
     Warmup[Lambda<br/>フロントエンド warmup]
     Health[Lambda<br/>API health check]
-    CDK[CDK for Terraform]
+    OpenTofu[OpenTofu]
 
     User --> Amplify
     Amplify --> API
@@ -176,8 +179,8 @@ graph TD
 
     Warmup --> Amplify
     Health --> API
-    CDK --> Warmup
-    CDK --> Health
+    OpenTofu --> Warmup
+    OpenTofu --> Health
 
     classDef frontend fill:#b3e5fc
     classDef backend fill:#ffcc80
@@ -186,6 +189,6 @@ graph TD
 
     class Amplify frontend
     class API,MySQL backend
-    class S3,Warmup,Health,CDK infra
+    class S3,Warmup,Health,OpenTofu infra
     class SendGrid external
 ```

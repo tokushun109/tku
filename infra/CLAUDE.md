@@ -4,36 +4,30 @@
 
 ## プロジェクト概要
 
-`infra/` では、CDK for Terraform を使って運用系の AWS リソースを管理しています。  
-現在の主な対象は、フロントエンド warmup 用 Lambda と、バックエンド API ヘルスチェック用 Lambda、およびそれらの定期実行設定です。
+`infra/opentofu/` では OpenTofu を使い、本番の AWS / Railway / Amplify リソースを管理しています。
+`infra/lambda/` には、フロントエンド warmup 用とバックエンド API ヘルスチェック用 Lambda のコードを置きます。
 
 ## 開発コマンド
 
 ```bash
-# 依存関係インストール
+# OpenTofu の初期化・差分確認（本番 state）
+cd opentofu
+tofu init -reconfigure -backend-config=backend.hcl
+tofu plan -var-file=production.tfvars
+
+# Lambda コードのビルド
+cd ../lambda
 pnpm install
-
-# TypeScript コンパイル
 pnpm build
-
-# Terraform 設定生成
-pnpm synth
-
-# インフラ変更計画
-cdktf plan
-
-# インフラ変更適用
-cdktf apply
-
-# テスト実行
-pnpm test
 ```
 
 ## 技術スタック
 
-- **IaC**: CDK for Terraform
+- **IaC**: OpenTofu
 - **クラウド**: AWS
-- **言語**: TypeScript
+- **PaaS**: Railway
+- **フロントエンドホスティング**: AWS Amplify
+- **Lambda コード**: TypeScript + esbuild
 - **パッケージマネージャー**: pnpm
 
 ## 管理対象リソース
@@ -54,40 +48,32 @@ pnpm test
 
 ```text
 infra/
-├── main.ts                         # スタック定義
-├── resources/
-│   ├── eventBridge/               # EventBridge ルール定義
-│   ├── lambda/                    # Lambda 定義とハンドラー
-│   │   └── handlers/
-│   │       ├── warmup/           # warmup 実処理
-│   │       └── healthCheck/      # health-check 実処理
-│   ├── ecs/                       # Lambda から参照する設定ファイル等
-│   ├── asm/
-│   ├── ec2/
-│   └── network/
-├── libs/                          # 補助ユーティリティ
-├── cdktf.json
-├── tsconfig.json
-└── package.json
+├── opentofu/                       # AWS / Railway / Amplify の IaC
+│   └── bootstrap/                  # OpenTofu state 用 S3 の IaC
+└── lambda/                         # Lambda コードと ZIP ビルド
+    ├── handlers/
+    │   ├── warmup/
+    │   └── health-check/
+    └── scripts/build.mjs
 ```
 
 ## 実装の要点
 
-- `main.ts` では `ap-northeast-1` を対象リージョンとしてスタックを組み立てる
+- AWS の通常リソースは `ap-northeast-1`、Amplify は `ap-southeast-1` を対象とする
 - warmup は日本時間の稼働帯を考慮し、5 分間隔で実行する
 - health-check は日本時間の稼働帯を考慮し、1 時間間隔で実行する
 - スケジュールは UTC ベースの cron で記述しているため、変更時は時差を必ず確認する
 
 ## デプロイフロー
 
-1. `cdktf plan` で差分を確認する
+1. `tofu plan -var-file=production.tfvars` で差分を確認する
 2. コードレビューで意図した変更だけが含まれているか確認する
-3. `cdktf apply` で適用する
+3. `tofu apply -var-file=production.tfvars` で適用する
 4. Lambda とスケジュールの動作を確認する
 
 ## 注意事項
 
-- 適用前に `cdktf plan` を必ず確認する
+- 適用前に `tofu plan` を必ず確認する
 - cron を変更する場合は、日本時間と UTC の対応を確認する
-- Lambda ハンドラー変更時は、対象 URL や必要な環境変数の影響も確認する
+- Lambda のコード更新では `infra/lambda` で ZIP をビルドし、AWS CLI で `update-function-code` を実行する。OpenTofu は Lambda の環境変数と配布済みアーカイブを変更しない。
 - 実装済みリソースとドキュメントの乖離を作らない

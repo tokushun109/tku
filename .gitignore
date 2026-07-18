@@ -2,3 +2,4 @@ vetur.config.js
 .vscode
 .serena/
 .claude/settings.local.json
+.railway/

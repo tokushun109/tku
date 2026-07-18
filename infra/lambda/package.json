@@ -1,0 +1,14 @@
+{
+  "name": "@tku/lambda",
+  "private": true,
+  "packageManager": "pnpm@10.34.1",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "type-check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "esbuild": "^0.28.0",
+    "typescript": "^5.9.0"
+  }
+}

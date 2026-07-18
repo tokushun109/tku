@@ -87,6 +87,21 @@ get_specified_version() {
     grep "^$tool " .tool-versions | awk '{print $2}' || echo ""
 }
 
+# asdfのコミュニティプラグインは、名前だけでは追加元が変わる場合があるため、
+# IaCで使用するOpenTofuは公式に案内されているプラグインを明示する。
+get_plugin_source() {
+    local tool=$1
+
+    case "$tool" in
+        opentofu)
+            echo "https://github.com/virtualroot/asdf-opentofu.git"
+            ;;
+        *)
+            echo ""
+            ;;
+    esac
+}
+
 # 指定バージョンがインストール済みか確認する関数
 is_version_installed() {
     local tool=$1
@@ -147,8 +162,8 @@ while IFS= read -r line || [ -n "$line" ]; do
     fi
 
     # ツール名とバージョンを抽出
-    tool=$(echo $line | awk '{print $1}')
-    specified_version=$(echo $line | awk '{print $2}')
+    tool=$(echo "$line" | awk '{print $1}')
+    specified_version=$(echo "$line" | awk '{print $2}')
 
     if [ -z "$tool" ] || [ -z "$specified_version" ]; then
         continue
@@ -157,13 +172,18 @@ while IFS= read -r line || [ -n "$line" ]; do
     echo "🔍 $tool を処理中..."
 
     # プラグインがインストールされているかチェック
-    if ! asdf plugin list | grep -q "^$tool$"; then
+    if ! asdf plugin list | grep -qx "$tool"; then
         echo "  📥 プラグイン $tool がインストールされていません。プラグインを追加中..."
-        asdf plugin add $tool
+        plugin_source=$(get_plugin_source "$tool")
+        if [ -n "$plugin_source" ]; then
+            asdf plugin add "$tool" "$plugin_source"
+        else
+            asdf plugin add "$tool"
+        fi
     fi
 
     # 現在のバージョンを取得
-    current_version=$(get_current_version $tool)
+    current_version=$(get_current_version "$tool")
     if is_version_installed "$tool" "$specified_version"; then
         installed_flag=true
     else
@@ -180,14 +200,14 @@ while IFS= read -r line || [ -n "$line" ]; do
 
         if [ "$installed_flag" != "true" ]; then
             echo "  📦 バージョンをインストール中: $specified_version"
-            asdf install $tool $specified_version
+            asdf install "$tool" "$specified_version"
         else
             echo "  📦 指定バージョンは既にインストール済みです"
         fi
 
         # グローバルバージョンを設定
         echo "  🔧 グローバルバージョンを設定中: $specified_version"
-        asdf set -u $tool $specified_version
+        asdf set -u "$tool" "$specified_version"
 
         # Node.jsの場合は追加パッケージをインストール
         if [ "$tool" == "nodejs" ]; then

@@ -1,0 +1,7 @@
+# Copy this outside the repository as backend.hcl and replace the placeholder.
+# The state bucket is created by ./bootstrap before this backend is initialized.
+bucket       = "replace-with-opentofu-state-bucket"
+key          = "tku/production/terraform.tfstate"
+region       = "ap-northeast-1"
+encrypt      = true
+use_lockfile = true

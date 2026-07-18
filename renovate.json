@@ -111,35 +111,16 @@
       ]
     },
     {
-      "description": "infra: CDK for Terraform コア",
+      "description": "infra: Lambda ビルドツール",
       "matchManagers": [
         "npm"
       ],
       "matchFileNames": [
-        "infra/**"
+        "infra/lambda/**"
       ],
-      "groupName": "infra: CDKTF core",
+      "groupName": "infra: Lambda build tools",
       "matchPackageNames": [
-        "/^cdktf/",
-        "/^@cdktf//",
-        "/^constructs/"
-      ]
-    },
-    {
-      "description": "infra: 開発ツール・型定義",
-      "matchManagers": [
-        "npm"
-      ],
-      "matchFileNames": [
-        "infra/**"
-      ],
-      "groupName": "infra: dev tools + types",
-      "matchPackageNames": [
-        "/^@types//",
-        "/^typescript/",
-        "/^jest/",
-        "/^ts-jest/",
-        "/^ts-node/"
+        "/^esbuild/"
       ]
     },
     {
@@ -179,16 +160,6 @@
       ],
       "matchPackageNames": [
         "golang"
-      ],
-      "rangeStrategy": "bump"
-    },
-    {
-      "description": "Terraformのバージョンを更新",
-      "matchDatasources": [
-        "github-releases"
-      ],
-      "matchPackageNames": [
-        "terraform"
       ],
       "rangeStrategy": "bump"
     }
