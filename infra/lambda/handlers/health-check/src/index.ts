@@ -1,14 +1,11 @@
 export const handler = async () => {
-  const timeout = setTimeout(async () => {
-    await lineNotification()
-    throw new Error('タイムアウトしました')
-  }, 15000)
   try {
     const res = await fetch('https://api.tocoriri.com/api/health_check', {
       headers: {
         'Content-Type': 'application/json',
       },
       method: 'GET',
+      signal: AbortSignal.timeout(15000),
     })
     const result = (await res.json()) as { success?: unknown }
     if (result.success === undefined) {
@@ -31,19 +28,25 @@ export const handler = async () => {
         result: null,
       },
     }
-  } finally {
-    clearTimeout(timeout)
   }
 }
 
 const lineNotification = async () => {
+  const token = process.env.LINE_HEALTH_CHECK_TOKEN
+  const userId = process.env.LINE_HEALTH_CHECK_USER_ID
+
+  if (!token || !userId) {
+    console.error('LINE_HEALTH_CHECK_TOKEN または LINE_HEALTH_CHECK_USER_ID が設定されていません。')
+    return
+  }
+
   const headers = {
     'Content-Type': 'application/json',
-    Authorization: `Bearer ${process.env.LINE_HEALTH_CHECK_TOKEN}`,
+    Authorization: `Bearer ${token}`,
   }
 
   const payload = {
-    to: process.env.LINE_HEALTH_CHECK_USER_ID,
+    to: userId,
     messages: [
       {
         type: 'text',
@@ -52,10 +55,17 @@ const lineNotification = async () => {
     ],
   }
 
-  await fetch('https://api.line.me/v2/bot/message/push', {
-    method: 'POST',
-    body: JSON.stringify(payload),
-    headers,
-  })
-  console.log('送信しました')
+  try {
+    const response = await fetch('https://api.line.me/v2/bot/message/push', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers,
+    })
+    if (!response.ok) {
+      throw new Error(`LINE API returned ${response.status}`)
+    }
+    console.log('送信しました')
+  } catch (e) {
+    console.error('LINE通知の送信に失敗しました。', e)
+  }
 }
