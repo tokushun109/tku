@@ -1,4 +1,4 @@
-# AWS runtime import 手順
+# production リソース import 手順
 
 この手順は既存リソースをOpenTofu Stateへ登録するだけで、AWSリソースを作成・変更しない。実行前に `tofu plan` の出力を確認し、置換または削除が表示された場合は中断する。
 
@@ -7,6 +7,7 @@
 - `infra/opentofu/bootstrap` によりリモートStateを作成済みであること
 - `backend.hcl` と `production.tfvars` はリポジトリ外に保存すること
 - `aws login --profile tku-terraform --region ap-northeast-1` が成功していること
+- RailwayのWorkspace API tokenを `RAILWAY_TOKEN` 環境変数へ設定していること
 
 ## 初期化
 
@@ -46,6 +47,14 @@ tofu import 'aws_lambda_permission.eventbridge["health_check"]' tku-health-check
 tofu import aws_amplify_app.production d2q4f71iidth8s
 tofu import aws_amplify_branch.production d2q4f71iidth8s/main
 tofu import aws_amplify_domain_association.production d2q4f71iidth8s/tocoriri.com
+
+# Railway
+tofu import railway_project.production 2d71949b-7110-4aa2-828b-50793553f402
+tofu import railway_environment.production 2d71949b-7110-4aa2-828b-50793553f402:production
+tofu import railway_service.api 6d0d6398-b22d-424d-81f9-868e72c30263
+tofu import railway_service.mysql a3aa6b9a-4c76-4fb8-b944-e68c7d2ff53a
+tofu import railway_service.migration 5b8ac0bf-dbd0-4a4a-859e-c8b4122fae85
+tofu import railway_custom_domain.api 6d0d6398-b22d-424d-81f9-868e72c30263:production:api.tocoriri.com
 ```
 
 ## 確認

@@ -17,8 +17,15 @@ Stateバケット作成前はローカルStateを使う。
 
 ```bash
 cd infra/opentofu/bootstrap
-tofu init
+tofu init -backend=false
 tofu apply -var='state_bucket_name=<globally-unique-name>'
+```
+
+作成後は、`bootstrap/backend.hcl.example` を参照してリポジトリ外に bootstrap 用 `backend.hcl` を作成し、ローカルStateをS3へ移行する。
+
+```bash
+cd infra/opentofu/bootstrap
+tofu init -migrate-state -backend-config=/absolute/path/to/bootstrap/backend.hcl
 ```
 
 作成後は、[`environments/`](./environments/) のテンプレートを使って、リポジトリ外に環境ごとの `backend.hcl` と `terraform.tfvars` を作成する。

@@ -1,0 +1,6 @@
+# Copy outside the repository after the state bucket is created.
+bucket       = "replace-with-opentofu-state-bucket"
+key          = "tku/bootstrap/terraform.tfstate"
+region       = "ap-northeast-1"
+encrypt      = true
+use_lockfile = true
