@@ -13,6 +13,7 @@ resource "aws_amplify_app" "production" {
   }
 
   lifecycle {
+    prevent_destroy = true
     # Console連携トークン・環境変数・ビルド設定は、シークレット管理方針を確定するまで維持する。
     ignore_changes = [access_token, build_spec, custom_headers, environment_variables, oauth_token]
   }
