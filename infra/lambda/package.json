@@ -1,7 +1,7 @@
 {
   "name": "@tku/lambda",
   "private": true,
-  "packageManager": "pnpm@10.34.1",
+  "packageManager": "pnpm@10.34.5",
   "scripts": {
     "build": "node scripts/build.mjs",
     "type-check": "tsc --noEmit"
