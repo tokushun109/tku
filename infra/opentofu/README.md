@@ -58,4 +58,16 @@ Railwayのbuild/deploy設定は、現在のDashboard設定を確認してから 
 
 ## CI
 
-PRでは `fmt` と `validate` だけを実行する。認証情報を必要とする `plan` と `apply` は、AWS OIDCとRailway API Tokenの権限・State分離・import完了後に別ワークフローで有効化する。
+PRでは `fmt` と `validate` を実行する。GitHub Actions の設定完了後は、同一リポジトリからのPRで `plan` も実行する。`apply` は別タスクで有効化する。
+
+同一リポジトリから作成されたPRでは、`opentofu-plan` ジョブも実行する。このジョブは GitHub Actions OIDC で `tku-github-actions-opentofu-plan` Role を引き受け、production State の読み取りと lock file の操作、および管理対象 AWS リソースの読み取りだけを許可する。`tofu apply` 権限は付与しない。
+
+有効化前に、bootstrap を適用して次の GitHub Actions 設定を登録する。
+
+- Variable `AWS_PLAN_ROLE_ARN`: `tofu -chdir=infra/opentofu/bootstrap output -raw github_actions_opentofu_plan_role_arn` の出力値
+- Variable `TOFU_STATE_BUCKET`: OpenTofu State バケット名
+- Secret `RAILWAY_TOKEN`: Railway Provider 用 Workspace API token
+
+外部 fork のPRではこのジョブを実行しない。`pull_request_target` は使用しないため、外部 fork に Secrets を渡すことはない。
+
+`AWS_PLAN_ROLE_ARN` または `TOFU_STATE_BUCKET` が未設定の間は、`opentofu-plan` ジョブをスキップする。Role の作成と GitHub Actions 設定が完了してから有効になるため、bootstrap 用の変更を含む最初のPRで認証エラーは発生しない。
