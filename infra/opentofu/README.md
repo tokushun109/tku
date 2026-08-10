@@ -21,6 +21,14 @@ tofu init -backend=false
 tofu apply -var='state_bucket_name=<globally-unique-name>'
 ```
 
+対象 AWS アカウントに GitHub Actions 用 OIDC Provider が既に存在する場合は、bootstrap の `apply` 前に既存リソースをStateへ取り込む。同一アカウント内で `https://token.actions.githubusercontent.com` の OIDC Provider は重複作成できない。
+
+```bash
+cd infra/opentofu/bootstrap
+tofu import aws_iam_openid_connect_provider.github_actions <既存OIDC ProviderのARN>
+tofu plan -var='state_bucket_name=<globally-unique-name>'
+```
+
 作成後は、`bootstrap/backend.hcl.example` を参照してリポジトリ外に bootstrap 用 `backend.hcl` を作成し、ローカルStateをS3へ移行する。
 
 ```bash

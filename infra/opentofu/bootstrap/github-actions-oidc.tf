@@ -44,8 +44,8 @@ data "aws_iam_policy_document" "github_actions_opentofu_plan" {
       test     = "StringLike"
       variable = "s3:prefix"
       values = [
-        "tku/production/terraform.tfstate",
-        "tku/production/terraform.tfstate.tflock",
+        "tku/production/",
+        "tku/production/terraform.tfstate*",
       ]
     }
   }
@@ -78,7 +78,6 @@ data "aws_iam_policy_document" "github_actions_opentofu_plan" {
 
     actions = [
       "s3:GetBucketAcl",
-      "s3:GetBucketEncryption",
       "s3:GetBucketLocation",
       "s3:GetBucketOwnershipControls",
       "s3:GetBucketPolicy",
@@ -86,6 +85,7 @@ data "aws_iam_policy_document" "github_actions_opentofu_plan" {
       "s3:GetBucketPublicAccessBlock",
       "s3:GetBucketTagging",
       "s3:GetBucketVersioning",
+      "s3:GetEncryptionConfiguration",
       "s3:ListBucket",
     ]
 
