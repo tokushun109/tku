@@ -32,7 +32,7 @@ const HomeTemplate = ({ carouselImages }: Props) => {
                         priority
                         src="/logo/tocoriri_logo.png"
                         style={{
-                            objectFit: 'cover',
+                            objectFit: 'contain',
                         }}
                         width={400}
                     />

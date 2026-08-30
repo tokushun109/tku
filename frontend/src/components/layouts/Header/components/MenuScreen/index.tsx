@@ -51,7 +51,7 @@ export const MenuScreen = ({ onCloseClick }: Props) => {
                         priority
                         src="/logo/tocoriri_logo_white.png"
                         style={{
-                            objectFit: 'cover',
+                            objectFit: 'contain',
                         }}
                         width={400}
                     />

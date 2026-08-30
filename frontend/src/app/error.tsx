@@ -29,6 +29,9 @@ const ErrorPage = ({ errorMessage, statusCode, showHomeButton = true }: Props) =
                             className={styles['site-title']}
                             height={150}
                             src="/logo/tocoriri_logo.png"
+                            style={{
+                                objectFit: 'contain',
+                            }}
                             width={370}
                         />
                     </Link>
