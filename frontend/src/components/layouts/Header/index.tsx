@@ -37,7 +37,7 @@ export const Header = ({ isDisabled = false }: Props) => {
                         priority
                         src="/logo/tocoriri_logo_white.png"
                         style={{
-                            objectFit: 'contain',
+                            objectFit: 'cover',
                         }}
                         width={96}
                     />
