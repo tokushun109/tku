@@ -1,0 +1,65 @@
+name: Railway API Recovery
+
+on:
+  workflow_dispatch:
+    inputs:
+      token_type:
+        description: Type of token stored in the RAILWAY_TOKEN GitHub secret
+        required: true
+        default: project
+        type: choice
+        options:
+          - project
+          - workspace
+      deploy_api:
+        description: Deploy the production API after checking Railway authentication
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: railway-deploy-backend
+  cancel-in-progress: false
+
+jobs:
+  check-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+      RAILWAY_ENVIRONMENT: ${{ secrets.RAILWAY_ENVIRONMENT }}
+      RAILWAY_CI_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      RAILWAY_TOKEN_TYPE: ${{ inputs.token_type }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Check required configuration
+        shell: bash
+        run: |
+          for name in RAILWAY_PROJECT_ID RAILWAY_ENVIRONMENT RAILWAY_CI_TOKEN; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Missing required configuration: $name (RAILWAY_CI_TOKEN comes from the RAILWAY_TOKEN secret)"
+              exit 1
+            fi
+          done
+      - name: Configure authentication for the selected token type
+        shell: bash
+        run: |
+          case "$RAILWAY_TOKEN_TYPE" in
+            project) printf 'RAILWAY_TOKEN=%s\n' "$RAILWAY_CI_TOKEN" >> "$GITHUB_ENV" ;;
+            workspace) printf 'RAILWAY_API_TOKEN=%s\n' "$RAILWAY_CI_TOKEN" >> "$GITHUB_ENV" ;;
+            *) echo "::error::Unsupported Railway token type"; exit 1 ;;
+          esac
+      - name: Install Railway CLI
+        run: npm install --global @railway/cli@5.71.0
+      - name: Check Railway authentication and project access
+        run: railway status --project "$RAILWAY_PROJECT_ID" --environment "$RAILWAY_ENVIRONMENT"
+      - name: Pin API build toolchain
+        if: ${{ inputs.deploy_api }}
+        run: |
+          printf '[tools]\ngo = "1.26.10"\n' > backend/mise.toml
+      - name: Deploy API only
+        if: ${{ inputs.deploy_api }}
+        run: railway up --ci --service tku --project "$RAILWAY_PROJECT_ID" --environment "$RAILWAY_ENVIRONMENT"
