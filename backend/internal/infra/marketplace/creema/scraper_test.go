@@ -3,12 +3,44 @@ package creema
 import (
 	"bytes"
 	"errors"
+	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"testing"
 
 	"github.com/tokushun109/tku/backend/internal/domain/primitive"
 	"github.com/tokushun109/tku/backend/internal/usecase"
 )
+
+func TestNewScraperUsesHTTP1WithHTTP2CapableServer(t *testing.T) {
+	server := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.ProtoMajor != 1 {
+			t.Errorf("expected HTTP/1.1, got %s", r.Proto)
+		}
+		w.WriteHeader(http.StatusOK)
+	}))
+	server.EnableHTTP2 = true
+	server.StartTLS()
+	defer server.Close()
+
+	scraper := NewScraper()
+	transport, ok := scraper.client.Transport.(*http.Transport)
+	if !ok {
+		transport = http.DefaultTransport.(*http.Transport).Clone()
+		scraper.client.Transport = transport
+	}
+	defer transport.CloseIdleConnections()
+	// Trust only the test server's certificate without disabling TLS validation.
+	transport.TLSClientConfig = server.Client().Transport.(*http.Transport).TLSClientConfig.Clone()
+	resp, err := scraper.client.Get(server.URL)
+	if err != nil {
+		t.Fatalf("unexpected request error: %v", err)
+	}
+	defer resp.Body.Close()
+	if resp.Proto != "HTTP/1.1" {
+		t.Fatalf("expected HTTP/1.1, got %s", resp.Proto)
+	}
+}
 
 func TestValidateProductPageURL(t *testing.T) {
 	t.Run("有効なCreema商品URLを受け入れる", func(t *testing.T) {

@@ -47,8 +47,21 @@ type Scraper struct {
 var _ usecaseProduct.DuplicateSource = (*Scraper)(nil)
 
 func NewScraper() *Scraper {
+	// Creema's image delivery can reject HTTP/2 requests. Keep this setting
+	// local to the scraper so other HTTP clients retain their defaults.
+	protocols := new(http.Protocols)
+	protocols.SetHTTP1(true)
+	transport := &http.Transport{
+		Proxy:                 http.ProxyFromEnvironment,
+		Protocols:             protocols,
+		MaxIdleConns:          100,
+		IdleConnTimeout:       90 * time.Second,
+		TLSHandshakeTimeout:   10 * time.Second,
+		ExpectContinueTimeout: time.Second,
+	}
+
 	return &Scraper{
-		client: &http.Client{Timeout: defaultTimeout},
+		client: &http.Client{Timeout: defaultTimeout, Transport: transport},
 	}
 }
 
