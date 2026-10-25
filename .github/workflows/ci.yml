@@ -14,9 +14,16 @@ jobs:
       - uses: pnpm/action-setup@v4
         with:
           version: 10
+      - name: Read Node.js version
+        id: node-version
+        working-directory: .
+        run: |
+          version=$(awk '$1 == "nodejs" { print $2 }' .tool-versions)
+          test -n "$version"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
       - uses: actions/setup-node@v5
         with:
-          node-version-file: ".tool-versions"
+          node-version: ${{ steps.node-version.outputs.version }}
           cache: "pnpm"
           cache-dependency-path: "frontend/pnpm-lock.yaml"
       - run: pnpm install --no-frozen-lockfile
@@ -60,9 +67,16 @@ jobs:
       - uses: pnpm/action-setup@v4
         with:
           version: 10
+      - name: Read Node.js version
+        id: node-version
+        working-directory: .
+        run: |
+          version=$(awk '$1 == "nodejs" { print $2 }' .tool-versions)
+          test -n "$version"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
       - uses: actions/setup-node@v5
         with:
-          node-version-file: ".tool-versions"
+          node-version: ${{ steps.node-version.outputs.version }}
           cache: "pnpm"
           cache-dependency-path: "infra/lambda/pnpm-lock.yaml"
       - run: pnpm install --no-frozen-lockfile
