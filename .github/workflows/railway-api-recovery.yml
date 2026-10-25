@@ -56,10 +56,6 @@ jobs:
         run: npm install --global @railway/cli@5.71.0
       - name: Check Railway authentication and project access
         run: railway status --project "$RAILWAY_PROJECT_ID" --environment "$RAILWAY_ENVIRONMENT"
-      - name: Pin API build toolchain
-        if: ${{ inputs.deploy_api }}
-        run: |
-          printf '[tools]\ngo = "1.26.10"\n' > backend/mise.toml
       - name: Deploy API only
         if: ${{ inputs.deploy_api }}
         run: railway up --ci --service tku --project "$RAILWAY_PROJECT_ID" --environment "$RAILWAY_ENVIRONMENT"

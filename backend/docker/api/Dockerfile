@@ -1,4 +1,4 @@
-FROM golang:1.26-alpine
+FROM golang:1.26.10-alpine
 
 ENV ROOT=/api
 WORKDIR ${ROOT}
