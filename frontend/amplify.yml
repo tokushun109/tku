@@ -5,6 +5,8 @@ applications:
           phases:
               preBuild:
                   commands:
+                      - nvm install "$(awk '$1 == "nodejs" {print $2}' ../.tool-versions)"
+                      - nvm use "$(awk '$1 == "nodejs" {print $2}' ../.tool-versions)"
                       - node --version
                       - npm --version
                       - corepack enable pnpm

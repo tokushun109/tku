@@ -4,6 +4,6 @@
 
 # Frontend and infra use Node.js, backend API uses Go.
 
-nodejs 24.18.0 # Node.js LTS version for frontend and infrastructure
-golang 1.26.5 # Latest stable Go version for backend API
+nodejs 24.22.1 # Node.js LTS version for frontend and infrastructure
+golang 1.26.10 # Go version for backend API
 opentofu 1.12.5 # IaC for the OpenTofu migration

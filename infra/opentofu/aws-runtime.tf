@@ -113,7 +113,7 @@ resource "aws_lambda_function" "scheduled" {
   handler       = "index.handler"
   memory_size   = 512
   role          = aws_iam_role.lambda[each.key].arn
-  runtime       = "nodejs22.x"
+  runtime       = "nodejs24.x"
   s3_bucket     = each.value.archive_bucket
   s3_key        = each.value.archive_key
   timeout       = 30

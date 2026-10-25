@@ -1,0 +1,3 @@
+# Keep Railway's Go toolchain aligned with .tool-versions and CI.
+[tools]
+go = "1.26.10"

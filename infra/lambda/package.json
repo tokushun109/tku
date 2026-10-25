@@ -3,6 +3,7 @@
   "private": true,
   "packageManager": "pnpm@10.34.5",
   "scripts": {
+    "test": "node --test scripts/runtime-version.test.mjs",
     "build": "node scripts/build.mjs",
     "type-check": "tsc --noEmit"
   },

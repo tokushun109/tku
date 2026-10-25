@@ -17,7 +17,21 @@
     "dockerfile",
     "terraform",
     "github-actions",
-    "asdf"
+    "asdf",
+    "mise",
+    "custom.regex"
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "LambdaのNode.jsメジャーランタイムを検出する",
+      "managerFilePatterns": ["infra/opentofu/aws-runtime.tf"],
+      "matchStrings": ["runtime\\s*=\\s*\"nodejs(?<currentValue>\\d+)\\.x\""],
+      "depNameTemplate": "node",
+      "datasourceTemplate": "node-version",
+      "versioningTemplate": "lambda-node",
+      "autoReplaceStringTemplate": "runtime       = \"nodejs{{newMajor}}.x\""
+    }
   ],
   "packageRules": [
     {
@@ -142,15 +156,15 @@
     },
     {
       "description": "Node.js LTS版のみ対象",
+      "matchManagers": ["asdf"],
       "matchDatasources": [
         "node-version"
       ],
       "matchPackageNames": [
+        "node",
         "nodejs"
       ],
-      "supportPolicy": [
-        "lts_latest"
-      ],
+      "versioning": "node",
       "rangeStrategy": "bump"
     },
     {
@@ -162,6 +176,27 @@
         "golang"
       ],
       "rangeStrategy": "bump"
+    },
+    {
+      "description": "Goのローカル・Railway・Docker指定をまとめて更新",
+      "matchManagers": ["asdf", "mise", "dockerfile"],
+      "matchFileNames": [".tool-versions", "backend/mise.toml", "backend/docker/api/Dockerfile"],
+      "matchPackageNames": ["go", "golang", "golang/go", "docker.io/library/golang"],
+      "groupName": "Go toolchain"
+    },
+    {
+      "description": "Node.jsのローカル・Docker・Lambda指定をまとめて更新",
+      "matchManagers": ["asdf", "dockerfile", "custom.regex"],
+      "matchFileNames": [".tool-versions", "frontend/docker/Dockerfile", "infra/opentofu/aws-runtime.tf"],
+      "matchPackageNames": ["node", "nodejs", "docker.io/library/node"],
+      "groupName": "Node.js runtime"
+    },
+    {
+      "description": "Lambdaのパッチ更新はAWS Autoに任せ、メジャー更新だけをPRにする",
+      "matchManagers": ["custom.regex"],
+      "matchFileNames": ["infra/opentofu/aws-runtime.tf"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "enabled": false
     }
   ]
 }
