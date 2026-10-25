@@ -156,6 +156,7 @@
     },
     {
       "description": "Node.js LTS版のみ対象",
+      "matchManagers": ["asdf"],
       "matchDatasources": [
         "node-version"
       ],
