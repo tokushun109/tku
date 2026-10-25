@@ -21,18 +21,26 @@ process.env.BROWSER_BASE_URL = 'http://localhost:8080/api'
 global.React = React
 
 // IntersectionObserver のモック
-global.IntersectionObserver = vi.fn().mockImplementation(() => ({
-    observe: vi.fn(),
-    unobserve: vi.fn(),
-    disconnect: vi.fn(),
-}))
+global.IntersectionObserver = vi.fn(
+    class {
+        root = null
+        rootMargin = '0px'
+        thresholds = []
+        takeRecords = vi.fn(() => [])
+        observe = vi.fn()
+        unobserve = vi.fn()
+        disconnect = vi.fn()
+    },
+)
 
 // ResizeObserver のモック
-global.ResizeObserver = vi.fn().mockImplementation(() => ({
-    observe: vi.fn(),
-    unobserve: vi.fn(),
-    disconnect: vi.fn(),
-}))
+global.ResizeObserver = vi.fn(
+    class {
+        observe = vi.fn()
+        unobserve = vi.fn()
+        disconnect = vi.fn()
+    },
+)
 
 // matchMedia のモック
 Object.defineProperty(window, 'matchMedia', {
