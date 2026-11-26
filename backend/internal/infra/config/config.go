@@ -10,20 +10,20 @@ import (
 )
 
 type Config struct {
-	Port                string
-	Env                 string
-	APIBaseURL          string
-	APIBucketName       string
-	S3UsePathStyle      bool
-	SendGridAPIKey      string
-	ContactSupportEmail string
-	DBHost              string
-	DBPort              int
-	DBName              string
-	DBUser              string
-	DBPass              string
-	ClientURL           string
-	SessionTTL          time.Duration
+	Port                       string
+	Env                        string
+	APIBaseURL                 string
+	APIBucketName              string
+	S3UsePathStyle             bool
+	ContactSlackWebhookURL     string
+	ContactSlackMentionUserIDs string
+	DBHost                     string
+	DBPort                     int
+	DBName                     string
+	DBUser                     string
+	DBPass                     string
+	ClientURL                  string
+	SessionTTL                 time.Duration
 }
 
 func Load() (*Config, error) {
@@ -52,23 +52,21 @@ func Load() (*Config, error) {
 	if err != nil {
 		return nil, fmt.Errorf("invalid SESSION_TTL: %w", err)
 	}
-	sendGridAPIKey := getEnv("SEND_GRID_API_KEY", "")
-	contactSupportEmail := getEnv("CONTACT_SUPPORT_EMAIL", "no-reply@tocoriri.com")
 	cfg := &Config{
-		Port:                port,
-		Env:                 env,
-		APIBaseURL:          apiBaseURL,
-		APIBucketName:       apiBucketName,
-		S3UsePathStyle:      s3UsePathStyle,
-		SendGridAPIKey:      sendGridAPIKey,
-		ContactSupportEmail: contactSupportEmail,
-		DBHost:              dbHost,
-		DBPort:              dbPort,
-		DBName:              getEnv("DB_NAME", ""),
-		DBUser:              getEnv("DB_USER", ""),
-		DBPass:              getEnv("DB_PASS", ""),
-		ClientURL:           clientURL,
-		SessionTTL:          ttl,
+		Port:                       port,
+		Env:                        env,
+		APIBaseURL:                 apiBaseURL,
+		APIBucketName:              apiBucketName,
+		S3UsePathStyle:             s3UsePathStyle,
+		ContactSlackWebhookURL:     getEnv("CONTACT_SLACK_WEBHOOK_URL", ""),
+		ContactSlackMentionUserIDs: getEnv("CONTACT_SLACK_MENTION_USER_IDS", ""),
+		DBHost:                     dbHost,
+		DBPort:                     dbPort,
+		DBName:                     getEnv("DB_NAME", ""),
+		DBUser:                     getEnv("DB_USER", ""),
+		DBPass:                     getEnv("DB_PASS", ""),
+		ClientURL:                  clientURL,
+		SessionTTL:                 ttl,
 	}
 	return cfg, nil
 }
