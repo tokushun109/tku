@@ -35,7 +35,7 @@ go test ./...
 - 商品 CSV のエクスポート / インポート
 - Creema の商品情報を利用した商品複製補助
 - ユーザー認証、セッション管理、管理者権限チェック
-- お問い合わせ保存 + SendGrid による通知
+- お問い合わせ保存 + Slack による運営担当者への通知
 - ヘルスチェック API
 
 ## ディレクトリ構成
@@ -80,7 +80,7 @@ backend/
 - `config`: 環境変数ロード
 - `db/mysql`: DB 接続、Repository 実装、Query 実装、Tx 管理
 - `storage/s3`: S3 連携
-- `mail/sendgrid`: メール送信
+- `notification/slack`: お問い合わせの新着通知
 - `marketplace/creema`: 商品複製用のスクレイピング実装
 - `uuid` / `clock` / `crypto`: 補助的な実装
 

@@ -6,8 +6,13 @@ import (
 
 	domain "github.com/tokushun109/tku/backend/internal/domain/contact"
 	"github.com/tokushun109/tku/backend/internal/domain/primitive"
+	"github.com/tokushun109/tku/backend/internal/shared/logger"
 	"github.com/tokushun109/tku/backend/internal/usecase"
 )
+
+type Notifier interface {
+	NotifyContactCreated(ctx context.Context, content string) error
+}
 
 type Usecase interface {
 	List(ctx context.Context) ([]*domain.Contact, error)
@@ -56,6 +61,11 @@ func (s *Service) Create(ctx context.Context, name string, company string, phone
 		return usecase.NewAppErrorWithMessage(usecase.ErrInternal, err.Error())
 	}
 
-	s.notifier.NotifyContactCreated(ctx, createdContact)
+	if s.notifier != nil {
+		// 保存済みの問い合わせは、送信元が切断した場合も通知する。
+		if err := s.notifier.NotifyContactCreated(context.WithoutCancel(ctx), createdContact.Content().Value()); err != nil {
+			logger.Warnf("contact Slack notification failed: %v", err)
+		}
+	}
 	return nil
 }

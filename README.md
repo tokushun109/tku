@@ -40,7 +40,7 @@ tku/
 - sqlx + MySQL
 - golang-migrate
 - AWS S3
-- SendGrid
+- Slack Incoming Webhooks
 
 ### infra
 
@@ -80,7 +80,7 @@ tku/
 ### 5. 実運用を意識した安全性
 
 - 管理系 API は認証・管理者権限・Origin 検証を組み合わせて保護
-- お問い合わせは保存だけでなく、SendGrid 連携で通知まで実装
+- お問い合わせを保存した後、運営担当者に Slack で通知
 - スキーマ変更は golang-migrate で履歴管理
 
 ### 6. ローカル再現性の高い開発環境
@@ -101,7 +101,7 @@ tku/
 
 - フレームワークに依存しすぎない Go 製 REST API
 - 商品、画像、作家情報、問い合わせ、認証などの API を提供
-- 外部連携（S3 / SendGrid / Creema）を usecase から抽象化して組み込み
+- 外部連携（S3 / Slack / Creema）を usecase から抽象化して組み込み
 
 ### `infra/`
 
@@ -141,6 +141,19 @@ docker-compose up
 - ビルド確認: `go build ./...`
 - テスト実行: `go test ./...`
 
+#### お問い合わせの Slack 通知
+
+指定の Slack チャンネルにひも付く Incoming Webhook を使います。ローカルの `backend/.env` と Railway の API サービスに、同じ通知先とメンション対象を設定します。[Slack の Webhook 設定手順](https://docs.slack.dev/messaging/sending-messages-using-incoming-webhooks/)
+
+| 変数 | ローカル | Railway 本番 |
+| --- | --- | --- |
+| `CONTACT_SLACK_WEBHOOK_URL` | 指定チャンネルの Webhook URL | ローカルと同じ URL |
+| `CONTACT_SLACK_MENTION_USER_IDS` | チャンネルに参加している担当者2名の Slack ユーザー ID をカンマ区切りで指定 | ローカルと同じ ID |
+| `ENV` | `local` | `production` |
+| `CLIENT_URL` | `http://localhost:3000` | `https://tocoriri.com` |
+
+通知の先頭に `【local】` または `【production】` が付き、問い合わせ本文を最大120文字表示します。本文が長い場合は末尾に `…` を付けます。本文の下には、各環境の `CLIENT_URL` を使った管理画面の URL を表示します。Webhook URL は Railway のシークレット変数に設定します。問い合わせを送信した方への自動返信メールは現在停止しています。
+
 ### infra
 
 OpenTofu の操作は `cd infra/opentofu` のうえで行います。
@@ -157,7 +170,7 @@ Lambda のコードは `cd infra/lambda` のうえで `pnpm install && pnpm buil
 ```mermaid
 graph TD
     User[ユーザー]
-    SendGrid[SendGrid]
+    Slack[Slack]
 
     Amplify[AWS Amplify<br/>Next.js]
 
@@ -175,7 +188,7 @@ graph TD
     Amplify --> API
     API --> MySQL
     API --> S3
-    API --> SendGrid
+    API --> Slack
 
     Warmup --> Amplify
     Health --> API
@@ -190,5 +203,5 @@ graph TD
     class Amplify frontend
     class API,MySQL backend
     class S3,Warmup,Health,OpenTofu infra
-    class SendGrid external
+    class Slack external
 ```

@@ -6,10 +6,11 @@ import (
 	clockInfra "github.com/tokushun109/tku/backend/internal/infra/clock"
 	"github.com/tokushun109/tku/backend/internal/infra/config"
 	cryptoInfra "github.com/tokushun109/tku/backend/internal/infra/crypto"
-	mailInfra "github.com/tokushun109/tku/backend/internal/infra/mail/sendgrid"
 	creemaMarketplace "github.com/tokushun109/tku/backend/internal/infra/marketplace/creema"
+	slackInfra "github.com/tokushun109/tku/backend/internal/infra/notification/slack"
 	s3Storage "github.com/tokushun109/tku/backend/internal/infra/storage/s3"
 	uuidInfra "github.com/tokushun109/tku/backend/internal/infra/uuid"
+	"github.com/tokushun109/tku/backend/internal/shared/logger"
 	usecase "github.com/tokushun109/tku/backend/internal/usecase"
 	usecaseCategory "github.com/tokushun109/tku/backend/internal/usecase/category"
 	usecaseContact "github.com/tokushun109/tku/backend/internal/usecase/contact"
@@ -70,10 +71,6 @@ func newUsecases(repos *repositories, qrs *queries, cfg *config.Config, txManage
 	if err := requireNonNil("passwordHasher", passwordHasher); err != nil {
 		return nil, err
 	}
-	mailer := mailInfra.NewMailer(cfg.Env, cfg.SendGridAPIKey)
-	if err := requireNonNil("mailer", mailer); err != nil {
-		return nil, err
-	}
 	storage, err := s3Storage.NewStorage(cfg.APIBucketName, cfg.S3UsePathStyle)
 	if err != nil {
 		return nil, fmt.Errorf("new creator logo storage: %w", err)
@@ -87,9 +84,12 @@ func newUsecases(repos *repositories, qrs *queries, cfg *config.Config, txManage
 	}
 
 	// ドメイン固有のユースケースの依存関係の構築
-	contactNotifier := usecaseContact.NewContactNotifier(mailer, repos.user, cfg.ContactSupportEmail)
-	if err := requireNonNil("contactNotifier", contactNotifier); err != nil {
-		return nil, err
+	var contactNotifier usecaseContact.Notifier
+	slackNotifier, err := slackInfra.NewContactNotifier(cfg.ContactSlackWebhookURL, cfg.ContactSlackMentionUserIDs, cfg.ClientURL, cfg.Env)
+	if err != nil {
+		logger.Warnf("contact Slack notification is disabled: %v", err)
+	} else {
+		contactNotifier = slackNotifier
 	}
 	sessionUC := usecaseSession.New(repos.session, cfg.SessionTTL, clock)
 	if err := requireNonNil("sessionUsecase", sessionUC); err != nil {

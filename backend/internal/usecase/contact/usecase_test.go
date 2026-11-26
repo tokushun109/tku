@@ -1,12 +1,15 @@
 package contact
 
 import (
+	"bytes"
 	"context"
 	"errors"
+	"strings"
 	"testing"
 	"time"
 
 	domain "github.com/tokushun109/tku/backend/internal/domain/contact"
+	"github.com/tokushun109/tku/backend/internal/shared/logger"
 	"github.com/tokushun109/tku/backend/internal/usecase"
 )
 
@@ -34,12 +37,14 @@ func (s *stubRepo) Create(ctx context.Context, contact *domain.Contact) (*domain
 
 type stubNotifier struct {
 	called  int
-	contact *domain.Contact
+	err     error
+	content string
 }
 
-func (s *stubNotifier) NotifyContactCreated(ctx context.Context, contact *domain.Contact) {
+func (s *stubNotifier) NotifyContactCreated(ctx context.Context, content string) error {
 	s.called++
-	s.contact = contact
+	s.content = content
+	return s.err
 }
 
 type stubUUIDGen struct {
@@ -103,6 +108,9 @@ func TestCreateContact(t *testing.T) {
 		if notifier.called != 1 {
 			t.Fatalf("expected notifier called once, got %d", notifier.called)
 		}
+		if notifier.content != repo.created.Content().Value() {
+			t.Fatalf("expected notifier to receive saved content, got %q", notifier.content)
+		}
 	})
 
 	t.Run("入力値が不正なときバリデーションエラーで失敗する", func(t *testing.T) {
@@ -130,6 +138,23 @@ func TestCreateContact(t *testing.T) {
 		}
 		if notifier.called != 0 {
 			t.Fatalf("expected notifier not called, got %d", notifier.called)
+		}
+	})
+
+	t.Run("Slack通知に失敗しても問い合わせを受け付けてログを残す", func(t *testing.T) {
+		var logOutput bytes.Buffer
+		logger.SetOutputs(&logOutput, nil)
+		t.Cleanup(logger.Reset)
+		repo := &stubRepo{}
+		notifier := &stubNotifier{err: errors.New("Slack webhook returned HTTP 503")}
+		uc := New(repo, notifier, &stubUUIDGen{uuid: "11111111-1111-4111-8111-111111111111"})
+
+		err := uc.Create(context.Background(), "山田太郎", "", "", "test@example.com", "お問い合わせです")
+		if err != nil || repo.created == nil || notifier.called != 1 {
+			t.Fatalf("expected contact to be accepted after one notification attempt: contact=%v calls=%d err=%v", repo.created != nil, notifier.called, err)
+		}
+		if !strings.Contains(logOutput.String(), "contact Slack notification failed: Slack webhook returned HTTP 503") {
+			t.Fatalf("expected notification failure log, got %q", logOutput.String())
 		}
 	})
 }

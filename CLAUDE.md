@@ -61,7 +61,7 @@ docker-compose up
 - `domain / usecase / interface / infra` で責務分離
 - `internal/app/di` を Composition Root として依存関係を集約
 - product は Query / Command を分離
-- S3 / SendGrid / Creema 連携を usecase から抽象化
+- S3 / Slack / Creema 連携を usecase から抽象化
 
 ### infra
 
@@ -76,7 +76,7 @@ docker-compose up
 - CSV による商品データ入出力
 - Creema 商品情報を使った複製補助
 - 管理者ログイン / セッション認証
-- お問い合わせ保存 + メール通知
+- お問い合わせ保存 + Slack 通知
 - 動的 OGP を含む SEO 対応
 
 ## デプロイ / 運用
@@ -84,7 +84,7 @@ docker-compose up
 - フロントエンド: AWS Amplify
 - バックエンド: Railway
 - 商品画像: AWS S3
-- お問い合わせ通知: SendGrid
+- お問い合わせ通知: Slack
 - 定期実行: AWS Lambda + EventBridge
 
 ## ディレクトリ別ガイド
