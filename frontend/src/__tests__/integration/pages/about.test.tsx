@@ -57,7 +57,7 @@ describe('About Page Integration Test', () => {
         // コンポーネントをレンダリング
         render(await About())
 
-        expect(screen.getAllByText(/^(Story|Concept|Profile)$/).map((title) => title.textContent)).toEqual(['Story', 'Concept', 'Profile'])
+        expect(screen.getAllByText(/^(Story|Concept|Profile|Relation)$/).map((title) => title.textContent)).toEqual(['Story', 'Concept', 'Relation'])
 
         // 販売サイトの表示を確認
         await waitFor(() => {
