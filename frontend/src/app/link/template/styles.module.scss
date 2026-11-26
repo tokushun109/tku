@@ -1,0 +1,194 @@
+$sans-font: 'Hiragino Sans', 'Yu Gothic', Meiryo, sans-serif;
+$paper: #fcfaf6;
+$muted-text: #6f6258;
+$link-text: #654637;
+$stone-veil: linear-gradient(#fcfaf659, #fcfaf659);
+
+.page {
+    display: grid;
+    align-items: center;
+    min-height: 100vh;
+    min-height: 100svh;
+    padding: clamp(24px, 4.5vw, 52px);
+    background:
+        $stone-veil,
+        $paper url('/image/link/milky-stone-landscape.png') center / cover no-repeat;
+    color: #5d5148;
+}
+
+.content {
+    display: grid;
+    grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(24px, 5vw, 56px);
+    width: min(100%, 936px);
+    margin-inline: auto;
+}
+
+.hero-image {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    border-radius: 7px;
+    object-fit: cover;
+}
+
+.details {
+    min-width: 0;
+}
+
+.identity {
+    margin-bottom: 24px;
+}
+
+.brand-name {
+    font-size: 40px;
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: 0.1em;
+}
+
+.roman-name {
+    margin-top: 3px;
+    color: $muted-text;
+    font:
+        500 14px / 1.3 Palatino,
+        Georgia,
+        serif;
+    letter-spacing: 0.19em;
+}
+
+.description {
+    margin-top: 13px;
+    color: $muted-text;
+    font: 400 12px / 1.7 $sans-font;
+    letter-spacing: 0.01em;
+}
+
+.section-title {
+    margin-bottom: 8px;
+    color: $muted-text;
+    font: 600 11px / 1.5 $sans-font;
+    letter-spacing: 0.09em;
+}
+
+.work-links {
+    display: grid;
+    gap: 7px;
+}
+
+.work-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-height: 49px;
+    padding-inline: 12px;
+    border: 1px solid #998678;
+    border-radius: 7px;
+    background-color: #fdfaf6;
+    color: $link-text;
+    font: 600 15px / 1.4 $sans-font;
+
+    &::after {
+        width: 8px;
+        height: 8px;
+        flex: none;
+        margin-inline-end: 3px;
+        transform: rotate(45deg);
+        border: solid currentColor;
+        border-width: 1px 1px 0 0;
+        content: '';
+    }
+
+    &:hover,
+    &:active {
+        background-color: #f4ebe3;
+    }
+}
+
+.social {
+    margin-top: 18px;
+
+    .section-title {
+        margin-bottom: 0;
+    }
+}
+
+.social-links {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 18px;
+
+    > li:only-child {
+        margin-inline: auto;
+    }
+}
+
+.social-link {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 44px;
+    min-height: 44px;
+    color: $link-text;
+    font: 500 12px / 1.35 $sans-font;
+}
+
+.social-icon {
+    display: flex;
+    flex: none;
+    color: $muted-text;
+    font-size: 16px;
+}
+
+.social-label {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.32em;
+}
+
+.work-link:focus-visible,
+.social-link:focus-visible {
+    outline: 2px solid #354b6a;
+    outline-offset: 2px;
+}
+
+@include media('sm') {
+    .page {
+        align-items: stretch;
+        padding: 0;
+        background: $paper;
+    }
+
+    .content {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+    }
+
+    .hero-image {
+        aspect-ratio: 8 / 5;
+        border-radius: 0;
+        object-position: 50% 45%;
+    }
+
+    .details {
+        flex: 1;
+        padding: 21px 24px 12px;
+        background:
+            $stone-veil,
+            $paper url('/image/link/milky-stone.png') center 22% / cover no-repeat;
+    }
+
+    .identity {
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .brand-name {
+        font-size: 34px;
+    }
+}
