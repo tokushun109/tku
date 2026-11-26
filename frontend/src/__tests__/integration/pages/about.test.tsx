@@ -5,7 +5,7 @@ import { getSalesSiteList } from '@/apis/salesSite'
 import { getSnsList } from '@/apis/sns'
 import About from '@/app/(contents)/about/page'
 
-import { render, screen, waitFor } from '../helpers'
+import { fireEvent, render, screen, waitFor } from '../helpers'
 
 // APIモック
 vi.mock('@/apis/creator')
@@ -34,6 +34,7 @@ describe('About Page Integration Test', () => {
             {
                 name: 'Creema',
                 uuid: 'creema-uuid',
+                url: 'https://www.creema.jp/c/tku_accessory/item/onsale',
             },
             {
                 name: 'minne',
@@ -49,11 +50,14 @@ describe('About Page Integration Test', () => {
             {
                 name: 'Instagram',
                 uuid: 'instagram-uuid',
+                url: 'https://www.instagram.com/tocoriri/',
             },
         ])
 
         // コンポーネントをレンダリング
         render(await About())
+
+        expect(screen.getAllByText(/^(Story|Concept|Profile)$/).map((title) => title.textContent)).toEqual(['Story', 'Concept', 'Profile'])
 
         // 販売サイトの表示を確認
         await waitFor(() => {
@@ -66,6 +70,16 @@ describe('About Page Integration Test', () => {
             expect(screen.getByText('Twitter')).toBeInTheDocument()
             expect(screen.getByText('Instagram')).toBeInTheDocument()
         })
+
+        const open = vi.spyOn(window, 'open').mockReturnValue(null)
+        try {
+            fireEvent.click(screen.getByText('Instagram'))
+            fireEvent.click(screen.getByText('Creema'))
+            expect(open).toHaveBeenNthCalledWith(1, 'https://www.instagram.com/tocoriri/', '_blank', 'noopener')
+            expect(open).toHaveBeenNthCalledWith(2, 'https://www.creema.jp/c/tku_accessory/item/onsale', '_blank', 'noopener')
+        } finally {
+            open.mockRestore()
+        }
     })
 
     it('販売サイトがない場合でもエラーにならない', async () => {
