@@ -57,12 +57,13 @@ describe('About Page Integration Test', () => {
         // コンポーネントをレンダリング
         render(await About())
 
-        expect(screen.getAllByText(/^(Story|Concept|Profile|Relation)$/).map((title) => title.textContent)).toEqual(['Story', 'Concept', 'Relation'])
+        expect(screen.getAllByText(/^(Story|Concept|Profile|Relation|Link)$/).map((title) => title.textContent)).toEqual(['Story', 'Concept', 'Link'])
 
         // 販売サイトの表示を確認
         await waitFor(() => {
             expect(screen.getByText('Creema')).toBeInTheDocument()
             expect(screen.getByText('minne')).toBeInTheDocument()
+            expect(screen.getByText('Mercari Shops')).toBeInTheDocument()
         })
 
         // SNSの表示を確認
@@ -75,11 +76,25 @@ describe('About Page Integration Test', () => {
         try {
             fireEvent.click(screen.getByText('Instagram'))
             fireEvent.click(screen.getByText('Creema'))
+            fireEvent.click(screen.getByText('Mercari Shops'))
             expect(open).toHaveBeenNthCalledWith(1, 'https://www.instagram.com/tocoriri/', '_blank', 'noopener')
             expect(open).toHaveBeenNthCalledWith(2, 'https://www.creema.jp/c/tku_accessory/item/onsale', '_blank', 'noopener')
+            expect(open).toHaveBeenNthCalledWith(3, 'https://mercari-shops.com/shops/jzQWRyiKK67Q4FR5q75PMZ', '_blank', 'noopener')
         } finally {
             open.mockRestore()
         }
+    })
+
+    it('販売サイトに同じ Mercari Shops がある場合は重複して表示しない', async () => {
+        mockGetSnsList.mockResolvedValue([])
+        mockGetSalesSiteList.mockResolvedValue([
+            { name: 'メルカリShops', url: 'https://mercari-shops.com/shops/jzQWRyiKK67Q4FR5q75PMZ/?source=about' },
+        ])
+
+        render(await About())
+
+        expect(screen.getByText('メルカリShops')).toBeInTheDocument()
+        expect(screen.queryByText('Mercari Shops')).not.toBeInTheDocument()
     })
 
     it('販売サイトがない場合でもエラーにならない', async () => {

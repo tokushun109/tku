@@ -4,6 +4,7 @@ import { getCreator } from '@/apis/creator'
 import { getSalesSiteList } from '@/apis/salesSite'
 import { getSnsList } from '@/apis/sns'
 import AboutTemplate from '@/app/(contents)/about/template'
+import { MERCARI_SHOP_URL } from '@/features/site/constants'
 
 export const dynamic = 'force-dynamic'
 
@@ -34,7 +35,10 @@ export async function generateMetadata(): Promise<Metadata> {
 const About = async () => {
     const snsList = await getSnsList()
     const salesSiteList = await getSalesSiteList()
-    return <AboutTemplate salesSiteList={salesSiteList} snsList={snsList} />
+    const hasMercariShop = salesSiteList.some(({ url }) => url?.replace(/[?#].*$/, '').replace(/\/+$/, '') === MERCARI_SHOP_URL)
+    const shopLinks = hasMercariShop ? salesSiteList : [...salesSiteList, { name: 'Mercari Shops', url: MERCARI_SHOP_URL }]
+
+    return <AboutTemplate salesSiteList={shopLinks} snsList={snsList} />
 }
 
 export default About

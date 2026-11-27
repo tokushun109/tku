@@ -105,7 +105,7 @@ const AboutTemplate = ({ snsList, salesSiteList }: Props) => {
                     </div>
                 </div>
             </Section>
-            <Section button={false} color={ColorType.Secondary} title="Relation">
+            <Section button={false} color={ColorType.Secondary} title="Link">
                 <div className={classNames(styles['content'], styles['relation'])}>
                     <div className={styles['column']}>
                         <div className={styles['column__wrapper']}>
