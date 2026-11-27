@@ -108,9 +108,9 @@
 
             .button-area {
                 display: flex;
+                flex-wrap: wrap;
                 justify-content: center;
                 align-items: center;
-                display: flex;
                 gap: 24px;
 
                 .sns-icon {
@@ -124,7 +124,10 @@
                 }
 
                 .sales-site-name {
+                    max-width: 76px;
                     font-size: $font-normal;
+                    line-height: 1.25;
+                    text-align: center;
                 }
             }
         }

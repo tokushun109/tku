@@ -1,5 +1,7 @@
 import Instagram from '@mui/icons-material/Instagram'
 
+import { MERCARI_SHOP_URL } from '@/features/site/constants'
+
 export const DESCRIPTION = '天然石と手編みのアクセサリー'
 
 export const HERO_IMAGE = {
@@ -24,7 +26,7 @@ export type SocialLink = {
 export const WORK_LINKS: readonly WorkLink[] = [
     { external: true, href: 'https://www.creema.jp/c/tku_accessory/item/onsale', name: 'Creema' },
     { external: true, href: 'https://minne.com/@tku001', name: 'minne' },
-    { external: true, href: 'https://mercari-shops.com/shops/jzQWRyiKK67Q4FR5q75PMZ', name: 'メルカリShops' },
+    { external: true, href: MERCARI_SHOP_URL, name: 'メルカリShops' },
     { external: false, href: '/product', name: 'とこりり公式サイト' },
 ]
 
